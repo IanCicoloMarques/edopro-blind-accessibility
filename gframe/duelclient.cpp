@@ -1,6 +1,7 @@
 #include <algorithm>
 #include <fmt/printf.h>
 #include <fmt/chrono.h>
+
 #if defined(_WIN32)
 #include <ws2tcpip.h>
 #else
@@ -27,9 +28,11 @@
 #include "CGUIImageButton/CGUIImageButton.h"
 #include "progressivebuffer.h"
 #include "utils.h"
+#include <nvdaController.h>
 #ifdef __ANDROID__
 #include "Android/porting_android.h"
 #endif
+
 
 #define DEFAULT_DUEL_RULE 5
 namespace ygo {
@@ -1492,7 +1495,7 @@ int DuelClient::ClientAnalyze(char* msg, uint32_t len) {
 		}
 		break;
 	}
-	case MSG_WIN: {
+	/*OK - Done simple*/case MSG_WIN: {
 		uint8_t player = BufferIO::Read<uint8_t>(pbuf);
 		uint8_t type = BufferIO::Read<uint8_t>(pbuf);
 		std::unique_lock<std::mutex> lock(mainGame->gMutex);
@@ -1517,6 +1520,9 @@ int DuelClient::ClientAnalyze(char* msg, uint32_t len) {
 		}
 		mainGame->showcard = 101;
 		mainGame->WaitFrameSignal(120, lock);
+
+		nvdaController_speakText(mainGame->dInfo.vic_string.c_str()); //TODO change to class
+
 		mainGame->dInfo.vic_string = L"";
 		mainGame->showcard = 0;
 		break;
@@ -1528,7 +1534,7 @@ int DuelClient::ClientAnalyze(char* msg, uint32_t len) {
 		mainGame->stHintMsg->setVisible(true);
 		return true;
 	}
-	case MSG_START: {
+	/*OK - Done Simple*/case MSG_START: {
 		const auto playertype = BufferIO::Read<uint8_t>(pbuf);
 		if(mainGame->dInfo.compat_mode)
 			/*duel_rule = */BufferIO::Read<uint8_t>(pbuf);
@@ -1575,6 +1581,9 @@ int DuelClient::ClientAnalyze(char* msg, uint32_t len) {
 		mainGame->dField.Initial(mainGame->LocalPlayer(1), deckc, extrac);
 		mainGame->dInfo.turn = 0;
 		mainGame->dInfo.is_shuffling = false;
+
+		nvdaController_speakText(L"Duel start."); //TODO change to class
+
 		return true;
 	}
 	case MSG_UPDATE_DATA: {
@@ -1806,7 +1815,7 @@ int DuelClient::ClientAnalyze(char* msg, uint32_t len) {
 		}
 		return false;
 	}
-	case MSG_SELECT_EFFECTYN: {
+	/*Done Simple*/case MSG_SELECT_EFFECTYN: {
 		/*uint8_t selecting_player = */BufferIO::Read<uint8_t>(pbuf);
 		uint32_t code = BufferIO::Read<uint32_t>(pbuf);
 		CoreUtils::loc_info info = CoreUtils::ReadLocInfo(pbuf, mainGame->dInfo.compat_mode);
@@ -1816,10 +1825,18 @@ int DuelClient::ClientAnalyze(char* msg, uint32_t len) {
 		if(desc == 0) {
 			text = fmt::format(L"{}\n{}", event_string,
 							   fmt::sprintf(gDataManager->GetSysString(200), gDataManager->GetName(code), gDataManager->FormatLocation(info.location, info.sequence)));
+
+			std::wstring nvdaString = fmt::format(L"Choice to use {} from {}", gDataManager->GetName(code), gDataManager->FormatLocation(info.location, info.sequence));
+			nvdaController_speakText(nvdaString.c_str()); //TODO change to class
+
 		} else if(desc == 221) {
 			text = fmt::format(L"{}\n{}\n{}", event_string,
 							   fmt::sprintf(gDataManager->GetSysString(221), gDataManager->GetName(code), gDataManager->FormatLocation(info.location, info.sequence)),
 							   gDataManager->GetSysString(223));
+
+			std::wstring nvdaString = fmt::format(L"Choice to trigger {} from {}", gDataManager->GetName(code), gDataManager->FormatLocation(info.location, info.sequence));
+			nvdaController_speakText(nvdaString.c_str()); //TODO change to class
+
 		} else {
 			text = fmt::sprintf(gDataManager->GetDesc(desc, mainGame->dInfo.compat_mode), gDataManager->GetName(code));
 		}
@@ -1832,6 +1849,7 @@ int DuelClient::ClientAnalyze(char* msg, uint32_t len) {
 			mainGame->dField.highlighting_card = pcard;
 		}
 		mainGame->stQMessage->setText(text.data());
+
 		mainGame->PopupElement(mainGame->wQuery);
 		return false;
 	}
@@ -2104,7 +2122,7 @@ int DuelClient::ClientAnalyze(char* msg, uint32_t len) {
 		return false;
 	}
 	case MSG_SELECT_PLACE:
-	case MSG_SELECT_DISFIELD: {
+	/*Added simple*/case MSG_SELECT_DISFIELD: {
 		uint8_t selecting_player = mainGame->LocalPlayer(BufferIO::Read<uint8_t>(pbuf));
 		mainGame->dField.select_min = BufferIO::Read<uint8_t>(pbuf);
 		uint32_t flag = BufferIO::Read<uint32_t>(pbuf);
@@ -2119,10 +2137,23 @@ int DuelClient::ClientAnalyze(char* msg, uint32_t len) {
 		if (mainGame->dInfo.curMsg == MSG_SELECT_PLACE) {
 			if (select_hint) {
 				text = fmt::sprintf(gDataManager->GetSysString(569), gDataManager->GetName(select_hint));
-			} else
+
+				std::wstring nvdaString = fmt::format(L"Select where to play {}", gDataManager->GetName(select_hint));
+				nvdaController_speakText(nvdaString.c_str());
+
+			}
+			else {
 				text = gDataManager->GetDesc(560, mainGame->dInfo.compat_mode).data();
-		} else
+
+				nvdaController_speakText(L"Select");
+			}
+		}
+		else {
 			text = gDataManager->GetDesc(select_hint ? select_hint : 570, mainGame->dInfo.compat_mode).data();
+
+			std::wstring nvdaString = fmt::format(L"Select a zone to become unusable", gDataManager->GetName(select_hint));
+			nvdaController_speakText(nvdaString.c_str());
+		}
 		select_hint = 0;
 		mainGame->stHintMsg->setText(text.data());
 		mainGame->stHintMsg->setVisible(true);
@@ -2188,7 +2219,7 @@ int DuelClient::ClientAnalyze(char* msg, uint32_t len) {
 		}
 		return false;
 	}
-	case MSG_SELECT_POSITION: {
+	/*Added simple*/case MSG_SELECT_POSITION: {
 		/*uint8_t selecting_player = */BufferIO::Read<uint8_t>(pbuf);
 		uint32_t code = BufferIO::Read<uint32_t>(pbuf);
 		uint8_t positions = BufferIO::Read<uint8_t>(pbuf);
@@ -2196,6 +2227,9 @@ int DuelClient::ClientAnalyze(char* msg, uint32_t len) {
 			SetResponseI(positions);
 			return true;
 		}
+
+		nvdaController_speakText(L"Select position");
+
 		int count = 0, filter = 0x1, startpos;
 		while(filter != 0x10) {
 			if(positions & filter) count++;
@@ -2230,7 +2264,7 @@ int DuelClient::ClientAnalyze(char* msg, uint32_t len) {
 		mainGame->PopupElement(mainGame->wPosSelect);
 		return false;
 	}
-	case MSG_SELECT_TRIBUTE: {
+	/*OK - Done simple*/case MSG_SELECT_TRIBUTE: {
 		/*uint8_t selecting_player = */BufferIO::Read<uint8_t>(pbuf);
 		mainGame->dField.select_cancelable = BufferIO::Read<uint8_t>(pbuf) != 0;
 		mainGame->dField.select_min = CompatRead<uint8_t, uint32_t>(pbuf);
@@ -2258,9 +2292,13 @@ int DuelClient::ClientAnalyze(char* msg, uint32_t len) {
 		}
 		std::lock_guard<std::mutex> lock(mainGame->gMutex);
 		mainGame->stHintMsg->setText(fmt::format(L"{}({}-{})", gDataManager->GetDesc(select_hint ? select_hint : 531, mainGame->dInfo.compat_mode), mainGame->dField.select_min, mainGame->dField.select_max).data());
+
+		nvdaController_speakText(L"Select tributes for summon"); //TODO change to class
+
 		mainGame->stHintMsg->setVisible(true);
 		if (mainGame->dField.select_cancelable) {
 			mainGame->dField.ShowCancelOrFinishButton(1);
+			nvdaController_speakText(L"Can cancel"); //TODO change to class
 		}
 		select_hint = 0;
 		return false;
@@ -2342,7 +2380,7 @@ int DuelClient::ClientAnalyze(char* msg, uint32_t len) {
 		return mainGame->dField.ShowSelectSum();
 	}
 	case MSG_SORT_CARD:
-	case MSG_SORT_CHAIN: {
+	/*added Simple*/case MSG_SORT_CHAIN: {
 		/*const auto player = */BufferIO::Read<uint8_t>(pbuf);
 		const auto count = CompatRead<uint8_t, uint32_t>(pbuf);
 		mainGame->dField.selectable_cards.clear();
@@ -2368,10 +2406,16 @@ int DuelClient::ClientAnalyze(char* msg, uint32_t len) {
 			DuelClient::SendResponse();
 			return true;
 		}
-		if(mainGame->dInfo.curMsg == MSG_SORT_CHAIN)
+		if (mainGame->dInfo.curMsg == MSG_SORT_CHAIN) {
 			mainGame->wCardSelect->setText(gDataManager->GetSysString(206).data());
-		else
+
+			nvdaController_speakText(L"Select chain order"); //TODO change to class
+		}
+
+		else {
 			mainGame->wCardSelect->setText(gDataManager->GetSysString(205).data());
+			nvdaController_speakText(L"Select from top to bottom"); //TODO change to class
+		}
 		mainGame->dField.select_min = 0;
 		mainGame->dField.select_max = count;
 		mainGame->dField.ShowSelectCard();
@@ -2552,7 +2596,7 @@ int DuelClient::ClientAnalyze(char* msg, uint32_t len) {
 		}
 		return true;
 	}
-	case MSG_SHUFFLE_DECK: {
+	/*OK - Added Simple*/case MSG_SHUFFLE_DECK: {
 		Play(SoundManager::SFX::SHUFFLE);
 		const auto player = mainGame->LocalPlayer(BufferIO::Read<uint8_t>(pbuf));
 		if(mainGame->dField.deck[player].size() < 2)
@@ -2591,9 +2635,14 @@ int DuelClient::ClientAnalyze(char* msg, uint32_t len) {
 					mainGame->dField.MoveCard(pcard, 10);
 			}
 		}
+
+		std::wstring nvdaString;
+		nvdaString = fmt::format(L"Deck {} shuffled.", player + 1);
+		nvdaController_speakText(nvdaString.c_str()); //TODO change to class
+
 		return true;
 	}
-	case MSG_SHUFFLE_HAND: {
+	/*OK - Added simple*/case MSG_SHUFFLE_HAND: {
 		const auto player = mainGame->LocalPlayer(BufferIO::Read<uint8_t>(pbuf));
 		/*const auto count = */CompatRead<uint8_t, uint32_t>(pbuf);
 		auto lock = LockIf();
@@ -2634,9 +2683,14 @@ int DuelClient::ClientAnalyze(char* msg, uint32_t len) {
 		}
 		if(!mainGame->dInfo.isCatchingUp)
 			mainGame->WaitFrameSignal(5, lock);
+
+		std::wstring nvdaString;
+		nvdaString = fmt::format(L"Hand {} shuffled.", player + 1);
+		nvdaController_speakText(nvdaString.c_str()); //TODO change to class
+
 		return true;
 	}
-	case MSG_SHUFFLE_EXTRA: {
+	/*Added Simple*/case MSG_SHUFFLE_EXTRA: {
 		const auto player = mainGame->LocalPlayer(BufferIO::Read<uint8_t>(pbuf));
 		const auto count = CompatRead<uint8_t, uint32_t>(pbuf);
 		if((mainGame->dField.extra[player].size() - mainGame->dField.extra_p_count[player]) < 2)
@@ -2665,6 +2719,11 @@ int DuelClient::ClientAnalyze(char* msg, uint32_t len) {
 		for (const auto& pcard : mainGame->dField.extra[player])
 			if(!(pcard->position & POS_FACEUP))
 				pcard->SetCode(BufferIO::Read<uint32_t>(pbuf));
+
+		std::wstring nvdaString;
+		nvdaString = fmt::format(L"Extra {} shuffled.", player + 1);
+		nvdaController_speakText(nvdaString.c_str()); //TODO change to class
+
 		return true;
 	}
 	case MSG_REFRESH_DECK: {
@@ -2790,7 +2849,7 @@ int DuelClient::ClientAnalyze(char* msg, uint32_t len) {
 		}
 		return true;
 	}
-	case MSG_NEW_TURN: {
+	/*OK - Added simple*/case MSG_NEW_TURN: {
 		Play(SoundManager::SFX::NEXT_TURN);
 		const auto player = mainGame->LocalPlayer(BufferIO::Read<uint8_t>(pbuf));
 		auto lock = LockIf();
@@ -2820,9 +2879,10 @@ int DuelClient::ClientAnalyze(char* msg, uint32_t len) {
 			mainGame->WaitFrameSignal(40, lock);
 			mainGame->showcard = 0;
 		}
+		nvdaController_speakText(L"Next turn."); //TODO change to class
 		return true;
 	}
-	case MSG_NEW_PHASE: {
+	/*OK - Added simple*/case MSG_NEW_PHASE: {
 		Play(SoundManager::SFX::PHASE);
 		const auto phase = BufferIO::Read<uint16_t>(pbuf);
 		auto lock = LockIf();
@@ -2861,18 +2921,21 @@ int DuelClient::ClientAnalyze(char* msg, uint32_t len) {
 			mainGame->btnDP->setVisible(true);
 			mainGame->btnDP->setSubElement(true);
 			mainGame->showcardcode = 4;
+			nvdaController_speakText(L"Draw Phase."); //TODO change to class
 			break;
 		case PHASE_STANDBY:
 			event_string = gDataManager->GetSysString(21).data();
 			mainGame->btnSP->setVisible(true);
 			mainGame->btnSP->setSubElement(true);
 			mainGame->showcardcode = 5;
+			nvdaController_speakText(L"Standby Phase."); //TODO change to class
 			break;
 		case PHASE_MAIN1:
 			event_string = gDataManager->GetSysString(22).data();
 			mainGame->btnM1->setVisible(true);
 			mainGame->btnM1->setSubElement(true);
 			mainGame->showcardcode = 6;
+			nvdaController_speakText(L"Main Phase One."); //TODO change to class
 			break;
 		case PHASE_BATTLE_START:
 			event_string = gDataManager->GetSysString(24).data();
@@ -2881,6 +2944,7 @@ int DuelClient::ClientAnalyze(char* msg, uint32_t len) {
 			mainGame->btnBP->setPressed(true);
 			mainGame->btnBP->setEnabled(false);
 			mainGame->showcardcode = 7;
+			nvdaController_speakText(L"Battle Phase."); //TODO change to class
 			break;
 		case PHASE_MAIN2:
 			event_string = gDataManager->GetSysString(22).data();
@@ -2889,6 +2953,7 @@ int DuelClient::ClientAnalyze(char* msg, uint32_t len) {
 			mainGame->btnM2->setPressed(true);
 			mainGame->btnM2->setEnabled(false);
 			mainGame->showcardcode = 8;
+			nvdaController_speakText(L"Main Phase Two."); //TODO change to class
 			break;
 		case PHASE_END:
 			event_string = gDataManager->GetSysString(26).data();
@@ -2897,6 +2962,7 @@ int DuelClient::ClientAnalyze(char* msg, uint32_t len) {
 			mainGame->btnEP->setPressed(true);
 			mainGame->btnEP->setEnabled(false);
 			mainGame->showcardcode = 9;
+			nvdaController_speakText(L"End Phase."); //TODO change to class
 			break;
 		}
 		if(!mainGame->dInfo.isCatchingUp) {
@@ -3142,7 +3208,7 @@ int DuelClient::ClientAnalyze(char* msg, uint32_t len) {
 		mainGame->dField.disabled_field = disabled;
 		return true;
 	}
-	case MSG_SUMMONING: {
+	/*OK - Added Simple*/case MSG_SUMMONING: {
 		const auto code = BufferIO::Read<uint32_t>(pbuf);
 		/*CoreUtils::loc_info info = CoreUtils::ReadLocInfo(pbuf, mainGame->dInfo.compat_mode);*/
 		if(!PlayChant(SoundManager::CHANT::SUMMON, code))
@@ -3158,13 +3224,20 @@ int DuelClient::ClientAnalyze(char* msg, uint32_t len) {
 			mainGame->showcard = 0;
 			mainGame->WaitFrameSignal(11, lock);
 		}
+
+		std::wstring nvdaString;
+		const auto player = mainGame->LocalPlayer(BufferIO::Read<uint8_t>(pbuf));
+		nvdaString = fmt::format(L"{} is summoning {}", player + 1, gDataManager->GetName(code));
+		nvdaController_speakText(nvdaString.c_str()); //TODO change to class
+
+
 		return true;
 	}
 	case MSG_SUMMONED: {
 		event_string = gDataManager->GetSysString(1604).data();
 		return true;
 	}
-	case MSG_SPSUMMONING: {
+	/*OK - Added Simple*/case MSG_SPSUMMONING: {
 		const auto code = BufferIO::Read<uint32_t>(pbuf);
 		/*CoreUtils::loc_info info = CoreUtils::ReadLocInfo(pbuf, mainGame->dInfo.compat_mode);*/
 		if(!PlayChant(SoundManager::CHANT::SUMMON, code))
@@ -3179,13 +3252,19 @@ int DuelClient::ClientAnalyze(char* msg, uint32_t len) {
 			mainGame->showcard = 0;
 			mainGame->WaitFrameSignal(11, lock);
 		}
+
+		std::wstring nvdaString;
+		const auto player = mainGame->LocalPlayer(BufferIO::Read<uint8_t>(pbuf));
+		nvdaString = fmt::format(L"{} is special summoning {}", player + 1, gDataManager->GetName(code));
+		nvdaController_speakText(nvdaString.c_str()); //TODO change to class
+
 		return true;
 	}
 	case MSG_SPSUMMONED: {
 		event_string = gDataManager->GetSysString(1606).data();
 		return true;
 	}
-	case MSG_FLIPSUMMONING: {
+	/*OK - Added Simple*/case MSG_FLIPSUMMONING: {
 		const auto code = BufferIO::Read<uint32_t>(pbuf);
 		CoreUtils::loc_info info = CoreUtils::ReadLocInfo(pbuf, mainGame->dInfo.compat_mode);
 		info.controler = mainGame->LocalPlayer(info.controler);
@@ -3207,6 +3286,12 @@ int DuelClient::ClientAnalyze(char* msg, uint32_t len) {
 			mainGame->showcard = 0;
 			mainGame->WaitFrameSignal(11, lock);
 		}
+
+		std::wstring nvdaString;
+		const auto player = mainGame->LocalPlayer(BufferIO::Read<uint8_t>(pbuf));
+		nvdaString = fmt::format(L"{} is flip summoning {}", player + 1, gDataManager->GetName(code));
+		nvdaController_speakText(nvdaString.c_str()); //TODO change to class
+
 		return true;
 	}
 	case MSG_FLIPSUMMONED: {
@@ -3354,7 +3439,7 @@ int DuelClient::ClientAnalyze(char* msg, uint32_t len) {
 		return true;
 	}
 	case MSG_CARD_SELECTED:
-	case MSG_BECOME_TARGET: {
+	/*OK - Added simple*/case MSG_BECOME_TARGET: {
 		if(mainGame->dInfo.isCatchingUp)
 			return true;
 		const auto count = CompatRead<uint8_t, uint32_t>(pbuf);
@@ -3385,11 +3470,16 @@ int DuelClient::ClientAnalyze(char* msg, uint32_t len) {
 			} else
 				mainGame->WaitFrameSignal(30, lock);
 			mainGame->AddLog(fmt::sprintf(gDataManager->GetSysString((mainGame->dInfo.curMsg == MSG_BECOME_TARGET) ? 1610 : 1680), gDataManager->GetName(pcard->code), gDataManager->FormatLocation(info.location, info.sequence), info.sequence + 1), pcard->code);
+
+			std::wstring nvdaString;
+			nvdaString = fmt::format(L"{} {}{} selected", gDataManager->GetName(pcard->code), gDataManager->FormatLocation(info.location, info.sequence), info.sequence + 1);
+			nvdaController_speakText(nvdaString.c_str()); //TODO change to class and fix this mess
+
 			pcard->is_highlighting = false;
 		}
 		return true;
 	}
-	case MSG_DRAW: {
+	/*OK - Added simple*/case MSG_DRAW: {
 		const auto player = mainGame->LocalPlayer(BufferIO::Read<uint8_t>(pbuf));
 		const auto count = CompatRead<uint8_t, uint32_t>(pbuf);
 		auto lock = LockIf();
@@ -3417,9 +3507,14 @@ int DuelClient::ClientAnalyze(char* msg, uint32_t len) {
 			}
 		}
 		event_string = fmt::sprintf(gDataManager->GetSysString(1611 + player), count);
+
+		std::wstring nvdaString;
+		nvdaString = fmt::format(L"Player {} drew {}", player + 1, count);
+		nvdaController_speakText(nvdaString.c_str()); //TODO change to class
+
 		return true;
 	}
-	case MSG_DAMAGE: {
+	/*OK - Added simple*/case MSG_DAMAGE: {
 		Play(SoundManager::SFX::DAMAGE);
 		const auto player = mainGame->LocalPlayer(BufferIO::Read<uint8_t>(pbuf));
 		const auto val = BufferIO::Read<uint32_t>(pbuf);
@@ -3441,9 +3536,14 @@ int DuelClient::ClientAnalyze(char* msg, uint32_t len) {
 		}
 		mainGame->dInfo.lp[player] = final;
 		mainGame->dInfo.strLP[player] = fmt::to_wstring(mainGame->dInfo.lp[player]);
+
+		std::wstring nvdaString;
+		nvdaString = fmt::format(L"Player {} minus {}LP", player+1, val);
+		nvdaController_speakText(nvdaString.c_str()); //TODO change to class
+
 		return true;
 	}
-	case MSG_RECOVER: {
+	/*OK - Added simple*/case MSG_RECOVER: {
 		Play(SoundManager::SFX::RECOVER);
 		const auto player = mainGame->LocalPlayer(BufferIO::Read<uint8_t>(pbuf));
 		const auto val = BufferIO::Read<uint32_t>(pbuf);
@@ -3463,9 +3563,13 @@ int DuelClient::ClientAnalyze(char* msg, uint32_t len) {
 		}
 		mainGame->dInfo.lp[player] = final;
 		mainGame->dInfo.strLP[player] = fmt::to_wstring(mainGame->dInfo.lp[player]);
+
+		std::wstring nvdaString;
+		nvdaString = fmt::format(L"Player {} plus {}LP", player + 1, val);
+		nvdaController_speakText(nvdaString.c_str()); //TODO change to class
 		return true;
 	}
-	case MSG_EQUIP: {
+	/*OK - Added simple*/case MSG_EQUIP: {
 		Play(SoundManager::SFX::EQUIP);
 		CoreUtils::loc_info info1 = CoreUtils::ReadLocInfo(pbuf, mainGame->dInfo.compat_mode);
 		CoreUtils::loc_info info2 = CoreUtils::ReadLocInfo(pbuf, mainGame->dInfo.compat_mode);
@@ -3486,9 +3590,14 @@ int DuelClient::ClientAnalyze(char* msg, uint32_t len) {
 			else if(mainGame->dField.hovered_card == pc2)
 				pc1->is_showequip = true;
 		}
+
+		std::wstring nvdaString;
+		nvdaString = fmt::format(L"{}{} equipped with {}{}", pc2->location, gDataManager->GetName(pc2->alias), pc1->location, gDataManager->GetName(pc1->alias));
+		nvdaController_speakText(nvdaString.c_str()); //TODO change to class
+
 		return true;
 	}
-	case MSG_LPUPDATE: {
+	/*Added simple*/case MSG_LPUPDATE: {
 		const auto player = mainGame->LocalPlayer(BufferIO::Read<uint8_t>(pbuf));
 		const auto val = BufferIO::Read<uint32_t>(pbuf);
 		auto lock = LockIf();
@@ -3500,6 +3609,11 @@ int DuelClient::ClientAnalyze(char* msg, uint32_t len) {
 		}
 		mainGame->dInfo.lp[player] = val;
 		mainGame->dInfo.strLP[player] = fmt::to_wstring(mainGame->dInfo.lp[player]);
+
+		std::wstring nvdaString;
+		nvdaString = fmt::format(L"Player {} LP set to {}", player + 1, val);
+		nvdaController_speakText(nvdaString.c_str()); //TODO change to class
+
 		return true;
 	}
 	case MSG_UNEQUIP: {
@@ -3571,7 +3685,7 @@ int DuelClient::ClientAnalyze(char* msg, uint32_t len) {
 		mainGame->dInfo.strLP[player] = fmt::to_wstring(mainGame->dInfo.lp[player]);
 		return true;
 	}
-	case MSG_ADD_COUNTER: {
+	/*Added simple*/case MSG_ADD_COUNTER: {
 		Play(SoundManager::SFX::COUNTER_ADD);
 		const auto type = BufferIO::Read<uint16_t>(pbuf);
 		const auto c = mainGame->LocalPlayer(BufferIO::Read<uint8_t>(pbuf));
@@ -3587,12 +3701,17 @@ int DuelClient::ClientAnalyze(char* msg, uint32_t len) {
 		std::unique_lock<std::mutex> lock(mainGame->gMutex);
 		pc->is_highlighting = true;
 		mainGame->stACMessage->setText(fmt::format(gDataManager->GetSysString(1617), gDataManager->GetName(pc->code), gDataManager->GetCounterName(type), count).data());
+
+		std::wstring nvdaString;
+		nvdaString = fmt::format(gDataManager->GetSysString(1617), gDataManager->GetName(pc->code), gDataManager->GetCounterName(type), count);
+		nvdaController_speakText(nvdaString.c_str()); //TODO change to class
+
 		mainGame->PopupElement(mainGame->wACMessage, 20);
 		mainGame->WaitFrameSignal(40, lock);
 		pc->is_highlighting = false;
 		return true;
 	}
-	case MSG_REMOVE_COUNTER: {
+	/*Added simple*/case MSG_REMOVE_COUNTER: {
 		Play(SoundManager::SFX::COUNTER_REMOVE);
 		const auto type = BufferIO::Read<uint16_t>(pbuf);
 		const auto c = mainGame->LocalPlayer(BufferIO::Read<uint8_t>(pbuf));
@@ -3608,12 +3727,17 @@ int DuelClient::ClientAnalyze(char* msg, uint32_t len) {
 			return true;
 		pc->is_highlighting = true;
 		mainGame->stACMessage->setText(fmt::format(gDataManager->GetSysString(1618), gDataManager->GetName(pc->code), gDataManager->GetCounterName(type), count).data());
+
+		std::wstring nvdaString;
+		nvdaString = fmt::format(gDataManager->GetSysString(1618), gDataManager->GetName(pc->code), gDataManager->GetCounterName(type), count);
+		nvdaController_speakText(nvdaString.c_str()); //TODO change to class
+
 		mainGame->PopupElement(mainGame->wACMessage, 20);
 		mainGame->WaitFrameSignal(40, lock);
 		pc->is_highlighting = false;
 		return true;
 	}
-	case MSG_ATTACK: {
+	/*-OK Added simple*/case MSG_ATTACK: {
 		CoreUtils::loc_info info1 = CoreUtils::ReadLocInfo(pbuf, mainGame->dInfo.compat_mode);
 		info1.controler = mainGame->LocalPlayer(info1.controler);
 		mainGame->dField.attacker = mainGame->dField.GetCard(info1.controler, info1.location, info1.sequence);
@@ -3640,6 +3764,11 @@ int DuelClient::ClientAnalyze(char* msg, uint32_t len) {
 			xd = 3.95f;
 			yd = (info1.controler == 0) ? -3.5f : 3.5f;
 		}
+
+
+		nvdaController_speakText(event_string.c_str()); //TODO change to class
+
+
 		sy = std::sqrt((xa - xd) * (xa - xd) + (ya - yd) * (ya - yd)) / 2.0f;
 		mainGame->atk_t.set((xa + xd) / 2, (ya + yd) / 2, 0);
 		mainGame->atk_r.set(0, 0, -std::atan((xd - xa) / (yd - ya)));
@@ -3688,26 +3817,37 @@ int DuelClient::ClientAnalyze(char* msg, uint32_t len) {
 		}
 		return true;
 	}
-	case MSG_ATTACK_DISABLED: {
+	/*Added simple*/case MSG_ATTACK_DISABLED: {
 		event_string = fmt::sprintf(gDataManager->GetSysString(1621), gDataManager->GetName(mainGame->dField.attacker->code));
+
+		nvdaController_speakText(L"Negated");
+
 		return true;
 	}
-	case MSG_DAMAGE_STEP_START: {
+	/*OK - Added simple*/case MSG_DAMAGE_STEP_START: {
+
+		nvdaController_speakText(L"Damage step start"); //TODO change to class
 		return true;
 	}
-	case MSG_DAMAGE_STEP_END: {
+	/*Added simple*/case MSG_DAMAGE_STEP_END: {
+		nvdaController_speakText(L"Damage step end"); //TODO change to class
 		return true;
 	}
-	case MSG_MISSED_EFFECT: {
+	/*Added simple*/case MSG_MISSED_EFFECT: {
 		if(mainGame->dInfo.isCatchingUp)
 			return true;
 		CoreUtils::ReadLocInfo(pbuf, mainGame->dInfo.compat_mode);
 		uint32_t code = BufferIO::Read<uint32_t>(pbuf);
 		std::unique_lock<std::mutex> lock(mainGame->gMutex);
 		mainGame->AddLog(fmt::sprintf(gDataManager->GetSysString(1622), gDataManager->GetName(code)), code);
+
+		std::wstring nvdaString;
+		nvdaString = fmt::format(gDataManager->GetSysString(1622), gDataManager->GetName(code));
+		nvdaController_speakText(nvdaString.c_str()); //TODO change to class
+
 		return true;
 	}
-	case MSG_TOSS_COIN: {
+	/*OK - Added simple*/case MSG_TOSS_COIN: {
 		if(mainGame->dInfo.isCatchingUp)
 			return true;
 		Play(SoundManager::SFX::COIN);
@@ -3717,6 +3857,7 @@ int DuelClient::ClientAnalyze(char* msg, uint32_t len) {
 		for (int i = 0; i < count; ++i) {
 			bool res = !!BufferIO::Read<uint8_t>(pbuf);
 			text += fmt::format(L"[{}]", gDataManager->GetSysString(res ? 60 : 61));
+			nvdaController_speakText(text.c_str()); //TODO change to class
 		}
 		std::unique_lock<std::mutex> lock(mainGame->gMutex);
 		mainGame->AddLog(text);
@@ -3725,7 +3866,7 @@ int DuelClient::ClientAnalyze(char* msg, uint32_t len) {
 		mainGame->WaitFrameSignal(40, lock);
 		return true;
 	}
-	case MSG_TOSS_DICE: {
+	/*Added simple*/case MSG_TOSS_DICE: {
 		if(mainGame->dInfo.isCatchingUp)
 			return true;
 		Play(SoundManager::SFX::DICE);
@@ -3735,6 +3876,7 @@ int DuelClient::ClientAnalyze(char* msg, uint32_t len) {
 		for (int i = 0; i < count; ++i) {
 			uint8_t res = BufferIO::Read<uint8_t>(pbuf);
 			text += fmt::format(L"[{}]", res);
+			nvdaController_speakText(text.c_str()); //TODO Change to class
 		}
 		std::unique_lock<std::mutex> lock(mainGame->gMutex);
 		mainGame->AddLog(text);
@@ -3769,7 +3911,7 @@ int DuelClient::ClientAnalyze(char* msg, uint32_t len) {
 		mainGame->WaitFrameSignal(60, lock);
 		return false;
 	}
-	case MSG_ANNOUNCE_RACE: {
+	/*Added simple*/case MSG_ANNOUNCE_RACE: {
 		/*const auto player = */mainGame->LocalPlayer(BufferIO::Read<uint8_t>(pbuf));
 		mainGame->dField.announce_count = BufferIO::Read<uint8_t>(pbuf);
 		const auto available = BufferIO::Read<uint32_t>(pbuf);
@@ -3783,9 +3925,15 @@ int DuelClient::ClientAnalyze(char* msg, uint32_t len) {
 		mainGame->wANRace->setText(gDataManager->GetDesc(select_hint ? select_hint : 563, mainGame->dInfo.compat_mode).data());
 		mainGame->PopupElement(mainGame->wANRace);
 		select_hint = 0;
+
+		std::wstring nvdaString;
+		nvdaString = fmt::format(gDataManager->GetDesc(select_hint ? select_hint : 563, mainGame->dInfo.compat_mode));
+		nvdaController_speakText(nvdaString.c_str()); //TODO change to class
+
+
 		return false;
 	}
-	case MSG_ANNOUNCE_ATTRIB: {
+	/*Added simple*/case MSG_ANNOUNCE_ATTRIB: {
 		/*const auto player = */mainGame->LocalPlayer(BufferIO::Read<uint8_t>(pbuf));
 		mainGame->dField.announce_count = BufferIO::Read<uint8_t>(pbuf);
 		const auto available = BufferIO::Read<uint32_t>(pbuf);
@@ -3799,9 +3947,14 @@ int DuelClient::ClientAnalyze(char* msg, uint32_t len) {
 		mainGame->wANAttribute->setText(gDataManager->GetDesc(select_hint ? select_hint : 562, mainGame->dInfo.compat_mode).data());
 		mainGame->PopupElement(mainGame->wANAttribute);
 		select_hint = 0;
+
+		std::wstring nvdaString;
+		nvdaString = fmt::format(gDataManager->GetDesc(select_hint ? select_hint : 562, mainGame->dInfo.compat_mode));
+		nvdaController_speakText(nvdaString.c_str()); //TODO change to class
+
 		return false;
 	}
-	case MSG_ANNOUNCE_CARD: {
+	/*Added simple*/case MSG_ANNOUNCE_CARD: {
 		/*const auto player = */mainGame->LocalPlayer(BufferIO::Read<uint8_t>(pbuf));
 		const auto count = BufferIO::Read<uint8_t>(pbuf);
 		mainGame->dField.declare_opcodes.clear();
@@ -3813,9 +3966,14 @@ int DuelClient::ClientAnalyze(char* msg, uint32_t len) {
 		mainGame->dField.UpdateDeclarableList();
 		mainGame->PopupElement(mainGame->wANCard);
 		select_hint = 0;
+
+		std::wstring nvdaString;
+		nvdaString = fmt::format(gDataManager->GetDesc(select_hint ? select_hint : 564, mainGame->dInfo.compat_mode));
+		nvdaController_speakText(nvdaString.c_str()); //TODO change to class
+
 		return false;
 	}
-	case MSG_ANNOUNCE_NUMBER: {
+	/*Added simple*/case MSG_ANNOUNCE_NUMBER: {
 		/*const auto player = */mainGame->LocalPlayer(BufferIO::Read<uint8_t>(pbuf));
 		const auto count = BufferIO::Read<uint8_t>(pbuf);
 		std::unique_lock<std::mutex> lock(mainGame->gMutex);
@@ -3828,6 +3986,11 @@ int DuelClient::ClientAnalyze(char* msg, uint32_t len) {
 		mainGame->wANNumber->setText(gDataManager->GetDesc(select_hint ? select_hint : 565, mainGame->dInfo.compat_mode).data());
 		mainGame->PopupElement(mainGame->wANNumber);
 		select_hint = 0;
+
+		std::wstring nvdaString;
+		nvdaString = fmt::format(gDataManager->GetDesc(select_hint ? select_hint : 565, mainGame->dInfo.compat_mode));
+		nvdaController_speakText(nvdaString.c_str()); //TODO change to class
+
 		return false;
 	}
 	case MSG_CARD_HINT: {

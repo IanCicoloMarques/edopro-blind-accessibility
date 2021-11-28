@@ -28,7 +28,12 @@
 #include "CGUIImageButton/CGUIImageButton.h"
 #include "progressivebuffer.h"
 #include "utils.h"
-#include <nvdaController.h>
+#include "ScreenReader.h"
+
+#include "nvdaController.h"
+
+
+
 #ifdef __ANDROID__
 #include "Android/porting_android.h"
 #endif
@@ -74,6 +79,23 @@ uint32_t DuelClient::temp_ip = 0;
 uint16_t DuelClient::temp_port = 0;
 uint16_t DuelClient::temp_ver = 0;
 bool DuelClient::try_needed = false;
+
+/*IScreenReader* screenReader = new nvdaController();
+IScreenReader *screenReader2 = new Jaw();
+
+ScreenReaderContoller SRC = new obj();
+IScreenReadar *scr3 = SRC.GetReader(); //static
+
+ScreenReader::SetReader(config);
+IScreenReader* scr = ScreenReader::GetReader();
+ScreenRedader::GetReader() = IScreenReader;
+
+scr.Speech();*/
+
+void ScreenReader::setReader();
+
+IScreenReader* screenReader = ScreenReader::getReader();
+
 
 std::pair<uint32_t, uint16_t> DuelClient::ResolveServer(epro::stringview address, uint16_t port) {
 	uint32_t remote_addr = inet_addr(address.data());
@@ -2666,7 +2688,7 @@ int DuelClient::ClientAnalyze(char* msg, uint32_t len) {
 						panel_confirm.push_back(pcard);
 				}
 			} else {
-				if(!mainGame->dInfo.isReplay || (l & LOCATION_ONFIELD) | (l & LOCATION_HAND && gGameConfig->hideHandsInReplays))
+				if(!mainGame->dInfo.isReplay || (l & LOCATION_ONFIELD) || (l & LOCATION_HAND && gGameConfig->hideHandsInReplays))
 					field_confirm.push_back(pcard);
 			}
 		}

@@ -14,11 +14,12 @@ class ScreenReader
 
 	public:
 
-		ScreenReader();
+		
 
 		static void setReader();
 		static IScreenReader* getReader();
-	
+
+		ScreenReader() {};
 		~ScreenReader() { delete screenReader; };
 };
 

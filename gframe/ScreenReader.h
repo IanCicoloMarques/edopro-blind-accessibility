@@ -16,7 +16,7 @@ class ScreenReader
 
 		ScreenReader();
 
-		static void setReader();
+		static void macarena();
 		static IScreenReader* getReader();
 	
 		~ScreenReader() { delete screenReader; };

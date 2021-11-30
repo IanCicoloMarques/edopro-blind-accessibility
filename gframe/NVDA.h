@@ -8,10 +8,9 @@
 class NVDA : public IScreenReader
 {
 	public:
-
-		void readScreen();
 		NVDA() {};
 		~NVDA() {};
+		void readScreen();
 
 	private:
 

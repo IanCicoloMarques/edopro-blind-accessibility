@@ -46,7 +46,7 @@
 namespace ygo {
 
 std::string showing_repo = "";
-
+static int teste = 0;
 bool ClientField::OnEvent(const irr::SEvent& event) {
 	bool stopPropagation = false;
 	if(OnCommonEvent(event, stopPropagation))
@@ -1678,6 +1678,41 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 	}
 	case irr::EET_KEY_INPUT_EVENT: {
 		switch(event.KeyInput.Key) {
+		case irr::KEY_KEY_Q: {
+			if (!event.KeyInput.PressedDown && !mainGame->dInfo.isReplay && mainGame->dInfo.player_type != 7 && mainGame->dInfo.isInDuel
+				&& !mainGame->wCardDisplay->isVisible() && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
+				int loc_id = 0;
+				display_cards.clear();
+				loc_id = 1007;
+				for (auto it = mzone[0].begin(); it != mzone[0].end(); ++it) {
+					if (*it) {
+						display_cards.push_back(*it);
+					}
+				}
+				if (display_cards.size()) {
+					mainGame->wCardDisplay->setText(fmt::format(L"{}({})", gDataManager->GetSysString(loc_id), display_cards.size()).data());
+					ShowLocationCard();
+				}
+			}
+		}
+		case irr::KEY_RIGHT: {
+			if (!event.KeyInput.PressedDown) {
+				if (display_cards.size() && teste < display_cards.size()) {
+					mainGame->ShowCardInfo(display_cards[teste]->code);
+					teste++;
+				}
+			}
+			break;
+		}
+		case irr::KEY_LEFT: {
+			if (!event.KeyInput.PressedDown) {
+				if (display_cards.size() && teste <= display_cards.size() && teste > 0) {
+					teste--;
+					mainGame->ShowCardInfo(display_cards[teste]->code);
+				}
+			}
+			break;
+		}
 		case irr::KEY_KEY_A: {
 			if(!mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
 				mainGame->always_chain = event.KeyInput.PressedDown;

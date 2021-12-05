@@ -46,7 +46,8 @@
 namespace ygo {
 
 std::string showing_repo = "";
-static int teste = 0;
+static irr::AccessibilityFieldFocus::FieldLookerLocId lookupFieldLocId;
+static int indexLookedUpCard = 0;
 bool ClientField::OnEvent(const irr::SEvent& event) {
 	bool stopPropagation = false;
 	if(OnCommonEvent(event, stopPropagation))
@@ -1679,36 +1680,66 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 	case irr::EET_KEY_INPUT_EVENT: {
 		switch(event.KeyInput.Key) {
 		case irr::KEY_KEY_Q: {
-			if (!event.KeyInput.PressedDown && !mainGame->dInfo.isReplay && mainGame->dInfo.player_type != 7 && mainGame->dInfo.isInDuel
-				&& !mainGame->wCardDisplay->isVisible() && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
-				int loc_id = 0;
-				display_cards.clear();
-				loc_id = 1007;
-				for (auto it = mzone[0].begin(); it != mzone[0].end(); ++it) {
-					if (*it) {
-						display_cards.push_back(*it);
-					}
-				}
-				if (display_cards.size()) {
-					mainGame->wCardDisplay->setText(fmt::format(L"{}({})", gDataManager->GetSysString(loc_id), display_cards.size()).data());
-					ShowLocationCard();
-				}
+			if (CheckIfCanViewCards(event)) {
+				lookupFieldLocId = irr::AccessibilityFieldFocus::FieldLookerLocId::PLAYER_HAND;
+				DisplayCards(summonable_cards[displayedField]);
 			}
+			break;
+		}
+		case irr::KEY_KEY_W: {
+			if (CheckIfCanViewCards(event)) {
+				lookupFieldLocId = irr::AccessibilityFieldFocus::FieldLookerLocId::PLAYER_MONSTERS;
+				DisplayCards(mzone[displayedField]);
+			}
+			break;
+		}
+		case irr::KEY_KEY_E: {
+			if (CheckIfCanViewCards(event)) {
+				lookupFieldLocId = irr::AccessibilityFieldFocus::FieldLookerLocId::PLAYER_SPELLS;
+				DisplayCards(szone[displayedField]);
+			}
+			break;
+		}
+		case irr::KEY_KEY_R: {
+			if (CheckIfCanViewCards(event)) {
+				lookupFieldLocId = irr::AccessibilityFieldFocus::FieldLookerLocId::PLAYER_GRAVEYARD;
+				DisplayCards(grave[displayedField]);
+			}
+			break;
+		}
+		case irr::KEY_KEY_P: {//TODO MUDAR ISSO PRA OUTRO BOTÃO
+			if (CheckIfCanViewCards(event)) {
+				lookupFieldLocId = irr::AccessibilityFieldFocus::FieldLookerLocId::PLAYER_HAND;
+				DisplayCards(summonable_cards);
+			}
+			break;
+		}
+		case irr::KEY_UP: {
+			if (!event.KeyInput.PressedDown) {
+				displayedField = irr::AccessibilityFieldFocus::DisplayedField::ENEMY_PLAYER;
+			}
+			break;
+		}
+		case irr::KEY_DOWN: {
+			if (!event.KeyInput.PressedDown) {
+				displayedField = irr::AccessibilityFieldFocus::DisplayedField::PLAYER;
+			}
+			break;
 		}
 		case irr::KEY_RIGHT: {
 			if (!event.KeyInput.PressedDown) {
-				if (display_cards.size() && teste < display_cards.size()) {
-					mainGame->ShowCardInfo(display_cards[teste]->code);
-					teste++;
+				if (display_cards.size() && indexLookedUpCard < display_cards.size()-1) {
+					indexLookedUpCard++;
+					mainGame->ShowCardInfo(display_cards[indexLookedUpCard]->code);
 				}
 			}
 			break;
 		}
 		case irr::KEY_LEFT: {
 			if (!event.KeyInput.PressedDown) {
-				if (display_cards.size() && teste <= display_cards.size() && teste > 0) {
-					teste--;
-					mainGame->ShowCardInfo(display_cards[teste]->code);
+				if (display_cards.size() && indexLookedUpCard <= display_cards.size() && indexLookedUpCard > 0) {
+					indexLookedUpCard--;
+					mainGame->ShowCardInfo(display_cards[indexLookedUpCard]->code);
 				}
 			}
 			break;
@@ -1818,6 +1849,30 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 	}
 	return false;
 }
+
+bool ClientField::CheckIfCanViewCards(const irr::SEvent& event) {
+	bool canViewCards = false;
+	if (!event.KeyInput.PressedDown && !mainGame->dInfo.isReplay && mainGame->dInfo.player_type != 7 && mainGame->dInfo.isInDuel
+		&& !mainGame->wCardDisplay->isVisible() && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX))
+		canViewCards = true;
+	return canViewCards;
+}
+
+void ClientField::DisplayCards(const std::vector<ClientCard*> &field) {
+	display_cards.clear();
+	indexLookedUpCard = 0;
+	for (auto it = field.begin(); it != field.end(); ++it) {
+		if (*it) {
+			display_cards.push_back(*it);
+		}
+	}
+	if (display_cards.size()) {
+		mainGame->wCardDisplay->setText(fmt::format(L"{}({})", gDataManager->GetSysString(lookupFieldLocId), display_cards.size()).data());
+		ShowLocationCard();
+		mainGame->ShowCardInfo(display_cards[0]->code);
+	}
+}
+
 static bool IsTrulyVisible(const irr::gui::IGUIElement* elem) {
 	while(elem->isVisible()) {
 		elem = elem->getParent();
@@ -2179,13 +2234,16 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event, bool& stopPropagation)
 			return false;
 		}
 		case irr::KEY_KEY_R: {
-			if(event.KeyInput.Control) {
-				mainGame->should_reload_skin = true;
+			if (!accessibilityFocus) {
+				if (event.KeyInput.Control) {
+					mainGame->should_reload_skin = true;
+					return true;
+				}
+				if (!event.KeyInput.PressedDown && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX))
+					mainGame->textFont->setTransparency(true);
 				return true;
 			}
-			if(!event.KeyInput.PressedDown && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX))
-				mainGame->textFont->setTransparency(true);
-			return true;
+			break;
 		}
 		case irr::KEY_KEY_O: {
 			if (event.KeyInput.Control && !event.KeyInput.PressedDown) {

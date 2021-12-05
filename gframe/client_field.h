@@ -146,6 +146,12 @@ public:
 	void SetResponseSelectedCards() const;
 	void SetResponseSelectedOption() const;
 	void CancelOrFinish();
+
+	//Accessibility Focus
+	bool accessibilityFocus = true; //TODO- FAZER UMA CONFIGURAÇÃO NO MENU PRA ISSO
+	int displayedField = irr::AccessibilityFieldFocus::DisplayedField::PLAYER;
+	void DisplayCards(const std::vector<ClientCard*> &field);
+	bool CheckIfCanViewCards(const irr::SEvent& event);
 };
 
 }

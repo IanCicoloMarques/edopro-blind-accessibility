@@ -150,8 +150,18 @@ public:
 	//Accessibility Focus
 	bool accessibilityFocus = true; //TODO- FAZER UMA CONFIGURAÇÃO NO MENU PRA ISSO
 	int displayedField = irr::AccessibilityFieldFocus::DisplayedField::PLAYER;
+	int displayedCards = irr::AccessibilityFieldFocus::DisplayedCards::LOOK_ONLY;
+	int battlePhase = irr::AccessibilityFieldFocus::BattleStep::MP1;
+	int cardType = irr::AccessibilityFieldFocus::CardType::MONSTER;
 	void DisplayCards(const std::vector<ClientCard*> &field);
+	void DisplayCards(const std::vector<ChainInfo>& field);
+	bool UseCard(const irr::AccessibilityFieldFocus::UseType& useType);
 	bool CheckIfCanViewCards(const irr::SEvent& event);
+	void SelectFieldSlot(const int& slot, const irr::AccessibilityFieldFocus::DisplayedField& player = irr::AccessibilityFieldFocus::DisplayedField::PLAYER);
+	float GetYPosition();
+	void SimulateButton(irr::gui::IGUIElement* caller = nullptr);
+	void MouseClick(const irr::SEvent& event);
+	bool SetCard(const int& setType, const irr::AccessibilityFieldFocus::UseType& useType = irr::AccessibilityFieldFocus::UseType::NORMAL_SUMMON);
 };
 
 }

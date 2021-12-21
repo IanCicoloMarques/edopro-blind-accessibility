@@ -5,12 +5,12 @@ void NVDA::readScreen()
 }
 
 
-void NVDA::textToSpeech()
+void NVDA::textToSpeech(std::wstring string)
 {
-	nvdaController_speakText(L"");
+	nvdaController_speakText(string.c_str());
 }
 
-void NVDA::textToBraile()
+void NVDA::textToBraile(std::wstring string)
 {
-	nvdaController_brailleMessage(L"");
+	nvdaController_brailleMessage(string.c_str());
 }

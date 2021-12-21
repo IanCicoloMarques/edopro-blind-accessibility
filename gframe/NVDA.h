@@ -5,18 +5,17 @@
 #include "IScreenReader.h"
 #include "nvdaController.h"
 
+
 class NVDA : public IScreenReader
 {
 	public:
-
 		void readScreen();
 		NVDA() {};
 		~NVDA() {};
 
-	private:
 
-		void textToSpeech();
-		void textToBraile();
+		void textToSpeech(std::wstring string);
+		void textToBraile(std::wstring string);
 
 
 };

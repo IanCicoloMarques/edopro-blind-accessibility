@@ -217,6 +217,8 @@
     <ClInclude Include="..\gframe\ScreenReader.h" />
     <ClInclude Include="..\gframe\IScreenReader.h" />
     <ClInclude Include="..\gframe\NVDA.h" />
+    <ClInclude Include="StringBuilder.h" />
+    <ClInclude Include="StringDTO.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\gframe\CGUICustomCheckBox\CGUICustomCheckBox.cpp">
@@ -315,6 +317,8 @@
     <ClCompile Include="..\gframe\windbot_panel.cpp" />
     <ClCompile Include="..\gframe\NVDA.cpp" />
     <ClCompile Include="..\gframe\ScreenReader.cpp" />
+    <ClCompile Include="StringBuilder.cpp" />
+    <ClCompile Include="StringDTO.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\gframe\dpiawarescaling.manifest" />

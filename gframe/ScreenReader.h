@@ -14,8 +14,6 @@ class ScreenReader
 
 	public:
 
-		
-
 		static void setReader();
 		static IScreenReader* getReader();
 

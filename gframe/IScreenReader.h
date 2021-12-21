@@ -2,6 +2,10 @@
 #ifndef ISCREENREADER_H
 #define ISCREENREADER_H
 
+#pragma once
+
+#include <string>
+
 class IScreenReader {
 
 
@@ -9,9 +13,8 @@ class IScreenReader {
 
 		virtual void readScreen() = 0;
 
-	private:
-		virtual void textToSpeech() = 0;
-		virtual void textToBraile() = 0;
+		virtual void textToSpeech(std::wstring string) = 0;
+		virtual void textToBraile(std::wstring string) = 0;
 
 };
 

@@ -28,7 +28,7 @@
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>Unicode</CharacterSet>
-    <PlatformToolset>v143</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
@@ -213,6 +213,8 @@
     <ClInclude Include="..\gframe\utils_gui.h" />
     <ClInclude Include="..\gframe\windbot.h" />
     <ClInclude Include="..\gframe\windbot_panel.h" />
+    <ClInclude Include="StringBuilder.h" />
+    <ClInclude Include="StringDTO.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\gframe\CGUICustomCheckBox\CGUICustomCheckBox.cpp" />
@@ -275,6 +277,8 @@
     <ClCompile Include="..\gframe\utils_gui.cpp" />
     <ClCompile Include="..\gframe\windbot.cpp" />
     <ClCompile Include="..\gframe\windbot_panel.cpp" />
+    <ClCompile Include="StringBuilder.cpp" />
+    <ClCompile Include="StringDTO.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\gframe\dpiawarescaling.manifest" />

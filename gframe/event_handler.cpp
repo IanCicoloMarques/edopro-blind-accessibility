@@ -1842,9 +1842,9 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					default:
 						break;
 					}
-					mainGame->HideElement(mainGame->wCardDisplay);
 				}
 			}
+			mainGame->HideElement(mainGame->wCardDisplay);
 			break;
 		}
 		case irr::KEY_LSHIFT: {

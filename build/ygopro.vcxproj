@@ -208,13 +208,12 @@
     <ClInclude Include="..\gframe\sound_manager.h" />
     <ClInclude Include="..\gframe\sound_sfml.h" />
     <ClInclude Include="..\gframe\sound_threaded_backend.h" />
+    <ClInclude Include="..\gframe\StringBuilder.h" />
     <ClInclude Include="..\gframe\text_types.h" />
     <ClInclude Include="..\gframe\utils.h" />
     <ClInclude Include="..\gframe\utils_gui.h" />
     <ClInclude Include="..\gframe\windbot.h" />
     <ClInclude Include="..\gframe\windbot_panel.h" />
-    <ClInclude Include="StringBuilder.h" />
-    <ClInclude Include="StringDTO.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\gframe\CGUICustomCheckBox\CGUICustomCheckBox.cpp" />
@@ -273,12 +272,11 @@
     <ClCompile Include="..\gframe\sound_manager.cpp" />
     <ClCompile Include="..\gframe\sound_sfml.cpp" />
     <ClCompile Include="..\gframe\sound_threaded_backend.cpp" />
+    <ClCompile Include="..\gframe\StringBuilder.cpp" />
     <ClCompile Include="..\gframe\utils.cpp" />
     <ClCompile Include="..\gframe\utils_gui.cpp" />
     <ClCompile Include="..\gframe\windbot.cpp" />
     <ClCompile Include="..\gframe\windbot_panel.cpp" />
-    <ClCompile Include="StringBuilder.cpp" />
-    <ClCompile Include="StringDTO.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\gframe\dpiawarescaling.manifest" />

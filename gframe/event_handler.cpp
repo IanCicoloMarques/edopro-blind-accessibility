@@ -1681,11 +1681,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 		switch(event.KeyInput.Key) {
 		case irr::KEY_KEY_Q: {
 			bool canViewCards = CheckIfCanViewCards(event);
-			if (canViewCards && displayedCards == irr::AccessibilityFieldFocus::DisplayedCards::SHIFT_ACTIVATABLE) {
-				lookupFieldLocId = irr::AccessibilityFieldFocus::FieldLookerLocId::PLAYER_ACTIVABLE_CARDS;
-				DisplayCards(activatable_cards);
-			}
-			else if (canViewCards) {
+			if (canViewCards) {
 				lookupFieldLocId = irr::AccessibilityFieldFocus::FieldLookerLocId::PLAYER_HAND;
 				DisplayCards(hand[displayedField]);
 			}
@@ -1707,12 +1703,12 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				lookupFieldLocId = irr::AccessibilityFieldFocus::FieldLookerLocId::PLAYER_SUMMONABLE_MONSTERS;
 				DisplayCards(summonable_cards);
 			}
-			else if (canViewCards && (displayedCards == irr::AccessibilityFieldFocus::DisplayedCards::ALT_SPECIAL_ATT ||
-				displayedCards == irr::AccessibilityFieldFocus::DisplayedCards::ALT_SPECIAL_DEF)) {
+			else if (canViewCards && (displayedCards == irr::AccessibilityFieldFocus::DisplayedCards::SHIFT_SPECIAL_ATT ||
+				displayedCards == irr::AccessibilityFieldFocus::DisplayedCards::SHIFT_SPECIAL_ATT)) {
 				lookupFieldLocId = irr::AccessibilityFieldFocus::FieldLookerLocId::PLAYER_SPECIAL_SUMMONABLE_MONSTERS;
 				DisplayCards(spsummonable_cards);
 			}
-			else if (canViewCards && displayedCards == irr::AccessibilityFieldFocus::DisplayedCards::SHIFT_ACTIVATABLE) {
+			else if (canViewCards && displayedCards == irr::AccessibilityFieldFocus::DisplayedCards::SHIFT_SPECIAL_DEF) {
 				lookupFieldLocId = irr::AccessibilityFieldFocus::FieldLookerLocId::ATTACKABLE_CARDS;
 				DisplayCards(attackable_cards);
 			}
@@ -1730,7 +1726,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				lookupFieldLocId = irr::AccessibilityFieldFocus::FieldLookerLocId::PLAYER_SETTABLE_CARDS;
 				DisplayCards(msetable_cards);
 			}
-			else if (canViewCards && displayedCards == irr::AccessibilityFieldFocus::DisplayedCards::SHIFT_ACTIVATABLE) {
+			else if (canViewCards && displayedCards == irr::AccessibilityFieldFocus::DisplayedCards::SHIFT_SPECIAL_ATT) {
 				lookupFieldLocId = irr::AccessibilityFieldFocus::FieldLookerLocId::SELECTABLE_CARDS;
 				DisplayCards(selectable_cards);
 			}
@@ -1744,7 +1740,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				lookupFieldLocId = irr::AccessibilityFieldFocus::FieldLookerLocId::PLAYER_GRAVEYARD;
 				DisplayCards(grave[displayedField]);
 			}
-			else if (canViewCards && displayedCards == irr::AccessibilityFieldFocus::DisplayedCards::SHIFT_ACTIVATABLE) {
+			else if (canViewCards && displayedCards == irr::AccessibilityFieldFocus::DisplayedCards::SHIFT_SPECIAL_ATT) {
 				lookupFieldLocId = irr::AccessibilityFieldFocus::FieldLookerLocId::SELECTED_CARDS;
 				DisplayCards(selected_cards);
 			}
@@ -1758,7 +1754,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				lookupFieldLocId = irr::AccessibilityFieldFocus::FieldLookerLocId::PLAYER_EXTRA_DECK;
 				DisplayCards(extra[displayedField]);
 			}
-			else if (canViewCards && displayedCards == irr::AccessibilityFieldFocus::DisplayedCards::SHIFT_ACTIVATABLE) {
+			else if (canViewCards && displayedCards == irr::AccessibilityFieldFocus::DisplayedCards::SHIFT_SPECIAL_ATT) {
 				lookupFieldLocId = irr::AccessibilityFieldFocus::FieldLookerLocId::MUST_SELECT_CARDS;
 				DisplayCards(must_select_cards);
 			}
@@ -1785,6 +1781,16 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				mainGame->wCardDisplay->setVisible(false);
 			break;
 		}
+		case irr::KEY_KEY_F: {
+			bool canViewCards = CheckIfCanViewCards(event);
+			if (canViewCards) {
+				lookupFieldLocId = irr::AccessibilityFieldFocus::FieldLookerLocId::PLAYER_ACTIVABLE_CARDS;
+				DisplayCards(activatable_cards);
+			}
+			else
+				mainGame->wCardDisplay->setVisible(false);
+			break;
+		}
 		case irr::KEY_RETURN: {
 			if (!event.KeyInput.PressedDown) {
 				if (!display_cards.empty() && indexLookedUpCard <= display_cards.size() && displayedCards != irr::AccessibilityFieldFocus::DisplayedCards::LOOK_ONLY) {
@@ -1803,7 +1809,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 						break;
 					}
 					case irr::AccessibilityFieldFocus::FieldLookerLocId::PLAYER_SPECIAL_SUMMONABLE_MONSTERS: {
-						if (displayedCards == irr::AccessibilityFieldFocus::DisplayedCards::ALT_SPECIAL_ATT) {
+						if (displayedCards == irr::AccessibilityFieldFocus::DisplayedCards::SHIFT_SPECIAL_ATT) {
 							cardType = irr::AccessibilityFieldFocus::CardType::MONSTER;
 							UseCard(irr::AccessibilityFieldFocus::UseType::SPECIAL_SUMMON);
 						}
@@ -1843,10 +1849,10 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 		}
 		case irr::KEY_LSHIFT: {
 			if (!event.KeyInput.PressedDown) {
-				if (displayedCards != irr::AccessibilityFieldFocus::DisplayedCards::SHIFT_ACTIVATABLE)
-					displayedCards = irr::AccessibilityFieldFocus::DisplayedCards::SHIFT_ACTIVATABLE;
+				if (displayedCards != irr::AccessibilityFieldFocus::DisplayedCards::SHIFT_SPECIAL_ATT)
+					displayedCards = irr::AccessibilityFieldFocus::DisplayedCards::SHIFT_SPECIAL_ATT;
 				else
-					displayedCards = irr::AccessibilityFieldFocus::DisplayedCards::SHIFT_NOT_ACTIVATABLE;
+					displayedCards = irr::AccessibilityFieldFocus::DisplayedCards::SHIFT_SPECIAL_DEF;
 			}
 			break;
 		}
@@ -1856,15 +1862,6 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					displayedCards = irr::AccessibilityFieldFocus::DisplayedCards::CTRL_NORMAL_FACEUP;
 				else
 					displayedCards = irr::AccessibilityFieldFocus::DisplayedCards::CTRL_NORMAL_SET;
-			}
-			break;
-		}
-		case irr::KEY_LMENU: {
-			if (!event.KeyInput.PressedDown) {
-				if (displayedCards != irr::AccessibilityFieldFocus::DisplayedCards::ALT_SPECIAL_ATT)
-					displayedCards = irr::AccessibilityFieldFocus::DisplayedCards::ALT_SPECIAL_ATT;
-				else
-					displayedCards = irr::AccessibilityFieldFocus::DisplayedCards::ALT_SPECIAL_DEF;
 			}
 			break;
 		}
@@ -2076,7 +2073,6 @@ bool ClientField::UseCard(const irr::AccessibilityFieldFocus::UseType& useType) 
 			simulated.GUIEvent.Caller->setParent(nullptr);
 			break;
 		}
-
 		case irr::AccessibilityFieldFocus::UseType::SET_MONSTER: {
 			simulated.GUIEvent.Caller = mainGame->btnMSet;
 			simulated.GUIEvent.Caller->setParent(nullptr);
@@ -2148,6 +2144,11 @@ bool ClientField::UseCard(const irr::AccessibilityFieldFocus::UseType& useType) 
 			//		break;
 			//	}
 			//}
+			break;
+		}
+		case irr::AccessibilityFieldFocus::UseType::EFFECT: {
+			simulated.GUIEvent.Caller = mainGame->btnActivate;
+			simulated.GUIEvent.Caller->setParent(nullptr);
 			break;
 		}
 

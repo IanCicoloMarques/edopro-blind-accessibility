@@ -28,8 +28,8 @@
 #include "CGUIImageButton/CGUIImageButton.h"
 #include "progressivebuffer.h"
 #include "utils.h"
-
 #include "ScreenReader.h"
+
 #include "nvdaController.h"
 
 
@@ -115,9 +115,7 @@ std::pair<uint32_t, uint16_t> DuelClient::ResolveServer(epro::stringview address
 }
 
 bool DuelClient::StartClient(uint32_t ip, uint16_t port, uint32_t gameid, bool create_game) {
-
 	ScreenReader::setReader();
-
 	if(connect_state)
 		return false;
 	client_base = event_base_new();

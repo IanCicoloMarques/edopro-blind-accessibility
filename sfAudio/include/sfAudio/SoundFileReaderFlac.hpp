@@ -33,7 +33,6 @@
 #include <string>
 #include <vector>
 
-
 namespace sf
 {
 namespace priv

@@ -31,7 +31,6 @@
 #include "sfAudio/SoundFileReader.hpp"
 #include <vorbis/vorbisfile.h>
 
-
 namespace sf
 {
 namespace priv

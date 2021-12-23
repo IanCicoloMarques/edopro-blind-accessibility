@@ -1,15 +1,13 @@
 #include "ScreenReader.h"
 
 IScreenReader* ScreenReader::screenReader = nullptr;
-
 void ScreenReader::setReader()
 {
-	//screenReader = new NVDA(); //TODO add configuration for other screenreaders
+	screenReader = new NVDA();
 }
 
 
 IScreenReader* ScreenReader::getReader()
 {
-	return screenReader = new NVDA(); //TODO add configuration for other screenreaders
+	return screenReader;
 }
-

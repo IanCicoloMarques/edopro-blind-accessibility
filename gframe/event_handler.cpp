@@ -1834,10 +1834,12 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 						if (displayedCards == irr::AccessibilityFieldFocus::DisplayedCards::CTRL_NORMAL_FACEUP) {
 							cardType = irr::AccessibilityFieldFocus::CardType::MONSTER;
 							UseCard(irr::AccessibilityFieldFocus::UseType::NORMAL_SUMMON);
+							mainGame->HideElement(mainGame->wCardDisplay);
 						}
 						else {
 							cardType = irr::AccessibilityFieldFocus::CardType::MONSTER;
 							UseCard(irr::AccessibilityFieldFocus::UseType::SET_MONSTER);
+							mainGame->HideElement(mainGame->wCardDisplay);
 						}
 						break;
 					}
@@ -1845,31 +1847,37 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 						if (displayedCards == irr::AccessibilityFieldFocus::DisplayedCards::SHIFT_SPECIAL_ATT) {
 							cardType = irr::AccessibilityFieldFocus::CardType::MONSTER;
 							UseCard(irr::AccessibilityFieldFocus::UseType::SPECIAL_SUMMON);
+							mainGame->HideElement(mainGame->wCardDisplay);
 						}
 						else {
 							cardType = irr::AccessibilityFieldFocus::CardType::MONSTER;
 							UseCard(irr::AccessibilityFieldFocus::UseType::SPECIAL_SUMMON_DEFENSE);
+							mainGame->HideElement(mainGame->wCardDisplay);
 						}
 						break;
 					}
 					case irr::AccessibilityFieldFocus::FieldLookerLocId::PLAYER_SETTABLE_CARDS: {
 						cardType = irr::AccessibilityFieldFocus::CardType::SPELL;
 						UseCard(irr::AccessibilityFieldFocus::UseType::SET_SPELL);
+						mainGame->HideElement(mainGame->wCardDisplay);
 						break;
 					}
 					case irr::AccessibilityFieldFocus::FieldLookerLocId::PLAYER_ACTIVABLE_CARDS: {
 						cardType = irr::AccessibilityFieldFocus::CardType::ACTIVABLE_EFFECT;
 						UseCard(irr::AccessibilityFieldFocus::UseType::EFFECT);
+						mainGame->HideElement(mainGame->wCardDisplay);
 						break;
 					}
 					case irr::AccessibilityFieldFocus::FieldLookerLocId::ATTACKABLE_CARDS: {
 						cardType = irr::AccessibilityFieldFocus::CardType::MONSTER;
 						UseCard(irr::AccessibilityFieldFocus::UseType::MONSTER_ATTACK);
+						mainGame->HideElement(mainGame->wCardDisplay);
 						break;
 					}
 					case irr::AccessibilityFieldFocus::FieldLookerLocId::SELECTABLE_CARDS: {
 						cardType = irr::AccessibilityFieldFocus::CardType::SELECTABLE;
 						UseCard(irr::AccessibilityFieldFocus::UseType::SELECT_CARD);
+						mainGame->HideElement(mainGame->wCardDisplay);
 						break;
 					}
 					default:
@@ -1877,7 +1885,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					}
 				}
 			}
-			mainGame->HideElement(mainGame->wCardDisplay);
+			//
 			break;
 		}
 		case irr::KEY_LSHIFT: {

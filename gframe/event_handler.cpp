@@ -1688,8 +1688,10 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				std::wstring nvdaString = fmt::format(L"Hand");
 				nvdaController_speakText(nvdaString.c_str());
 			}
-			else
-				mainGame->wCardDisplay->setVisible(false);
+			else {
+				if (mainGame->wCardDisplay->isVisible())
+					mainGame->wCardDisplay->setVisible(false);
+			}
 			break;
 		}
 		case irr::KEY_KEY_W: {
@@ -1725,8 +1727,10 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				std::wstring nvdaString = fmt::format(L"Attackable Cards");
 				nvdaController_speakText(nvdaString.c_str());
 			}
-			else
-				mainGame->wCardDisplay->setVisible(false);
+			else {
+				if (mainGame->wCardDisplay->isVisible())
+					mainGame->wCardDisplay->setVisible(false);
+			}
 			break;
 		}
 		case irr::KEY_KEY_E: {
@@ -1749,8 +1753,10 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				std::wstring nvdaString = fmt::format(L"Selectable Cards");
 				nvdaController_speakText(nvdaString.c_str());
 			}
-			else
-				mainGame->wCardDisplay->setVisible(false);
+			else {
+				if (mainGame->wCardDisplay->isVisible())
+					mainGame->wCardDisplay->setVisible(false);
+			}
 			break;
 		}
 		case irr::KEY_KEY_R: {
@@ -1767,8 +1773,10 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				std::wstring nvdaString = fmt::format(L"Selected Cards");
 				nvdaController_speakText(nvdaString.c_str());
 			}
-			else
-				mainGame->wCardDisplay->setVisible(false);
+			else {
+				if (mainGame->wCardDisplay->isVisible())
+					mainGame->wCardDisplay->setVisible(false);
+			}
 			break;
 		}
 		case irr::KEY_KEY_A: {
@@ -1785,8 +1793,10 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				std::wstring nvdaString = fmt::format(L"Must Select Cards");
 				nvdaController_speakText(nvdaString.c_str());
 			}
-			else
-				mainGame->wCardDisplay->setVisible(false);
+			else {
+				if (mainGame->wCardDisplay->isVisible())
+					mainGame->wCardDisplay->setVisible(false);
+			}
 			break;
 		}
 		case irr::KEY_KEY_S: {
@@ -1797,8 +1807,10 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				std::wstring nvdaString = fmt::format(L"Removed Cards");
 				nvdaController_speakText(nvdaString.c_str());
 			}
-			else
-				mainGame->wCardDisplay->setVisible(false);
+			else {
+				if (mainGame->wCardDisplay->isVisible())
+					mainGame->wCardDisplay->setVisible(false);
+			}
 			break;
 		}
 		case irr::KEY_KEY_D: {//TODO - Fazer validação de chain
@@ -1808,8 +1820,10 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				std::wstring nvdaString = fmt::format(L"Chained Cards");
 				nvdaController_speakText(nvdaString.c_str());
 			}
-			else
-				mainGame->wCardDisplay->setVisible(false);
+			else {
+				if (mainGame->wCardDisplay->isVisible())
+					mainGame->wCardDisplay->setVisible(false);
+			}
 			break;
 		}
 		case irr::KEY_KEY_F: {
@@ -1820,8 +1834,10 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				std::wstring nvdaString = fmt::format(L"Activable Cards");
 				nvdaController_speakText(nvdaString.c_str());
 			}
-			else
-				mainGame->wCardDisplay->setVisible(false);
+			else {
+				if (mainGame->wCardDisplay->isVisible())
+					mainGame->wCardDisplay->setVisible(false);
+			}
 			break;
 		}
 		case irr::KEY_RETURN: {
@@ -1910,7 +1926,12 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 		}
 		case irr::KEY_RIGHT: {
 			if (!event.KeyInput.PressedDown) {
-				if (display_cards.size() && indexLookedUpCard < display_cards.size()-1) {
+				if (display_cards.size() == 1) {
+					mainGame->ShowCardInfo(display_cards[0]->code);
+					std::wstring nvdaString = fmt::format(L"{}", gDataManager->GetName(display_cards[indexLookedUpCard]->code));
+					nvdaController_speakText(nvdaString.c_str());
+				}
+				else if (display_cards.size() && indexLookedUpCard < display_cards.size()-1) {
 					indexLookedUpCard++;
 					mainGame->ShowCardInfo(display_cards[indexLookedUpCard]->code);
 					std::wstring nvdaString = fmt::format(L"{}", gDataManager->GetName(display_cards[indexLookedUpCard]->code));
@@ -1921,7 +1942,12 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 		}
 		case irr::KEY_LEFT: {
 			if (!event.KeyInput.PressedDown) {
-				if (display_cards.size() && indexLookedUpCard <= display_cards.size() && indexLookedUpCard > 0) {
+				if (display_cards.size() == 1) {
+					mainGame->ShowCardInfo(display_cards[0]->code);
+					std::wstring nvdaString = fmt::format(L"{}", gDataManager->GetName(display_cards[indexLookedUpCard]->code));
+					nvdaController_speakText(nvdaString.c_str());
+				}
+				else if (display_cards.size() && indexLookedUpCard <= display_cards.size() && indexLookedUpCard > 0) {
 					indexLookedUpCard--;
 					mainGame->ShowCardInfo(display_cards[indexLookedUpCard]->code);
 					std::wstring nvdaString = fmt::format(L"{}", gDataManager->GetName(display_cards[indexLookedUpCard]->code));
@@ -2232,7 +2258,6 @@ void ClientField::DisplayCards(const std::vector<ClientCard*> &field) {
 		}
 	}
 	if (display_cards.size()) {
-		indexLookedUpCard = 1;
 		mainGame->wCardDisplay->setText(fmt::format(L"{}({})", gDataManager->GetSysString(lookupFieldLocId), display_cards.size()).data());
 		ShowLocationCard();
 		mainGame->ShowCardInfo(display_cards[0]->code);

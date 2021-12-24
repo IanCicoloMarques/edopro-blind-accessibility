@@ -25,6 +25,86 @@ struct ChainInfo {
 	void UpdateDrawCoordinates();
 };
 
+//! Information on a joystick, returned from @ref irr::IrrlichtDevice::activateJoysticks()
+struct AccessibilityFieldFocus
+{
+	/** A identifier to tell where the accessibility reader will look at in the field*/
+	enum FieldLookerLocId
+	{
+		PLAYER_HAND = 0,
+		PLAYER_MONSTERS = 1007,
+		PLAYER_SPELLS = 1,
+		PLAYER_GRAVEYARD = 2,
+		PLAYER_EXTRA_DECK = 3,
+		PLAYER_DECK = 4,
+		PLAYER_BANNED_CARDS = 5,
+		PLAYER_FIELD = 6,
+		PLAYER_PENDULUM_ZONE = 7,
+		PLAYER_SUMMONABLE_MONSTERS = 8,
+		PLAYER_SPECIAL_SUMMONABLE_MONSTERS = 9,
+		PLAYER_ACTIVABLE_CARDS = 10,
+		PLAYER_SETTABLE_CARDS = 11,
+		ATTACKABLE_CARDS = 12,
+		SELECTABLE_CARDS = 13,
+		SELECTED_CARDS = 14,
+		MUST_SELECT_CARDS = 15,
+		ENEMY_PLAYER_HAND = 0,
+		ENEMY_PLAYER_MONSTERS = 0,
+		ENEMY_PLAYER_SPELLS = 0,
+		ENEMY_PLAYER_GRAVEYARD = 0,
+		ENEMY_PLAYER_EXTRA_DECK = 0,
+		ENEMY_PLAYER_DECK = 0,
+		ENEMY_PLAYER_BANNED_CARDS = 0,
+		ENEMY_PLAYER_FIELD = 0,
+		ENEMY_PLAYER_PENDULUM_ZONE = 0,
+		LINK_ZONE = 0,
+	};
+
+	enum DisplayedField
+	{
+		PLAYER = 0,
+		ENEMY_PLAYER = 1
+	};
+
+	enum DisplayedCards
+	{
+		LOOK_ONLY = 0,
+		SHIFT_SPECIAL_ATT = 1,
+		SHIFT_SPECIAL_DEF = 2,
+		CTRL_NORMAL_SET = 5,
+		CTRL_NORMAL_FACEUP = 6
+
+	};
+
+	enum UseType
+	{
+		NORMAL_SUMMON = 0,
+		SPECIAL_SUMMON = 1,
+		SPECIAL_SUMMON_DEFENSE = 2,
+		SET_MONSTER = 3,
+		SET_SPELL = 4,
+		MONSTER_ATTACK = 5,
+		EFFECT = 6,
+		SELECT_CARD = 7
+	};
+
+	enum CardType
+	{
+		MONSTER = 0,
+		SPELL = 1,
+		ACTIVABLE_EFFECT = 2,
+		SELECTABLE = 3
+	};
+
+	enum BattleStep
+	{
+		MP1 = 0,
+		BP = 1,
+		MP2 = 2,
+		ED = 3
+	};
+};
+
 class ClientField: public irr::IEventReceiver {
 public:
 	std::vector<ClientCard*> deck[2];
@@ -149,19 +229,19 @@ public:
 
 	//Accessibility Focus
 	bool accessibilityFocus = true; //TODO- FAZER UMA CONFIGURAÇÃO NO MENU PRA ISSO
-	int displayedField = irr::AccessibilityFieldFocus::DisplayedField::PLAYER;
-	int displayedCards = irr::AccessibilityFieldFocus::DisplayedCards::LOOK_ONLY;
-	int battlePhase = irr::AccessibilityFieldFocus::BattleStep::MP1;
-	int cardType = irr::AccessibilityFieldFocus::CardType::MONSTER;
+	int displayedField = AccessibilityFieldFocus::DisplayedField::PLAYER;
+	int displayedCards = AccessibilityFieldFocus::DisplayedCards::LOOK_ONLY;
+	int battlePhase = AccessibilityFieldFocus::BattleStep::MP1;
+	int cardType = AccessibilityFieldFocus::CardType::MONSTER;
 	void DisplayCards(const std::vector<ClientCard*> &field);
 	void DisplayCards(const std::vector<ChainInfo>& field);
-	bool UseCard(const irr::AccessibilityFieldFocus::UseType& useType);
+	bool UseCard(const AccessibilityFieldFocus::UseType& useType);
 	bool CheckIfCanViewCards(const irr::SEvent& event);
-	void SelectFieldSlot(const int& slot, const irr::AccessibilityFieldFocus::DisplayedField& player = irr::AccessibilityFieldFocus::DisplayedField::PLAYER);
+	void SelectFieldSlot(const int& slot, const AccessibilityFieldFocus::DisplayedField& player = AccessibilityFieldFocus::DisplayedField::PLAYER);
 	float GetYPosition();
 	void SimulateButton(irr::gui::IGUIElement* caller = nullptr);
 	void MouseClick(const irr::SEvent& event);
-	bool SetCard(const int& setType, const irr::AccessibilityFieldFocus::UseType& useType = irr::AccessibilityFieldFocus::UseType::NORMAL_SUMMON);
+	bool SetCard(const int& setType, const AccessibilityFieldFocus::UseType& useType = AccessibilityFieldFocus::UseType::NORMAL_SUMMON);
 };
 
 }

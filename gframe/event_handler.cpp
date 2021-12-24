@@ -1739,7 +1739,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 			}
 			else if (canViewCards && displayedCards == AccessibilityFieldFocus::DisplayedCards::CTRL_NORMAL_SET) {
 				lookupFieldLocId = AccessibilityFieldFocus::FieldLookerLocId::PLAYER_SETTABLE_CARDS;
-				DisplayCards(msetable_cards);
+				DisplayCards(ssetable_cards);
 				std::wstring nvdaString = fmt::format(L"Settable Spells");
 				nvdaController_speakText(nvdaString.c_str());
 			}

@@ -1883,6 +1883,8 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					default:
 						break;
 					}
+					if(mainGame->wCardDisplay->isVisible())
+						mainGame->HideElement(mainGame->wCardDisplay);
 				}
 			}
 			//
@@ -1946,9 +1948,8 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 		}
 		case irr::KEY_DOWN: {
 			if (!event.KeyInput.PressedDown) {
-
-				if (displayedField != AccessibilityFieldFocus::DisplayedCards::LOOK_ONLY)
-					displayedField = AccessibilityFieldFocus::DisplayedCards::LOOK_ONLY;
+				if (displayedCards != AccessibilityFieldFocus::DisplayedCards::LOOK_ONLY)
+					displayedCards = AccessibilityFieldFocus::DisplayedCards::LOOK_ONLY;
 			}
 			break;
 		}
@@ -2002,6 +2003,8 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					SimulateButton(mainGame->btnEP);
 					battlePhase = AccessibilityFieldFocus::BattleStep::ED;
 				}
+				else
+					battlePhase = AccessibilityFieldFocus::BattleStep::MP1;
 			}
 			break;
 		}

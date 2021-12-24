@@ -2232,6 +2232,7 @@ void ClientField::DisplayCards(const std::vector<ClientCard*> &field) {
 		}
 	}
 	if (display_cards.size()) {
+		indexLookedUpCard = 1;
 		mainGame->wCardDisplay->setText(fmt::format(L"{}({})", gDataManager->GetSysString(lookupFieldLocId), display_cards.size()).data());
 		ShowLocationCard();
 		mainGame->ShowCardInfo(display_cards[0]->code);

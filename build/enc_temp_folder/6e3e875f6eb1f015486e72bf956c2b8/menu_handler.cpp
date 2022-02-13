@@ -1074,8 +1074,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 			break;
 		}
 		case irr::KEY_KEY_D: {
-			if (!event.KeyInput.PressedDown && mainGame->btnHostPrepWindBot->isVisible() && mainGame->btnHostPrepStart->isEnabled())
-				ClickButton(mainGame->btnHostPrepStart);
+
 			if (!event.KeyInput.PressedDown && !mainGame->wSinglePlay->isVisible())
 				ClickButton(mainGame->btnLanMode);
 			if (!event.KeyInput.PressedDown && mainGame->btnCreateHost->isVisible())

@@ -44,7 +44,7 @@ premake5.exe
 #/irrlicht/*
 !/irrlicht/premake5.lua
 !/irrlicht/defines.lua
-irrlicht/include/*
-irrlicht/src/*
-build/enc_temp_folder/*
+/irrlicht/include/*
+/irrlicht/src/*
+/build/enc_temp_folder/*
 

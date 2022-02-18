@@ -1811,16 +1811,19 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 		}
 		case irr::KEY_KEY_A: {
 			bool canViewCards = CheckIfCanViewCards(event);
-			if (canViewCards && displayedCards == AccessibilityFieldFocus::DisplayedCards::LOOK_ONLY) {
-				lookupFieldLocId = AccessibilityFieldFocus::FieldLookerLocId::PLAYER_EXTRA_DECK;
-				DisplayCards(extra[displayedField]);
-				std::wstring nvdaString = fmt::format(L"Extra Deck");
-				nvdaController_speakText(nvdaString.c_str());
-			}
-			else if (canViewCards && displayedCards == AccessibilityFieldFocus::DisplayedCards::SHIFT_SPECIAL_ATT) {
+			if (canViewCards && displayedCards == AccessibilityFieldFocus::DisplayedCards::SHIFT_SPECIAL_ATT) {
 				lookupFieldLocId = AccessibilityFieldFocus::FieldLookerLocId::MUST_SELECT_CARDS;
 				DisplayCards(must_select_cards);
 				std::wstring nvdaString = fmt::format(L"Must Select Cards");
+				nvdaController_speakText(nvdaString.c_str());
+			}
+			else if (mainGame->btnYes->isTrulyVisible()) {
+				TriggerEvent(mainGame->btnYes, irr::gui::EGET_BUTTON_CLICKED);
+			}
+			else if (canViewCards && displayedCards == AccessibilityFieldFocus::DisplayedCards::LOOK_ONLY) {
+				lookupFieldLocId = AccessibilityFieldFocus::FieldLookerLocId::PLAYER_EXTRA_DECK;
+				DisplayCards(extra[displayedField]);
+				std::wstring nvdaString = fmt::format(L"Extra Deck");
 				nvdaController_speakText(nvdaString.c_str());
 			}
 			else {
@@ -1844,11 +1847,14 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 			break;
 		}
 		case irr::KEY_KEY_D: {//TODO - Fazer validação de chain
-			if (mainGame->btnSingleMode->isVisible()) {
-				auto var = mainGame->btnSingleMode->getClickShiftState();
-				auto var2 = 0;
+			bool canViewCards = CheckIfCanViewCards(event);
+			if (mainGame->btnFileSaveNo->isTrulyVisible()) {
+				TriggerEvent(mainGame->btnFileSaveNo, irr::gui::EGET_BUTTON_CLICKED);
 			}
-			if (CheckIfCanViewCards(event)) {
+			else if (mainGame->btnNo->isTrulyVisible()) {
+				TriggerEvent(mainGame->btnNo, irr::gui::EGET_BUTTON_CLICKED);
+			}
+			else if (canViewCards) {
 				lookupFieldLocId = AccessibilityFieldFocus::FieldLookerLocId::PLAYER_ACTIVABLE_CARDS;
 				DisplayCards(chains);
 				std::wstring nvdaString = fmt::format(L"Chained Cards");
@@ -1861,10 +1867,6 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 			break;
 		}
 		case irr::KEY_KEY_F: {
-			if (mainGame->btnSingleMode->isVisible()) {
-				auto var = mainGame->btnSingleMode->getClickShiftState();
-				auto var2 = 0;
-			}
 			bool canViewCards = CheckIfCanViewCards(event);
 			if (canViewCards) {
 				lookupFieldLocId = AccessibilityFieldFocus::FieldLookerLocId::PLAYER_ACTIVABLE_CARDS;
@@ -1879,70 +1881,107 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 			
 			break;
 		}
+		case irr::KEY_KEY_I: {
+			if (!display_cards.empty() && indexLookedUpCard <= display_cards.size()) {
+				auto selectedCard = display_cards[indexLookedUpCard];
+
+				std::wstring cardName = fmt::format(L"{}", gDataManager->GetName(selectedCard->code));
+				std::wstring cardType = fmt::format(L"{}", gDataManager->FormatType(selectedCard->type));
+				std::wstring cardLevel = fmt::format(L"Level {}", gDataManager->GetCardData(selectedCard->code)->level);
+				std::wstring cardRace = fmt::format(L"{}", gDataManager->FormatRace(selectedCard->race));
+				std::wstring cardAttack = fmt::format(L"Attack {}", gDataManager->GetCardData(selectedCard->code)->attack);
+				std::wstring cardDefense = fmt::format(L"Defense: {}", gDataManager->GetCardData(selectedCard->code)->defense);
+				std::wstring cardEffect = fmt::format(L"{}", gDataManager->GetText(selectedCard->code));
+				//selectedCard->lscstring
+				nvdaController_speakText(cardName.c_str());
+				nvdaController_speakText(cardRace.c_str());
+				nvdaController_speakText(cardLevel.c_str());
+				nvdaController_speakText(cardType.c_str());
+				nvdaController_speakText(cardAttack.c_str());
+				nvdaController_speakText(cardDefense.c_str());
+				nvdaController_speakText(cardEffect.c_str());
+			}
+			break;
+		}
 		case irr::KEY_RETURN: {
 			if (!event.KeyInput.PressedDown) {
-				if (!display_cards.empty() && indexLookedUpCard <= display_cards.size() && displayedCards != AccessibilityFieldFocus::DisplayedCards::LOOK_ONLY) {
+				if (mainGame->btnMsgOK->isTrulyVisible()) {
+					TriggerEvent(mainGame->btnMsgOK, irr::gui::EGET_BUTTON_CLICKED);
+				}
+				else if (!display_cards.empty() && indexLookedUpCard <= display_cards.size() && displayedCards != AccessibilityFieldFocus::DisplayedCards::LOOK_ONLY) {
 					clicked_card = display_cards[indexLookedUpCard];
 					switch (lookupFieldLocId)
 					{
 					case AccessibilityFieldFocus::FieldLookerLocId::PLAYER_SUMMONABLE_MONSTERS: {
 						if (displayedCards == AccessibilityFieldFocus::DisplayedCards::CTRL_NORMAL_FACEUP) {
 							cardType = AccessibilityFieldFocus::CardType::MONSTER;
-							UseCard(AccessibilityFieldFocus::UseType::NORMAL_SUMMON);
-							mainGame->HideElement(mainGame->wCardDisplay);
+							UseCard(AccessibilityFieldFocus::UseType::NORMAL_SUMMON, event);
 						}
 						else {
 							cardType = AccessibilityFieldFocus::CardType::MONSTER;
-							UseCard(AccessibilityFieldFocus::UseType::SET_MONSTER);
-							mainGame->HideElement(mainGame->wCardDisplay);
+							UseCard(AccessibilityFieldFocus::UseType::SET_MONSTER, event);
 						}
 						break;
 					}
 					case AccessibilityFieldFocus::FieldLookerLocId::PLAYER_SPECIAL_SUMMONABLE_MONSTERS: {
 						if (displayedCards == AccessibilityFieldFocus::DisplayedCards::SHIFT_SPECIAL_ATT) {
 							cardType = AccessibilityFieldFocus::CardType::MONSTER;
-							UseCard(AccessibilityFieldFocus::UseType::SPECIAL_SUMMON);
-							mainGame->HideElement(mainGame->wCardDisplay);
+							UseCard(AccessibilityFieldFocus::UseType::SPECIAL_SUMMON, event);
 						}
 						else {
 							cardType = AccessibilityFieldFocus::CardType::MONSTER;
-							UseCard(AccessibilityFieldFocus::UseType::SPECIAL_SUMMON_DEFENSE);
-							mainGame->HideElement(mainGame->wCardDisplay);
+							UseCard(AccessibilityFieldFocus::UseType::SPECIAL_SUMMON_DEFENSE, event);
 						}
 						break;
 					}
 					case AccessibilityFieldFocus::FieldLookerLocId::PLAYER_SETTABLE_CARDS: {
 						cardType = AccessibilityFieldFocus::CardType::SPELL;
-						UseCard(AccessibilityFieldFocus::UseType::SET_SPELL);
-						mainGame->HideElement(mainGame->wCardDisplay);
+						UseCard(AccessibilityFieldFocus::UseType::SET_SPELL, event);
 						break;
 					}
 					case AccessibilityFieldFocus::FieldLookerLocId::PLAYER_ACTIVABLE_CARDS: {
 						cardType = AccessibilityFieldFocus::CardType::ACTIVABLE_EFFECT;
-						UseCard(AccessibilityFieldFocus::UseType::EFFECT);
-						mainGame->HideElement(mainGame->wCardDisplay);
+						UseCard(AccessibilityFieldFocus::UseType::EFFECT, event);
 						break;
 					}
 					case AccessibilityFieldFocus::FieldLookerLocId::ATTACKABLE_CARDS: {
 						cardType = AccessibilityFieldFocus::CardType::MONSTER;
-						UseCard(AccessibilityFieldFocus::UseType::MONSTER_ATTACK);
-						mainGame->HideElement(mainGame->wCardDisplay);
+						UseCard(AccessibilityFieldFocus::UseType::MONSTER_ATTACK, event);
 						break;
 					}
 					case AccessibilityFieldFocus::FieldLookerLocId::SELECTABLE_CARDS: {
-						cardType = AccessibilityFieldFocus::CardType::SELECTABLE;
-						UseCard(AccessibilityFieldFocus::UseType::SELECT_CARD);
-						mainGame->HideElement(mainGame->wCardDisplay);
+						if (mainGame->wCardDisplay->isVisible())
+							mainGame->HideElement(mainGame->wCardDisplay);
+		/*				displayedCards = AccessibilityFieldFocus::DisplayedCards::LOOK_ONLY;
+						clicked_card->is_selected = true;
+						selected_cards.push_back(clicked_card);
+						SetResponseSelectedCards();
+						ShowCancelOrFinishButton(0);
+						DuelClient::SendResponse();*/
+						UseCard(AccessibilityFieldFocus::UseType::SELECT_CARD, event);
 						break;
 					}
 					default:
 						break;
 					}
-					if(mainGame->wCardDisplay->isVisible())
-						mainGame->HideElement(mainGame->wCardDisplay);
 				}
+				//else {
+				//	SetMouseOnCard();
+				//	MouseClick(event);
+
+				//	/*irr::SEvent simulated{};
+				//	simulated.EventType = irr::EET_GUI_EVENT;
+				//	simulated.GUIEvent.EventType = irr::gui::EGET_BUTTON_CLICKED;
+				//	simulated.GUIEvent.Caller = mainGame->btnPSAU;
+				//	simulated.GUIEvent.Caller->setParent(nullptr);
+				//	if (simulated.GUIEvent.Caller)
+				//		mainGame->device->postEventFromUser(simulated);*/
+				//}
+
+
+				if (mainGame->wCardDisplay->isVisible())
+					mainGame->HideElement(mainGame->wCardDisplay);
 			}
-			//
 			break;
 		}
 		case irr::KEY_LSHIFT: {
@@ -2020,53 +2059,76 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 		}
 		case irr::KEY_KEY_1: {
 			if (!event.KeyInput.PressedDown) {
-				//SelectFieldSlot(1);
-				//MouseClick(event);
-
-				clicked_card = hand[0][2];
-
-				ShowMenu(10, 0, 0);
-				auto cursor = mainGame->device->getCursorControl();
-				auto pos = cursor->getRelativePosition();
-				irr::core::vector2di mouse = mainGame->Resize(0, 0, true);
-
-				const auto coords = MouseToField(cursor->getPosition());
-				irr::core::recti rect{ clicked_card->hand_collision.UpperLeftCorner, clicked_card->hand_collision.LowerRightCorner };
-				//cursor->setReferenceRect(&rect);
-				pos.X = clicked_card->hand_collision.getCenter().X;
-				pos.Y = clicked_card->hand_collision.getCenter().Y;
-				auto clamp = [](auto& val) { val = (val < 0.f) ? 0.f : (1.f < val) ? 1.f : val;	};
-				clamp(pos.X);
-				clamp(pos.Y);
-				cursor->setPosition(clicked_card->hand_collision.getCenter());
-				MouseClick(event);
-				//irr::core::vector3df t = clicked_card->curPos;
-				//irr::core::vector3df rot = clicked_card->curRot;
-				//MoveCard(clicked_card, &t, &rot);
-				////void ClientField::MoveCard(ClientCard* pcard, float frame)
-				//clicked_card->UpdateDrawCoordinates();
-				//pos.X = clicked_card->mTransform[5];
-				//pos.Y = clicked_card->mTransform[9];
-				//auto clamp = [](auto& val) { val = (val < 0.f) ? 0.f : (1.f < val) ? 1.f : val;	};
-				//clamp(pos.X);
-				//clamp(pos.Y);
-				//cursor->setPosition(pos.X, pos.Y);
-				
-				//MouseClick(event);
+				if (mainGame->btnHand[0]->isTrulyVisible()) {
+					TriggerEvent(mainGame->btnHand[0], irr::gui::EGET_BUTTON_CLICKED);
+					std::wstring nvdaString = fmt::format(L"SCISSORS");
+					nvdaController_speakText(nvdaString.c_str());
+				}
+				else if(mainGame->btnFirst->isTrulyVisible()){
+					TriggerEvent(mainGame->btnFirst, irr::gui::EGET_BUTTON_CLICKED);
+					std::wstring nvdaString = fmt::format(L"First turn");
+					nvdaController_speakText(nvdaString.c_str());
+				}
+				else if(mainGame->btnPSAU->isTrulyVisible()){
+					TriggerEvent(mainGame->btnPSAU, irr::gui::EGET_BUTTON_CLICKED);
+					std::wstring nvdaString = fmt::format(L"Attack Up");
+					nvdaController_speakText(nvdaString.c_str());
+				}
+				else if (mainGame->btnPSAD->isTrulyVisible()){
+					TriggerEvent(mainGame->btnPSAU, irr::gui::EGET_BUTTON_CLICKED);
+					std::wstring nvdaString = fmt::format(L"Attack Down");
+					nvdaController_speakText(nvdaString.c_str());
+				}
+				else
+				{
+					SelectFieldSlot(1);
+					MouseClick(event);
+				}
 			}
 			break;
 		}
 		case irr::KEY_KEY_2: {
 			if (!event.KeyInput.PressedDown) {
-				SelectFieldSlot(2);
-				MouseClick(event);
+				if (mainGame->btnHand[1]->isTrulyVisible()) {
+					TriggerEvent(mainGame->btnHand[1], irr::gui::EGET_BUTTON_CLICKED);
+					std::wstring nvdaString = fmt::format(L"ROCK");
+					nvdaController_speakText(nvdaString.c_str());
+				}
+				else if (mainGame->btnSecond->isTrulyVisible()){
+					TriggerEvent(mainGame->btnSecond, irr::gui::EGET_BUTTON_CLICKED);
+					std::wstring nvdaString = fmt::format(L"Second Turn");
+					nvdaController_speakText(nvdaString.c_str());
+				}
+				else if (mainGame->btnPSDU->isTrulyVisible()){
+					TriggerEvent(mainGame->btnPSDU, irr::gui::EGET_BUTTON_CLICKED);
+					std::wstring nvdaString = fmt::format(L"Defense Up");
+					nvdaController_speakText(nvdaString.c_str());
+				}
+				else if (mainGame->btnPSDD->isTrulyVisible()){
+					TriggerEvent(mainGame->btnPSDD, irr::gui::EGET_BUTTON_CLICKED);
+					std::wstring nvdaString = fmt::format(L"Defense Down");
+					nvdaController_speakText(nvdaString.c_str());
+				}
+				else
+				{
+					SelectFieldSlot(2);
+					MouseClick(event);
+				}
 			}
 			break;
 		}
 		case irr::KEY_KEY_3: {
 			if (!event.KeyInput.PressedDown) {
-				SelectFieldSlot(3);
-				MouseClick(event);
+				if (mainGame->btnHand[2]->isTrulyVisible()){
+					TriggerEvent(mainGame->btnHand[2], irr::gui::EGET_BUTTON_CLICKED);
+					std::wstring nvdaString = fmt::format(L"Paper");
+					nvdaController_speakText(nvdaString.c_str());
+				}
+				else
+				{
+					SelectFieldSlot(3);
+					MouseClick(event);
+				}
 			}
 			break;
 		}
@@ -2088,19 +2150,28 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 			}
 			break;
 		}
+		case irr::KEY_KEY_0: {
+			if (!event.KeyInput.PressedDown) {
+				if (mainGame->btnLeaveGame->isTrulyVisible()) {
+					TriggerEvent(mainGame->btnLeaveGame, irr::gui::EGET_BUTTON_CLICKED);
+					std::wstring nvdaString = fmt::format(L"Surrender");
+					nvdaController_speakText(nvdaString.c_str());
+				}
+			}
+			break;
+		}
 		case irr::KEY_BACK: {
 			if (!event.KeyInput.PressedDown) {
-				//MouseClick(event);
 				if (battlePhase == AccessibilityFieldFocus::BattleStep::MP1) {
-					SimulateButton(mainGame->btnBP);
+					TriggerEvent(mainGame->btnBP, irr::gui::EGET_BUTTON_CLICKED);
 					battlePhase = AccessibilityFieldFocus::BattleStep::BP;
 				}
 				else if (battlePhase == AccessibilityFieldFocus::BattleStep::BP) {
-					SimulateButton(mainGame->btnM2);
+					TriggerEvent(mainGame->btnM2, irr::gui::EGET_BUTTON_CLICKED);
 					battlePhase = AccessibilityFieldFocus::BattleStep::MP2;
 				}
 				else if (battlePhase == AccessibilityFieldFocus::BattleStep::MP2) {
-					SimulateButton(mainGame->btnEP);
+					TriggerEvent(mainGame->btnEP, irr::gui::EGET_BUTTON_CLICKED);
 					battlePhase = AccessibilityFieldFocus::BattleStep::ED;
 				}
 				else
@@ -2214,7 +2285,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 	return false;
 }
 
-bool ClientField::UseCard(const AccessibilityFieldFocus::UseType& useType) {
+bool ClientField::UseCard(const AccessibilityFieldFocus::UseType& useType, const irr::SEvent& event) {
 	bool canUse = false;
 	if (clicked_card) {
 		irr::SEvent simulated{};
@@ -2234,57 +2305,118 @@ bool ClientField::UseCard(const AccessibilityFieldFocus::UseType& useType) {
 		}
 		case AccessibilityFieldFocus::UseType::SPECIAL_SUMMON: {
 			list_command = 0;
-			//simulated.GUIEvent.Caller = mainGame->btnSPSummon;
-			//simulated.GUIEvent.Caller->setParent(nullptr);
+			/*for (size_t i = 0; i < hand[0].size(); ++i) {
+				if (hand[0][i] == clicked_card) {
+					ShowMenu(4, 0, 0);
+					TriggerEvent(mainGame->btnSPSummon, irr::gui::EGET_BUTTON_CLICKED);
+					break;
+				}
+			}*/
 			ShowMenu(4, 0, 0);
 			TriggerEvent(mainGame->btnSPSummon, irr::gui::EGET_BUTTON_CLICKED);
 			break;
-			/*if (!list_command && clicked_card) {
-				for (size_t i = 0; i < spsummonable_cards.size(); ++i) {
-					if (spsummonable_cards[i] == clicked_card) {
-						ClearCommandFlag();
-						DuelClient::SetResponseI((i << 16) + 1);
-						DuelClient::SendResponse();
-						canUse = true;
-						break;
-					}
-				}
-			}
-			else {
-				selectable_cards.clear();
-				switch (command_location) {
-				case LOCATION_DECK: {
-					for (size_t i = 0; i < deck[command_controler].size(); ++i)
-						if (deck[command_controler][i]->cmdFlag & COMMAND_SPSUMMON)
-							selectable_cards.push_back(deck[command_controler][i]);
-					break;
-				}
-				case LOCATION_GRAVE: {
-					for (size_t i = 0; i < grave[command_controler].size(); ++i)
-						if (grave[command_controler][i]->cmdFlag & COMMAND_SPSUMMON)
-							selectable_cards.push_back(grave[command_controler][i]);
-					break;
-				}
-				case LOCATION_REMOVED: {
-					for (size_t i = 0; i < remove[command_controler].size(); ++i)
-						if (remove[command_controler][i]->cmdFlag & COMMAND_SPSUMMON)
-							selectable_cards.push_back(remove[command_controler][i]);
-					break;
-				}
-				case LOCATION_EXTRA: {
-					for (size_t i = 0; i < extra[command_controler].size(); ++i)
-						if (extra[command_controler][i]->cmdFlag & COMMAND_SPSUMMON)
-							selectable_cards.push_back(extra[command_controler][i]);
-					break;
-				}
-				}
-				list_command = COMMAND_SPSUMMON;
-				mainGame->wCardSelect->setText(gDataManager->GetSysString(509).data());
-				ShowSelectCard();
-				select_ready = false;
-				ShowCancelOrFinishButton(1);
-			}
-			break;*/
+	//		/*if (!list_command && clicked_card) {
+	//			for (size_t i = 0; i < spsummonable_cards.size(); ++i) {
+	//				if (spsummonable_cards[i] == clicked_card) {
+	//					ClearCommandFlag();
+	//					DuelClient::SetResponseI((i << 16) + 1);
+	//					DuelClient::SendResponse();
+	//					canUse = true;
+	//					break;
+	//				}
+	//			}
+	//		}
+	//		else {
+	//			selectable_cards.clear();
+	//			switch (command_location) {
+	//			case LOCATION_DECK: {
+	//				for (size_t i = 0; i < deck[command_controler].size(); ++i)
+	//					if (deck[command_controler][i]->cmdFlag & COMMAND_SPSUMMON)
+	//						selectable_cards.push_back(deck[command_controler][i]);
+	//				break;
+	//			}
+	//			case LOCATION_GRAVE: {
+	//				for (size_t i = 0; i < grave[command_controler].size(); ++i)
+	//					if (grave[command_controler][i]->cmdFlag & COMMAND_SPSUMMON)
+	//						selectable_cards.push_back(grave[command_controler][i]);
+	//				break;
+	//			}
+	//			case LOCATION_REMOVED: {
+	//				for (size_t i = 0; i < remove[command_controler].size(); ++i)
+	//					if (remove[command_controler][i]->cmdFlag & COMMAND_SPSUMMON)
+	//						selectable_cards.push_back(remove[command_controler][i]);
+	//				break;
+	//			}
+	//			case LOCATION_EXTRA: {
+	//				for (size_t i = 0; i < extra[command_controler].size(); ++i)
+	//					if (extra[command_controler][i]->cmdFlag & COMMAND_SPSUMMON)
+	//						selectable_cards.push_back(extra[command_controler][i]);
+	//				break;
+	//			}
+	//			}
+	//			list_command = COMMAND_SPSUMMON;
+	//			mainGame->wCardSelect->setText(gDataManager->GetSysString(509).data());
+	//			ShowSelectCard();
+	//			select_ready = false;
+	//		}
+	//		break;
+	//	}
+	//	case AccessibilityFieldFocus::UseType::SELECT_CARD: {
+	//		list_command = 1;
+	//		if (!list_command && clicked_card) {
+	//			for (size_t i = 0; i < selectable_cards.size(); ++i) {
+	//				if (selectable_cards[i] == clicked_card) {
+	//					ClearCommandFlag();
+	//					DuelClient::SetResponseI((i << 16) + 1);
+	//					DuelClient::SendResponse();
+	//					canUse = true;
+	//					break;
+	//				}
+	//			}
+	//		}
+	//		else {
+	//			switch (command_location) {
+	//				case LOCATION_SZONE: {
+	//					mainGame->HideElement(mainGame->wCardDisplay);
+	//					auto cursor = mainGame->device->getCursorControl();
+	//					auto pos = cursor->getRelativePosition();
+	///*					pos.X = clicked_card->dPos.X;
+	//					pos.Y = clicked_card->dPos.Y;*/
+	//					auto clamp = [](auto& val) { val = (val < 0.f) ? 0.f : (1.f < val) ? 1.f : val;	};
+	//					clamp(pos.X);
+	//					clamp(pos.Y);
+	//					cursor->setPosition(pos.X, pos.Y);
+	//					MouseClick(event);
+	//					break;
+	//				}
+	//				case LOCATION_DECK: {
+	//					for (size_t i = 0; i < deck[command_controler].size(); ++i)
+	//						if (deck[command_controler][i]->cmdFlag & COMMAND_SPSUMMON)
+	//							selectable_cards.push_back(deck[command_controler][i]);
+	//					break;
+	//				}
+	//				case LOCATION_GRAVE: {
+	//					for (size_t i = 0; i < grave[command_controler].size(); ++i)
+	//						if (grave[command_controler][i]->cmdFlag & COMMAND_SPSUMMON)
+	//							selectable_cards.push_back(grave[command_controler][i]);
+	//					break;
+	//				}
+	//				case LOCATION_REMOVED: {
+	//					for (size_t i = 0; i < remove[command_controler].size(); ++i)
+	//						if (remove[command_controler][i]->cmdFlag & COMMAND_SPSUMMON)
+	//							selectable_cards.push_back(remove[command_controler][i]);
+	//					break;
+	//				}
+	//				case LOCATION_EXTRA: {
+	//					for (size_t i = 0; i < extra[command_controler].size(); ++i)
+	//						if (extra[command_controler][i]->cmdFlag & COMMAND_SPSUMMON)
+	//							selectable_cards.push_back(extra[command_controler][i]);
+	//					break;
+	//				}
+	//								   mainGame->btnCancelOrFinish.click();
+	//			}
+	//		}
+	//		break;*/
 		}
 		case AccessibilityFieldFocus::UseType::SET_SPELL: {
 			ShowMenu(17, 0, 0);
@@ -2301,7 +2433,12 @@ bool ClientField::UseCard(const AccessibilityFieldFocus::UseType& useType) {
 			TriggerEvent(mainGame->btnActivate, irr::gui::EGET_BUTTON_CLICKED);
 			break;
 		}
-
+		case AccessibilityFieldFocus::UseType::SELECT_CARD: {
+			//ShowMenu(10, 0, 0);
+			SetMouseOnCard();
+			MouseClick(event);
+			break;
+		}					
 		default:
 			break;
 		}
@@ -2311,7 +2448,8 @@ bool ClientField::UseCard(const AccessibilityFieldFocus::UseType& useType) {
 	return canUse;
 }
 
-bool ClientField::CheckIfCanViewCards(const irr::SEvent& event) {
+bool ClientField::CheckIfCanViewCards(irr::SEvent event) {
+	event.KeyInput.PressedDown = false;
 	bool canViewCards = false;
 	if (!event.KeyInput.PressedDown && !mainGame->dInfo.isReplay && mainGame->dInfo.player_type != 7 && mainGame->dInfo.isInDuel
 		&& !mainGame->wCardDisplay->isVisible() && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX))
@@ -2406,6 +2544,18 @@ void ClientField::MouseClick(const irr::SEvent& event) {
 	};
 
 	CheckAndPost(JWrapper::Buttons::A, irr::EMIE_LMOUSE_PRESSED_DOWN);
+}
+
+void ClientField::SetMouseOnCard()
+{
+	auto cursor = mainGame->device->getCursorControl();
+	auto pos = cursor->getRelativePosition();
+	pos.X = clicked_card->hand_collision.getCenter().X;
+	pos.Y = clicked_card->hand_collision.getCenter().Y;
+	auto clamp = [](auto& val) { val = (val < 0.f) ? 0.f : (1.f < val) ? 1.f : val;	};
+	clamp(pos.X);
+	clamp(pos.Y);
+	cursor->setPosition(clicked_card->hand_collision.getCenter());
 }
 
 static bool IsTrulyVisible(const irr::gui::IGUIElement* elem) {

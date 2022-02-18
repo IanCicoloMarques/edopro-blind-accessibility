@@ -25,6 +25,7 @@
 #include <IGUITabControl.h>
 #include <IGUITable.h>
 #include <IGUIWindow.h>
+#include <nvdaController.h>
 
 namespace ygo {
 
@@ -188,6 +189,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case BUTTON_LAN_MODE: {
+				nvdaController_speakText(L"LAN + AI"); //TODO change to class
 				mainGame->isHostingOnline = false;
 				mainGame->btnCreateHost->setEnabled(mainGame->coreloaded);
 				mainGame->btnJoinHost->setEnabled(true);
@@ -227,6 +229,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 			}
 			case BUTTON_CREATE_HOST: {
 				if (wcslen(mainGame->ebNickName->getText())) {
+					nvdaController_speakText(L"Host game"); //TODO change to class
 					mainGame->isHostingOnline = false;
 					mainGame->btnHostConfirm->setEnabled(true);
 					mainGame->btnHostCancel->setEnabled(true);
@@ -314,6 +317,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case BUTTON_HOST_CONFIRM: {
+				nvdaController_speakText(L"Rules ok"); //TODO change to class
 				DuelClient::is_local_host = false;
 				if(mainGame->isHostingOnline) {
 					ServerLobby::JoinServer(true);
@@ -379,6 +383,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case BUTTON_HP_READY: {
+				nvdaController_speakText(L"Player ready"); //TODO change to class
 				bool check = false;
 				if(!mainGame->cbDeckSelect2->isVisible())
 					check = (mainGame->cbDeckSelect->getSelected() == -1 || !gdeckManager->LoadDeck(Utils::ToPathString(mainGame->cbDeckSelect->getItem(mainGame->cbDeckSelect->getSelected()))));
@@ -403,6 +408,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case BUTTON_HP_START: {
+				nvdaController_speakText(L"Start game"); //TODO change to class
 				DuelClient::SendPacketToServer(CTOS_HS_START);
 				break;
 			}
@@ -498,6 +504,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case BUTTON_HP_AI_TOGGLE: {
+				nvdaController_speakText(L"Select bot"); //TODO change to class
 				if (mainGame->gBot.window->isVisible()) {
 					mainGame->HideElement(mainGame->gBot.window);
 				}
@@ -508,6 +515,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 			}
 			case BUTTON_BOT_ADD: {
 				try {
+					nvdaController_speakText(L"Add Bot"); //TODO change to class
 					int port = std::stoi(gGameConfig->serverport);
 					if(mainGame->gBot.LaunchSelected(port, mainGame->dInfo.secret.pass))
 						break;
@@ -1074,21 +1082,45 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 			break;
 		}
 		case irr::KEY_KEY_D: {
-			if (!event.KeyInput.PressedDown && mainGame->btnHostPrepWindBot->isVisible() && mainGame->btnHostPrepStart->isEnabled())
+			if (!event.KeyInput.PressedDown && mainGame->btnHostPrepWindBot->isTrulyVisible() && mainGame->btnHostPrepStart->isEnabled()) {
 				ClickButton(mainGame->btnHostPrepStart);
-			if (!event.KeyInput.PressedDown && !mainGame->wSinglePlay->isVisible())
+			}
+			else if (!event.KeyInput.PressedDown && !mainGame->wSinglePlay->isTrulyVisible()) {
 				ClickButton(mainGame->btnLanMode);
-			if (!event.KeyInput.PressedDown && mainGame->btnCreateHost->isVisible())
+			}
+			if (!event.KeyInput.PressedDown && mainGame->btnCreateHost->isTrulyVisible()) {
 				ClickButton(mainGame->btnCreateHost);
-			if (!event.KeyInput.PressedDown && mainGame->btnHostConfirm->isVisible())
+			}
+			else if (!event.KeyInput.PressedDown && mainGame->btnHostConfirm->isTrulyVisible()) {
 				ClickButton(mainGame->btnHostConfirm);
-			if (!event.KeyInput.PressedDown && mainGame->btnHostPrepReady->isVisible())
+			}
+			else if (!event.KeyInput.PressedDown && mainGame->btnHostPrepReady->isTrulyVisible()) {
 				ClickButton(mainGame->btnHostPrepReady);
-			if (!event.KeyInput.PressedDown && mainGame->gBot.btnAdd->isVisible())
+			}
+			else if (!event.KeyInput.PressedDown && mainGame->gBot.btnAdd->isTrulyVisible()) {
 				ClickButton(mainGame->gBot.btnAdd);
-			if (!event.KeyInput.PressedDown && mainGame->btnHostPrepWindBot->isVisible())
+			}
+			else if (!event.KeyInput.PressedDown && mainGame->btnHostPrepWindBot->isTrulyVisible()) {
 				ClickButton(mainGame->btnHostPrepWindBot);
+			}
 			
+			break;
+		}
+		case irr::KEY_KEY_0: {
+			if (!event.KeyInput.PressedDown && mainGame->btnHostPrepCancel->isTrulyVisible()) {
+				ClickButton(mainGame->btnHostPrepCancel);
+			}
+			else if (!event.KeyInput.PressedDown && mainGame->btnHostCancel->isTrulyVisible()) {
+				ClickButton(mainGame->btnHostCancel);
+			}
+			else if (!event.KeyInput.PressedDown && mainGame->btnJoinCancel->isTrulyVisible()) {
+				ClickButton(mainGame->btnJoinCancel);
+			}
+			else if (!event.KeyInput.PressedDown && mainGame->btnModeExit->isTrulyVisible()) {
+				ClickButton(mainGame->btnModeExit);
+			}
+			
+
 			break;
 		}
 		default: break;

@@ -657,11 +657,15 @@ void DuelClient::HandleSTOCPacketLan2(char* data, uint32_t len) {
 		break;
 	}
 	case STOC_SELECT_HAND: {
+		std::wstring nvdaString = fmt::format(L"SCISSORS ROCK PAPER ");
+		nvdaController_speakText(nvdaString.c_str());//TODO Change to class
 		mainGame->wHand->setVisible(true);
 		break;
 	}
 	case STOC_SELECT_TP: {
 		std::lock_guard<std::mutex> lock(mainGame->gMutex);
+		std::wstring nvdaString = fmt::format(L"Select your turn");
+		nvdaController_speakText(nvdaString.c_str());
 		mainGame->PopupElement(mainGame->wFTSelect);
 		break;
 	}
@@ -1306,6 +1310,9 @@ int DuelClient::ClientAnalyze(char* msg, uint32_t len) {
 			std::unique_lock<std::mutex> lock(mainGame->gMutex);
 			mainGame->stMessage->setText(gDataManager->GetSysString(1434).data());
 
+			std::wstring nvdaString = fmt::format(gDataManager->GetSysString(1434).data());
+			nvdaController_speakText(nvdaString.c_str());
+
 			nvdaController_speakText(L"Error"); //TODO change to class
 
 			mainGame->PopupElement(mainGame->wMessage);
@@ -1316,6 +1323,8 @@ int DuelClient::ClientAnalyze(char* msg, uint32_t len) {
 			{
 				std::unique_lock<std::mutex> lock(mainGame->gMutex);
 				mainGame->stMessage->setText(gDataManager->GetSysString(1434).data());
+				std::wstring nvdaString = fmt::format(gDataManager->GetSysString(1434).data());
+				nvdaController_speakText(nvdaString.c_str());
 
 				nvdaController_speakText(L"Error"); //TODO change to class
 

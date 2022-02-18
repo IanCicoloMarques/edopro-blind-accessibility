@@ -235,13 +235,14 @@ public:
 	int cardType = AccessibilityFieldFocus::CardType::MONSTER;
 	void DisplayCards(const std::vector<ClientCard*> &field);
 	void DisplayCards(const std::vector<ChainInfo>& field);
-	bool UseCard(const AccessibilityFieldFocus::UseType& useType);
-	bool CheckIfCanViewCards(const irr::SEvent& event);
+	bool UseCard(const AccessibilityFieldFocus::UseType& useType, const irr::SEvent& event);
+	bool CheckIfCanViewCards(irr::SEvent event);
 	void SelectFieldSlot(const int& slot, const AccessibilityFieldFocus::DisplayedField& player = AccessibilityFieldFocus::DisplayedField::PLAYER);
 	float GetYPosition();
 	void SimulateButton(irr::gui::IGUIElement* caller = nullptr);
 	void MouseClick(const irr::SEvent& event);
 	bool SetCard(const int& setType, const AccessibilityFieldFocus::UseType& useType = AccessibilityFieldFocus::UseType::NORMAL_SUMMON);
+	void SetMouseOnCard();
 };
 
 }

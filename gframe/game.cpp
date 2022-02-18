@@ -38,6 +38,7 @@
 #include "utils_gui.h"
 #include "custom_skin_enum.h"
 #include "joystick_wrapper.h"
+#include <nvdaController.h>
 #if defined(__MINGW32__) && defined(UNICODE)
 #include <fcntl.h>
 #include <ext/stdio_filebuf.h>
@@ -45,6 +46,9 @@
 
 #ifdef __ANDROID__
 #include "CGUICustomComboBox/CGUICustomComboBox.h"
+#include <nvdaController.h>
+#include <nvdaController.h>
+#include <nvdaController.h>
 namespace porting {
 	void dispatchQueuedMessages();
 }
@@ -1867,6 +1871,8 @@ bool Game::MainLoop() {
 				update_checked = true;
 				HideElement(updateWindow);
 				stMessage->setText(gDataManager->GetSysString(1467).data());
+				std::wstring nvdaString = fmt::format(gDataManager->GetSysString(1467).data());
+				nvdaController_speakText(nvdaString.c_str());
 				PopupElement(wMessage);
 			} else {
 				update_checked = true;

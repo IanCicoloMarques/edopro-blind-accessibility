@@ -78,14 +78,15 @@ struct AccessibilityFieldFocus
 
 	enum UseType
 	{
-		NORMAL_SUMMON = 0,
-		SPECIAL_SUMMON = 1,
-		SPECIAL_SUMMON_DEFENSE = 2,
-		SET_MONSTER = 3,
-		SET_SPELL = 4,
-		MONSTER_ATTACK = 5,
-		EFFECT = 6,
-		SELECT_CARD = 7
+		NO_USE = 0,
+		NORMAL_SUMMON = 1,
+		SPECIAL_SUMMON = 2,
+		SPECIAL_SUMMON_DEFENSE = 3,
+		SET_MONSTER = 4,
+		SET_SPELL = 5,
+		MONSTER_ATTACK = 6,
+		EFFECT = 7,
+		SELECT_CARD = 8
 	};
 
 	enum CardType
@@ -93,7 +94,8 @@ struct AccessibilityFieldFocus
 		MONSTER = 0,
 		SPELL = 1,
 		ACTIVABLE_EFFECT = 2,
-		SELECTABLE = 3
+		SELECTABLE = 3,
+		LINK = 4
 	};
 
 	enum BattleStep
@@ -102,6 +104,15 @@ struct AccessibilityFieldFocus
 		BP = 1,
 		MP2 = 2,
 		ED = 3
+	};
+
+	enum Scroll
+	{
+		NO_SCROLL = 0,
+		UP = 1,
+		DOWN = 2,
+		LEFT = 3,
+		RIGHT = 4
 	};
 };
 
@@ -215,6 +226,8 @@ public:
 	ClientCard* highlighting_card;
 	uint16_t list_command;
 
+	int indexLookedUpCard = 0;
+
 	virtual bool OnEvent(const irr::SEvent& event);
 	virtual bool OnCommonEvent(const irr::SEvent& event, bool& stopPropagation);
 	void GetHoverField(irr::core::vector2d<irr::s32> mouse);
@@ -229,6 +242,7 @@ public:
 
 	//Accessibility Focus
 	bool accessibilityFocus = true; //TODO- FAZER UMA CONFIGURAÇÃO NO MENU PRA ISSO
+	int cardSelectPosition = 0;
 	int displayedField = AccessibilityFieldFocus::DisplayedField::PLAYER;
 	int displayedCards = AccessibilityFieldFocus::DisplayedCards::LOOK_ONLY;
 	int battlePhase = AccessibilityFieldFocus::BattleStep::MP1;
@@ -238,7 +252,10 @@ public:
 	bool UseCard(const AccessibilityFieldFocus::UseType& useType, const irr::SEvent& event);
 	bool CheckIfCanViewCards(irr::SEvent event);
 	void SelectFieldSlot(const int& slot, const AccessibilityFieldFocus::DisplayedField& player = AccessibilityFieldFocus::DisplayedField::PLAYER);
+	void ScrollCardList(const AccessibilityFieldFocus::Scroll& position = AccessibilityFieldFocus::Scroll::RIGHT);
 	float GetYPosition();
+	float GetXPosition(const int& slot);
+	float GetXPosition(const AccessibilityFieldFocus::Scroll& position = AccessibilityFieldFocus::Scroll::RIGHT);
 	void SimulateButton(irr::gui::IGUIElement* caller = nullptr);
 	void MouseClick(const irr::SEvent& event);
 	bool SetCard(const int& setType, const AccessibilityFieldFocus::UseType& useType = AccessibilityFieldFocus::UseType::NORMAL_SUMMON);

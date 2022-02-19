@@ -2016,6 +2016,8 @@ int DuelClient::ClientAnalyze(char* msg, uint32_t len) {
 			if (info.location & 0xf1)
 				panelmode = true;
 		}
+		mainGame->dField.display_cards = mainGame->dField.selectable_cards;
+		mainGame->dField.indexLookedUpCard = 0;
 		std::sort(mainGame->dField.selectable_cards.begin(), mainGame->dField.selectable_cards.end(), ClientCard::client_card_sort);
 		std::wstring text = fmt::format(L"{}({}-{})", gDataManager->GetDesc(select_hint ? select_hint : 560, mainGame->dInfo.compat_mode),
 			mainGame->dField.select_min, mainGame->dField.select_max);

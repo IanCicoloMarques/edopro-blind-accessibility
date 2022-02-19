@@ -86,7 +86,8 @@ struct AccessibilityFieldFocus
 		SET_SPELL = 5,
 		MONSTER_ATTACK = 6,
 		EFFECT = 7,
-		SELECT_CARD = 8
+		SELECT_CARD = 8,
+		MONSTER_ATTACK_SELECT = 9
 	};
 
 	enum CardType
@@ -249,7 +250,7 @@ public:
 	int cardType = AccessibilityFieldFocus::CardType::MONSTER;
 	void DisplayCards(const std::vector<ClientCard*> &field);
 	void DisplayCards(const std::vector<ChainInfo>& field);
-	bool UseCard(const AccessibilityFieldFocus::UseType& useType, const irr::SEvent& event);
+	bool UseCard(const AccessibilityFieldFocus::UseType& useType, irr::SEvent event);
 	bool CheckIfCanViewCards(irr::SEvent event);
 	void SelectFieldSlot(const int& slot, const AccessibilityFieldFocus::DisplayedField& player = AccessibilityFieldFocus::DisplayedField::PLAYER);
 	void ScrollCardList(const AccessibilityFieldFocus::Scroll& position = AccessibilityFieldFocus::Scroll::RIGHT);

@@ -1934,6 +1934,16 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 			}
 			break;
 		}
+		case irr::KEY_KEY_M: {
+			bool canViewCards = CheckIfCanViewCards(event);
+			if (canViewCards) {
+				lookupFieldLocId = AccessibilityFieldFocus::FieldLookerLocId::ENEMY_PLAYER_MONSTERS;
+				DisplayCards(mzone[AccessibilityFieldFocus::DisplayedField::ENEMY_PLAYER]);
+				std::wstring nvdaString = fmt::format(L"Enemy player monsters");
+				nvdaController_speakText(nvdaString.c_str());
+			}
+			break;
+		}
 		case irr::KEY_RETURN: {
 			if (!event.KeyInput.PressedDown) {
 				if (mainGame->btnMsgOK->isTrulyVisible()) {
@@ -1984,6 +1994,10 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 							cardType = AccessibilityFieldFocus::CardType::MONSTER;
 							UseCard(AccessibilityFieldFocus::UseType::MONSTER_ATTACK, event);
 						}
+						break;
+					}
+					case AccessibilityFieldFocus::FieldLookerLocId::ENEMY_PLAYER_MONSTERS: {
+						UseCard(AccessibilityFieldFocus::UseType::MONSTER_ATTACK_SELECT, event);
 						break;
 					}
 					case AccessibilityFieldFocus::FieldLookerLocId::SELECTABLE_CARDS: {
@@ -2210,6 +2224,13 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 			}
 			break;
 		}
+		case irr::KEY_KEY_6: {
+			if (!event.KeyInput.PressedDown) {
+				SelectFieldSlot(clicked_card->location);
+				MouseClick(event);
+			}
+			break;
+		}
 		case irr::KEY_KEY_0: {
 			if (!event.KeyInput.PressedDown) {
 				if (mainGame->btnLeaveGame->isTrulyVisible()) {
@@ -2347,7 +2368,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 	return false;
 }
 
-bool ClientField::UseCard(const AccessibilityFieldFocus::UseType& useType, const irr::SEvent& event) {
+bool ClientField::UseCard(const AccessibilityFieldFocus::UseType& useType, irr::SEvent event) {
 	bool canUse = false;
 	if (clicked_card) {
 		irr::SEvent simulated{};
@@ -2488,6 +2509,12 @@ bool ClientField::UseCard(const AccessibilityFieldFocus::UseType& useType, const
 		case AccessibilityFieldFocus::UseType::MONSTER_ATTACK: {
 			ShowMenu(64, 0, 0);
 			TriggerEvent(mainGame->btnAttack, irr::gui::EGET_BUTTON_CLICKED);
+			break;
+		}
+		case AccessibilityFieldFocus::UseType::MONSTER_ATTACK_SELECT: {
+			displayedField == AccessibilityFieldFocus::DisplayedField::ENEMY_PLAYER;
+			SelectFieldSlot(clicked_card->location, AccessibilityFieldFocus::DisplayedField::ENEMY_PLAYER);
+			MouseClick(event);
 			break;
 		}
 		case AccessibilityFieldFocus::UseType::EFFECT: {

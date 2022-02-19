@@ -2486,7 +2486,7 @@ bool ClientField::UseCard(const AccessibilityFieldFocus::UseType& useType, const
 			break;
 		}
 		case AccessibilityFieldFocus::UseType::MONSTER_ATTACK: {
-			ShowMenu(10, 0, 0);
+			ShowMenu(64, 0, 0);
 			TriggerEvent(mainGame->btnAttack, irr::gui::EGET_BUTTON_CLICKED);
 			break;
 		}
@@ -2599,23 +2599,22 @@ void ClientField::ScrollCardList(const AccessibilityFieldFocus::Scroll& position
 
 float ClientField::GetXPosition(const int& slot) {
 	float posX = 0.f;
-	if (displayedField == AccessibilityFieldFocus::DisplayedField::PLAYER) {
-		if (cardType == AccessibilityFieldFocus::CardType::MONSTER || cardType == AccessibilityFieldFocus::CardType::SPELL)
-			posX = 0.40 + (slot * 0.08f);
-		else if (cardType == AccessibilityFieldFocus::CardType::LINK) {
-			switch (slot)
-			{
-			case 1: {
-				posX = 0.40 + (2 * 0.08f);
-				break;
-			}
-			case 2: {
-				posX = 0.40 + (4 * 0.08f);
-				break;
-			}
-			default:
-				break;
-			}
+
+	if (cardType == AccessibilityFieldFocus::CardType::MONSTER || cardType == AccessibilityFieldFocus::CardType::SPELL)
+		posX = 0.40 + (slot * 0.08f);
+	else if (cardType == AccessibilityFieldFocus::CardType::LINK) {
+		switch (slot)
+		{
+		case 1: {
+			posX = 0.40 + (2 * 0.08f);
+			break;
+		}
+		case 2: {
+			posX = 0.40 + (4 * 0.08f);
+			break;
+		}
+		default:
+			break;
 		}
 	}
 	return posX;

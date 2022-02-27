@@ -267,6 +267,7 @@ public:
 	float GetXPosition(const AccessibilityFieldFocus::Scroll& position = AccessibilityFieldFocus::Scroll::RIGHT);
 	void SimulateButton(irr::gui::IGUIElement* caller = nullptr);
 	void MouseClick(const irr::SEvent& event);
+	void MouseRightClick(const irr::SEvent& event);
 	//bool SetCard(const int& setType, const AccessibilityFieldFocus::UseType& useType = AccessibilityFieldFocus::UseType::NORMAL_SUMMON);
 	void SetMouseOnCard();
 };

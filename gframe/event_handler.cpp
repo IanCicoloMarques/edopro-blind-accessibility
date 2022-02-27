@@ -1982,6 +1982,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 						UseCard(AccessibilityFieldFocus::UseType::SELECT_CARD, event);
 				}
 				CloseDialog();
+				MouseRightClick(event);
 			}
 			break;
 		}
@@ -2325,6 +2326,7 @@ bool ClientField::UseCard(const AccessibilityFieldFocus::UseType& useType, irr::
 void ClientField::CloseDialog() {
 	if (mainGame->wCardDisplay->isVisible())
 		TriggerEvent(mainGame->btnDisplayOK, irr::gui::EGET_BUTTON_CLICKED);
+
 }
 
 bool ClientField::CheckIfCanViewCards(irr::SEvent event) {
@@ -2522,6 +2524,34 @@ void ClientField::MouseClick(const irr::SEvent& event) {
 	};
 
 	CheckAndPost(JWrapper::Buttons::A, irr::EMIE_LMOUSE_PRESSED_DOWN);
+}
+
+void ClientField::MouseRightClick(const irr::SEvent& event) {
+	auto cursor = mainGame->device->getCursorControl();
+	auto pos = cursor->getRelativePosition();
+
+	auto& jevent = event.JoystickEvent;
+	static irr::u32 buttonstates = 0;
+	buttonstates |= irr::E_MOUSE_BUTTON_STATE_MASK::EMBSM_RIGHT;
+	irr::SEvent simulated{};
+	simulated.EventType = irr::EET_MOUSE_INPUT_EVENT;
+	simulated.MouseInput.ButtonStates = buttonstates;
+	simulated.MouseInput.Control = false;
+	simulated.MouseInput.Shift = false;
+	simulated.MouseInput.X = irr::core::round32(pos.X * mainGame->window_size.Width);
+	simulated.MouseInput.Y = irr::core::round32(pos.Y * mainGame->window_size.Height);
+
+	buttonstates |= (simulated.MouseInput.Control) ? 1 << 30 : 0;
+	buttonstates |= (simulated.MouseInput.Shift) ? 1 << 29 : 0;
+
+	auto& changed = jevent.POV;
+
+	auto CheckAndPost = [device = mainGame->device, &simulated, &changed, &states = jevent.ButtonStates](int button, irr::EMOUSE_INPUT_EVENT type) {
+		simulated.MouseInput.Event = (states & button) ? type : (irr::EMOUSE_INPUT_EVENT)(type + 3);
+		device->postEventFromUser(simulated);
+	};
+
+	CheckAndPost(JWrapper::Buttons::A, irr::EMIE_RMOUSE_PRESSED_DOWN);
 }
 
 void ClientField::SetMouseOnCard()

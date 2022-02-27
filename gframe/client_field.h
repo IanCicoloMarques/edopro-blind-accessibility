@@ -87,16 +87,20 @@ struct AccessibilityFieldFocus
 		MONSTER_ATTACK = 6,
 		EFFECT = 7,
 		SELECT_CARD = 8,
-		MONSTER_ATTACK_SELECT = 9
+		MONSTER_ATTACK_SELECT = 9,
+		ACTIVATE = 10,
+		SET_CARD = 11,
+		CHANGE_MODE = 12
 	};
 
 	enum CardType
 	{
-		MONSTER = 0,
-		SPELL = 1,
-		ACTIVABLE_EFFECT = 2,
-		SELECTABLE = 3,
-		LINK = 4
+		NO_CARD_TYPE = 0,
+		MONSTER = 1,
+		SPELL = 2,
+		ACTIVABLE_EFFECT = 3,
+		SELECTABLE = 4,
+		LINK = 5
 	};
 
 	enum BattleStep
@@ -248,18 +252,22 @@ public:
 	int displayedCards = AccessibilityFieldFocus::DisplayedCards::LOOK_ONLY;
 	int battlePhase = AccessibilityFieldFocus::BattleStep::MP1;
 	int cardType = AccessibilityFieldFocus::CardType::MONSTER;
+	void CloseDialog();
 	void DisplayCards(const std::vector<ClientCard*> &field);
 	void DisplayCards(const std::vector<ChainInfo>& field);
 	bool UseCard(const AccessibilityFieldFocus::UseType& useType, irr::SEvent event);
 	bool CheckIfCanViewCards(irr::SEvent event);
 	void SelectFieldSlot(const int& slot, const AccessibilityFieldFocus::DisplayedField& player = AccessibilityFieldFocus::DisplayedField::PLAYER);
+	void SelectFieldSlotNoPlayer(const int& slot);
+	int GetFieldSlot(const int& slot, const AccessibilityFieldFocus::DisplayedField& player = AccessibilityFieldFocus::DisplayedField::PLAYER);
+	int SearchFieldSlot(const int& displayedField);
 	void ScrollCardList(const AccessibilityFieldFocus::Scroll& position = AccessibilityFieldFocus::Scroll::RIGHT);
 	float GetYPosition();
 	float GetXPosition(const int& slot);
 	float GetXPosition(const AccessibilityFieldFocus::Scroll& position = AccessibilityFieldFocus::Scroll::RIGHT);
 	void SimulateButton(irr::gui::IGUIElement* caller = nullptr);
 	void MouseClick(const irr::SEvent& event);
-	bool SetCard(const int& setType, const AccessibilityFieldFocus::UseType& useType = AccessibilityFieldFocus::UseType::NORMAL_SUMMON);
+	//bool SetCard(const int& setType, const AccessibilityFieldFocus::UseType& useType = AccessibilityFieldFocus::UseType::NORMAL_SUMMON);
 	void SetMouseOnCard();
 };
 

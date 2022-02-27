@@ -1073,6 +1073,24 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				ServerLobby::RefreshRooms();
 			break;
 		}
+		case irr::KEY_KEY_D: {
+			if (!event.KeyInput.PressedDown && mainGame->btnHostPrepWindBot->isVisible() && mainGame->btnHostPrepStart->isEnabled())
+				ClickButton(mainGame->btnHostPrepStart);
+			if (!event.KeyInput.PressedDown && !mainGame->wSinglePlay->isVisible())
+				ClickButton(mainGame->btnLanMode);
+			if (!event.KeyInput.PressedDown && mainGame->btnCreateHost->isVisible())
+				ClickButton(mainGame->btnCreateHost);
+			if (!event.KeyInput.PressedDown && mainGame->btnHostConfirm->isVisible())
+				ClickButton(mainGame->btnHostConfirm);
+			if (!event.KeyInput.PressedDown && mainGame->btnHostPrepReady->isVisible())
+				ClickButton(mainGame->btnHostPrepReady);
+			if (!event.KeyInput.PressedDown && mainGame->gBot.btnAdd->isVisible())
+				ClickButton(mainGame->gBot.btnAdd);
+			if (!event.KeyInput.PressedDown && mainGame->btnHostPrepWindBot->isVisible())
+				ClickButton(mainGame->btnHostPrepWindBot);
+			
+			break;
+		}
 		default: break;
 		}
 		break;

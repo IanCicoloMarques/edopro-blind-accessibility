@@ -49,6 +49,36 @@ namespace ygo {
 std::string showing_repo = "";
 static AccessibilityFieldFocus::FieldLookerLocId lookupFieldLocId;
 static int indexLookedUpCard = 0;
+
+
+
+irr::core::vector3df MouseToPlane(const irr::core::vector2d<irr::s32>& mouse, const irr::core::plane3d<irr::f32>& plane) {
+	const auto collmanager = mainGame->smgr->getSceneCollisionManager();
+	irr::core::line3df line = collmanager->getRayFromScreenCoordinates(mouse);
+	irr::core::vector3d<irr::f32> startintersection;
+	plane.getIntersectionWithLimitedLine(line.start, line.end, startintersection);
+	return startintersection;
+}
+
+inline irr::core::vector3df MouseToField(irr::core::vector2d<irr::s32> mouse) {
+	return MouseToPlane(mouse, { matManager.vFieldExtra[0][0][0].Pos,
+								 matManager.vFieldExtra[0][0][1].Pos,
+								 matManager.vFieldExtra[0][0][2].Pos });
+}
+
+static inline void TriggerEvent(irr::gui::IGUIElement* target, irr::gui::EGUI_EVENT_TYPE type) {
+	irr::SEvent event;
+	event.EventType = irr::EET_GUI_EVENT;
+	event.GUIEvent.EventType = type;
+	event.GUIEvent.Caller = target;
+	//event.GUIEvent.Caller->setParent(nullptr);
+	ygo::mainGame->device->postEventFromUser(event);
+}
+
+//static inline void ClickButton(irr::gui::IGUIElement* btn) {
+//	TriggerEvent(btn, irr::gui::EGET_BUTTON_CLICKED);
+//}
+
 bool ClientField::OnEvent(const irr::SEvent& event) {
 	bool stopPropagation = false;
 	if(OnCommonEvent(event, stopPropagation))
@@ -1814,6 +1844,10 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 			break;
 		}
 		case irr::KEY_KEY_D: {//TODO - Fazer validação de chain
+			if (mainGame->btnSingleMode->isVisible()) {
+				auto var = mainGame->btnSingleMode->getClickShiftState();
+				auto var2 = 0;
+			}
 			if (CheckIfCanViewCards(event)) {
 				lookupFieldLocId = AccessibilityFieldFocus::FieldLookerLocId::PLAYER_ACTIVABLE_CARDS;
 				DisplayCards(chains);
@@ -1827,6 +1861,10 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 			break;
 		}
 		case irr::KEY_KEY_F: {
+			if (mainGame->btnSingleMode->isVisible()) {
+				auto var = mainGame->btnSingleMode->getClickShiftState();
+				auto var2 = 0;
+			}
 			bool canViewCards = CheckIfCanViewCards(event);
 			if (canViewCards) {
 				lookupFieldLocId = AccessibilityFieldFocus::FieldLookerLocId::PLAYER_ACTIVABLE_CARDS;
@@ -1838,6 +1876,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				if (mainGame->wCardDisplay->isVisible())
 					mainGame->wCardDisplay->setVisible(false);
 			}
+			
 			break;
 		}
 		case irr::KEY_RETURN: {
@@ -1981,8 +2020,39 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 		}
 		case irr::KEY_KEY_1: {
 			if (!event.KeyInput.PressedDown) {
-				SelectFieldSlot(1);
+				//SelectFieldSlot(1);
+				//MouseClick(event);
+
+				clicked_card = hand[0][2];
+
+				ShowMenu(10, 0, 0);
+				auto cursor = mainGame->device->getCursorControl();
+				auto pos = cursor->getRelativePosition();
+				irr::core::vector2di mouse = mainGame->Resize(0, 0, true);
+
+				const auto coords = MouseToField(cursor->getPosition());
+				irr::core::recti rect{ clicked_card->hand_collision.UpperLeftCorner, clicked_card->hand_collision.LowerRightCorner };
+				//cursor->setReferenceRect(&rect);
+				pos.X = clicked_card->hand_collision.getCenter().X;
+				pos.Y = clicked_card->hand_collision.getCenter().Y;
+				auto clamp = [](auto& val) { val = (val < 0.f) ? 0.f : (1.f < val) ? 1.f : val;	};
+				clamp(pos.X);
+				clamp(pos.Y);
+				cursor->setPosition(clicked_card->hand_collision.getCenter());
 				MouseClick(event);
+				//irr::core::vector3df t = clicked_card->curPos;
+				//irr::core::vector3df rot = clicked_card->curRot;
+				//MoveCard(clicked_card, &t, &rot);
+				////void ClientField::MoveCard(ClientCard* pcard, float frame)
+				//clicked_card->UpdateDrawCoordinates();
+				//pos.X = clicked_card->mTransform[5];
+				//pos.Y = clicked_card->mTransform[9];
+				//auto clamp = [](auto& val) { val = (val < 0.f) ? 0.f : (1.f < val) ? 1.f : val;	};
+				//clamp(pos.X);
+				//clamp(pos.Y);
+				//cursor->setPosition(pos.X, pos.Y);
+				
+				//MouseClick(event);
 			}
 			break;
 		}
@@ -2002,8 +2072,12 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 		}
 		case irr::KEY_KEY_4: {
 			if (!event.KeyInput.PressedDown) {
-				SelectFieldSlot(4);
-				MouseClick(event);
+				//SelectFieldSlot(4);
+				//MouseClick(event);
+				if(mainGame->btnPSAU->isVisible())
+					TriggerEvent(mainGame->btnPSAU, irr::gui::EGET_BUTTON_CLICKED);
+				if (mainGame->btnPSAD->isVisible())
+					TriggerEvent(mainGame->btnPSAD, irr::gui::EGET_BUTTON_CLICKED);
 			}
 			break;
 		}
@@ -2149,20 +2223,23 @@ bool ClientField::UseCard(const AccessibilityFieldFocus::UseType& useType) {
 		switch (useType)
 		{
 		case AccessibilityFieldFocus::UseType::NORMAL_SUMMON: {
-			simulated.GUIEvent.Caller = mainGame->btnSummon;
-			simulated.GUIEvent.Caller->setParent(nullptr);
+			ShowMenu(10, 0, 0);
+			TriggerEvent(mainGame->btnSummon, irr::gui::EGET_BUTTON_CLICKED);
 			break;
 		}
 		case AccessibilityFieldFocus::UseType::SET_MONSTER: {
-			simulated.GUIEvent.Caller = mainGame->btnMSet;
-			simulated.GUIEvent.Caller->setParent(nullptr);
+			ShowMenu(10, 0, 0);
+			TriggerEvent(mainGame->btnMSet, irr::gui::EGET_BUTTON_CLICKED);
 			break;
 		}
 		case AccessibilityFieldFocus::UseType::SPECIAL_SUMMON: {
 			list_command = 0;
 			//simulated.GUIEvent.Caller = mainGame->btnSPSummon;
 			//simulated.GUIEvent.Caller->setParent(nullptr);
-			if (!list_command && clicked_card) {
+			ShowMenu(4, 0, 0);
+			TriggerEvent(mainGame->btnSPSummon, irr::gui::EGET_BUTTON_CLICKED);
+			break;
+			/*if (!list_command && clicked_card) {
 				for (size_t i = 0; i < spsummonable_cards.size(); ++i) {
 					if (spsummonable_cards[i] == clicked_card) {
 						ClearCommandFlag();
@@ -2207,36 +2284,29 @@ bool ClientField::UseCard(const AccessibilityFieldFocus::UseType& useType) {
 				select_ready = false;
 				ShowCancelOrFinishButton(1);
 			}
-			break;
+			break;*/
 		}
 		case AccessibilityFieldFocus::UseType::SET_SPELL: {
-			simulated.GUIEvent.Caller = mainGame->btnSSet;
-			simulated.GUIEvent.Caller->setParent(nullptr);
+			ShowMenu(17, 0, 0);
+			TriggerEvent(mainGame->btnSSet, irr::gui::EGET_BUTTON_CLICKED);
 			break;
 		}
 		case AccessibilityFieldFocus::UseType::MONSTER_ATTACK: {
-			simulated.GUIEvent.Caller = mainGame->btnAttack;
-			simulated.GUIEvent.Caller->setParent(nullptr);
-			//for (size_t i = 0; i < attackable_cards.size(); ++i) {
-			//	if (attackable_cards[i] == clicked_card) {
-			//		DuelClient::SetResponseI((i << 16) + 1);
-			//		DuelClient::SendResponse();
-			//		break;
-			//	}
-			//}
+			ShowMenu(10, 0, 0);
+			TriggerEvent(mainGame->btnAttack, irr::gui::EGET_BUTTON_CLICKED);
 			break;
 		}
 		case AccessibilityFieldFocus::UseType::EFFECT: {
-			simulated.GUIEvent.Caller = mainGame->btnActivate;
-			simulated.GUIEvent.Caller->setParent(nullptr);
+			ShowMenu(1, 0, 0);
+			TriggerEvent(mainGame->btnActivate, irr::gui::EGET_BUTTON_CLICKED);
 			break;
 		}
 
 		default:
 			break;
 		}
-		if(simulated.GUIEvent.Caller)
-			mainGame->device->postEventFromUser(simulated);
+		//if(simulated.GUIEvent.Caller)
+		//	mainGame->device->postEventFromUser(simulated);
 	}
 	return canUse;
 }
@@ -2282,6 +2352,7 @@ void ClientField::SelectFieldSlot(const int& slot, const AccessibilityFieldFocus
 	auto pos = cursor->getRelativePosition();
 	pos.X = 0.40 + (slot * 0.08f);
 	pos.Y = GetYPosition();
+	auto test = matManager.vFieldMzone[1][0][2].Pos.X;
 	auto clamp = [](auto& val) { val = (val < 0.f) ? 0.f : (1.f < val) ? 1.f : val;	};
 	clamp(pos.X);
 	clamp(pos.Y);
@@ -2947,22 +3018,9 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event, bool& stopPropagation)
 	return false;
 }
 
-irr::core::vector3df MouseToPlane(const irr::core::vector2d<irr::s32>& mouse, const irr::core::plane3d<irr::f32>& plane) {
-	const auto collmanager = mainGame->smgr->getSceneCollisionManager();
-	irr::core::line3df line = collmanager->getRayFromScreenCoordinates(mouse);
-	irr::core::vector3d<irr::f32> startintersection;
-	plane.getIntersectionWithLimitedLine(line.start, line.end, startintersection);
-	return startintersection;
-}
-
-inline irr::core::vector3df MouseToField(irr::core::vector2d<irr::s32> mouse) {
-	return MouseToPlane(mouse, { matManager.vFieldExtra[0][0][0].Pos,
-								 matManager.vFieldExtra[0][0][1].Pos,
-								 matManager.vFieldExtra[0][0][2].Pos });
-}
-
 bool CheckHand(const irr::core::vector2d<irr::s32>& mouse, std::vector<ClientCard*>& hand) {
 	if(hand.empty()) return false;
+	auto height = hand.front()->hand_collision.UpperLeftCorner;
 	irr::core::recti rect{ hand.front()->hand_collision.UpperLeftCorner, hand.back()->hand_collision.LowerRightCorner };
 	if(!rect.isValid())
 		rect = { hand.back()->hand_collision.UpperLeftCorner, hand.front()->hand_collision.LowerRightCorner };

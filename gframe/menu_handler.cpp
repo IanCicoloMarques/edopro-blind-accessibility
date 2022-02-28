@@ -1106,6 +1106,39 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 			
 			break;
 		}
+		case irr::KEY_KEY_F: {
+			if (!event.KeyInput.PressedDown && mainGame->btnHostPrepNotReady->isEnabled())
+				ClickButton(mainGame->btnHostPrepNotReady);
+			break;
+		}
+		case irr::KEY_KEY_C: {
+			if (!event.KeyInput.PressedDown && mainGame->cbDeckSelect->isTrulyVisible()) {
+				mainGame->env->setFocus(mainGame->cbDeckSelect);
+				std::wstring nvdaString = fmt::format(L"Deck {}", mainGame->cbDeckSelect->getItem(mainGame->cbDeckSelect->getSelected()));
+				nvdaController_speakText(nvdaString.c_str());
+			}
+			break;
+		}
+		case irr::KEY_KEY_V: {
+			if (!event.KeyInput.PressedDown && mainGame->gBot.cbBotDeck->isTrulyVisible()) {
+				mainGame->env->setFocus(mainGame->gBot.cbBotDeck);
+				std::wstring nvdaString = fmt::format(L"Deck {}", mainGame->gBot.cbBotDeck->getItem(mainGame->gBot.cbBotDeck->getSelected()));
+				nvdaController_speakText(nvdaString.c_str());
+			}
+			break;
+		}
+		case irr::KEY_DOWN:
+		case irr::KEY_UP: {
+			if (!event.KeyInput.PressedDown && mainGame->env->hasFocus(mainGame->cbDeckSelect)) {
+				std::wstring nvdaString = fmt::format(L"Deck {}", mainGame->cbDeckSelect->getItem(mainGame->cbDeckSelect->getSelected()));
+				nvdaController_speakText(nvdaString.c_str());
+			}
+			else if (!event.KeyInput.PressedDown && mainGame->env->hasFocus(mainGame->gBot.cbBotDeck)) {
+				std::wstring nvdaString = fmt::format(L"Deck {}", mainGame->gBot.cbBotDeck->getItem(mainGame->gBot.cbBotDeck->getSelected()));
+				nvdaController_speakText(nvdaString.c_str());
+			}
+			break;
+		}
 		case irr::KEY_KEY_0: {
 			if (!event.KeyInput.PressedDown && mainGame->btnHostPrepCancel->isTrulyVisible()) {
 				ClickButton(mainGame->btnHostPrepCancel);

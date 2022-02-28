@@ -1811,7 +1811,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 			if (!event.KeyInput.PressedDown) {
 				if (clicked_card && clicked_card->cmdFlag == 10)
 					cardType = AccessibilityFieldFocus::CardType::MONSTER;
-				else if (clicked_card && clicked_card->cmdFlag == 17)
+				else if (clicked_card && (clicked_card->cmdFlag == 17 || clicked_card->cmdFlag == 1))
 					cardType = AccessibilityFieldFocus::CardType::SPELL;
 				UseCard(AccessibilityFieldFocus::UseType::ACTIVATE, event);
 			}
@@ -2318,7 +2318,6 @@ bool ClientField::UseCard(const AccessibilityFieldFocus::UseType& useType, irr::
 			}
 			break;
 		}
-		indexLookedUpCard = 0;
 	}
 	return canUse;
 }

@@ -11,6 +11,7 @@ void ScreenReader::setReader()
 
 IScreenReader* ScreenReader::getReader()
 {
-	setReader();
+	if (screenReader == nullptr)
+		setReader();
 	return screenReader;
 }

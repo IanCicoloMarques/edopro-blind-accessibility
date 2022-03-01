@@ -2,14 +2,12 @@
 #ifndef ISCREENREADER_H
 #define ISCREENREADER_H
 
-#pragma once
+//#pragma once
 
 #include <string>
 #include "StringBuilder.h"
 
 class IScreenReader {
-
-
 	public:
 
 		void readScreen(std::wstring string) {
@@ -18,7 +16,6 @@ class IScreenReader {
 
 		virtual void textToSpeech(std::wstring string) = 0;
 		virtual void textToBraile(std::wstring string) = 0;
-
 };
 
 #endif

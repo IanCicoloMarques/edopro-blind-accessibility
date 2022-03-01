@@ -42,13 +42,15 @@
 #include <IGUITabControl.h>
 #include <IGUIScrollBar.h>
 #include "joystick_wrapper.h"
-#include <nvdaController.h>
+#include <../gframe/ScreenReader/TolkController.h>
+#include "ScreenReader/ScreenReader.h"
 using namespace irr;
 
 namespace ygo {
 
 std::string showing_repo = "";
 static AccessibilityFieldFocus::FieldLookerLocId lookupFieldLocId;
+//IScreenReader* ScreenReader::getReader() = ScreenReader::getReader();
 //static int indexLookedUpCard = 0;
 
 
@@ -1717,7 +1719,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					lookupFieldLocId = AccessibilityFieldFocus::FieldLookerLocId::PLAYER_HAND;
 					DisplayCards(hand[displayedField]);
 					std::wstring nvdaString = fmt::format(L"Hand");
-					nvdaController_speakText(nvdaString.c_str());
+					ScreenReader::getReader()->readScreen(nvdaString.c_str());
 				}
 				else
 					CloseDialog();
@@ -1731,7 +1733,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					lookupFieldLocId = AccessibilityFieldFocus::FieldLookerLocId::PLAYER_MONSTERS;
 					DisplayCards(mzone[displayedField]);
 					std::wstring nvdaString = fmt::format(L"Monster Zone");
-					nvdaController_speakText(nvdaString.c_str());
+					ScreenReader::getReader()->readScreen(nvdaString.c_str());
 				}
 				else
 					CloseDialog();
@@ -1745,7 +1747,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					lookupFieldLocId = AccessibilityFieldFocus::FieldLookerLocId::PLAYER_SPELLS;
 					DisplayCards(szone[displayedField]);
 					std::wstring nvdaString = fmt::format(L"Spells");
-					nvdaController_speakText(nvdaString.c_str());
+					ScreenReader::getReader()->readScreen(nvdaString.c_str());
 				}
 				else
 					CloseDialog();
@@ -1759,7 +1761,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					lookupFieldLocId = AccessibilityFieldFocus::FieldLookerLocId::PLAYER_EXTRA_DECK;
 					DisplayCards(extra[displayedField]);
 					std::wstring nvdaString = fmt::format(L"Extra Deck");
-					nvdaController_speakText(nvdaString.c_str());
+					ScreenReader::getReader()->readScreen(nvdaString.c_str());
 				}
 				else
 					CloseDialog();
@@ -1773,7 +1775,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					lookupFieldLocId = AccessibilityFieldFocus::FieldLookerLocId::PLAYER_GRAVEYARD;
 					DisplayCards(grave[displayedField]);
 					std::wstring nvdaString = fmt::format(L"Graveyard");
-					nvdaController_speakText(nvdaString.c_str());
+					ScreenReader::getReader()->readScreen(nvdaString.c_str());
 				}
 				else
 					CloseDialog();
@@ -1832,7 +1834,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					lookupFieldLocId = AccessibilityFieldFocus::FieldLookerLocId::SELECTABLE_CARDS;
 					DisplayCards(selectable_cards);
 					std::wstring nvdaString = fmt::format(L"Selectable Cards");
-					nvdaController_speakText(nvdaString.c_str());
+					ScreenReader::getReader()->readScreen(nvdaString.c_str());
 				}
 				else
 					CloseDialog();
@@ -1846,7 +1848,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					lookupFieldLocId = AccessibilityFieldFocus::FieldLookerLocId::PLAYER_SPECIAL_SUMMONABLE_MONSTERS;
 					DisplayCards(spsummonable_cards);
 					std::wstring nvdaString = fmt::format(L"Special Summonable Cards");
-					nvdaController_speakText(nvdaString.c_str());
+					ScreenReader::getReader()->readScreen(nvdaString.c_str());
 				}
 				else
 					CloseDialog();
@@ -1860,7 +1862,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					lookupFieldLocId = AccessibilityFieldFocus::FieldLookerLocId::PLAYER_ACTIVABLE_CARDS;
 					DisplayCards(activatable_cards);
 					std::wstring nvdaString = fmt::format(L"Activable Cards");
-					nvdaController_speakText(nvdaString.c_str());
+					ScreenReader::getReader()->readScreen(nvdaString.c_str());
 				}
 				else
 					CloseDialog();
@@ -1872,17 +1874,17 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				if (cardType == AccessibilityFieldFocus::CardType::LINK || cardType == AccessibilityFieldFocus::CardType::NO_CARD_TYPE) {
 					cardType = AccessibilityFieldFocus::CardType::MONSTER;
 					std::wstring nvdaString = fmt::format(L"Monster Field");
-					nvdaController_speakText(nvdaString.c_str());
+					ScreenReader::getReader()->readScreen(nvdaString.c_str());
 				}
 				else if (cardType == AccessibilityFieldFocus::CardType::MONSTER) {
 					cardType = AccessibilityFieldFocus::CardType::SPELL;
 					std::wstring nvdaString = fmt::format(L"Spell Field");
-					nvdaController_speakText(nvdaString.c_str());
+					ScreenReader::getReader()->readScreen(nvdaString.c_str());
 				}
 				else {
 					cardType = AccessibilityFieldFocus::CardType::LINK;
 					std::wstring nvdaString = fmt::format(L"Link Field");
-					nvdaController_speakText(nvdaString.c_str());
+					ScreenReader::getReader()->readScreen(nvdaString.c_str());
 				}
 
 			}
@@ -1893,22 +1895,22 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				if (mainGame->btnYes->isTrulyVisible()) {
 					TriggerEvent(mainGame->btnYes, irr::gui::EGET_BUTTON_CLICKED);
 					std::wstring nvdaString = fmt::format(L"Yes");
-					nvdaController_speakText(nvdaString.c_str());
+					ScreenReader::getReader()->readScreen(nvdaString.c_str());
 				}
 				else if (mainGame->btnFirst->isTrulyVisible()) {
 					TriggerEvent(mainGame->btnFirst, irr::gui::EGET_BUTTON_CLICKED);
 					std::wstring nvdaString = fmt::format(L"First turn");
-					nvdaController_speakText(nvdaString.c_str());
+					ScreenReader::getReader()->readScreen(nvdaString.c_str());
 				}
 				else if (mainGame->btnPSAU->isTrulyVisible()) {
 					TriggerEvent(mainGame->btnPSAU, irr::gui::EGET_BUTTON_CLICKED);
 					std::wstring nvdaString = fmt::format(L"Attack Up");
-					nvdaController_speakText(nvdaString.c_str());
+					ScreenReader::getReader()->readScreen(nvdaString.c_str());
 				}
 				else if (mainGame->btnPSAD->isTrulyVisible()) {
 					TriggerEvent(mainGame->btnPSAU, irr::gui::EGET_BUTTON_CLICKED);
 					std::wstring nvdaString = fmt::format(L"Attack Down");
-					nvdaController_speakText(nvdaString.c_str());
+					ScreenReader::getReader()->readScreen(nvdaString.c_str());
 				}
 			}
 			break;
@@ -1918,27 +1920,27 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				if (mainGame->btnFileSaveNo->isTrulyVisible()) {
 					TriggerEvent(mainGame->btnFileSaveNo, irr::gui::EGET_BUTTON_CLICKED);
 					std::wstring nvdaString = fmt::format(L"No");
-					nvdaController_speakText(nvdaString.c_str());
+					ScreenReader::getReader()->readScreen(nvdaString.c_str());
 				}
 				else if (mainGame->btnNo->isTrulyVisible()) {
 					TriggerEvent(mainGame->btnNo, irr::gui::EGET_BUTTON_CLICKED);
 					std::wstring nvdaString = fmt::format(L"No");
-					nvdaController_speakText(nvdaString.c_str());
+					ScreenReader::getReader()->readScreen(nvdaString.c_str());
 				}
 				else if (mainGame->btnSecond->isTrulyVisible()) {
 					TriggerEvent(mainGame->btnSecond, irr::gui::EGET_BUTTON_CLICKED);
 					std::wstring nvdaString = fmt::format(L"Second Turn");
-					nvdaController_speakText(nvdaString.c_str());
+					ScreenReader::getReader()->readScreen(nvdaString.c_str());
 				}
 				else if (mainGame->btnPSDU->isTrulyVisible()) {
 					TriggerEvent(mainGame->btnPSDU, irr::gui::EGET_BUTTON_CLICKED);
 					std::wstring nvdaString = fmt::format(L"Defense Up");
-					nvdaController_speakText(nvdaString.c_str());
+					ScreenReader::getReader()->readScreen(nvdaString.c_str());
 				}
 				else if (mainGame->btnPSDD->isTrulyVisible()) {
 					TriggerEvent(mainGame->btnPSDD, irr::gui::EGET_BUTTON_CLICKED);
 					std::wstring nvdaString = fmt::format(L"Defense Down");
-					nvdaController_speakText(nvdaString.c_str());
+					ScreenReader::getReader()->readScreen(nvdaString.c_str());
 				}
 			}
 			break;
@@ -1957,14 +1959,14 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					std::wstring cardEffect = fmt::format(L"{}", gDataManager->GetText(selectedCard->code));
 					std::wstring position = selectedCard->position == 1 ? fmt::format(L"Attack Position") : fmt::format(L"Defense Position");
 					//selectedCard->lscstring
-					nvdaController_speakText(cardName.c_str());
-					nvdaController_speakText(cardRace.c_str());
-					nvdaController_speakText(cardLevel.c_str());
-					nvdaController_speakText(cardType.c_str());
-					nvdaController_speakText(cardAttack.c_str());
-					nvdaController_speakText(cardDefense.c_str());
-					nvdaController_speakText(cardEffect.c_str());
-					nvdaController_speakText(position.c_str());
+					ScreenReader::getReader()->readScreen(cardName.c_str());
+					ScreenReader::getReader()->readScreen(cardRace.c_str());
+					ScreenReader::getReader()->readScreen(cardLevel.c_str());
+					ScreenReader::getReader()->readScreen(cardType.c_str());
+					ScreenReader::getReader()->readScreen(cardAttack.c_str());
+					ScreenReader::getReader()->readScreen(cardDefense.c_str());
+					ScreenReader::getReader()->readScreen(cardEffect.c_str());
+					ScreenReader::getReader()->readScreen(position.c_str());
 				}
 			}
 			break;
@@ -1993,13 +1995,13 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				if (display_cards.size() == 1) {
 					mainGame->ShowCardInfo(display_cards[0]->code);
 					std::wstring nvdaString = fmt::format(L"{}", gDataManager->GetName(display_cards[indexLookedUpCard]->code));
-					nvdaController_speakText(nvdaString.c_str());
+					ScreenReader::getReader()->readScreen(nvdaString.c_str());
 				}
 				else if (display_cards.size() && indexLookedUpCard < display_cards.size()-1) {
 					indexLookedUpCard++;
 					mainGame->ShowCardInfo(display_cards[indexLookedUpCard]->code);
 					std::wstring nvdaString = fmt::format(L"{}", gDataManager->GetName(display_cards[indexLookedUpCard]->code));
-					nvdaController_speakText(nvdaString.c_str());
+					ScreenReader::getReader()->readScreen(nvdaString.c_str());
 				}
 			}
 			break;
@@ -2011,13 +2013,13 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				if (display_cards.size() == 1) {
 					mainGame->ShowCardInfo(display_cards[0]->code);
 					std::wstring nvdaString = fmt::format(L"{}", gDataManager->GetName(display_cards[indexLookedUpCard]->code));
-					nvdaController_speakText(nvdaString.c_str());
+					ScreenReader::getReader()->readScreen(nvdaString.c_str());
 				}
 				else if (display_cards.size() && indexLookedUpCard <= display_cards.size() && indexLookedUpCard > 0) {
 					indexLookedUpCard--;
 					mainGame->ShowCardInfo(display_cards[indexLookedUpCard]->code);
 					std::wstring nvdaString = fmt::format(L"{}", gDataManager->GetName(display_cards[indexLookedUpCard]->code));
-					nvdaController_speakText(nvdaString.c_str());
+					ScreenReader::getReader()->readScreen(nvdaString.c_str());
 				}
 			}
 			break;
@@ -2029,24 +2031,24 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					if (display_cards.size() == 1) {
 						mainGame->ShowCardInfo(display_cards[0]->code);
 						std::wstring nvdaString = fmt::format(L"{}", gDataManager->GetName(display_cards[indexLookedUpCard]->code));
-						nvdaController_speakText(nvdaString.c_str());
+						ScreenReader::getReader()->readScreen(nvdaString.c_str());
 					}
 					else if (display_cards.size() && indexLookedUpCard <= display_cards.size() && indexLookedUpCard > 0) {
 						indexLookedUpCard--;
 						mainGame->ShowCardInfo(display_cards[indexLookedUpCard]->code);
 						std::wstring nvdaString = fmt::format(L"{}", gDataManager->GetName(display_cards[indexLookedUpCard]->code));
-						nvdaController_speakText(nvdaString.c_str());
+						ScreenReader::getReader()->readScreen(nvdaString.c_str());
 					}
 				}*/
 				if (displayedField != AccessibilityFieldFocus::DisplayedField::PLAYER) {
 					displayedField = AccessibilityFieldFocus::DisplayedField::PLAYER;
 					std::wstring nvdaString = fmt::format(L"Player Field");
-					nvdaController_speakText(nvdaString.c_str());
+					ScreenReader::getReader()->readScreen(nvdaString.c_str());
 				}
 				else {
 					displayedField = AccessibilityFieldFocus::DisplayedField::ENEMY_PLAYER;
 					std::wstring nvdaString = fmt::format(L"Enemy Player Field");
-					nvdaController_speakText(nvdaString.c_str());
+					ScreenReader::getReader()->readScreen(nvdaString.c_str());
 				}
 			}
 			break;
@@ -2056,7 +2058,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				if (mainGame->btnHand[0]->isTrulyVisible()) {
 					TriggerEvent(mainGame->btnHand[0], irr::gui::EGET_BUTTON_CLICKED);
 					std::wstring nvdaString = fmt::format(L"SCISSORS");
-					nvdaController_speakText(nvdaString.c_str());
+					ScreenReader::getReader()->readScreen(nvdaString.c_str());
 				}
 				else
 				{
@@ -2071,7 +2073,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				if (mainGame->btnHand[1]->isTrulyVisible()) {
 					TriggerEvent(mainGame->btnHand[1], irr::gui::EGET_BUTTON_CLICKED);
 					std::wstring nvdaString = fmt::format(L"ROCK");
-					nvdaController_speakText(nvdaString.c_str());
+					ScreenReader::getReader()->readScreen(nvdaString.c_str());
 				}
 				else
 				{
@@ -2086,7 +2088,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				if (mainGame->btnHand[2]->isTrulyVisible()){
 					TriggerEvent(mainGame->btnHand[2], irr::gui::EGET_BUTTON_CLICKED);
 					std::wstring nvdaString = fmt::format(L"Paper");
-					nvdaController_speakText(nvdaString.c_str());
+					ScreenReader::getReader()->readScreen(nvdaString.c_str());
 				}
 				else
 				{
@@ -2115,7 +2117,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				if (mainGame->btnLeaveGame->isTrulyVisible()) {
 					TriggerEvent(mainGame->btnLeaveGame, irr::gui::EGET_BUTTON_CLICKED);
 					std::wstring nvdaString = fmt::format(L"Surrender");
-					nvdaController_speakText(nvdaString.c_str());
+					ScreenReader::getReader()->readScreen(nvdaString.c_str());
 				}
 			}
 			break;
@@ -2274,14 +2276,9 @@ bool ClientField::UseCard(const AccessibilityFieldFocus::UseType& useType, irr::
 		}
 		case AccessibilityFieldFocus::UseType::ACTIVATE: {
 			lookupFieldLocId = AccessibilityFieldFocus::FieldLookerLocId::SELECTABLE_CARDS;
-			if (clicked_card->cmdFlag == 1) {
-				ShowMenu(1, 0, 0);
+			ShowMenu(clicked_card->cmdFlag, 500, 500);
+			if(mainGame->btnActivate->isVisible())
 				TriggerEvent(mainGame->btnActivate, irr::gui::EGET_BUTTON_CLICKED);
-			}
-			else if (clicked_card->cmdFlag == 17) {
-				ShowMenu(17, 500, 500);
-				TriggerEvent(mainGame->btnActivate, irr::gui::EGET_BUTTON_CLICKED);
-			}
 			break;
 		}
 		case AccessibilityFieldFocus::UseType::MONSTER_ATTACK: {

@@ -26,6 +26,7 @@
 #include <IGUITable.h>
 #include <IGUIWindow.h>
 #include <nvdaController.h>
+#include "ScreenReader/ScreenReader.h"
 
 namespace ygo {
 
@@ -189,7 +190,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case BUTTON_LAN_MODE: {
-				nvdaController_speakText(L"LAN + AI"); //TODO change to class
+				ScreenReader::getReader()->readScreen(L"LAN + AI"); //TODO change to class
 				mainGame->isHostingOnline = false;
 				mainGame->btnCreateHost->setEnabled(mainGame->coreloaded);
 				mainGame->btnJoinHost->setEnabled(true);
@@ -229,7 +230,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 			}
 			case BUTTON_CREATE_HOST: {
 				if (wcslen(mainGame->ebNickName->getText())) {
-					nvdaController_speakText(L"Host game"); //TODO change to class
+					ScreenReader::getReader()->readScreen(L"Host game"); //TODO change to class
 					mainGame->isHostingOnline = false;
 					mainGame->btnHostConfirm->setEnabled(true);
 					mainGame->btnHostCancel->setEnabled(true);
@@ -317,7 +318,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case BUTTON_HOST_CONFIRM: {
-				nvdaController_speakText(L"Rules ok"); //TODO change to class
+				ScreenReader::getReader()->readScreen(L"Rules ok. Select Deck"); //TODO change to class
 				DuelClient::is_local_host = false;
 				if(mainGame->isHostingOnline) {
 					ServerLobby::JoinServer(true);
@@ -383,7 +384,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case BUTTON_HP_READY: {
-				nvdaController_speakText(L"Player ready"); //TODO change to class
+				ScreenReader::getReader()->readScreen(L"Player ready"); //TODO change to class
 				bool check = false;
 				if(!mainGame->cbDeckSelect2->isVisible())
 					check = (mainGame->cbDeckSelect->getSelected() == -1 || !gdeckManager->LoadDeck(Utils::ToPathString(mainGame->cbDeckSelect->getItem(mainGame->cbDeckSelect->getSelected()))));
@@ -408,7 +409,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case BUTTON_HP_START: {
-				nvdaController_speakText(L"Start game"); //TODO change to class
+				ScreenReader::getReader()->readScreen(L"Start game"); //TODO change to class
 				DuelClient::SendPacketToServer(CTOS_HS_START);
 				break;
 			}
@@ -504,7 +505,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case BUTTON_HP_AI_TOGGLE: {
-				nvdaController_speakText(L"Select bot"); //TODO change to class
+				ScreenReader::getReader()->readScreen(L"Select bot deck"); //TODO change to class
 				if (mainGame->gBot.window->isVisible()) {
 					mainGame->HideElement(mainGame->gBot.window);
 				}
@@ -515,7 +516,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 			}
 			case BUTTON_BOT_ADD: {
 				try {
-					nvdaController_speakText(L"Add Bot"); //TODO change to class
+					ScreenReader::getReader()->readScreen(L"Add Bot"); //TODO change to class
 					int port = std::stoi(gGameConfig->serverport);
 					if(mainGame->gBot.LaunchSelected(port, mainGame->dInfo.secret.pass))
 						break;
@@ -1115,7 +1116,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 			if (!event.KeyInput.PressedDown && mainGame->cbDeckSelect->isTrulyVisible()) {
 				mainGame->env->setFocus(mainGame->cbDeckSelect);
 				std::wstring nvdaString = fmt::format(L"Deck {}", mainGame->cbDeckSelect->getItem(mainGame->cbDeckSelect->getSelected()));
-				nvdaController_speakText(nvdaString.c_str());
+				ScreenReader::getReader()->readScreen(nvdaString.c_str());
 			}
 			break;
 		}
@@ -1123,7 +1124,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 			if (!event.KeyInput.PressedDown && mainGame->gBot.cbBotDeck->isTrulyVisible()) {
 				mainGame->env->setFocus(mainGame->gBot.cbBotDeck);
 				std::wstring nvdaString = fmt::format(L"Deck {}", mainGame->gBot.cbBotDeck->getItem(mainGame->gBot.cbBotDeck->getSelected()));
-				nvdaController_speakText(nvdaString.c_str());
+				ScreenReader::getReader()->readScreen(nvdaString.c_str());
 			}
 			break;
 		}
@@ -1131,11 +1132,11 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 		case irr::KEY_UP: {
 			if (!event.KeyInput.PressedDown && mainGame->env->hasFocus(mainGame->cbDeckSelect)) {
 				std::wstring nvdaString = fmt::format(L"Deck {}", mainGame->cbDeckSelect->getItem(mainGame->cbDeckSelect->getSelected()));
-				nvdaController_speakText(nvdaString.c_str());
+				ScreenReader::getReader()->readScreen(nvdaString.c_str());
 			}
 			else if (!event.KeyInput.PressedDown && mainGame->env->hasFocus(mainGame->gBot.cbBotDeck)) {
 				std::wstring nvdaString = fmt::format(L"Deck {}", mainGame->gBot.cbBotDeck->getItem(mainGame->gBot.cbBotDeck->getSelected()));
-				nvdaController_speakText(nvdaString.c_str());
+				ScreenReader::getReader()->readScreen(nvdaString.c_str());
 			}
 			break;
 		}

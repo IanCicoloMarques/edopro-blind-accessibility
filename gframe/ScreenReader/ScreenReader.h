@@ -4,6 +4,7 @@
 
 #include "IScreenReader.h"
 #include "NVDA.h"
+#include "TolkController.h"
 
 class ScreenReader
 {

@@ -5,13 +5,16 @@
 #pragma once
 
 #include <string>
+#include "StringBuilder.h"
 
 class IScreenReader {
 
 
 	public:
 
-		virtual void readScreen() = 0;
+		void readScreen(std::wstring string) {
+			textToSpeech(StringBuilder::parseInput(string));
+		}
 
 		virtual void textToSpeech(std::wstring string) = 0;
 		virtual void textToBraile(std::wstring string) = 0;

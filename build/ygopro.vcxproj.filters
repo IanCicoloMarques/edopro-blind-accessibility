@@ -49,6 +49,9 @@
     <Filter Include="nonstd">
       <UniqueIdentifier>{1B648D10-0706-B8E6-F0C0-CB3ADC013F37}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ScreenReader">
+      <UniqueIdentifier>{275b8510-f786-44ca-9011-82176bfa7120}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\gframe\Base64.h" />
@@ -214,10 +217,21 @@
     <ClInclude Include="..\gframe\utils_gui.h" />
     <ClInclude Include="..\gframe\windbot.h" />
     <ClInclude Include="..\gframe\windbot_panel.h" />
-    <ClInclude Include="..\gframe\ScreenReader.h" />
-    <ClInclude Include="..\gframe\IScreenReader.h" />
-    <ClInclude Include="..\gframe\NVDA.h" />
-    <ClInclude Include="..\gframe\StringBuilder.h" />
+    <ClInclude Include="..\gframe\ScreenReader\IScreenReader.h">
+      <Filter>ScreenReader</Filter>
+    </ClInclude>
+    <ClInclude Include="..\gframe\ScreenReader\NVDA.h">
+      <Filter>ScreenReader</Filter>
+    </ClInclude>
+    <ClInclude Include="..\gframe\ScreenReader\ScreenReader.h">
+      <Filter>ScreenReader</Filter>
+    </ClInclude>
+    <ClInclude Include="..\gframe\ScreenReader\StringBuilder.h">
+      <Filter>ScreenReader</Filter>
+    </ClInclude>
+    <ClInclude Include="..\gframe\ScreenReader\TolkController.h">
+      <Filter>ScreenReader</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\gframe\CGUICustomCheckBox\CGUICustomCheckBox.cpp">
@@ -314,9 +328,18 @@
     <ClCompile Include="..\gframe\utils_gui.cpp" />
     <ClCompile Include="..\gframe\windbot.cpp" />
     <ClCompile Include="..\gframe\windbot_panel.cpp" />
-    <ClCompile Include="..\gframe\NVDA.cpp" />
-    <ClCompile Include="..\gframe\ScreenReader.cpp" />
-    <ClCompile Include="..\gframe\StringBuilder.cpp" />
+    <ClCompile Include="..\gframe\ScreenReader\NVDA.cpp">
+      <Filter>ScreenReader</Filter>
+    </ClCompile>
+    <ClCompile Include="..\gframe\ScreenReader\ScreenReader.cpp">
+      <Filter>ScreenReader</Filter>
+    </ClCompile>
+    <ClCompile Include="..\gframe\ScreenReader\StringBuilder.cpp">
+      <Filter>ScreenReader</Filter>
+    </ClCompile>
+    <ClCompile Include="..\gframe\ScreenReader\TolkController.cpp">
+      <Filter>ScreenReader</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\gframe\dpiawarescaling.manifest" />

@@ -28,9 +28,9 @@
 #include "CGUIImageButton/CGUIImageButton.h"
 #include "progressivebuffer.h"
 #include "utils.h"
-#include "ScreenReader.h"
 
-#include "nvdaController.h"
+#include "../gframe/ScreenReader/ScreenReader.h"
+
 
 
 

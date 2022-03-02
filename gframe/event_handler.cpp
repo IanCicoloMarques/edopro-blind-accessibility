@@ -1731,6 +1731,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				bool canViewCards = CheckIfCanViewCards(event);
 				if (canViewCards && displayedCards == AccessibilityFieldFocus::DisplayedCards::LOOK_ONLY) {
 					lookupFieldLocId = AccessibilityFieldFocus::FieldLookerLocId::PLAYER_MONSTERS;
+					cardType = AccessibilityFieldFocus::CardType::MONSTER;
 					DisplayCards(mzone[displayedField]);
 					std::wstring nvdaString = fmt::format(L"Monster Zone");
 					ScreenReader::getReader()->readScreen(nvdaString.c_str());
@@ -1745,6 +1746,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				bool canViewCards = CheckIfCanViewCards(event);
 				if (canViewCards && displayedCards == AccessibilityFieldFocus::DisplayedCards::LOOK_ONLY) {
 					lookupFieldLocId = AccessibilityFieldFocus::FieldLookerLocId::PLAYER_SPELLS;
+					cardType = AccessibilityFieldFocus::CardType::SPELL;
 					DisplayCards(szone[displayedField]);
 					std::wstring nvdaString = fmt::format(L"Spells");
 					ScreenReader::getReader()->readScreen(nvdaString.c_str());
@@ -1796,7 +1798,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 			if (!event.KeyInput.PressedDown) {
 				if (clicked_card && clicked_card->cmdFlag == 10)
 					cardType = AccessibilityFieldFocus::CardType::MONSTER;
-				else if (clicked_card && clicked_card->cmdFlag == 17)
+				else
 					cardType = AccessibilityFieldFocus::CardType::SPELL;
 				UseCard(AccessibilityFieldFocus::UseType::SET_CARD, event);
 			}
@@ -1973,6 +1975,10 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 		}
 		case irr::KEY_RETURN: {
 			if (!event.KeyInput.PressedDown) {
+				mainGame->always_chain = true;
+				if (mainGame->btnBP->isEnabled()) {
+					battlePhase = AccessibilityFieldFocus::BattleStep::MP1;
+				}
 				if (mainGame->btnMsgOK->isTrulyVisible()) {
 					TriggerEvent(mainGame->btnMsgOK, irr::gui::EGET_BUTTON_CLICKED);
 				}
@@ -2251,32 +2257,28 @@ bool ClientField::UseCard(const AccessibilityFieldFocus::UseType& useType, irr::
 	if (mainGame->wCardDisplay->isVisible())
 		TriggerEvent(mainGame->btnDisplayOK, irr::gui::EGET_BUTTON_CLICKED);
 	if (clicked_card) {
+		ShowMenu(clicked_card->cmdFlag, 0, 0);
 		switch (useType)
 		{
 		case AccessibilityFieldFocus::UseType::NORMAL_SUMMON: {
-			ShowMenu(10, 0, 0);
-			TriggerEvent(mainGame->btnSummon, irr::gui::EGET_BUTTON_CLICKED);
+			if (mainGame->btnSummon->isVisible())
+				TriggerEvent(mainGame->btnSummon, irr::gui::EGET_BUTTON_CLICKED);
 			break;
 		}
 		case AccessibilityFieldFocus::UseType::SET_CARD: {
-			if (clicked_card->cmdFlag == 10) {
-				ShowMenu(10, 0, 0);
+			if (mainGame->btnMSet->isVisible())
 				TriggerEvent(mainGame->btnMSet, irr::gui::EGET_BUTTON_CLICKED);
-			}
-			else if (clicked_card->cmdFlag == 17) {
-				ShowMenu(17, 0, 0);
+			else if (mainGame->btnSSet->isVisible())
 				TriggerEvent(mainGame->btnSSet, irr::gui::EGET_BUTTON_CLICKED);
-			}
 			break;
 		}
 		case AccessibilityFieldFocus::UseType::SPECIAL_SUMMON: {
-			ShowMenu(4, 0, 0);
-			TriggerEvent(mainGame->btnSPSummon, irr::gui::EGET_BUTTON_CLICKED);
+			if (mainGame->btnSPSummon->isVisible())
+				TriggerEvent(mainGame->btnSPSummon, irr::gui::EGET_BUTTON_CLICKED);
 			break;
 		}
 		case AccessibilityFieldFocus::UseType::ACTIVATE: {
 			lookupFieldLocId = AccessibilityFieldFocus::FieldLookerLocId::SELECTABLE_CARDS;
-			ShowMenu(clicked_card->cmdFlag, 500, 500);
 			if(mainGame->btnActivate->isVisible())
 				TriggerEvent(mainGame->btnActivate, irr::gui::EGET_BUTTON_CLICKED);
 			break;
@@ -2287,14 +2289,15 @@ bool ClientField::UseCard(const AccessibilityFieldFocus::UseType& useType, irr::
 				MouseClick(event);
 			}
 			else {
-				ShowMenu(64, 0, 0);
-				TriggerEvent(mainGame->btnAttack, irr::gui::EGET_BUTTON_CLICKED);
+				ShowMenu(64, 500, 500);
+				if (mainGame->btnAttack->isVisible())
+					TriggerEvent(mainGame->btnAttack, irr::gui::EGET_BUTTON_CLICKED);
 			}
 			break;
 		}
 		case AccessibilityFieldFocus::UseType::CHANGE_MODE: {
-			ShowMenu(32, 0, 0);
-			TriggerEvent(mainGame->btnRepos, irr::gui::EGET_BUTTON_CLICKED);
+			if (mainGame->btnRepos->isVisible())
+				TriggerEvent(mainGame->btnRepos, irr::gui::EGET_BUTTON_CLICKED);
 			break;
 		}
 		case AccessibilityFieldFocus::UseType::SELECT_CARD: {
@@ -2384,10 +2387,10 @@ void ClientField::SelectFieldSlotNoPlayer(const int& slot) {
 	auto clamp = [](auto& val) { val = (val < 0.f) ? 0.f : (1.f < val) ? 1.f : val;	};
 	clamp(pos.X);
 	clamp(pos.Y);
-	if(clicked_card->hand_collision.getCenter().X == 0 && clicked_card->hand_collision.getCenter().Y == 0)
-		cursor->setPosition(pos.X, pos.Y);
-	else
+	if(clicked_card->status == 1024)
 		cursor->setPosition(clicked_card->hand_collision.getCenter());
+	else
+		cursor->setPosition(pos.X, pos.Y);
 }
 
 int ClientField::GetFieldSlot(const int& slot, const AccessibilityFieldFocus::DisplayedField& player) {

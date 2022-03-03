@@ -1967,7 +1967,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					if (selectedCard->position != 10)
 						ScreenReader::getReader()->readScreen(position.c_str());
 					ScreenReader::getReader()->readScreen(cardType.c_str());
-					if (cardLevel.compare(L"Level 0") != 0) {
+					if (cardType.find(L"Spell") == std::string::npos && cardType.find(L"Trap") == std::string::npos) {
 						ScreenReader::getReader()->readScreen(cardLevel.c_str());
 						ScreenReader::getReader()->readScreen(cardRace.c_str());
 						ScreenReader::getReader()->readScreen(cardAttack.c_str());

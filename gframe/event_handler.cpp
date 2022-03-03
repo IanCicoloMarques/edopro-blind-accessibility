@@ -2066,6 +2066,10 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					std::wstring nvdaString = fmt::format(L"SCISSORS");
 					ScreenReader::getReader()->readScreen(nvdaString.c_str());
 				}
+				else if (mainGame->btnOption[0]->isTrulyVisible()) {
+					selected_option = 0;
+					SetResponseSelectedOption();
+				}
 				else
 				{
 					SelectFieldSlot(1);
@@ -2080,6 +2084,10 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					TriggerEvent(mainGame->btnHand[1], irr::gui::EGET_BUTTON_CLICKED);
 					std::wstring nvdaString = fmt::format(L"ROCK");
 					ScreenReader::getReader()->readScreen(nvdaString.c_str());
+				}
+				else if (mainGame->btnOption[1]->isTrulyVisible()) {
+					selected_option = 1;
+					SetResponseSelectedOption();
 				}
 				else
 				{
@@ -2096,6 +2104,10 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					std::wstring nvdaString = fmt::format(L"Paper");
 					ScreenReader::getReader()->readScreen(nvdaString.c_str());
 				}
+				else if (mainGame->btnOption[2]->isTrulyVisible()) {
+					selected_option = 2;
+					SetResponseSelectedOption();
+				}
 				else
 				{
 					SelectFieldSlot(3);
@@ -2106,15 +2118,27 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 		}
 		case irr::KEY_KEY_4: {
 			if (!event.KeyInput.PressedDown) {
-				SelectFieldSlot(4);
-				MouseClick(event);
+				if (mainGame->btnOption[3]->isTrulyVisible()) {
+					selected_option = 3;
+					SetResponseSelectedOption();
+				}
+				else {
+					SelectFieldSlot(4);
+					MouseClick(event);
+				}
 			}
 			break;
 		}
 		case irr::KEY_KEY_5: {
 			if (!event.KeyInput.PressedDown) {
-				SelectFieldSlot(5);
-				MouseClick(event);
+				if (mainGame->btnOption[4]->isTrulyVisible()) {
+					selected_option = 4;
+					SetResponseSelectedOption();
+				}
+				else {
+					SelectFieldSlot(5);
+					MouseClick(event);
+				}
 			}
 			break;
 		}

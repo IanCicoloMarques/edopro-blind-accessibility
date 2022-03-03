@@ -21,6 +21,7 @@
 #include "CGUIImageButton/CGUIImageButton.h"
 #include "CGUITTFont/CGUITTFont.h"
 #include "custom_skin_enum.h"
+#include "ScreenReader/ScreenReader.h"
 
 namespace ygo {
 
@@ -601,8 +602,12 @@ void ClientField::ShowSelectOption(uint64_t select_hint, bool should_lock) {
 			break;
 		}
 	}
-	for(int i = 0; (i < count) && (i < 5) && quickmode; i++)
+	std::wstring nvdaString = fmt::format(L"Select a option");
+	ScreenReader::getReader()->readScreen(nvdaString.c_str());
+	for (int i = 0; (i < count) && (i < 5) && quickmode; i++) {
 		mainGame->btnOption[i]->setText(gDataManager->GetDesc(select_options[i], mainGame->dInfo.compat_mode).data());
+		ScreenReader::getReader()->readScreen(fmt::format(L"{} - {}", i +1, gDataManager->GetDesc(select_options[i], mainGame->dInfo.compat_mode).data()));
+	}
 	irr::core::recti pos = mainGame->wOptions->getRelativePosition();
 	if(count > 5 && quickmode)
 		pos.LowerRightCorner.X = pos.UpperLeftCorner.X + mainGame->Scale(375);

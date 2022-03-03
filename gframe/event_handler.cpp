@@ -1815,7 +1815,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 			if (!event.KeyInput.PressedDown) {
 				if (clicked_card && clicked_card->cmdFlag == 10)
 					cardType = AccessibilityFieldFocus::CardType::MONSTER;
-				else if (clicked_card && (clicked_card->cmdFlag == 17 || clicked_card->cmdFlag == 1))
+				else /*(clicked_card && (clicked_card->cmdFlag == 17 || clicked_card->cmdFlag == 1))*/
 					cardType = AccessibilityFieldFocus::CardType::SPELL;
 				UseCard(AccessibilityFieldFocus::UseType::ACTIVATE, event);
 			}
@@ -2165,15 +2165,15 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 		}
 		case irr::KEY_BACK: {
 			if (!event.KeyInput.PressedDown) {
-				if (mainGame->btnBP->isEnabled()) {
+				if (mainGame->btnBP->isVisible() && mainGame->btnBP->isEnabled()) {
 					TriggerEvent(mainGame->btnBP, irr::gui::EGET_BUTTON_CLICKED);
 					battlePhase = AccessibilityFieldFocus::BattleStep::BP;
 				}
-				else if (mainGame->btnM2->isEnabled()) {
+				else if (mainGame->btnM2->isVisible() && mainGame->btnM2->isEnabled()) {
 					TriggerEvent(mainGame->btnM2, irr::gui::EGET_BUTTON_CLICKED);
 					battlePhase = AccessibilityFieldFocus::BattleStep::MP2;
 				}
-				else if (!mainGame->btnBP->isEnabled() && !mainGame->btnM2->isEnabled()) {
+				else /*if (!mainGame->btnBP->isEnabled() && !mainGame->btnM2->isEnabled())*/ {
 					TriggerEvent(mainGame->btnEP, irr::gui::EGET_BUTTON_CLICKED);
 					battlePhase = AccessibilityFieldFocus::BattleStep::MP1;
 					cardType = AccessibilityFieldFocus::CardType::MONSTER;

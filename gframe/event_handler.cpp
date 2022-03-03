@@ -1960,15 +1960,24 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					std::wstring cardDefense = fmt::format(L"Defense: {}", gDataManager->GetCardData(selectedCard->code)->defense);
 					std::wstring cardEffect = fmt::format(L"{}", gDataManager->GetText(selectedCard->code));
 					std::wstring position = selectedCard->position == 1 ? fmt::format(L"Attack Position") : fmt::format(L"Defense Position");
+					std::wstring leftScale = fmt::format(L"Left Scale {}", selectedCard->lscstring);
+					std::wstring rightScale = fmt::format(L"Right Scale {}", selectedCard->rscstring);
 					//selectedCard->lscstring
 					ScreenReader::getReader()->readScreen(cardName.c_str());
-					ScreenReader::getReader()->readScreen(cardRace.c_str());
-					ScreenReader::getReader()->readScreen(cardLevel.c_str());
+					if (selectedCard->position != 10)
+						ScreenReader::getReader()->readScreen(position.c_str());
 					ScreenReader::getReader()->readScreen(cardType.c_str());
-					ScreenReader::getReader()->readScreen(cardAttack.c_str());
-					ScreenReader::getReader()->readScreen(cardDefense.c_str());
+					if (cardLevel.compare(L"Level 0") != 0) {
+						ScreenReader::getReader()->readScreen(cardLevel.c_str());
+						ScreenReader::getReader()->readScreen(cardRace.c_str());
+						ScreenReader::getReader()->readScreen(cardAttack.c_str());
+						ScreenReader::getReader()->readScreen(cardDefense.c_str());
+					}
+					if(leftScale.compare(L"Left Scale 0") != 0)
+						ScreenReader::getReader()->readScreen(leftScale.c_str());
+					if (rightScale.compare(L"Right Scale 0") != 0)
+						ScreenReader::getReader()->readScreen(rightScale.c_str());
 					ScreenReader::getReader()->readScreen(cardEffect.c_str());
-					ScreenReader::getReader()->readScreen(position.c_str());
 				}
 			}
 			break;
@@ -1991,6 +2000,8 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				}
 				CloseDialog();
 				MouseRightClick(event);
+				std::wstring cardName = fmt::format(L"Selected {}", gDataManager->GetName(clicked_card->code));
+				ScreenReader::getReader()->readScreen(cardName.c_str());
 			}
 			break;
 		}

@@ -34,7 +34,7 @@
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <CharacterSet>Unicode</CharacterSet>
-    <PlatformToolset>v143</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -113,7 +113,7 @@
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>nvdaControllerClient32.lib;opengl32.lib;ws2_32.lib;winmm.lib;gdi32.lib;kernel32.lib;user32.lib;imm32.lib;wldap32.lib;crypt32.lib;advapi32.lib;rpcrt4.lib;ole32.lib;uuid.lib;winhttp.lib;Iphlpapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>nvdaControllerClient32.lib;Tolk.lib;opengl32.lib;ws2_32.lib;winmm.lib;gdi32.lib;kernel32.lib;user32.lib;imm32.lib;wldap32.lib;crypt32.lib;advapi32.lib;rpcrt4.lib;ole32.lib;uuid.lib;winhttp.lib;Iphlpapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>..\gframe\ScreenReader\libs\x86;..\gframe\ScreenReader\libs\x64;..\nvda-lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <Manifest>

@@ -68,11 +68,9 @@ struct AccessibilityFieldFocus
 
 	enum DisplayedCards
 	{
-		LOOK_ONLY = 0,
-		SHIFT_SPECIAL_ATT = 1,
-		SHIFT_SPECIAL_DEF = 2,
-		CTRL_NORMAL_SET = 5,
-		CTRL_NORMAL_FACEUP = 6
+		NO_DISPLAY = 0,
+		DISPLAY_HAND = 1,
+		DISPLAY_FIELD = 2
 
 	};
 
@@ -248,7 +246,7 @@ public:
 	//Accessibility Focus
 	bool accessibilityFocus = true; //TODO- FAZER UMA CONFIGURAÇÃO NO MENU PRA ISSO
 	int cardSelectPosition = 0;
-	int displayedField = AccessibilityFieldFocus::DisplayedField::PLAYER;
+	AccessibilityFieldFocus::DisplayedField displayedField = AccessibilityFieldFocus::DisplayedField::PLAYER;
 	int displayedCards = AccessibilityFieldFocus::DisplayedCards::LOOK_ONLY;
 	int battlePhase = AccessibilityFieldFocus::BattleStep::MP1;
 	int cardType = AccessibilityFieldFocus::CardType::MONSTER;
@@ -257,14 +255,15 @@ public:
 	void DisplayCards(const std::vector<ChainInfo>& field);
 	bool UseCard(const AccessibilityFieldFocus::UseType& useType, irr::SEvent event);
 	bool CheckIfCanViewCards(irr::SEvent event);
-	void SelectFieldSlot(const int& slot, const AccessibilityFieldFocus::DisplayedField& player = AccessibilityFieldFocus::DisplayedField::PLAYER);
+	void SelectFieldSlot(const int& slot, const AccessibilityFieldFocus::DisplayedField& player = AccessibilityFieldFocus::DisplayedField::PLAYER, const AccessibilityFieldFocus::CardType& cardType = AccessibilityFieldFocus::CardType::NO_CARD_TYPE);
 	void SelectFieldSlotNoPlayer(const int& slot);
-	int GetFieldSlot(const int& slot, const AccessibilityFieldFocus::DisplayedField& player = AccessibilityFieldFocus::DisplayedField::PLAYER);
+	int GetFieldSlot(const int& slot, const AccessibilityFieldFocus::DisplayedField& player = AccessibilityFieldFocus::DisplayedField::PLAYER, const AccessibilityFieldFocus::CardType& cardType = AccessibilityFieldFocus::CardType::NO_CARD_TYPE);
 	int SearchFieldSlot(const int& displayedField);
 	void ScrollCardList(const AccessibilityFieldFocus::Scroll& position = AccessibilityFieldFocus::Scroll::RIGHT);
 	float GetYPosition();
-	float GetXPosition(const int& slot);
+	float GetXPosition(const int& slot, const AccessibilityFieldFocus::DisplayedField& player = AccessibilityFieldFocus::DisplayedField::PLAYER);
 	float GetXPosition(const AccessibilityFieldFocus::Scroll& position = AccessibilityFieldFocus::Scroll::RIGHT);
+	AccessibilityFieldFocus::DisplayedCards GetCardField();
 	void SimulateButton(irr::gui::IGUIElement* caller = nullptr);
 	void MouseClick(const irr::SEvent& event);
 	void MouseRightClick(const irr::SEvent& event);

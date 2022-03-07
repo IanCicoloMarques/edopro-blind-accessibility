@@ -247,7 +247,7 @@ public:
 	bool accessibilityFocus = true; //TODO- FAZER UMA CONFIGURAÇÃO NO MENU PRA ISSO
 	int cardSelectPosition = 0;
 	AccessibilityFieldFocus::DisplayedField displayedField = AccessibilityFieldFocus::DisplayedField::PLAYER;
-	int displayedCards = AccessibilityFieldFocus::DisplayedCards::LOOK_ONLY;
+	int displayedCards = AccessibilityFieldFocus::DisplayedCards::NO_DISPLAY;
 	int battlePhase = AccessibilityFieldFocus::BattleStep::MP1;
 	int cardType = AccessibilityFieldFocus::CardType::MONSTER;
 	void CloseDialog();

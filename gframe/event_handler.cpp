@@ -1729,7 +1729,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 		case irr::KEY_KEY_W: {
 			if (!event.KeyInput.PressedDown) {
 				bool canViewCards = CheckIfCanViewCards(event);
-				if (canViewCards && displayedCards == AccessibilityFieldFocus::DisplayedCards::LOOK_ONLY) {
+				if (canViewCards) {
 					lookupFieldLocId = AccessibilityFieldFocus::FieldLookerLocId::PLAYER_MONSTERS;
 					cardType = AccessibilityFieldFocus::CardType::MONSTER;
 					DisplayCards(mzone[displayedField]);
@@ -1744,7 +1744,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 		case irr::KEY_KEY_E: {
 			if (!event.KeyInput.PressedDown) {
 				bool canViewCards = CheckIfCanViewCards(event);
-				if (canViewCards && displayedCards == AccessibilityFieldFocus::DisplayedCards::LOOK_ONLY) {
+				if (canViewCards) {
 					lookupFieldLocId = AccessibilityFieldFocus::FieldLookerLocId::PLAYER_SPELLS;
 					cardType = AccessibilityFieldFocus::CardType::SPELL;
 					DisplayCards(szone[displayedField]);
@@ -1759,7 +1759,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 		case irr::KEY_KEY_R: {
 			if (!event.KeyInput.PressedDown) {
 				bool canViewCards = CheckIfCanViewCards(event);
-				if (canViewCards && displayedCards == AccessibilityFieldFocus::DisplayedCards::LOOK_ONLY) {
+				if (canViewCards) {
 					lookupFieldLocId = AccessibilityFieldFocus::FieldLookerLocId::PLAYER_EXTRA_DECK;
 					DisplayCards(extra[displayedField]);
 					std::wstring nvdaString = fmt::format(L"Extra Deck");
@@ -1773,7 +1773,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 		case irr::KEY_KEY_T: {
 			if (!event.KeyInput.PressedDown) {
 				bool canViewCards = CheckIfCanViewCards(event);
-				if (canViewCards && displayedCards == AccessibilityFieldFocus::DisplayedCards::LOOK_ONLY) {
+				if (canViewCards) {
 					lookupFieldLocId = AccessibilityFieldFocus::FieldLookerLocId::PLAYER_GRAVEYARD;
 					DisplayCards(grave[displayedField]);
 					std::wstring nvdaString = fmt::format(L"Graveyard");
@@ -2342,14 +2342,18 @@ bool ClientField::UseCard(const AccessibilityFieldFocus::UseType& useType, irr::
 		}					
 		default:
 			if (indexLookedUpCard <= display_cards.size() && mainGame->btnCardSelect[0]->isTrulyVisible()) {
-				mainGame->scrCardList->setPos(indexLookedUpCard*10);
-				SEvent newEvent;
-				newEvent.EventType = EET_GUI_EVENT;
-				newEvent.GUIEvent.Caller = mainGame->scrCardList;
-				newEvent.GUIEvent.Element = 0;
-				newEvent.GUIEvent.EventType = irr::gui::EGUI_EVENT_TYPE::EGET_SCROLL_BAR_CHANGED;
-				mainGame->scrCardList->OnEvent(newEvent);
-				TriggerEvent(mainGame->btnCardSelect[0], irr::gui::EGET_BUTTON_CLICKED);
+				if (display_cards.size() > 5) {
+					mainGame->scrCardList->setPos(indexLookedUpCard*10);
+					SEvent newEvent;
+					newEvent.EventType = EET_GUI_EVENT;
+					newEvent.GUIEvent.Caller = mainGame->scrCardList;
+					newEvent.GUIEvent.Element = 0;
+					newEvent.GUIEvent.EventType = irr::gui::EGUI_EVENT_TYPE::EGET_SCROLL_BAR_CHANGED;
+					mainGame->scrCardList->OnEvent(newEvent);
+					TriggerEvent(mainGame->btnCardSelect[0], irr::gui::EGET_BUTTON_CLICKED);
+				}
+				else
+					TriggerEvent(mainGame->btnCardSelect[indexLookedUpCard], irr::gui::EGET_BUTTON_CLICKED);
 			}
 			break;
 		}
@@ -2429,10 +2433,11 @@ void ClientField::SelectFieldSlotNoPlayer(const int& slot) {
 }
 AccessibilityFieldFocus::DisplayedCards ClientField::GetCardField() {
 	for (int i = 0; i < 5; i++) {
-		if (hand[0][i] && hand[0][i] == clicked_card) {
+		
+		if (hand[0].size() > i && hand[0][i] == clicked_card) {
 			return AccessibilityFieldFocus::DisplayedCards::DISPLAY_HAND;
 		}
-		else if (hand[1][i] && hand[1][i] == clicked_card) {
+		else if (hand[1].size() > i && hand[1][i] == clicked_card) {
 			return AccessibilityFieldFocus::DisplayedCards::DISPLAY_HAND;
 		}
 	}
@@ -2474,7 +2479,6 @@ void ClientField::ScrollCardList(const AccessibilityFieldFocus::Scroll& position
 	auto pos = cursor->getRelativePosition();
 	pos.X = GetXPosition(position);
 	pos.Y = 0.54f;
-	auto test = matManager.vFieldMzone[1][0][2].Pos.X;
 	auto clamp = [](auto& val) { val = (val < 0.f) ? 0.f : (1.f < val) ? 1.f : val;	};
 	clamp(pos.X);
 	clamp(pos.Y);

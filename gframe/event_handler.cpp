@@ -2059,20 +2059,20 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 		}
 		case irr::KEY_UP: {
 			if (!event.KeyInput.PressedDown) {
-				if (mainGame->scrCardList->isTrulyVisible()) {
-					mainGame->env->setFocus(mainGame->scrCardList);
-					/*if (display_cards.size() == 1) {
-						mainGame->ShowCardInfo(display_cards[0]->code);
-						std::wstring nvdaString = fmt::format(L"{}", gDataManager->GetName(display_cards[indexLookedUpCard]->code));
-						ScreenReader::getReader()->readScreen(nvdaString.c_str());
-					}
-					else if (display_cards.size() && indexLookedUpCard <= display_cards.size() && indexLookedUpCard > 0) {
-						indexLookedUpCard--;
-						mainGame->ShowCardInfo(display_cards[indexLookedUpCard]->code);
-						std::wstring nvdaString = fmt::format(L"{}", gDataManager->GetName(display_cards[indexLookedUpCard]->code));
-						ScreenReader::getReader()->readScreen(nvdaString.c_str());
-					}*/
-				}
+				//if (mainGame->scrCardList->isTrulyVisible()) {
+				//	mainGame->env->setFocus(mainGame->scrCardList);
+				//	/*if (display_cards.size() == 1) {
+				//		mainGame->ShowCardInfo(display_cards[0]->code);
+				//		std::wstring nvdaString = fmt::format(L"{}", gDataManager->GetName(display_cards[indexLookedUpCard]->code));
+				//		ScreenReader::getReader()->readScreen(nvdaString.c_str());
+				//	}
+				//	else if (display_cards.size() && indexLookedUpCard <= display_cards.size() && indexLookedUpCard > 0) {
+				//		indexLookedUpCard--;
+				//		mainGame->ShowCardInfo(display_cards[indexLookedUpCard]->code);
+				//		std::wstring nvdaString = fmt::format(L"{}", gDataManager->GetName(display_cards[indexLookedUpCard]->code));
+				//		ScreenReader::getReader()->readScreen(nvdaString.c_str());
+				//	}*/
+				//}
 				if (displayedField != AccessibilityFieldFocus::DisplayedField::PLAYER) {
 					displayedField = AccessibilityFieldFocus::DisplayedField::PLAYER;
 					std::wstring nvdaString = fmt::format(L"Player Field");

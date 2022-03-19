@@ -145,9 +145,14 @@ void DeckBuilder::Terminate(bool showmenu) {
 }
 static void ImportDeck() {
 	const wchar_t* deck_string = Utils::OSOperator->getTextFromClipboard();
+	std::wstring wstringDeckString = std::wstring(deck_string);
+	std::size_t startPosition = wstringDeckString.find(L"ydke://");
 	if(deck_string) {
 		if(wcsncmp(L"ydke://", deck_string, sizeof(L"ydke://") / sizeof(wchar_t) - 1) == 0)
 			DeckManager::ImportDeckBase64(gdeckManager->current_deck, deck_string);
+		else if (startPosition != 0 && startPosition != std::string::npos) {
+			DeckManager::ImportDeckBase64(gdeckManager->current_deck, (wstringDeckString.substr(startPosition)).c_str());
+		}
 		else
 			(void)DeckManager::ImportDeckBase64Omega(gdeckManager->current_deck, deck_string);
 	}

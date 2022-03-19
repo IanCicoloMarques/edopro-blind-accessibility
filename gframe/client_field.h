@@ -251,6 +251,8 @@ public:
 	int battlePhase = AccessibilityFieldFocus::BattleStep::MP1;
 	int cardType = AccessibilityFieldFocus::CardType::MONSTER;
 	void CloseDialog();
+	void ScrollCardList();
+	//void ScrollCardList(const AccessibilityFieldFocus::Scroll& position = AccessibilityFieldFocus::Scroll::RIGHT);
 	void DisplayCards(const std::vector<ClientCard*> &field);
 	void DisplayCards(const std::vector<ChainInfo>& field);
 	bool UseCard(const AccessibilityFieldFocus::UseType& useType, irr::SEvent event);
@@ -259,13 +261,12 @@ public:
 	void SelectFieldSlotNoPlayer(const int& slot);
 	int GetFieldSlot(const int& slot, const AccessibilityFieldFocus::DisplayedField& player = AccessibilityFieldFocus::DisplayedField::PLAYER, const AccessibilityFieldFocus::CardType& cardType = AccessibilityFieldFocus::CardType::NO_CARD_TYPE);
 	int SearchFieldSlot(const int& displayedField);
-	void ScrollCardList(const AccessibilityFieldFocus::Scroll& position = AccessibilityFieldFocus::Scroll::RIGHT);
 	float GetYPosition();
 	float GetXPosition(const int& slot, const AccessibilityFieldFocus::DisplayedField& player = AccessibilityFieldFocus::DisplayedField::PLAYER);
 	float GetXPosition(const AccessibilityFieldFocus::Scroll& position = AccessibilityFieldFocus::Scroll::RIGHT);
 	AccessibilityFieldFocus::DisplayedCards GetCardField();
 	void SimulateButton(irr::gui::IGUIElement* caller = nullptr);
-	void MouseClick(const irr::SEvent& event);
+	void MouseClick(const irr::SEvent& event, bool rightClick = false);
 	void MouseRightClick(const irr::SEvent& event);
 	//bool SetCard(const int& setType, const AccessibilityFieldFocus::UseType& useType = AccessibilityFieldFocus::UseType::NORMAL_SUMMON);
 	void SetMouseOnCard();

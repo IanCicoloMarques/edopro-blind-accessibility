@@ -1914,6 +1914,9 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					std::wstring nvdaString = fmt::format(L"Attack Down");
 					ScreenReader::getReader()->readScreen(nvdaString.c_str());
 				}
+				else {
+					MouseClick(event, true);
+				}
 			}
 			break;
 		}
@@ -2007,15 +2010,22 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 		}
 		case irr::KEY_RIGHT: {
 			if (!event.KeyInput.PressedDown) {
-				if (mainGame->scrCardList->isTrulyVisible() && display_cards != selectable_cards)
-					display_cards = selectable_cards;
-				if (display_cards.size() == 1) {
-					mainGame->ShowCardInfo(display_cards[0]->code);
-					std::wstring nvdaString = fmt::format(L"{}", gDataManager->GetName(display_cards[indexLookedUpCard]->code));
-					ScreenReader::getReader()->readScreen(nvdaString.c_str());
-				}
-				else if (display_cards.size() && indexLookedUpCard < display_cards.size()-1) {
+				if (!display_cards.empty() && display_cards.size() == 1)
+					indexLookedUpCard = 0;
+				else if (!display_cards.empty() && indexLookedUpCard < display_cards.size()-1)
 					indexLookedUpCard++;
+				else if (mainGame->scrCardList->isTrulyVisible()) {
+					int pos = mainGame->scrCardList->getPos();
+					int maxPos = mainGame->scrCardList->getMax();
+					mainGame->scrCardList->setPos(pos + 10);
+					int cardPos = (mainGame->scrCardList->getPos() / 10) + 4;
+					ScrollCardList();
+					if (display_cards.back() != selectable_cards.back() && cardPos < selectable_cards.size() && !display_cards.empty()) {
+						display_cards.push_back(selectable_cards[cardPos]);
+						display_cards.erase(display_cards.begin());
+					}
+				}
+				if (!display_cards.empty()) {
 					mainGame->ShowCardInfo(display_cards[indexLookedUpCard]->code);
 					std::wstring nvdaString = fmt::format(L"{}", gDataManager->GetName(display_cards[indexLookedUpCard]->code));
 					ScreenReader::getReader()->readScreen(nvdaString.c_str());
@@ -2025,15 +2035,21 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 		}
 		case irr::KEY_LEFT: {
 			if (!event.KeyInput.PressedDown) {
-				if (mainGame->scrCardList->isTrulyVisible() && display_cards != selectable_cards)
-					display_cards = selectable_cards;
-				if (display_cards.size() == 1) {
-					mainGame->ShowCardInfo(display_cards[0]->code);
-					std::wstring nvdaString = fmt::format(L"{}", gDataManager->GetName(display_cards[indexLookedUpCard]->code));
-					ScreenReader::getReader()->readScreen(nvdaString.c_str());
-				}
-				else if (display_cards.size() && indexLookedUpCard <= display_cards.size() && indexLookedUpCard > 0) {
+				if (!display_cards.empty() && display_cards.size() == 1)
+					indexLookedUpCard = 0;
+				else if (display_cards.size() && indexLookedUpCard <= display_cards.size() && indexLookedUpCard > 0)
 					indexLookedUpCard--;
+				else if (mainGame->scrCardList->isTrulyVisible()) {
+					int pos = mainGame->scrCardList->getPos();
+					mainGame->scrCardList->setPos(pos - 10);
+					int cardPos = (mainGame->scrCardList->getPos() / 10);
+					ScrollCardList();
+					if (display_cards.front() != selectable_cards.front() && cardPos < selectable_cards.size() && !display_cards.empty()) {
+						display_cards.insert(display_cards.begin(), selectable_cards[cardPos]);
+						display_cards.pop_back();
+					}
+				}
+				if (!display_cards.empty()) {
 					mainGame->ShowCardInfo(display_cards[indexLookedUpCard]->code);
 					std::wstring nvdaString = fmt::format(L"{}", gDataManager->GetName(display_cards[indexLookedUpCard]->code));
 					ScreenReader::getReader()->readScreen(nvdaString.c_str());
@@ -2043,9 +2059,9 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 		}
 		case irr::KEY_UP: {
 			if (!event.KeyInput.PressedDown) {
-				/*if (mainGame->scrCardList->isTrulyVisible()) {
+				if (mainGame->scrCardList->isTrulyVisible()) {
 					mainGame->env->setFocus(mainGame->scrCardList);
-					if (display_cards.size() == 1) {
+					/*if (display_cards.size() == 1) {
 						mainGame->ShowCardInfo(display_cards[0]->code);
 						std::wstring nvdaString = fmt::format(L"{}", gDataManager->GetName(display_cards[indexLookedUpCard]->code));
 						ScreenReader::getReader()->readScreen(nvdaString.c_str());
@@ -2055,8 +2071,8 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 						mainGame->ShowCardInfo(display_cards[indexLookedUpCard]->code);
 						std::wstring nvdaString = fmt::format(L"{}", gDataManager->GetName(display_cards[indexLookedUpCard]->code));
 						ScreenReader::getReader()->readScreen(nvdaString.c_str());
-					}
-				}*/
+					}*/
+				}
 				if (displayedField != AccessibilityFieldFocus::DisplayedField::PLAYER) {
 					displayedField = AccessibilityFieldFocus::DisplayedField::PLAYER;
 					std::wstring nvdaString = fmt::format(L"Player Field");
@@ -2341,19 +2357,19 @@ bool ClientField::UseCard(const AccessibilityFieldFocus::UseType& useType, irr::
 			break;
 		}					
 		default:
-			if (indexLookedUpCard <= display_cards.size() && mainGame->btnCardSelect[0]->isTrulyVisible()) {
-				if (display_cards.size() > 5) {
-					mainGame->scrCardList->setPos(indexLookedUpCard*10);
-					SEvent newEvent;
-					newEvent.EventType = EET_GUI_EVENT;
-					newEvent.GUIEvent.Caller = mainGame->scrCardList;
-					newEvent.GUIEvent.Element = 0;
-					newEvent.GUIEvent.EventType = irr::gui::EGUI_EVENT_TYPE::EGET_SCROLL_BAR_CHANGED;
-					mainGame->scrCardList->OnEvent(newEvent);
-					TriggerEvent(mainGame->btnCardSelect[0], irr::gui::EGET_BUTTON_CLICKED);
-				}
-				else
-					TriggerEvent(mainGame->btnCardSelect[indexLookedUpCard], irr::gui::EGET_BUTTON_CLICKED);
+			if (indexLookedUpCard < display_cards.size() && mainGame->btnCardSelect[indexLookedUpCard]->isTrulyVisible()) {
+				//if (display_cards.size() > 5) {
+				//	mainGame->scrCardList->setPos(indexLookedUpCard*10);
+				//	SEvent newEvent;
+				//	newEvent.EventType = EET_GUI_EVENT;
+				//	newEvent.GUIEvent.Caller = mainGame->scrCardList;
+				//	newEvent.GUIEvent.Element = 0;
+				//	newEvent.GUIEvent.EventType = irr::gui::EGUI_EVENT_TYPE::EGET_SCROLL_BAR_CHANGED;
+				//	mainGame->scrCardList->OnEvent(newEvent);
+				//	TriggerEvent(mainGame->btnCardSelect[indexLookedUpCard], irr::gui::EGET_BUTTON_CLICKED);
+				//}
+				//else
+				TriggerEvent(mainGame->btnCardSelect[indexLookedUpCard], irr::gui::EGET_BUTTON_CLICKED);
 			}
 			break;
 		}
@@ -2362,9 +2378,22 @@ bool ClientField::UseCard(const AccessibilityFieldFocus::UseType& useType, irr::
 }
 
 void ClientField::CloseDialog() {
-	if (mainGame->wCardDisplay->isVisible())
+	if (mainGame->wCardDisplay->isVisible()) {
 		TriggerEvent(mainGame->btnDisplayOK, irr::gui::EGET_BUTTON_CLICKED);
+		if (!display_cards.empty())
+			display_cards.clear();
+	}
+}
 
+void ClientField::ScrollCardList() {
+	if (mainGame->btnCardSelect[0]->isTrulyVisible()) {
+		SEvent newEvent;
+		newEvent.EventType = EET_GUI_EVENT;
+		newEvent.GUIEvent.Caller = mainGame->scrCardList;
+		newEvent.GUIEvent.Element = 0;
+		newEvent.GUIEvent.EventType = irr::gui::EGUI_EVENT_TYPE::EGET_SCROLL_BAR_CHANGED;
+		mainGame->scrCardList->OnEvent(newEvent);
+	}
 }
 
 bool ClientField::CheckIfCanViewCards(irr::SEvent event) {
@@ -2474,16 +2503,16 @@ int ClientField::SearchFieldSlot(const int& displayedField) {
 	return fieldSlot;
 }
 
-void ClientField::ScrollCardList(const AccessibilityFieldFocus::Scroll& position) {
-	auto cursor = mainGame->device->getCursorControl();
-	auto pos = cursor->getRelativePosition();
-	pos.X = GetXPosition(position);
-	pos.Y = 0.54f;
-	auto clamp = [](auto& val) { val = (val < 0.f) ? 0.f : (1.f < val) ? 1.f : val;	};
-	clamp(pos.X);
-	clamp(pos.Y);
-	cursor->setPosition(pos.X, pos.Y);
-}
+//void ClientField::ScrollCardList(const AccessibilityFieldFocus::Scroll& position) {
+//	auto cursor = mainGame->device->getCursorControl();
+//	auto pos = cursor->getRelativePosition();
+//	pos.X = GetXPosition(position);
+//	pos.Y = 0.54f;
+//	auto clamp = [](auto& val) { val = (val < 0.f) ? 0.f : (1.f < val) ? 1.f : val;	};
+//	clamp(pos.X);
+//	clamp(pos.Y);
+//	cursor->setPosition(pos.X, pos.Y);
+//}
 
 float ClientField::GetXPosition(const int& slot, const AccessibilityFieldFocus::DisplayedField& player) {
 	float posX = 0.f;
@@ -2558,7 +2587,7 @@ void ClientField::SimulateButton(irr::gui::IGUIElement* caller) {
 	mainGame->device->postEventFromUser(simulated);
 }
 
-void ClientField::MouseClick(const irr::SEvent& event) {
+void ClientField::MouseClick(const irr::SEvent& event, bool rightClick) {
 	auto cursor = mainGame->device->getCursorControl();
 	auto pos = cursor->getRelativePosition();
 
@@ -2583,7 +2612,7 @@ void ClientField::MouseClick(const irr::SEvent& event) {
 		device->postEventFromUser(simulated);
 	};
 
-	CheckAndPost(JWrapper::Buttons::A, irr::EMIE_LMOUSE_PRESSED_DOWN);
+	CheckAndPost(JWrapper::Buttons::A, rightClick ? irr::EMIE_RMOUSE_PRESSED_DOWN : irr::EMIE_LMOUSE_PRESSED_DOWN);
 }
 
 void ClientField::MouseRightClick(const irr::SEvent& event) {

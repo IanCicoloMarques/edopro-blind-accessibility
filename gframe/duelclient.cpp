@@ -2016,14 +2016,22 @@ int DuelClient::ClientAnalyze(char* msg, uint32_t len) {
 			if (info.location & 0xf1)
 				panelmode = true;
 		}
-		mainGame->dField.display_cards = mainGame->dField.selectable_cards;
+		mainGame->dField.display_cards.clear();// = mainGame->dField.selectable_cards;
+		for (int i = 0; i < 5; i++)
+		{
+			if (i < mainGame->dField.selectable_cards.size())
+				mainGame->dField.display_cards.push_back(mainGame->dField.selectable_cards[i]);
+			else
+				break;
+		}
 		mainGame->dField.indexLookedUpCard = 0;
+
 		std::sort(mainGame->dField.selectable_cards.begin(), mainGame->dField.selectable_cards.end(), ClientCard::client_card_sort);
 		std::wstring text = fmt::format(L"{}({}-{})", gDataManager->GetDesc(select_hint ? select_hint : 560, mainGame->dInfo.compat_mode),
 			mainGame->dField.select_min, mainGame->dField.select_max);
 
-		std::wstring nvdaString = fmt::format(L"{}", gDataManager->GetDesc(select_hint ? select_hint : 560, mainGame->dInfo.compat_mode));
-		screenReader->readScreen(nvdaString.c_str()); //TODO change to class
+		std::wstring screenReaderString = fmt::format(L"{}", gDataManager->GetDesc(select_hint ? select_hint : 560, mainGame->dInfo.compat_mode));
+		screenReader->readScreen(screenReaderString.c_str()); //TODO change to class
 
 
 		std::lock_guard<std::mutex> lock(mainGame->gMutex);
@@ -2042,6 +2050,9 @@ int DuelClient::ClientAnalyze(char* msg, uint32_t len) {
 		} else {
 			mainGame->dField.ShowCancelOrFinishButton(0);
 		}
+		mainGame->ShowCardInfo(mainGame->dField.display_cards[mainGame->dField.indexLookedUpCard]->code);
+		screenReaderString = fmt::format(L"{}", gDataManager->GetName(mainGame->dField.display_cards[mainGame->dField.indexLookedUpCard]->code));
+		ScreenReader::getReader()->readScreen(screenReaderString.c_str());
 		return false;
 	}
 	case MSG_SELECT_UNSELECT_CARD: {

@@ -1952,9 +1952,8 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 		}
 		case irr::KEY_KEY_I: {
 			if (!event.KeyInput.PressedDown) {
-				if (!display_cards.empty() && indexLookedUpCard <= display_cards.size()) {
+				if (!display_cards.empty() && indexLookedUpCard <= display_cards.size() && display_cards[indexLookedUpCard]->code != 0) {
 					auto selectedCard = display_cards[indexLookedUpCard];
-
 					std::wstring cardName = fmt::format(L"{}", gDataManager->GetName(selectedCard->code));
 					std::wstring cardType = fmt::format(L"{}", gDataManager->FormatType(selectedCard->type));
 					std::wstring cardLevel = fmt::format(L"Level {}", gDataManager->GetCardData(selectedCard->code)->level);
@@ -1982,6 +1981,8 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 						ScreenReader::getReader()->readScreen(rightScale.c_str());
 					ScreenReader::getReader()->readScreen(cardEffect.c_str());
 				}
+				else if (!display_cards.empty() && indexLookedUpCard <= display_cards.size() && display_cards[indexLookedUpCard]->code == 0)
+					ScreenReader::getReader()->readScreen(fmt::format(L"Face-down"));
 			}
 			break;
 		}

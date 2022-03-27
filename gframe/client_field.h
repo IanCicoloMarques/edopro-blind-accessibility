@@ -267,7 +267,7 @@ public:
 	AccessibilityFieldFocus::DisplayedCards GetCardField();
 	void SimulateButton(irr::gui::IGUIElement* caller = nullptr);
 	void MouseClick(const irr::SEvent& event, bool rightClick = false);
-	void MouseRightClick(const irr::SEvent& event);
+	//void MouseRightClick(const irr::SEvent& event);
 	//bool SetCard(const int& setType, const AccessibilityFieldFocus::UseType& useType = AccessibilityFieldFocus::UseType::NORMAL_SUMMON);
 	void SetMouseOnCard();
 };

@@ -190,7 +190,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case BUTTON_LAN_MODE: {
-				ScreenReader::getReader()->readScreen(L"LAN + AI"); //TODO change to class
+				ScreenReader::getReader()->readScreen(L"LAN + AI");
 				mainGame->isHostingOnline = false;
 				mainGame->btnCreateHost->setEnabled(mainGame->coreloaded);
 				mainGame->btnJoinHost->setEnabled(true);
@@ -230,7 +230,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 			}
 			case BUTTON_CREATE_HOST: {
 				if (wcslen(mainGame->ebNickName->getText())) {
-					ScreenReader::getReader()->readScreen(L"Host game"); //TODO change to class
+					ScreenReader::getReader()->readScreen(L"Host game");
 					mainGame->isHostingOnline = false;
 					mainGame->btnHostConfirm->setEnabled(true);
 					mainGame->btnHostCancel->setEnabled(true);
@@ -318,7 +318,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case BUTTON_HOST_CONFIRM: {
-				ScreenReader::getReader()->readScreen(L"Rules ok. Select Deck"); //TODO change to class
+				ScreenReader::getReader()->readScreen(L"Rules ok. Select Deck");
 				DuelClient::is_local_host = false;
 				if(mainGame->isHostingOnline) {
 					ServerLobby::JoinServer(true);
@@ -384,7 +384,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case BUTTON_HP_READY: {
-				ScreenReader::getReader()->readScreen(L"Player ready"); //TODO change to class
+				ScreenReader::getReader()->readScreen(L"Player ready");
 				bool check = false;
 				if(!mainGame->cbDeckSelect2->isVisible())
 					check = (mainGame->cbDeckSelect->getSelected() == -1 || !gdeckManager->LoadDeck(Utils::ToPathString(mainGame->cbDeckSelect->getItem(mainGame->cbDeckSelect->getSelected()))));
@@ -409,7 +409,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case BUTTON_HP_START: {
-				ScreenReader::getReader()->readScreen(L"Start game"); //TODO change to class
+				ScreenReader::getReader()->readScreen(L"Start game");
 				DuelClient::SendPacketToServer(CTOS_HS_START);
 				break;
 			}
@@ -505,7 +505,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case BUTTON_HP_AI_TOGGLE: {
-				ScreenReader::getReader()->readScreen(L"Select bot deck"); //TODO change to class
+				ScreenReader::getReader()->readScreen(L"Select bot deck");
 				if (mainGame->gBot.window->isVisible()) {
 					mainGame->HideElement(mainGame->gBot.window);
 				}
@@ -516,7 +516,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 			}
 			case BUTTON_BOT_ADD: {
 				try {
-					ScreenReader::getReader()->readScreen(L"Add Bot"); //TODO change to class
+					ScreenReader::getReader()->readScreen(L"Add Bot");
 					int port = std::stoi(gGameConfig->serverport);
 					if(mainGame->gBot.LaunchSelected(port, mainGame->dInfo.secret.pass))
 						break;
@@ -606,6 +606,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case BUTTON_DECK_EDIT: {
+				ScreenReader::getReader()->readScreen(L"Deck Editor");
 				mainGame->RefreshDeck(mainGame->cbDBDecks);
 				if(open_file && gdeckManager->LoadDeck(open_file_name, nullptr, true)) {
 					auto name = Utils::GetFileName(open_file_name);
@@ -618,6 +619,8 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				}
 				mainGame->HideElement(mainGame->wMainMenu);
 				mainGame->deckBuilder.Initialize();
+				if(mainGame->btnClearDeck->isVisible())
+					mainGame->env->setFocus(mainGame->btnClearDeck);
 				break;
 			}
 			case BUTTON_MSG_OK: {
@@ -1103,6 +1106,13 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 			}
 			else if (!event.KeyInput.PressedDown && mainGame->btnHostPrepWindBot->isTrulyVisible()) {
 				ClickButton(mainGame->btnHostPrepWindBot);
+			}
+			
+			break;
+		}
+		case irr::KEY_KEY_G: {
+			if (!event.KeyInput.PressedDown && mainGame->btnDeckEdit->isTrulyVisible()) {
+				ClickButton(mainGame->btnDeckEdit);
 			}
 			
 			break;

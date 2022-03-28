@@ -21,7 +21,6 @@
 #include "CGUIImageButton/CGUIImageButton.h"
 #include "CGUITTFont/CGUITTFont.h"
 #include "custom_skin_enum.h"
-#include "ScreenReader/ScreenReader.h"
 
 namespace ygo {
 
@@ -317,7 +316,7 @@ ClientCard* ClientField::RemoveCard(uint8_t controler, uint8_t location, uint32_
 	pcard->location = 0;
 	return pcard;
 }
-void ClientField::UpdateCard(uint8_t controler, uint8_t location, uint32_t sequence, char* data, uint32_t len) {
+void ClientField::UpdateCard(uint8_t controler, uint8_t location, uint32_t sequence, const char* data, uint32_t len) {
 	ClientCard* pcard = GetCard(controler, location, sequence);
 	if(pcard) {
 		if(mainGame->dInfo.compat_mode)
@@ -325,13 +324,13 @@ void ClientField::UpdateCard(uint8_t controler, uint8_t location, uint32_t seque
 		pcard->UpdateInfo(CoreUtils::Query{ data, mainGame->dInfo.compat_mode, len });
 	}
 }
-void ClientField::UpdateFieldCard(uint8_t controler, uint8_t location, char* data, uint32_t len) {
+void ClientField::UpdateFieldCard(uint8_t controler, uint8_t location, const char* data, uint32_t len) {
 	auto lst = GetList(location, controler);
 	if(!lst)
 		return;
 	CoreUtils::QueryStream stream{ data, mainGame->dInfo.compat_mode, len };
 	auto cit = lst->begin();
-	for(auto& query : stream.GetQueries()) {
+	for(const auto& query : stream.GetQueries()) {
 		auto pcard = *cit++;
 		if(pcard)
 			pcard->UpdateInfo(query);
@@ -404,7 +403,7 @@ void ClientField::ShowSelectCard(bool buttonok, bool chain) {
 			// text
 			std::wstring text = L"";
 			if(conti_selecting)
-				text = DataManager::unknown_string;
+				text = std::wstring{ DataManager::unknown_string };
 			else if(curcard->location == LOCATION_OVERLAY) {
 				text = fmt::format(L"{}[{}]({})", gDataManager->FormatLocation(curcard->overlayTarget->location, curcard->overlayTarget->sequence),
 					curcard->overlayTarget->sequence + 1, curcard->sequence + 1);
@@ -463,8 +462,6 @@ void ClientField::ShowSelectCard(bool buttonok, bool chain) {
 		mainGame->scrCardList->setMax((selectable_cards.size() - 5) * 10 + 9);
 		mainGame->scrCardList->setPos(0);
 	}
-	display_cards = selectable_cards;
-	mainGame->dField.indexLookedUpCard = 0;
 	mainGame->btnSelectOK->setVisible(buttonok);
 	mainGame->PopupElement(mainGame->wCardSelect);
 }
@@ -604,12 +601,8 @@ void ClientField::ShowSelectOption(uint64_t select_hint, bool should_lock) {
 			break;
 		}
 	}
-	std::wstring nvdaString = fmt::format(L"Select a option");
-	ScreenReader::getReader()->readScreen(nvdaString.c_str());
-	for (int i = 0; (i < count) && (i < 5) && quickmode; i++) {
+	for(int i = 0; (i < count) && (i < 5) && quickmode; i++)
 		mainGame->btnOption[i]->setText(gDataManager->GetDesc(select_options[i], mainGame->dInfo.compat_mode).data());
-		ScreenReader::getReader()->readScreen(fmt::format(L"{} - {}", i +1, gDataManager->GetDesc(select_options[i], mainGame->dInfo.compat_mode).data()));
-	}
 	irr::core::recti pos = mainGame->wOptions->getRelativePosition();
 	if(count > 5 && quickmode)
 		pos.LowerRightCorner.X = pos.UpperLeftCorner.X + mainGame->Scale(375);
@@ -695,6 +688,7 @@ void ClientField::RefreshAllCards() {
 		if(pcard) {
 			pcard->UpdateDrawCoordinates(true);
 			pcard->is_moving = false;
+			pcard->aniFrame = 0;
 		}
 	};
 	auto refreshloc = [&refresh](const auto& zone) {

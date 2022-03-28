@@ -1,85 +1,50 @@
 {
-	"repos": [
-		{
-			"url": "https://github.com/ProjectIgnis/LFLists",
-			"repo_name": "Forbidden & Limited Card Lists",
-			"repo_path": "./repositories/lflists",
-			"lflist_path": ".",
-			"should_update": true,
-			"should_read": true
-		}
-	],
-	"urls": [
-		{
-			"url": "default",
-			"type": "pic"
-		},
-		{
-			"url": "default",
-			"type": "field"
-		},
-		{
-			"url": "default",
-			"type": "cover"
-		}
-	],
-	"servers": [
-		{
-			"name": "EU Central (Casual)",
-			"address": "185.227.110.90",
-			"duelport": 7912,
-			"roomaddress": "185.227.110.90",
-			"roomlistport": 7923
-		},
-		{
-			"name": "EU Central (Competitive)",
-			"address": "185.227.110.90",
-			"duelport": 7911,
-			"roomaddress": "185.227.110.90",
-			"roomlistport": 7922
-		},
-		{
-			"name": "US West (Casual)",
-			"address": "146.71.79.166",
-			"duelport": 7911,
-			"roomaddress": "146.71.79.166",
-			"roomlistport": 7922
-		},
-		{
-			"name": "US West (Competitive)",
-			"address": "146.71.79.166",
-			"duelport": 7912,
-			"roomaddress": "146.71.79.166",
-			"roomlistport": 7923
-		},
-		{
-			"name": "GOAT (Gideon)",
-			"address": "73.240.71.103",
-			"duelport": 7905,
-			"roomaddress": "73.240.71.103",
-			"roomlistport": 7906
-		},
-		{
-			"name": "NA Pacific (Gideon)",
-			"address": "73.240.71.103",
-			"duelport": 7911,
-			"roomaddress": "73.240.71.103",
-			"roomlistport": 7922
-		},
-		{
-			"name": "21 Sussex (Kevin)",
-			"address": "128.100.146.10",
-			"duelport": 7911,
-			"roomaddress": "128.100.146.10",
-			"roomlistport": 7922
-		},
-		{
-			"name": "localhost",
-			"address": "127.0.0.1",
-			"duelport": 7911,
-			"roomaddress": "127.0.0.1",
-			"roomlistport": 7922
-		}
-	],
-	"posixPathExtension": "/usr/local/bin:/Library/Frameworks/Mono.framework/Versions/Current/Commands"
+    "repos": [
+        {
+            "url": "default",
+            "should_update": false,
+            "should_read": false
+        },
+        {
+            "url": "default_anime",
+            "should_update": false,
+            "should_read": false
+        },
+        {
+            "url": "https://github.com/Gideon9212/Livecustom",
+            "repo_path": "./expansions/Livecustom",
+            "data_path": "",
+            "script_path": "script",
+            "pics_path": "pics",
+            "should_update": false,
+            "should_read": false
+        }
+    ],
+    "urls": [
+        {
+            "url": "default",
+            "type": "pic"
+        },
+        {
+            "url": "default",
+            "type": "field"
+        },
+        {
+            "url": "https://raw.githubusercontent.com/Gideon9212/Livecustom/master/pics/{}.png",
+            "type": "pic"
+        },
+        {
+            "url": "https://raw.githubusercontent.com/Gideon9212/Livecustom/master/pics/field/{}.png",
+            "type": "field"
+        }
+    ],
+    "servers": [
+        {
+            "name": "localhost",
+            "address": "127.0.0.1",
+            "roomaddress": "127.0.0.1",
+            "roomlistport": 7922,
+            "duelport": 7911
+        }
+    ]
 }

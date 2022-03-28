@@ -25,8 +25,6 @@
 #include <IGUITabControl.h>
 #include <IGUITable.h>
 #include <IGUIWindow.h>
-#include <nvdaController.h>
-#include "ScreenReader/ScreenReader.h"
 
 namespace ygo {
 
@@ -55,11 +53,8 @@ static void LoadReplay() {
 	if(open_file) {
 		bool res = replay.OpenReplay(open_file_name);
 		open_file = false;
-		if(!res || (replay.pheader.id == REPLAY_YRP1 && !mainGame->coreloaded)) {
-			if(exit_on_return)
-				mainGame->device->closeDevice();
+		if(!res || (replay.pheader.id == REPLAY_YRP1 && !mainGame->coreloaded))
 			return;
-		}
 	} else {
 		if(mainGame->lstReplayList->getSelected() == -1)
 			return;
@@ -190,7 +185,6 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case BUTTON_LAN_MODE: {
-				ScreenReader::getReader()->readScreen(L"LAN + AI");
 				mainGame->isHostingOnline = false;
 				mainGame->btnCreateHost->setEnabled(mainGame->coreloaded);
 				mainGame->btnJoinHost->setEnabled(true);
@@ -220,8 +214,6 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 			case BUTTON_JOIN_CANCEL: {
 				mainGame->HideElement(mainGame->wLanWindow);
 				mainGame->ShowElement(mainGame->wMainMenu);
-				if(exit_on_return)
-					mainGame->device->closeDevice();
 				break;
 			}
 			case BUTTON_LAN_REFRESH: {
@@ -230,7 +222,6 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 			}
 			case BUTTON_CREATE_HOST: {
 				if (wcslen(mainGame->ebNickName->getText())) {
-					ScreenReader::getReader()->readScreen(L"Host game");
 					mainGame->isHostingOnline = false;
 					mainGame->btnHostConfirm->setEnabled(true);
 					mainGame->btnHostCancel->setEnabled(true);
@@ -306,7 +297,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 					if(i == 3)
 						mainGame->chkCustomRules[4]->setEnabled(set);
 				}
-				constexpr uint32_t limits[] = { TYPE_FUSION, TYPE_SYNCHRO, TYPE_XYZ, TYPE_PENDULUM, TYPE_LINK };
+				static constexpr uint32_t limits[]{ TYPE_FUSION, TYPE_SYNCHRO, TYPE_XYZ, TYPE_PENDULUM, TYPE_LINK };
 				for (int i = 0; i < sizeofarr(mainGame->chkTypeLimit); ++i)
 						mainGame->chkTypeLimit[i]->setChecked(mainGame->forbiddentypes & limits[i]);
 				mainGame->PopupElement(mainGame->wCustomRules);
@@ -318,7 +309,6 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case BUTTON_HOST_CONFIRM: {
-				ScreenReader::getReader()->readScreen(L"Rules ok. Select Deck");
 				DuelClient::is_local_host = false;
 				if(mainGame->isHostingOnline) {
 					ServerLobby::JoinServer(true);
@@ -384,7 +374,6 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case BUTTON_HP_READY: {
-				ScreenReader::getReader()->readScreen(L"Player ready");
 				bool check = false;
 				if(!mainGame->cbDeckSelect2->isVisible())
 					check = (mainGame->cbDeckSelect->getSelected() == -1 || !gdeckManager->LoadDeck(Utils::ToPathString(mainGame->cbDeckSelect->getItem(mainGame->cbDeckSelect->getSelected()))));
@@ -409,7 +398,6 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case BUTTON_HP_START: {
-				ScreenReader::getReader()->readScreen(L"Start game");
 				DuelClient::SendPacketToServer(CTOS_HS_START);
 				break;
 			}
@@ -430,8 +418,6 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				else
 					mainGame->ShowElement(mainGame->wLanWindow);
 				mainGame->wChat->setVisible(false);
-				if(exit_on_return)
-					mainGame->device->closeDevice();
 				break;
 			}
 			case BUTTON_REPLAY_MODE: {
@@ -505,7 +491,6 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case BUTTON_HP_AI_TOGGLE: {
-				ScreenReader::getReader()->readScreen(L"Select bot deck");
 				if (mainGame->gBot.window->isVisible()) {
 					mainGame->HideElement(mainGame->gBot.window);
 				}
@@ -516,7 +501,6 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 			}
 			case BUTTON_BOT_ADD: {
 				try {
-					ScreenReader::getReader()->readScreen(L"Add Bot");
 					int port = std::stoi(gGameConfig->serverport);
 					if(mainGame->gBot.LaunchSelected(port, mainGame->dInfo.secret.pass))
 						break;
@@ -606,7 +590,6 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case BUTTON_DECK_EDIT: {
-				ScreenReader::getReader()->readScreen(L"Deck Editor");
 				mainGame->RefreshDeck(mainGame->cbDBDecks);
 				if(open_file && gdeckManager->LoadDeck(open_file_name, nullptr, true)) {
 					auto name = Utils::GetFileName(open_file_name);
@@ -619,8 +602,6 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				}
 				mainGame->HideElement(mainGame->wMainMenu);
 				mainGame->deckBuilder.Initialize();
-				if(mainGame->btnClearDeck->isVisible())
-					mainGame->env->setFocus(mainGame->btnClearDeck);
 				break;
 			}
 			case BUTTON_MSG_OK: {
@@ -1024,7 +1005,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 					if(i == 3)
 						mainGame->chkCustomRules[4]->setEnabled(set);
 				}
-				constexpr uint32_t limits[] = { TYPE_FUSION, TYPE_SYNCHRO, TYPE_XYZ, TYPE_PENDULUM, TYPE_LINK };
+				static constexpr uint32_t limits[]{ TYPE_FUSION, TYPE_SYNCHRO, TYPE_XYZ, TYPE_PENDULUM, TYPE_LINK };
 				for(int i = 0; i < sizeofarr(mainGame->chkTypeLimit); ++i)
 					mainGame->chkTypeLimit[i]->setChecked(mainGame->forbiddentypes & limits[i]);
 				break;
@@ -1083,88 +1064,6 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 		case irr::KEY_F5: {
 			if(!event.KeyInput.PressedDown && mainGame->wRoomListPlaceholder->isVisible())
 				ServerLobby::RefreshRooms();
-			break;
-		}
-		case irr::KEY_KEY_D: {
-			if (!event.KeyInput.PressedDown && mainGame->btnHostPrepWindBot->isTrulyVisible() && mainGame->btnHostPrepStart->isEnabled()) {
-				ClickButton(mainGame->btnHostPrepStart);
-			}
-			else if (!event.KeyInput.PressedDown && !mainGame->wSinglePlay->isTrulyVisible()) {
-				ClickButton(mainGame->btnLanMode);
-			}
-			if (!event.KeyInput.PressedDown && mainGame->btnCreateHost->isTrulyVisible()) {
-				ClickButton(mainGame->btnCreateHost);
-			}
-			else if (!event.KeyInput.PressedDown && mainGame->btnHostConfirm->isTrulyVisible()) {
-				ClickButton(mainGame->btnHostConfirm);
-			}
-			else if (!event.KeyInput.PressedDown && mainGame->btnHostPrepReady->isTrulyVisible()) {
-				ClickButton(mainGame->btnHostPrepReady);
-			}
-			else if (!event.KeyInput.PressedDown && mainGame->gBot.btnAdd->isTrulyVisible()) {
-				ClickButton(mainGame->gBot.btnAdd);
-			}
-			else if (!event.KeyInput.PressedDown && mainGame->btnHostPrepWindBot->isTrulyVisible()) {
-				ClickButton(mainGame->btnHostPrepWindBot);
-			}
-			
-			break;
-		}
-		case irr::KEY_KEY_G: {
-			if (!event.KeyInput.PressedDown && mainGame->btnDeckEdit->isTrulyVisible()) {
-				ClickButton(mainGame->btnDeckEdit);
-			}
-			
-			break;
-		}
-		case irr::KEY_KEY_F: {
-			if (!event.KeyInput.PressedDown && mainGame->btnHostPrepNotReady->isEnabled())
-				ClickButton(mainGame->btnHostPrepNotReady);
-			break;
-		}
-		case irr::KEY_KEY_C: {
-			if (!event.KeyInput.PressedDown && mainGame->cbDeckSelect->isTrulyVisible()) {
-				mainGame->env->setFocus(mainGame->cbDeckSelect);
-				std::wstring nvdaString = fmt::format(L"Deck {}", mainGame->cbDeckSelect->getItem(mainGame->cbDeckSelect->getSelected()));
-				ScreenReader::getReader()->readScreen(nvdaString.c_str());
-			}
-			break;
-		}
-		case irr::KEY_KEY_V: {
-			if (!event.KeyInput.PressedDown && mainGame->gBot.cbBotDeck->isTrulyVisible()) {
-				mainGame->env->setFocus(mainGame->gBot.cbBotDeck);
-				std::wstring nvdaString = fmt::format(L"Deck {}", mainGame->gBot.cbBotDeck->getItem(mainGame->gBot.cbBotDeck->getSelected()));
-				ScreenReader::getReader()->readScreen(nvdaString.c_str());
-			}
-			break;
-		}
-		case irr::KEY_DOWN:
-		case irr::KEY_UP: {
-			if (!event.KeyInput.PressedDown && mainGame->env->hasFocus(mainGame->cbDeckSelect)) {
-				std::wstring nvdaString = fmt::format(L"Deck {}", mainGame->cbDeckSelect->getItem(mainGame->cbDeckSelect->getSelected()));
-				ScreenReader::getReader()->readScreen(nvdaString.c_str());
-			}
-			else if (!event.KeyInput.PressedDown && mainGame->env->hasFocus(mainGame->gBot.cbBotDeck)) {
-				std::wstring nvdaString = fmt::format(L"Deck {}", mainGame->gBot.cbBotDeck->getItem(mainGame->gBot.cbBotDeck->getSelected()));
-				ScreenReader::getReader()->readScreen(nvdaString.c_str());
-			}
-			break;
-		}
-		case irr::KEY_KEY_0: {
-			if (!event.KeyInput.PressedDown && mainGame->btnHostPrepCancel->isTrulyVisible()) {
-				ClickButton(mainGame->btnHostPrepCancel);
-			}
-			else if (!event.KeyInput.PressedDown && mainGame->btnHostCancel->isTrulyVisible()) {
-				ClickButton(mainGame->btnHostCancel);
-			}
-			else if (!event.KeyInput.PressedDown && mainGame->btnJoinCancel->isTrulyVisible()) {
-				ClickButton(mainGame->btnJoinCancel);
-			}
-			else if (!event.KeyInput.PressedDown && mainGame->btnModeExit->isTrulyVisible()) {
-				ClickButton(mainGame->btnModeExit);
-			}
-			
-
 			break;
 		}
 		default: break;

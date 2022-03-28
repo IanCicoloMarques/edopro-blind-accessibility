@@ -118,20 +118,16 @@ local ygopro_config=function(static_core)
 		files { "*.m", "*.mm" }
 		defines "LUA_USE_MACOSX"
 		includedirs { "/usr/local/include/irrlicht" }
-		linkoptions { "-Wl,-rpath ./" }
-		links { "curl", "Cocoa.framework", "IOKit.framework", "OpenGL.framework", "Security.framework" }
-		if _OPTIONS["update-url"] then
-			links "crypto"
-		end
+		links { "ssl", "crypto", "Cocoa.framework", "IOKit.framework", "OpenGL.framework", "Security.framework" }
 		if static_core then
 			links "lua"
 		end
 
 	filter { "system:macosx", "configurations:Debug" }
-		links "fmtd"
+		links { "fmtd", "curl-d", "ldap" }
 
 	filter { "system:macosx", "configurations:Release" }
-		links "fmt"
+		links { "fmt", "curl", "ldap" }
 
 	filter { "system:linux or windows", "action:not vs*", "configurations:Debug" }
 		if _OPTIONS["vcpkg-root"] then
@@ -153,7 +149,6 @@ local ygopro_config=function(static_core)
 		else
 			includedirs "/usr/include/irrlicht"
 		end
-		linkoptions { "-Wl,-rpath=./" }
 		if static_core then
 			links  "lua:static"
 		end

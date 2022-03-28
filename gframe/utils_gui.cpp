@@ -56,6 +56,11 @@ struct X11Helper {
 }
 
 static std::unique_ptr<X11Helper> X11{ nullptr };
+
+static inline bool try_guess_wayland() {
+	const char* env = getenv("XDG_SESSION_TYPE");
+	return env == nullptr || env != "x11"_sv;
+}
 #endif
 
 namespace ygo {
@@ -101,9 +106,13 @@ irr::IrrlichtDevice* GUIUtils::CreateDevice(GameConfig* configs) {
 	irr::SIrrlichtCreationParameters params{};
 	params.AntiAlias = configs->antialias;
 #if defined(__linux__) && !defined(__ANDROID__) && (IRRLICHT_VERSION_MAJOR==1 && IRRLICHT_VERSION_MINOR==9)
-	if(configs->useWayland == 1) {
+	if(configs->useWayland == 2) {
+		if(!try_guess_wayland())
+			configs->useWayland = 0;
+	} else if(configs->useWayland == 1) {
 		params.DeviceType = irr::E_DEVICE_TYPE::EIDT_WAYLAND;
-		fmt::print("You're using the wayland device backend.\nKeep in mind that it's still experimental and might be unstable.\n"
+		fmt::print("You're using the wayland device backend.\n"
+				   "Keep in mind that it's still experimental and might be unstable.\n"
 				   "If you are getting any major issues, or the game doesn't start,\n"
 				   "you can manually disable this option from the system.conf file by toggling the useWayland option.\n"
 				   "Feel free to report any issues you encounter.\n");
@@ -164,8 +173,12 @@ irr::IrrlichtDevice* GUIUtils::CreateDevice(GameConfig* configs) {
 	SendMessage(hWnd, WM_SETICON, ICON_BIG, reinterpret_cast<LPARAM>(hBigIcon));
 	if(gGameConfig->windowStruct.size()) {
 		auto winstruct = base64_decode(gGameConfig->windowStruct);
-		if(winstruct.size() == sizeof(WINDOWPLACEMENT))
-			SetWindowPlacement(hWnd, reinterpret_cast<WINDOWPLACEMENT*>(winstruct.data()));
+		if(winstruct.size() == sizeof(WINDOWPLACEMENT)) {
+			WINDOWPLACEMENT wp;
+			memcpy(&wp, winstruct.data(), sizeof(WINDOWPLACEMENT));
+			if(wp.length == sizeof(WINDOWPLACEMENT))
+				SetWindowPlacement(hWnd, &wp);
+		}
 	}
 #elif defined(EDOPRO_MACOS)
 	if(gGameConfig->windowStruct.size())

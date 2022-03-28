@@ -16,7 +16,7 @@
 #endif
 
 namespace ygo {
-CardDataC* DeckManager::GetDummyOrMappedCardData(uint32_t code) {
+const CardDataC* DeckManager::GetDummyOrMappedCardData(uint32_t code) const {
 	if(!load_dummies)
 		return gDataManager->GetMappedCardData(code);
 	auto it = dummy_entries.find(code);
@@ -128,9 +128,11 @@ void DeckManager::RefreshDeck(Deck& deck) {
 	for(auto& list : { &deck.main, &deck.extra, &deck.side }) {
 		for(auto& card : *list) {
 			if(card->code == 0 && card->alias) {
-				if(auto cd = gDataManager->GetCardData(card->alias)) {
+				const CardDataC* cd;
+				if((cd = gDataManager->GetCardData(card->alias)) == nullptr)
+					cd = gDataManager->GetMappedCardData(card->alias);
+				if(cd != nullptr)
 					card = cd;
-				}
 			}
 		}
 	}
@@ -145,18 +147,18 @@ epro::wstringview DeckManager::GetLFListName(uint32_t lfhash) {
 		return lflist->listName;
 	return gDataManager->unknown_string;
 }
-int DeckManager::TypeCount(std::vector<CardDataC*> cards, uint32_t type) {
+int DeckManager::TypeCount(const Deck::Vector& cards, uint32_t type) const {
 	int count = 0;
-	for(auto card : cards) {
+	for(const auto& card : cards) {
 		if(card->type & type)
 			count++;
 	}
 	return count;
 }
-inline DeckError CheckCards(const std::vector<CardDataC*> &cards, LFList* curlist, banlist_content_t* list,
+static DeckError CheckCards(const Deck::Vector& cards, LFList* curlist,
 					  DuelAllowedCards allowedCards,
-					  banlist_content_t &ccount,
-					  DeckError(*additionalCheck)(CardDataC*) = nullptr) {
+					  banlist_content_t& ccount,
+					  DeckError(*additionalCheck)(const CardDataC*) = nullptr) {
 	DeckError ret{ DeckError::NONE };
 	for (const auto cit : cards) {
 		ret.code = cit->code;
@@ -193,15 +195,14 @@ inline DeckError CheckCards(const std::vector<CardDataC*> &cards, LFList* curlis
 		int dc = ccount[code];
 		if (dc > 3)
 			return ret.type = DeckError::CARDCOUNT, ret;
-		auto it = list->find(cit->code);
-		if (it == list->end())
-			it = list->find(code);
-		if ((it != list->end() && dc > it->second) || (curlist->whitelist && it == list->end()))
+		auto it = curlist->GetLimitationIterator(cit);
+		auto is_end = it == curlist->content.end();
+		if ((!is_end && dc > it->second) || (curlist->whitelist && is_end))
 			return ret.type = DeckError::LFLIST, ret;
 	}
 	return { DeckError::NONE };
 }
-DeckError DeckManager::CheckDeck(Deck& deck, uint32_t lfhash, DuelAllowedCards allowedCards, bool doubled, uint32_t forbiddentypes) {
+DeckError DeckManager::CheckDeck(const Deck& deck, uint32_t lfhash, DuelAllowedCards allowedCards, bool doubled, uint32_t forbiddentypes) {
 	banlist_content_t ccount;
 	LFList* curlist = nullptr;
 	for(auto& list : _lfList) {
@@ -213,7 +214,6 @@ DeckError DeckManager::CheckDeck(Deck& deck, uint32_t lfhash, DuelAllowedCards a
 	DeckError ret{ DeckError::NONE };
 	if(!curlist)
 		return ret;
-	auto list = &curlist->content;
 	if(TypeCount(deck.main, forbiddentypes) > 0 || TypeCount(deck.extra, forbiddentypes) > 0 || TypeCount(deck.side, forbiddentypes) > 0)
 		return ret.type = DeckError::FORBTYPE, ret;
 	bool speed = mainGame->extra_rules & DECK_LIMIT_20;
@@ -253,19 +253,19 @@ DeckError DeckManager::CheckDeck(Deck& deck, uint32_t lfhash, DuelAllowedCards a
 	}
 	if(ret.type)
 		return ret;
-	ret = CheckCards(deck.main, curlist, list, allowedCards, ccount, [](CardDataC* cit)->DeckError {
+	ret = CheckCards(deck.main, curlist, allowedCards, ccount, [](const CardDataC* cit)->DeckError {
 		if ((cit->type & (TYPE_FUSION | TYPE_SYNCHRO | TYPE_XYZ)) || (cit->type & TYPE_LINK && cit->type & TYPE_MONSTER))
 			return { DeckError::EXTRACOUNT };
 		return { DeckError::NONE };
 	});
 	if (ret.type) return ret;
-	ret = CheckCards(deck.extra, curlist, list, allowedCards , ccount, [](CardDataC* cit)->DeckError {
+	ret = CheckCards(deck.extra, curlist, allowedCards , ccount, [](const CardDataC* cit)->DeckError {
 		if (!(cit->type & (TYPE_FUSION | TYPE_SYNCHRO | TYPE_XYZ)) && !(cit->type & TYPE_LINK && cit->type & TYPE_MONSTER))
 			return { DeckError::EXTRACOUNT };
 		return { DeckError::NONE };
 	});
 	if (ret.type) return ret;
-	return CheckCards(deck.side, curlist, list, allowedCards, ccount);
+	return CheckCards(deck.side, curlist, allowedCards, ccount);
 }
 uint32_t DeckManager::LoadDeck(Deck& deck, uint32_t* dbuf, uint32_t mainc, uint32_t sidec, uint32_t mainc2, uint32_t sidec2) {
 	cardlist_type mainvect(mainc + mainc2);
@@ -285,7 +285,7 @@ uint32_t DeckManager::LoadDeck(Deck& deck, uint32_t* dbuf, uint32_t mainc, uint3
 uint32_t DeckManager::LoadDeck(Deck& deck, const cardlist_type& mainlist, const cardlist_type& sidelist, const cardlist_type* extralist) {
 	deck.clear();
 	uint32_t errorcode = 0;
-	CardDataC* cd = nullptr;
+	const CardDataC* cd = nullptr;
 	const bool loadalways = !!extralist;
 	for(auto code : mainlist) {
 		if(!(cd = gDataManager->GetCardData(code))) {
@@ -483,7 +483,7 @@ bool DeckManager::SaveDeck(epro::path_stringview name, const cardlist_type& main
 		deckfile << fmt::to_string(card) << "\n";
 	return true;
 }
-const wchar_t* DeckManager::ExportDeckBase64(Deck& deck) {
+const wchar_t* DeckManager::ExportDeckBase64(const Deck& deck) {
 	static std::wstring res;
 	auto decktobuf = [](const auto& src) {
 		static cardlist_type cards;
@@ -545,14 +545,12 @@ const wchar_t* DeckManager::ExportDeckCardNames(Deck deck) {
 	}
 	return res.data();
 }
-cardlist_type BufferToCardlist(const std::vector<uint8_t>& input) {
+static cardlist_type BufferToCardlist(const std::vector<uint8_t>& input) {
 	cardlist_type vect(input.size() / 4);
 	memcpy(vect.data(), input.data(), input.size());
 	return vect;
 }
 void DeckManager::ImportDeckBase64(Deck& deck, const wchar_t* buffer) {
-	std::wstring newBuffer = std::wstring(buffer) + L"!";
-	buffer = newBuffer.c_str();
 	buffer += (sizeof(L"ydke://") / sizeof(wchar_t)) - 1;
 	size_t delimiters[3];
 	int delim = 0;

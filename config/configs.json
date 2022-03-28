@@ -1,35 +1,17 @@
 {
 	"repos": [
 		{
-			"url": "https://github.com/ProjectIgnis/DeltaUtopia",
-			"repo_name": "Project Ignis updates",
-			"repo_path": "./repositories/delta-utopia",
-			"has_core": true,
-			"core_path": "bin",
-			"data_path": "",
-			"script_path": "script",
-			"should_update": true,
-			"should_read": true
-		},
-		{
 			"url": "https://github.com/ProjectIgnis/LFLists",
 			"repo_name": "Forbidden & Limited Card Lists",
 			"repo_path": "./repositories/lflists",
 			"lflist_path": ".",
 			"should_update": true,
 			"should_read": true
-		},
-		{
-			"url": "https://github.com/ProjectIgnis/Puzzles",
-			"repo_name": "Project Ignis puzzles",
-			"repo_path": "./puzzles/Canon collection",
-			"should_update": true,
-			"should_read": true
 		}
 	],
 	"urls": [
 		{
-			"url": "https://ygoprodeck.com/pics/{}.jpg",
+			"url": "default",
 			"type": "pic"
 		},
 		{
@@ -44,43 +26,59 @@
 	"servers": [
 		{
 			"name": "EU Central (Casual)",
-			"address": "eu.ygopro.co",
+			"address": "185.227.110.90",
 			"duelport": 7912,
-			"roomaddress": "eu.ygopro.co",
-			"roomlistprotocol": "http",
+			"roomaddress": "185.227.110.90",
 			"roomlistport": 7923
 		},
 		{
 			"name": "EU Central (Competitive)",
-			"address": "eu.ygopro.co",
+			"address": "185.227.110.90",
 			"duelport": 7911,
-			"roomaddress": "eu.ygopro.co",
-			"roomlistprotocol": "http",
+			"roomaddress": "185.227.110.90",
 			"roomlistport": 7922
 		},
 		{
 			"name": "US West (Casual)",
-			"address": "us.ygopro.co",
+			"address": "146.71.79.166",
 			"duelport": 7911,
-			"roomaddress": "us.ygopro.co",
-			"roomlistprotocol": "http",
+			"roomaddress": "146.71.79.166",
 			"roomlistport": 7922
 		},
 		{
 			"name": "US West (Competitive)",
-			"address": "us.ygopro.co",
+			"address": "146.71.79.166",
 			"duelport": 7912,
-			"roomaddress": "us.ygopro.co",
-			"roomlistprotocol": "http",
+			"roomaddress": "146.71.79.166",
 			"roomlistport": 7923
 		},
 		{
-			"name": "Asia Central (Casual/Competitive)",
-			"address": "ignis-duel.ygopro.cn",
-			"duelport": 44444,
-			"roomaddress": "ignis-room.ygopro.cn",
-			"roomlistprotocol": "https",
-			"roomlistport": 443
+			"name": "GOAT (Gideon)",
+			"address": "73.240.71.103",
+			"duelport": 7905,
+			"roomaddress": "73.240.71.103",
+			"roomlistport": 7906
+		},
+		{
+			"name": "NA Pacific (Gideon)",
+			"address": "73.240.71.103",
+			"duelport": 7911,
+			"roomaddress": "73.240.71.103",
+			"roomlistport": 7922
+		},
+		{
+			"name": "21 Sussex (Kevin)",
+			"address": "128.100.146.10",
+			"duelport": 7911,
+			"roomaddress": "128.100.146.10",
+			"roomlistport": 7922
+		},
+		{
+			"name": "localhost",
+			"address": "127.0.0.1",
+			"duelport": 7911,
+			"roomaddress": "127.0.0.1",
+			"roomlistport": 7922
 		}
 	],
 	"posixPathExtension": "/usr/local/bin:/Library/Frameworks/Mono.framework/Versions/Current/Commands"

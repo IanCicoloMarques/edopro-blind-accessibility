@@ -18,7 +18,7 @@
 #include "network.h"
 #include "data_manager.h"
 #include "deck_manager.h"
-#include "random_fwd.h"
+#include "RNG/mt19937.h"
 #include "replay.h"
 
 namespace ygo {
@@ -46,7 +46,7 @@ private:
 	static std::thread client_thread;
 	static std::condition_variable cv;
 public:
-	static randengine rnd;
+	static RNG::mt19937 rnd;
 	static uint32_t temp_ip;
 	static uint16_t temp_port;
 	static uint16_t temp_ver;
@@ -71,7 +71,10 @@ public:
 	static std::pair<uint32_t, uint32_t> GetPlayersCount();
 	static ReplayStream replay_stream;
 	static Replay last_replay;
-	static int ClientAnalyze(char* msg, uint32_t len);
+	static int ClientAnalyze(const char* msg, uint32_t len);
+	static int ClientAnalyze(const CoreUtils::Packet& packet) {
+		return ClientAnalyze(packet.data(), packet.buff_size());
+	}
 	static int GetSpectatorsCount() {
 		return watching;
 	};

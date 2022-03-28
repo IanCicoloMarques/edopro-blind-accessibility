@@ -35,6 +35,7 @@
     <UseDebugLibraries>false</UseDebugLibraries>
     <CharacterSet>Unicode</CharacterSet>
     <PlatformToolset>v142</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -110,6 +111,7 @@
   <ItemGroup>
     <ClInclude Include="..\ocgcore\card.h" />
     <ClInclude Include="..\ocgcore\common.h" />
+    <ClInclude Include="..\ocgcore\containers_fwd.h" />
     <ClInclude Include="..\ocgcore\duel.h" />
     <ClInclude Include="..\ocgcore\effect.h" />
     <ClInclude Include="..\ocgcore\effectset.h" />

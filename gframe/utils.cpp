@@ -40,9 +40,10 @@ using Stat = struct stat;
 #include <ext/stdio_filebuf.h>
 #endif
 
-#if defined(_WIN32) && defined(_MSC_VER)
+#if defined(_WIN32)
 namespace WindowsWeirdStuff {
 
+#if defined(_MSC_VER)
 //https://docs.microsoft.com/en-us/visualstudio/debugger/how-to-set-a-thread-name-in-native-code?view=vs-2015&redirectedfrom=MSDN
 
 static constexpr DWORD MS_VC_EXCEPTION = 0x406D1388;
@@ -61,6 +62,8 @@ static inline void NameThread(const char* threadName) {
 	__try {	RaiseException(MS_VC_EXCEPTION, 0, sizeof(info) / sizeof(ULONG_PTR), (ULONG_PTR*)&info); }
 	__except(EXCEPTION_EXECUTE_HANDLER) {}
 }
+#pragma warning(pop)
+#endif
 using SetThreadDescription_t = HRESULT(WINAPI*)(HANDLE, PCWSTR);
 inline const SetThreadDescription_t GetSetThreadDescription() {
 	auto proc = GetProcAddress(GetModuleHandle(EPRO_TEXT("kernel32.dll")), "SetThreadDescription");
@@ -69,7 +72,6 @@ inline const SetThreadDescription_t GetSetThreadDescription() {
 	return reinterpret_cast<SetThreadDescription_t>(proc);
 }
 }
-#pragma warning(pop)
 #endif
 
 namespace ygo {
@@ -77,6 +79,8 @@ namespace ygo {
 	irr::io::IFileSystem* Utils::filesystem{ nullptr };
 	irr::IOSOperator* Utils::OSOperator{ nullptr };
 	epro::path_string Utils::working_dir;
+
+	RNG::SplitMix64 Utils::generator(std::chrono::high_resolution_clock::now().time_since_epoch().count());
 
 	void Utils::InternalSetThreadName(const char* name, const wchar_t* wname) {
 #if defined(_WIN32)
@@ -107,7 +111,7 @@ namespace ygo {
 #ifdef __linux__
 	bool Utils::FileCopyFD(int source, int destination) {
 		off_t bytesCopied = 0;
-		struct stat fileinfo = { 0 };
+		Stat fileinfo = { 0 };
 		fstat(source, &fileinfo);
 		int result = sendfile(destination, source, &bytesCopied, fileinfo.st_size);
 		return result != -1;
@@ -523,7 +527,7 @@ namespace ygo {
 #ifdef _WIN32
 		STARTUPINFO si{ sizeof(si) };
 		PROCESS_INFORMATION pi{};
-		auto command = fmt::format(EPRO_TEXT("{} -C {} show_changelog"), ygo::Utils::GetFileName(path, true), ygo::Utils::working_dir);
+		auto command = fmt::format(EPRO_TEXT("{} -C {} -l"), ygo::Utils::GetFileName(path, true), ygo::Utils::working_dir);
 		if(!CreateProcess(path.data(), &command[0], nullptr, nullptr, false, 0, nullptr, nullptr, &si, &pi))
 			return;
 		CloseHandle(pi.hProcess);
@@ -537,9 +541,9 @@ namespace ygo {
 		auto pid = vfork();
 		if(pid == 0) {
 #ifdef __linux__
-			execl(path.data(), path.data(), "-C", ygo::Utils::working_dir.data(), "show_changelog", nullptr);
+			execl(path.data(), path.data(), "-C", ygo::Utils::working_dir.data(), "-l", nullptr);
 #else
-			execlp("open", "open", "-b", "io.github.edo9300.ygoprodll", "--args", "-C", ygo::Utils::working_dir.data(), "show_changelog", nullptr);
+			execlp("open", "open", "-b", "io.github.edo9300.ygoprodll", "--args", "-C", ygo::Utils::working_dir.data(), "-l", nullptr);
 #endif
 			_exit(EXIT_FAILURE);
 		}

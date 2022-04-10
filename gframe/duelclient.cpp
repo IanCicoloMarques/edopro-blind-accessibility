@@ -2227,13 +2227,11 @@ int DuelClient::ClientAnalyze(char* msg, uint32_t len) {
 		std::lock_guard<std::mutex> lock(mainGame->gMutex);
 		if (!conti_exist) {
 			mainGame->stHintMsg->setText(gDataManager->GetSysString(550).data());
-
-			//screenReader->readScreen(L"Select effects to active"); TODO over information 
+			ScreenReader::getReader()->readScreen(gDataManager->GetSysString(550).data());
 		}
 		else {
 			mainGame->stHintMsg->setText(gDataManager->GetSysString(556).data());
-
-			screenReader->readScreen(L"Select effect to resolve"); //TODO change to class
+			ScreenReader::getReader()->readScreen(gDataManager->GetSysString(556).data());
 		}
 
 		mainGame->stHintMsg->setVisible(true);

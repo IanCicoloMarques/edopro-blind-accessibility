@@ -1986,6 +1986,13 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 			}
 			break;
 		}
+		case irr::KEY_KEY_L: {
+			if (!event.KeyInput.PressedDown) {
+				ScreenReader::getReader()->readScreen(fmt::format(L"Player: {} LP", mainGame->dInfo.lp[AccessibilityFieldFocus::DisplayedField::PLAYER]).c_str());
+				ScreenReader::getReader()->readScreen(fmt::format(L"Enemy: {} LP", mainGame->dInfo.lp[AccessibilityFieldFocus::DisplayedField::ENEMY_PLAYER]).c_str());
+			}
+			break;
+		}
 		case irr::KEY_KEY_P: {
 			if (!event.KeyInput.PressedDown) {
 				MouseClick(event);

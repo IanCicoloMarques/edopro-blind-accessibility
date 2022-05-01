@@ -579,12 +579,23 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 						break;
 					}
 				}
-				displayedField = AccessibilityFieldFocus::DisplayedField::ENEMY_PLAYER;
-				if (CheckIfCanViewCards(event)) {
-					lookupFieldLocId = AccessibilityFieldFocus::FieldLookerLocId::PLAYER_MONSTERS;
-					cardType = AccessibilityFieldFocus::CardType::MONSTER;
-					DisplayCards(mzone[displayedField], fmt::format(L"Monster Zone"));
+				bool hasMonster = false;
+				for (auto it = mzone[AccessibilityFieldFocus::DisplayedField::ENEMY_PLAYER].begin(); it != mzone[AccessibilityFieldFocus::DisplayedField::ENEMY_PLAYER].end(); ++it) {
+					if (*it) {
+						hasMonster = true;
+						break;
+					}
 				}
+				if (hasMonster) {
+					displayedField = AccessibilityFieldFocus::DisplayedField::ENEMY_PLAYER;
+					if (CheckIfCanViewCards(event)) {
+						lookupFieldLocId = AccessibilityFieldFocus::FieldLookerLocId::PLAYER_MONSTERS;
+						cardType = AccessibilityFieldFocus::CardType::MONSTER;
+						DisplayCards(mzone[displayedField], fmt::format(L"Monster Zone"));
+					}
+				}
+				else
+					displayedField = AccessibilityFieldFocus::DisplayedField::PLAYER;
 				break;
 			}
 			case BUTTON_CMD_SHOWLIST: {
@@ -1817,8 +1828,6 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 		}
 		case irr::KEY_KEY_A: {
 			if (!event.KeyInput.PressedDown) {
-				lookupFieldLocId = AccessibilityFieldFocus::PLAYER_MONSTERS;
-				cardType = AccessibilityFieldFocus::CardType::MONSTER;
 				if (battlePhase == AccessibilityFieldFocus::BattleStep::BP) 
 					UseCard(AccessibilityFieldFocus::UseType::MONSTER_ATTACK, event);
 				else 
@@ -1828,10 +1837,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 		}
 		case irr::KEY_KEY_S: {
 			if (!event.KeyInput.PressedDown) {
-				if (clicked_card && clicked_card->cmdFlag == 10)
-					ChangeField(AccessibilityFieldFocus::CardType::MONSTER);
-				else
-					ChangeField(AccessibilityFieldFocus::CardType::SPELL);
+				ChangeFieldByCard();
 				UseCard(AccessibilityFieldFocus::UseType::SET_CARD, event);
 			}
 			break;
@@ -2022,6 +2028,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 		}
 		case irr::KEY_KEY_P: {
 			if (!event.KeyInput.PressedDown) {
+				ChangeFieldByCard();
 				MouseClick(event);
 			}
 			break;
@@ -2392,6 +2399,7 @@ bool ClientField::UseCard(const AccessibilityFieldFocus::UseType& useType, irr::
 		case AccessibilityFieldFocus::UseType::MONSTER_ATTACK: {
 			if (lookupFieldLocId == AccessibilityFieldFocus::FieldLookerLocId::PLAYER_MONSTERS &&
 				displayedField == AccessibilityFieldFocus::DisplayedField::ENEMY_PLAYER) {
+				displayedField = AccessibilityFieldFocus::DisplayedField::PLAYER;
 				MouseClick(event);
 			}
 			else {
@@ -2516,16 +2524,32 @@ void ClientField::SelectFieldSlotNoPlayer(int slot) {
 }
 
 void ClientField::ChangeFieldByCard() {
+	bool selected = false;
+	if (!clicked_card)
+		return;
 	for (int i = 0; i < 5; i++) {
 		if (mzone[0][i] && mzone[0][i] == clicked_card) {
 			cardType = AccessibilityFieldFocus::CardType::MONSTER;
 			lookupFieldLocId = AccessibilityFieldFocus::PLAYER_MONSTERS;
+			selected = true;
 			break;
 		}
 		else if (szone[0][i] && szone[0][i] == clicked_card) {
 			cardType = AccessibilityFieldFocus::CardType::SPELL;
 			lookupFieldLocId = AccessibilityFieldFocus::PLAYER_SPELLS;
+			selected = true;
 			break;
+		}
+	}
+	if (!selected) {
+		std::wstring cardTypeString = fmt::format(L"{}", gDataManager->FormatType(clicked_card->type));
+		if (cardTypeString.find(L"Spell") == std::string::npos && cardTypeString.find(L"Trap") == std::string::npos) {
+			lookupFieldLocId = AccessibilityFieldFocus::PLAYER_MONSTERS;
+			cardType = AccessibilityFieldFocus::CardType::MONSTER;
+		}
+		else {
+			lookupFieldLocId = AccessibilityFieldFocus::PLAYER_SPELLS;
+			cardType = AccessibilityFieldFocus::CardType::SPELL;
 		}
 	}
 }

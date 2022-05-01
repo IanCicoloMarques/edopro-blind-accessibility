@@ -8,14 +8,15 @@
 #include "StringBuilder.h"
 
 class IScreenReader {
-	public:
+public:
 
-		void readScreen(std::wstring string) {
-			textToSpeech(StringBuilder::parseInput(string));
-		}
+	void readScreen(std::wstring string) {
+		textToSpeech(StringBuilder::parseInput(string));
+	}
 
-		virtual void textToSpeech(std::wstring string) = 0;
-		virtual void textToBraile(std::wstring string) = 0;
+	virtual void textToSpeech(std::wstring string) = 0;
+	virtual void textToBraile(std::wstring string) = 0;
+	virtual void readLastMessage() = 0;
 };
 
 #endif

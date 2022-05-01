@@ -3845,11 +3845,7 @@ int DuelClient::ClientAnalyze(char* msg, uint32_t len) {
 		}
 		mainGame->dInfo.lp[player] = final;
 		mainGame->dInfo.strLP[player] = fmt::to_wstring(mainGame->dInfo.lp[player]);
-
-		std::wstring nvdaString;
-		nvdaString = fmt::format(L"Player {} minus {}LP", player+1, val);
-		screenReader->readScreen(nvdaString.c_str()); //TODO change to class
-
+		screenReader->readScreen(fmt::format(L"Player {} LP minus {}, {} LP remaining", player + 1, val, mainGame->dInfo.lp[player]).c_str());
 		return true;
 	}
 	/*OK - Added simple*/case MSG_RECOVER: {
@@ -3872,10 +3868,7 @@ int DuelClient::ClientAnalyze(char* msg, uint32_t len) {
 		}
 		mainGame->dInfo.lp[player] = final;
 		mainGame->dInfo.strLP[player] = fmt::to_wstring(mainGame->dInfo.lp[player]);
-
-		std::wstring nvdaString;
-		nvdaString = fmt::format(L"Player {} plus {}LP", player + 1, val);
-		screenReader->readScreen(nvdaString.c_str()); //TODO change to class
+		screenReader->readScreen(fmt::format(L"Player {} LP minus {}, {} LP remaining", player + 1, val, mainGame->dInfo.lp[player]).c_str());
 		return true;
 	}
 	/*OK - Added simple*/case MSG_EQUIP: {
@@ -3992,6 +3985,7 @@ int DuelClient::ClientAnalyze(char* msg, uint32_t len) {
 		}
 		mainGame->dInfo.lp[player] = final;
 		mainGame->dInfo.strLP[player] = fmt::to_wstring(mainGame->dInfo.lp[player]);
+		screenReader->readScreen(fmt::format(L"Player {} LP minus {}, {} LP left", player + 1, cost, mainGame->dInfo.lp[player]).c_str()); //TODO change to class
 		return true;
 	}
 	/*Added simple*/case MSG_ADD_COUNTER: {

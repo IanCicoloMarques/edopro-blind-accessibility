@@ -454,9 +454,11 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					}
 					if(!conti_selecting) {
 						mainGame->wCardSelect->setText(gDataManager->GetSysString(566).data());
+						ScreenReader::getReader()->readScreen(gDataManager->GetSysString(566).data());
 						list_command = COMMAND_ACTIVATE;
 					} else {
 						mainGame->wCardSelect->setText(gDataManager->GetSysString(568).data());
+						ScreenReader::getReader()->readScreen(gDataManager->GetSysString(568).data());
 						list_command = COMMAND_OPERATION;
 					}
 					std::sort(selectable_cards.begin(), selectable_cards.end(), ClientCard::client_card_sort);
@@ -576,6 +578,12 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 						DuelClient::SendResponse();
 						break;
 					}
+				}
+				displayedField = AccessibilityFieldFocus::DisplayedField::ENEMY_PLAYER;
+				if (CheckIfCanViewCards(event)) {
+					lookupFieldLocId = AccessibilityFieldFocus::FieldLookerLocId::PLAYER_MONSTERS;
+					cardType = AccessibilityFieldFocus::CardType::MONSTER;
+					DisplayCards(mzone[displayedField], fmt::format(L"Monster Zone"));
 				}
 				break;
 			}
@@ -1102,10 +1110,13 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				}
 				if(id >= BUTTON_DISPLAY_0 && id <= BUTTON_DISPLAY_4) {
 					int pos = mainGame->scrDisplayList->getPos() / 10;
-					ClientCard* mcard = display_cards[id - BUTTON_DISPLAY_0 + pos];
-					if(mcard)
-						SetShowMark(mcard, false);
-					mainGame->stCardListTip->setVisible(false);
+					int display_cards_pos = id - BUTTON_DISPLAY_0 + pos;
+					if (display_cards.size() > display_cards_pos) {
+						ClientCard* mcard = display_cards[id - BUTTON_DISPLAY_0 + pos];
+						if(mcard)
+							SetShowMark(mcard, false);
+						mainGame->stCardListTip->setVisible(false);
+					}
 				}
 			}
 			if(id == TEXT_CARD_LIST_TIP) {
@@ -1147,7 +1158,8 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 			GetHoverField(mousepos);
 			if(hovered_location & 0xe)
 				clicked_card = GetCard(hovered_controler, hovered_location, hovered_sequence);
-			else clicked_card = 0;
+			else if (!lookupFieldLocId == AccessibilityFieldFocus::FieldLookerLocId::PLAYER_GRAVEYARD)
+				clicked_card = 0;
 			if(mainGame->dInfo.isReplay) {
 				if(mainGame->wCardSelect->isVisible())
 					break;
@@ -1717,6 +1729,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				bool canViewCards = CheckIfCanViewCards(event);
 				if (canViewCards) {
 					lookupFieldLocId = AccessibilityFieldFocus::FieldLookerLocId::PLAYER_HAND;
+					cardType = AccessibilityFieldFocus::CardType::MONSTER;
 					DisplayCards(hand[displayedField], fmt::format(L"Hand"));
 				}
 				else
@@ -1755,6 +1768,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				bool canViewCards = CheckIfCanViewCards(event);
 				if (canViewCards) {
 					lookupFieldLocId = AccessibilityFieldFocus::FieldLookerLocId::PLAYER_EXTRA_DECK;
+					cardType = AccessibilityFieldFocus::CardType::MONSTER;
 					DisplayCards(extra[displayedField], fmt::format(L"Extra Deck"));
 				}
 				else
@@ -1767,6 +1781,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				bool canViewCards = CheckIfCanViewCards(event);
 				if (canViewCards) {
 					lookupFieldLocId = AccessibilityFieldFocus::FieldLookerLocId::PLAYER_GRAVEYARD;
+					cardType = AccessibilityFieldFocus::CardType::GRAVEYARD;
 					DisplayCards(grave[displayedField], fmt::format(L"Graveyard"));
 				}
 				else
@@ -1774,9 +1789,36 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 			}
 			break;
 		}
-		case irr::KEY_KEY_A: {
-			cardType = AccessibilityFieldFocus::CardType::MONSTER;
+		case irr::KEY_KEY_Y: {
 			if (!event.KeyInput.PressedDown) {
+				bool canViewCards = CheckIfCanViewCards(event);
+				if (canViewCards) {
+					cardType = AccessibilityFieldFocus::CardType::MONSTER;
+					lookupFieldLocId = AccessibilityFieldFocus::FieldLookerLocId::PLAYER_BANNED_CARDS;
+					DisplayCards(remove[displayedField], fmt::format(L"Removed Cards"));
+				}
+				else
+					CloseDialog();
+			}
+			break;
+		}
+		case irr::KEY_KEY_U: {
+			if (!event.KeyInput.PressedDown) {
+				bool canViewCards = CheckIfCanViewCards(event);
+				if (canViewCards) {
+					cardType = AccessibilityFieldFocus::CardType::MONSTER;
+					lookupFieldLocId = AccessibilityFieldFocus::FieldLookerLocId::PLAYER_DECK;
+					DisplayCards(deck[displayedField], fmt::format(L"Deck"));
+				}
+				else
+					CloseDialog();
+			}
+			break;
+		}
+		case irr::KEY_KEY_A: {
+			if (!event.KeyInput.PressedDown) {
+				lookupFieldLocId = AccessibilityFieldFocus::PLAYER_MONSTERS;
+				cardType = AccessibilityFieldFocus::CardType::MONSTER;
 				if (battlePhase == AccessibilityFieldFocus::BattleStep::BP) 
 					UseCard(AccessibilityFieldFocus::UseType::MONSTER_ATTACK, event);
 				else 
@@ -1796,6 +1838,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 		}
 		case irr::KEY_KEY_D: {
 			if (!event.KeyInput.PressedDown) {
+				lookupFieldLocId = AccessibilityFieldFocus::PLAYER_MONSTERS;
 				cardType = AccessibilityFieldFocus::CardType::MONSTER;
 				UseCard(AccessibilityFieldFocus::UseType::SPECIAL_SUMMON, event);
 			}
@@ -1803,10 +1846,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 		}
 		case irr::KEY_KEY_F: {
 			if (!event.KeyInput.PressedDown) {
-				if (clicked_card && clicked_card->cmdFlag == 10)
-					ChangeField(AccessibilityFieldFocus::CardType::MONSTER);
-				else /*(clicked_card && (clicked_card->cmdFlag == 17 || clicked_card->cmdFlag == 1))*/
-					ChangeField(AccessibilityFieldFocus::CardType::SPELL);
+				ChangeFieldByCard();
 				UseCard(AccessibilityFieldFocus::UseType::ACTIVATE, event);
 			}
 			
@@ -1814,6 +1854,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 		}
 		case irr::KEY_KEY_G: {
 			if (!event.KeyInput.PressedDown) {
+				cardType = AccessibilityFieldFocus::CardType::MONSTER;
 				UseCard(AccessibilityFieldFocus::UseType::CHANGE_MODE, event);
 			}
 			break;
@@ -1822,6 +1863,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 			if (!event.KeyInput.PressedDown) {
 				bool canViewCards = CheckIfCanViewCards(event);
 				if (canViewCards) {
+					cardType = AccessibilityFieldFocus::CardType::MONSTER;
 					lookupFieldLocId = AccessibilityFieldFocus::FieldLookerLocId::SELECTABLE_CARDS;
 					DisplayCards(selectable_cards, fmt::format(L"Selectable Cards"));
 				}
@@ -1834,6 +1876,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 			if (!event.KeyInput.PressedDown) {
 				bool canViewCards = CheckIfCanViewCards(event);
 				if (canViewCards) {
+					cardType = AccessibilityFieldFocus::CardType::MONSTER;
 					lookupFieldLocId = AccessibilityFieldFocus::FieldLookerLocId::PLAYER_SPECIAL_SUMMONABLE_MONSTERS;
 					DisplayCards(spsummonable_cards, fmt::format(L"Special Summonable Cards"));
 				}
@@ -1846,6 +1889,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 			if (!event.KeyInput.PressedDown) {
 				bool canViewCards = CheckIfCanViewCards(event);
 				if (canViewCards) {
+					cardType = AccessibilityFieldFocus::CardType::MONSTER;
 					lookupFieldLocId = AccessibilityFieldFocus::FieldLookerLocId::PLAYER_ACTIVABLE_CARDS;
 					DisplayCards(activatable_cards, fmt::format(L"Activable Cards"));
 				}
@@ -1856,7 +1900,9 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 		}
 		case irr::KEY_KEY_V: {
 			if (!event.KeyInput.PressedDown) {
-				if (cardType == AccessibilityFieldFocus::CardType::LINK || cardType == AccessibilityFieldFocus::CardType::NO_CARD_TYPE) {
+				if (cardType == AccessibilityFieldFocus::CardType::LINK ||
+					cardType == AccessibilityFieldFocus::CardType::NO_CARD_TYPE ||
+					cardType == AccessibilityFieldFocus::CardType::GRAVEYARD) {
 					ChangeField(AccessibilityFieldFocus::CardType::MONSTER);
 				}
 				else if (cardType == AccessibilityFieldFocus::CardType::MONSTER) {
@@ -1941,7 +1987,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					std::wstring position = selectedCard->position == 1 ? fmt::format(L"Attack Position") : fmt::format(L"Defense Position");
 					std::wstring leftScale = fmt::format(L"Left Scale {}", selectedCard->lscstring);
 					std::wstring rightScale = fmt::format(L"Right Scale {}", selectedCard->rscstring);
-					std::wstring fieldSlot = fmt::format(L"Slot {}", SearchFieldSlot(displayedField, selectedCard));
+					std::wstring fieldSlot = fmt::format(L"Zone {}", SearchFieldSlot(displayedField, selectedCard));
 					
 					//selectedCard->lscstring
 					ScreenReader::getReader()->readScreen(cardName.c_str());
@@ -1963,7 +2009,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					ScreenReader::getReader()->readScreen(cardEffect.c_str());
 				}
 				else if (!display_cards.empty() && indexLookedUpCard <= display_cards.size() && display_cards[indexLookedUpCard]->code == 0)
-					ScreenReader::getReader()->readScreen(fmt::format(L"Face-down"));
+					ScreenReader::getReader()->readScreen(fmt::format(L"Face-down Zone {}", SearchFieldSlot(displayedField, display_cards[indexLookedUpCard])));
 			}
 			break;
 		}
@@ -1977,6 +2023,18 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 		case irr::KEY_KEY_P: {
 			if (!event.KeyInput.PressedDown) {
 				MouseClick(event);
+			}
+			break;
+		}
+		case irr::KEY_KEY_M: {
+			if (!event.KeyInput.PressedDown) {
+				MouseClick(event, true);
+			}
+			break;
+		}
+		case irr::KEY_KEY_B: {
+			if (!event.KeyInput.PressedDown) {
+				ScreenReader::getReader()->readLastMessage();
 			}
 			break;
 		}
@@ -2021,12 +2079,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 
 				if (!display_cards.empty()) {
 					mainGame->ShowCardInfo(display_cards[indexLookedUpCard]->code);
-					std::wstring nvdaString;
-					if (display_cards[indexLookedUpCard]->code != 0)
-						nvdaString = fmt::format(L"{}", gDataManager->GetName(display_cards[indexLookedUpCard]->code));
-					else
-						nvdaString = fmt::format(L"Face-down");
-					ScreenReader::getReader()->readScreen(nvdaString.c_str());
+					ReadCardName();
 				}
 			}
 			break;
@@ -2049,12 +2102,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				}
 				if (!display_cards.empty()) {
 					mainGame->ShowCardInfo(display_cards[indexLookedUpCard]->code);
-					std::wstring nvdaString;
-					if(display_cards[indexLookedUpCard]->code != 0)
-						nvdaString = fmt::format(L"{}", gDataManager->GetName(display_cards[indexLookedUpCard]->code));
-					else
-						nvdaString = fmt::format(L"Face-down");
-					ScreenReader::getReader()->readScreen(nvdaString.c_str());
+					ReadCardName();
 				}
 			}
 			break;
@@ -2295,12 +2343,15 @@ void ClientField::ChangeField(const AccessibilityFieldFocus::CardType& cardField
 	std::wstring nvdaString = L"";
 	cardType = cardField;
 	if (cardType == AccessibilityFieldFocus::CardType::LINK){
+		lookupFieldLocId = AccessibilityFieldFocus::PLAYER_MONSTERS;
 		nvdaString = fmt::format(L"Link Field");
 	}
 	else if (cardType == AccessibilityFieldFocus::CardType::MONSTER) {
+		lookupFieldLocId = AccessibilityFieldFocus::PLAYER_MONSTERS;
 		nvdaString = fmt::format(L"Monster Field");
 	}
 	else if (cardType == AccessibilityFieldFocus::CardType::SPELL) {
+		lookupFieldLocId = AccessibilityFieldFocus::PLAYER_SPELLS;
 		nvdaString = fmt::format(L"Spell Field");
 	}
 	ScreenReader::getReader()->readScreen(nvdaString.c_str());
@@ -2308,6 +2359,7 @@ void ClientField::ChangeField(const AccessibilityFieldFocus::CardType& cardField
 
 bool ClientField::UseCard(const AccessibilityFieldFocus::UseType& useType, irr::SEvent event) {
 	bool canUse = false;
+	SetLookUpField();
 	if (mainGame->wCardDisplay->isVisible())
 		TriggerEvent(mainGame->btnDisplayOK, irr::gui::EGET_BUTTON_CLICKED);
 	if (clicked_card) {
@@ -2338,8 +2390,8 @@ bool ClientField::UseCard(const AccessibilityFieldFocus::UseType& useType, irr::
 			break;
 		}
 		case AccessibilityFieldFocus::UseType::MONSTER_ATTACK: {
-			if (displayedField == AccessibilityFieldFocus::DisplayedField::ENEMY_PLAYER) {
-				//SelectFieldSlot(clicked_card->location, AccessibilityFieldFocus::DisplayedField::ENEMY_PLAYER, AccessibilityFieldFocus::CardType::MONSTER);
+			if (lookupFieldLocId == AccessibilityFieldFocus::FieldLookerLocId::PLAYER_MONSTERS &&
+				displayedField == AccessibilityFieldFocus::DisplayedField::ENEMY_PLAYER) {
 				MouseClick(event);
 			}
 			else {
@@ -2462,6 +2514,22 @@ void ClientField::SelectFieldSlotNoPlayer(int slot) {
 	else
 		cursor->setPosition(pos.X, pos.Y);
 }
+
+void ClientField::ChangeFieldByCard() {
+	for (int i = 0; i < 5; i++) {
+		if (mzone[0][i] && mzone[0][i] == clicked_card) {
+			cardType = AccessibilityFieldFocus::CardType::MONSTER;
+			lookupFieldLocId = AccessibilityFieldFocus::PLAYER_MONSTERS;
+			break;
+		}
+		else if (szone[0][i] && szone[0][i] == clicked_card) {
+			cardType = AccessibilityFieldFocus::CardType::SPELL;
+			lookupFieldLocId = AccessibilityFieldFocus::PLAYER_SPELLS;
+			break;
+		}
+	}
+}
+
 AccessibilityFieldFocus::DisplayedCards ClientField::GetCardField() {
 	for (int i = 0; i < hand[0].size(); i++) {
 		
@@ -2491,7 +2559,58 @@ int ClientField::GetFieldSlot(const int& slot, const AccessibilityFieldFocus::Di
 	return fieldSlot;
 }
 
+void ClientField::SetLookUpField() {
+
+	//if (clicked_card && clicked_card->location == AccessibilityFieldFocus::PLAYER_DECK) {
+	//	lookupFieldLocId = AccessibilityFieldFocus::PLAYER_DECK;
+	//	cardType = AccessibilityFieldFocus::CardType::DECK;
+	//}
+	//else
+	if (clicked_card && clicked_card->location == AccessibilityFieldFocus::PLAYER_MONSTERS) {
+		lookupFieldLocId = AccessibilityFieldFocus::PLAYER_MONSTERS;
+		cardType = AccessibilityFieldFocus::CardType::MONSTER;
+		//ChangeField(AccessibilityFieldFocus::CardType::MONSTER);
+	}
+	else if (clicked_card && clicked_card->location == AccessibilityFieldFocus::PLAYER_SPELLS) {
+		lookupFieldLocId = AccessibilityFieldFocus::PLAYER_SPELLS;
+		cardType = AccessibilityFieldFocus::CardType::SPELL;
+		//ChangeField(AccessibilityFieldFocus::CardType::SPELL);
+	}
+	else if (clicked_card && clicked_card->location == AccessibilityFieldFocus::PLAYER_GRAVEYARD) {
+		lookupFieldLocId = AccessibilityFieldFocus::PLAYER_GRAVEYARD;
+		cardType = AccessibilityFieldFocus::CardType::GRAVEYARD;
+	}
+	//else if (clicked_card && clicked_card->location == AccessibilityFieldFocus::PLAYER_BANNED_CARDS) {
+	//	lookupFieldLocId = AccessibilityFieldFocus::PLAYER_BANNED_CARDS;
+	//	cardType = AccessibilityFieldFocus::CardType::BANNED;
+	//}
+	//else if (clicked_card && clicked_card->location == AccessibilityFieldFocus::PLAYER_EXTRA_DECK) {
+	//	lookupFieldLocId = AccessibilityFieldFocus::PLAYER_EXTRA_DECK;
+	//	cardType = AccessibilityFieldFocus::CardType::MONSTER;
+	//}
+}
+
+void ClientField::ReadCardName() {
+	std::wstring nvdaString;
+	SetLookUpField();
+	if (lookupFieldLocId == AccessibilityFieldFocus::FieldLookerLocId::PLAYER_MONSTERS || lookupFieldLocId == AccessibilityFieldFocus::FieldLookerLocId::PLAYER_SPELLS) {
+		if (display_cards[indexLookedUpCard]->code != 0)
+			nvdaString = fmt::format(L"{} zone {}", gDataManager->GetName(display_cards[indexLookedUpCard]->code), SearchFieldSlot(displayedField, display_cards[indexLookedUpCard]));
+		else
+			nvdaString = fmt::format(L"Face-down zone {}", SearchFieldSlot(displayedField, display_cards[indexLookedUpCard]));
+	}
+	else {
+		if (display_cards[indexLookedUpCard]->code != 0)
+			nvdaString = fmt::format(L"{} slot {}", gDataManager->GetName(display_cards[indexLookedUpCard]->code), indexLookedUpCard);
+		else
+			nvdaString = fmt::format(L"Face-down slot {}", indexLookedUpCard);
+
+	}
+	ScreenReader::getReader()->readScreen(nvdaString.c_str());
+}
+
 int ClientField::SearchFieldSlot(const int& displayedField, ClientCard* card) {
+	SetLookUpField();
 	auto selectedCard = card == NULL ? clicked_card : card;
 	int fieldSlot = 0;
 	for (int i = 0; i < 7; i++) {
@@ -2539,6 +2658,16 @@ float ClientField::GetXPosition(int slot, const AccessibilityFieldFocus::Display
 			break;
 		}
 	}
+	else if (lookupFieldLocId == AccessibilityFieldFocus::FieldLookerLocId::PLAYER_GRAVEYARD || lookupFieldLocId == AccessibilityFieldFocus::FieldLookerLocId::PLAYER_DECK) {
+		int localSlot = 6;
+		if (displayedField == AccessibilityFieldFocus::DisplayedField::PLAYER) {
+			startPosition = 0.43f;
+		}
+		else {
+			startPosition = 0.0f;
+		}
+		posX = startPosition + (localSlot * fieldSlotSize);
+	}
 	return posX;
 }
 
@@ -2569,7 +2698,21 @@ float ClientField::GetYPosition(int slot) {
 		startPosY = 0.4f;
 		startSpellPosY = -0.05f;
 	}
-	if (cardType == AccessibilityFieldFocus::CardType::MONSTER)
+	if (lookupFieldLocId == AccessibilityFieldFocus::FieldLookerLocId::PLAYER_GRAVEYARD) {
+		/*if (displayedField == AccessibilityFieldFocus::DisplayedField::ENEMY_PLAYER)
+			startSpellPosY = -0.04f;
+		else*/
+		startSpellPosY = 0.05f;
+		posY = startPosY + startSpellPosY;
+	}
+	/*else if (lookupFieldLocId == AccessibilityFieldFocus::FieldLookerLocId::PLAYER_DECK) {
+		if (displayedField == AccessibilityFieldFocus::DisplayedField::ENEMY_PLAYER)
+			startSpellPosY = -0.09f;
+		else
+			startSpellPosY = 0.18f;
+		posY = startPosY + startSpellPosY;
+	}*/
+	else if (cardType == AccessibilityFieldFocus::CardType::MONSTER)
 		posY = startPosY;
 	else if (cardType == AccessibilityFieldFocus::CardType::SPELL) {
 		if (slot > 5) {
@@ -2617,34 +2760,6 @@ void ClientField::MouseClick(const irr::SEvent& event, bool rightClick) {
 
 	CheckAndPost(JWrapper::Buttons::A, rightClick ? irr::EMIE_RMOUSE_PRESSED_DOWN : irr::EMIE_LMOUSE_PRESSED_DOWN);
 }
-
-//void ClientField::MouseRightClick(const irr::SEvent& event) {
-//	auto cursor = mainGame->device->getCursorControl();
-//	auto pos = cursor->getRelativePosition();
-//
-//	auto& jevent = event.JoystickEvent;
-//	static irr::u32 buttonstates = 0;
-//	buttonstates |= irr::E_MOUSE_BUTTON_STATE_MASK::EMBSM_RIGHT;
-//	irr::SEvent simulated{};
-//	simulated.EventType = irr::EET_MOUSE_INPUT_EVENT;
-//	simulated.MouseInput.ButtonStates = buttonstates;
-//	simulated.MouseInput.Control = false;
-//	simulated.MouseInput.Shift = false;
-//	simulated.MouseInput.X = irr::core::round32(pos.X * mainGame->window_size.Width);
-//	simulated.MouseInput.Y = irr::core::round32(pos.Y * mainGame->window_size.Height);
-//
-//	buttonstates |= (simulated.MouseInput.Control) ? 1 << 30 : 0;
-//	buttonstates |= (simulated.MouseInput.Shift) ? 1 << 29 : 0;
-//
-//	auto& changed = jevent.POV;
-//
-//	auto CheckAndPost = [device = mainGame->device, &simulated, &changed, &states = jevent.ButtonStates](int button, irr::EMOUSE_INPUT_EVENT type) {
-//		simulated.MouseInput.Event = (states & button) ? type : (irr::EMOUSE_INPUT_EVENT)(type + 3);
-//		device->postEventFromUser(simulated);
-//	};
-//
-//	CheckAndPost(JWrapper::Buttons::A, irr::EMIE_RMOUSE_PRESSED_DOWN);
-//}
 
 void ClientField::SetMouseOnCard()
 {

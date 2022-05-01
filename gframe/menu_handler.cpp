@@ -1138,6 +1138,12 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 			}
 			break;
 		}
+		case irr::KEY_KEY_B: {
+			if (!event.KeyInput.PressedDown) {
+				ScreenReader::getReader()->readLastMessage();
+			}
+			break;
+		}
 		case irr::KEY_DOWN:
 		case irr::KEY_UP: {
 			if (!event.KeyInput.PressedDown && mainGame->env->hasFocus(mainGame->cbDeckSelect)) {

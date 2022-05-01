@@ -32,12 +32,12 @@ struct AccessibilityFieldFocus
 	enum FieldLookerLocId
 	{
 		PLAYER_HAND = 0,
-		PLAYER_MONSTERS = 1007,
-		PLAYER_SPELLS = 1,
-		PLAYER_GRAVEYARD = 2,
-		PLAYER_EXTRA_DECK = 3,
-		PLAYER_DECK = 4,
-		PLAYER_BANNED_CARDS = 5,
+		PLAYER_DECK = 1,
+		PLAYER_MONSTERS = 4,
+		PLAYER_SPELLS = 8,
+		PLAYER_GRAVEYARD = 16,
+		PLAYER_BANNED_CARDS = 32,
+		PLAYER_EXTRA_DECK = 64,
 		PLAYER_FIELD = 6,
 		PLAYER_PENDULUM_ZONE = 7,
 		PLAYER_SUMMONABLE_MONSTERS = 8,
@@ -48,16 +48,7 @@ struct AccessibilityFieldFocus
 		SELECTABLE_CARDS = 13,
 		SELECTED_CARDS = 14,
 		MUST_SELECT_CARDS = 15,
-		ENEMY_PLAYER_HAND = 0,
-		ENEMY_PLAYER_MONSTERS = 0,
-		ENEMY_PLAYER_SPELLS = 0,
-		ENEMY_PLAYER_GRAVEYARD = 0,
-		ENEMY_PLAYER_EXTRA_DECK = 0,
-		ENEMY_PLAYER_DECK = 0,
-		ENEMY_PLAYER_BANNED_CARDS = 0,
-		ENEMY_PLAYER_FIELD = 0,
-		ENEMY_PLAYER_PENDULUM_ZONE = 0,
-		LINK_ZONE = 0,
+		LINK_ZONE = 25,
 	};
 
 	enum DisplayedField
@@ -98,7 +89,10 @@ struct AccessibilityFieldFocus
 		SPELL = 2,
 		ACTIVABLE_EFFECT = 3,
 		SELECTABLE = 4,
-		LINK = 5
+		LINK = 5,
+		GRAVEYARD = 6,
+		BANNED = 7,
+		DECK = 8
 	};
 
 	enum BattleStep
@@ -268,9 +262,12 @@ public:
 	void SimulateButton(irr::gui::IGUIElement* caller = nullptr);
 	void MouseClick(const irr::SEvent& event, bool rightClick = false);
 	void ChangeField(const AccessibilityFieldFocus::CardType& cardField);
+	void ChangeFieldByCard();
 	//void MouseRightClick(const irr::SEvent& event);
 	//bool SetCard(const int& setType, const AccessibilityFieldFocus::UseType& useType = AccessibilityFieldFocus::UseType::NORMAL_SUMMON);
 	void SetMouseOnCard();
+	void SetLookUpField();
+	void ReadCardName();
 };
 
 }

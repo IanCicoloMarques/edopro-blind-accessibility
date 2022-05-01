@@ -16,7 +16,8 @@ class NVDA : public IScreenReader
 
 		void textToSpeech(std::wstring string);
 		void textToBraile(std::wstring string);
-
+		void readLastMessage();
+		std::wstring lastMessage;
 
 };
 #endif

@@ -2639,10 +2639,12 @@ int ClientField::SearchFieldSlot(const int& displayedField, ClientCard* card) {
 	int fieldSlot = 0;
 	for (int i = 0; i < 7; i++) {
 		if ((mzone[displayedField][i] && mzone[displayedField][i] == selectedCard) || (szone[displayedField][i] && szone[displayedField][i] == selectedCard)) {
-			if (displayedField == AccessibilityFieldFocus::DisplayedField::PLAYER)
-				fieldSlot = i+1;
-			else
+			if (displayedField == AccessibilityFieldFocus::DisplayedField::PLAYER && i < 5)
+				fieldSlot = i + 1;
+			else if (i < 5)
 				fieldSlot = 5 - i;
+			else
+				fieldSlot = i;
 			break;
 		}
 	}

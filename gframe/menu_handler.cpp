@@ -103,6 +103,20 @@ static inline void TriggerEvent(irr::gui::IGUIElement* target, irr::gui::EGUI_EV
 static inline void ClickButton(irr::gui::IGUIElement* btn) {
 	TriggerEvent(btn, irr::gui::EGET_BUTTON_CLICKED);
 }
+
+static inline void CheckBox(irr::gui::IGUICheckBox* chkbox) {
+	if (chkbox->isTrulyVisible()) {
+		chkbox->setChecked(!chkbox->isChecked());
+	}
+}
+
+static inline void FocusTextBox(irr::gui::IGUIEditBox* editBox) {
+	if (editBox->isTrulyVisible()) {
+		editBox->setText(L"");
+		//mainGame->ebNickNameOnline->setText(L"");
+		mainGame->env->setFocus(editBox);
+	}
+}
 bool MenuHandler::OnEvent(const irr::SEvent& event) {
 	bool stopPropagation = false;
 	if(mainGame->dField.OnCommonEvent(event, stopPropagation))
@@ -1086,28 +1100,64 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 			break;
 		}
 		case irr::KEY_KEY_D: {
-			if (!event.KeyInput.PressedDown && mainGame->btnHostPrepWindBot->isTrulyVisible() && mainGame->btnHostPrepStart->isEnabled()) {
-				ClickButton(mainGame->btnHostPrepStart);
-			}
-			else if (!event.KeyInput.PressedDown && !mainGame->wSinglePlay->isTrulyVisible()) {
-				ClickButton(mainGame->btnLanMode);
-			}
-			if (!event.KeyInput.PressedDown && mainGame->btnCreateHost->isTrulyVisible()) {
-				ClickButton(mainGame->btnCreateHost);
-			}
-			else if (!event.KeyInput.PressedDown && mainGame->btnHostConfirm->isTrulyVisible()) {
-				ClickButton(mainGame->btnHostConfirm);
-			}
-			else if (!event.KeyInput.PressedDown && mainGame->btnHostPrepReady->isTrulyVisible()) {
-				ClickButton(mainGame->btnHostPrepReady);
-			}
-			else if (!event.KeyInput.PressedDown && mainGame->gBot.btnAdd->isTrulyVisible()) {
-				ClickButton(mainGame->gBot.btnAdd);
-			}
-			else if (!event.KeyInput.PressedDown && mainGame->btnHostPrepWindBot->isTrulyVisible()) {
-				ClickButton(mainGame->btnHostPrepWindBot);
+			if (!event.KeyInput.PressedDown && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
+				if (mainGame->btnHostPrepWindBot->isTrulyVisible() && mainGame->btnHostPrepStart->isEnabled()) {
+					ClickButton(mainGame->btnHostPrepStart);
+				}
+				else if (!mainGame->wSinglePlay->isTrulyVisible()) {
+					ClickButton(mainGame->btnLanMode);
+				}
+				if (mainGame->btnCreateHost->isTrulyVisible()) {
+					ClickButton(mainGame->btnCreateHost);
+				}
+				else if (mainGame->btnHostConfirm->isTrulyVisible()) {
+					ClickButton(mainGame->btnHostConfirm);
+				}
+				else if (mainGame->btnHostPrepReady->isTrulyVisible()) {
+					ClickButton(mainGame->btnHostPrepReady);
+				}
+				else if (mainGame->gBot.btnAdd->isTrulyVisible()) {
+					ClickButton(mainGame->gBot.btnAdd);
+				}
+				else if (mainGame->btnHostPrepWindBot->isTrulyVisible()) {
+					ClickButton(mainGame->btnHostPrepWindBot);
+				}
 			}
 			
+			break;
+		}
+		case irr::KEY_KEY_P: {
+			if (!event.KeyInput.PressedDown) {
+				if (mainGame->ebNickName->isTrulyVisible()) {
+					mainGame->ebNickName->setText(L"");
+					//mainGame->ebNickNameOnline->setText(L"");
+					mainGame->env->setFocus(mainGame->ebNickName);
+				}
+				/*if (mainGame->ebBestOf->isTrulyVisible()) {
+					mainGame->ebBestOf->setText(L"");
+					mainGame->env->setFocus(mainGame->ebBestOf);
+				}*/
+				/*if (mainGame->ebTimeLimit->isTrulyVisible()) {
+					mainGame->ebTimeLimit->setText(L"");
+					mainGame->env->setFocus(mainGame->ebTimeLimit);
+				}*/
+	/*			if (mainGame->chkNoCheckDeck->isTrulyVisible()) {
+					mainGame->chkNoCheckDeck->setChecked(!mainGame->chkNoCheckDeck->isChecked());
+				}*/
+				if (mainGame->chkNoShuffleDeck->isTrulyVisible()) {
+					mainGame->chkNoShuffleDeck->setChecked(!mainGame->chkNoShuffleDeck->isChecked());
+				}
+				if (mainGame->gBot.chkThrowRock->isTrulyVisible()) {
+					mainGame->gBot.chkThrowRock->setChecked(!mainGame->gBot.chkThrowRock->isChecked());
+				}
+				
+				//ebStartLP
+				//	ebStartHand
+				//	ebDrawCount
+				//	ebServerName
+				//	ebServerPass
+			}
+
 			break;
 		}
 		case irr::KEY_KEY_G: {
@@ -1146,28 +1196,130 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 		}
 		case irr::KEY_DOWN:
 		case irr::KEY_UP: {
-			if (!event.KeyInput.PressedDown && mainGame->env->hasFocus(mainGame->cbDeckSelect)) {
-				std::wstring nvdaString = fmt::format(L"Deck {}", mainGame->cbDeckSelect->getItem(mainGame->cbDeckSelect->getSelected()));
-				ScreenReader::getReader()->readScreen(nvdaString.c_str());
+			if (!event.KeyInput.PressedDown) {
+				if (mainGame->env->hasFocus(mainGame->cbDeckSelect)) {
+					std::wstring nvdaString = fmt::format(L"Deck {}", mainGame->cbDeckSelect->getItem(mainGame->cbDeckSelect->getSelected()));
+					ScreenReader::getReader()->readScreen(nvdaString.c_str());
+				}
+				else if (mainGame->env->hasFocus(mainGame->gBot.cbBotDeck)) {
+					std::wstring nvdaString = fmt::format(L"Deck {}", mainGame->gBot.cbBotDeck->getItem(mainGame->gBot.cbBotDeck->getSelected()));
+					ScreenReader::getReader()->readScreen(nvdaString.c_str());
+				}
+				//else{
+				//	if (menu.empty())
+				//		menu = menuMain;
+				//	menuSelectCounter++;
+				//	if (menuSelectCounter >= menu.size())
+				//		menuSelectCounter = 0;
+				//	currentMenu = menu.at(menuSelectCounter);
+				//	ScreenReader::getReader()->readScreen(menu.at(menuSelectCounter).c_str());
+				//}
 			}
-			else if (!event.KeyInput.PressedDown && mainGame->env->hasFocus(mainGame->gBot.cbBotDeck)) {
-				std::wstring nvdaString = fmt::format(L"Deck {}", mainGame->gBot.cbBotDeck->getItem(mainGame->gBot.cbBotDeck->getSelected()));
-				ScreenReader::getReader()->readScreen(nvdaString.c_str());
+			break;
+		}
+		case irr::KEY_RIGHT: {
+			if (!event.KeyInput.PressedDown) {
+				if (menu.empty())
+					menu = menuMain;
+				menuSelectCounter++;
+				if (menuSelectCounter >= menu.size())
+					menuSelectCounter = 0;
+				currentMenu = menu.at(menuSelectCounter);
+				ScreenReader::getReader()->readScreen(menu.at(menuSelectCounter).c_str());
+			}
+			break;
+		}
+		case irr::KEY_LEFT: {
+			if (!event.KeyInput.PressedDown) {
+				if (menu.empty())
+					menu = menuMain;
+				menuSelectCounter--;
+				if (menuSelectCounter < 0)
+					menuSelectCounter = menu.size()-1;
+				currentMenu = menu.at(menuSelectCounter);
+				ScreenReader::getReader()->readScreen(menu.at(menuSelectCounter).c_str());
+			}
+			break;
+		}
+		case irr::KEY_RETURN: {
+			if (!event.KeyInput.PressedDown) {
+				if (menu.empty())
+					menu = menuMain;
+				if (mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX))
+					mainGame->env->removeFocus(mainGame->env->getFocus());
+				if (menu.at(0) == L"Duel") {
+					if (currentMenu == L"Duel" && !mainGame->wSinglePlay->isTrulyVisible()) {
+						menu = menuSinglePlayer;
+						menuSelectCounter = 0;
+						ClickButton(mainGame->btnLanMode);
+					}
+					else if (currentMenu == L"Deck Editor" && mainGame->btnDeckEdit->isTrulyVisible()) {
+						ClickButton(mainGame->btnDeckEdit);
+					}
+				}
+				else if (menu.at(0) == L"Host Duel") {
+					if (currentMenu == L"Host Duel" && !mainGame->btnCreateHost->isTrulyVisible()) {
+						ClickButton(mainGame->btnCreateHost);
+					}
+					else if (currentMenu == L"Player Name" && mainGame->ebNickName->isTrulyVisible()) {
+						FocusTextBox(mainGame->ebNickName);
+					}
+				}
+				else if (menu.at(0) == L"Rules ok") {
+					if (currentMenu == L"Rules ok" && !mainGame->btnHostConfirm->isTrulyVisible()) {
+						ClickButton(mainGame->btnHostConfirm);
+					}
+					else if (currentMenu == L"Best of" && mainGame->ebBestOf->isTrulyVisible()) {
+						FocusTextBox(mainGame->ebBestOf);
+					}
+					else if (currentMenu == L"Time Limit" && mainGame->ebTimeLimit->isTrulyVisible()) {
+						FocusTextBox(mainGame->ebTimeLimit);
+					}
+					else if (currentMenu == L"Starting LP" && mainGame->ebStartLP->isTrulyVisible()) {
+						FocusTextBox(mainGame->ebStartLP);
+					}
+					else if (currentMenu == L"Starting Hand" && mainGame->ebStartHand->isTrulyVisible()) {
+						FocusTextBox(mainGame->ebStartHand);
+					}
+					else if (currentMenu == L"Cards pew Draw" && mainGame->ebDrawCount->isTrulyVisible()) {
+						FocusTextBox(mainGame->ebDrawCount);
+					}
+					else if (currentMenu == L"Don't check deck" && mainGame->chkNoCheckDeck->isTrulyVisible()) {
+						CheckBox(mainGame->chkNoCheckDeck);
+					}
+					else if (currentMenu == L"Don't shuffle deck" && mainGame->chkNoShuffleDeck->isTrulyVisible()) {
+						CheckBox(mainGame->chkNoShuffleDeck);
+					}
+				}
+				else if (menu.at(0) == L"AI Ok") {
+					if (currentMenu == L"AI Ok" && !mainGame->gBot.btnAdd->isTrulyVisible()) {
+					}
+					else if (currentMenu == L"Select Deck" && !mainGame->gBot.cbBotDeck->isTrulyVisible()) {
+						mainGame->env->setFocus(mainGame->gBot.cbBotDeck);
+						std::wstring nvdaString = fmt::format(L"Deck {}", mainGame->gBot.cbBotDeck->getItem(mainGame->gBot.cbBotDeck->getSelected()));
+						ScreenReader::getReader()->readScreen(nvdaString.c_str());
+					}
+					else if (currentMenu == L"Always throw Rock" && !mainGame->gBot.chkThrowRock->isTrulyVisible()) {
+						CheckBox(mainGame->gBot.chkThrowRock);
+					}
+				}
 			}
 			break;
 		}
 		case irr::KEY_KEY_0: {
-			if (!event.KeyInput.PressedDown && mainGame->btnHostPrepCancel->isTrulyVisible()) {
-				ClickButton(mainGame->btnHostPrepCancel);
-			}
-			else if (!event.KeyInput.PressedDown && mainGame->btnHostCancel->isTrulyVisible()) {
-				ClickButton(mainGame->btnHostCancel);
-			}
-			else if (!event.KeyInput.PressedDown && mainGame->btnJoinCancel->isTrulyVisible()) {
-				ClickButton(mainGame->btnJoinCancel);
-			}
-			else if (!event.KeyInput.PressedDown && mainGame->btnModeExit->isTrulyVisible()) {
-				ClickButton(mainGame->btnModeExit);
+			if (!event.KeyInput.PressedDown && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
+				if (mainGame->btnHostPrepCancel->isTrulyVisible()) {
+					ClickButton(mainGame->btnHostPrepCancel);
+				}
+				else if (mainGame->btnHostCancel->isTrulyVisible()) {
+					ClickButton(mainGame->btnHostCancel);
+				}
+				else if (mainGame->btnJoinCancel->isTrulyVisible()) {
+					ClickButton(mainGame->btnJoinCancel);
+				}
+				else if (mainGame->btnModeExit->isTrulyVisible()) {
+					ClickButton(mainGame->btnModeExit);
+				}
 			}
 			
 

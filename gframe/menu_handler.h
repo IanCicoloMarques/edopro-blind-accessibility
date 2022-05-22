@@ -3,6 +3,8 @@
 
 #include "config.h"
 #include <IEventReceiver.h>
+#include <string>
+#include <vector>
 
 namespace ygo {
 
@@ -11,7 +13,15 @@ public:
 	virtual bool OnEvent(const irr::SEvent& event);
 	int prev_operation;
 	int prev_sel;
-
+	int menuSelectCounter = 0;
+	int subMenuSelectCounter = 0;
+	std::vector<std::wstring> menu;
+	std::vector<std::wstring> menuMain = { L"Duel", L"Deck Editor" };
+	std::vector<std::wstring> menuSinglePlayer = { L"Host Duel", L"Player Name" };
+	std::vector<std::wstring> menuHostDuel = { L"Rules ok", L"Best of", L"Time Limit", L"Starting LP", L"Starting Hand", L"Cards pew Draw", L"Don't check deck", L"Don't shuffle deck" };
+	std::vector<std::wstring> menuRulesOk = { L"Start Duel", L"Select Deck", L"Select AI" };
+	std::vector<std::wstring> menuSelectAI = { L"AI Ok", L"Select Deck", L"Always throw Rock" };
+	std::wstring currentMenu = L"Duel";
 };
 
 // These are passed to Irrlicht constructors as IDs and useful for identifying spawned GUI events

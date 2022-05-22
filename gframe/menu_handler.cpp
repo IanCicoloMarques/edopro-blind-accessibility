@@ -1123,43 +1123,42 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 					ClickButton(mainGame->btnHostPrepWindBot);
 				}
 			}
-			
 			break;
 		}
-		case irr::KEY_KEY_P: {
-			if (!event.KeyInput.PressedDown) {
-				if (mainGame->ebNickName->isTrulyVisible()) {
-					mainGame->ebNickName->setText(L"");
-					//mainGame->ebNickNameOnline->setText(L"");
-					mainGame->env->setFocus(mainGame->ebNickName);
-				}
-				/*if (mainGame->ebBestOf->isTrulyVisible()) {
-					mainGame->ebBestOf->setText(L"");
-					mainGame->env->setFocus(mainGame->ebBestOf);
-				}*/
-				/*if (mainGame->ebTimeLimit->isTrulyVisible()) {
-					mainGame->ebTimeLimit->setText(L"");
-					mainGame->env->setFocus(mainGame->ebTimeLimit);
-				}*/
-	/*			if (mainGame->chkNoCheckDeck->isTrulyVisible()) {
-					mainGame->chkNoCheckDeck->setChecked(!mainGame->chkNoCheckDeck->isChecked());
-				}*/
-				if (mainGame->chkNoShuffleDeck->isTrulyVisible()) {
-					mainGame->chkNoShuffleDeck->setChecked(!mainGame->chkNoShuffleDeck->isChecked());
-				}
-				if (mainGame->gBot.chkThrowRock->isTrulyVisible()) {
-					mainGame->gBot.chkThrowRock->setChecked(!mainGame->gBot.chkThrowRock->isChecked());
-				}
-				
-				//ebStartLP
-				//	ebStartHand
-				//	ebDrawCount
-				//	ebServerName
-				//	ebServerPass
-			}
+	//	case irr::KEY_KEY_P: {
+	//		if (!event.KeyInput.PressedDown) {
+	//			if (mainGame->ebNickName->isTrulyVisible()) {
+	//				mainGame->ebNickName->setText(L"");
+	//				//mainGame->ebNickNameOnline->setText(L"");
+	//				mainGame->env->setFocus(mainGame->ebNickName);
+	//			}
+	//			/*if (mainGame->ebBestOf->isTrulyVisible()) {
+	//				mainGame->ebBestOf->setText(L"");
+	//				mainGame->env->setFocus(mainGame->ebBestOf);
+	//			}*/
+	//			/*if (mainGame->ebTimeLimit->isTrulyVisible()) {
+	//				mainGame->ebTimeLimit->setText(L"");
+	//				mainGame->env->setFocus(mainGame->ebTimeLimit);
+	//			}*/
+	///*			if (mainGame->chkNoCheckDeck->isTrulyVisible()) {
+	//				mainGame->chkNoCheckDeck->setChecked(!mainGame->chkNoCheckDeck->isChecked());
+	//			}*/
+	//			if (mainGame->chkNoShuffleDeck->isTrulyVisible()) {
+	//				mainGame->chkNoShuffleDeck->setChecked(!mainGame->chkNoShuffleDeck->isChecked());
+	//			}
+	//			if (mainGame->gBot.chkThrowRock->isTrulyVisible()) {
+	//				mainGame->gBot.chkThrowRock->setChecked(!mainGame->gBot.chkThrowRock->isChecked());
+	//			}
+	//			
+	//			//ebStartLP
+	//			//	ebStartHand
+	//			//	ebDrawCount
+	//			//	ebServerName
+	//			//	ebServerPass
+	//		}
 
-			break;
-		}
+	//		break;
+	//	}
 		case irr::KEY_KEY_G: {
 			if (!event.KeyInput.PressedDown && mainGame->btnDeckEdit->isTrulyVisible()) {
 				ClickButton(mainGame->btnDeckEdit);
@@ -1205,15 +1204,6 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 					std::wstring nvdaString = fmt::format(L"Deck {}", mainGame->gBot.cbBotDeck->getItem(mainGame->gBot.cbBotDeck->getSelected()));
 					ScreenReader::getReader()->readScreen(nvdaString.c_str());
 				}
-				//else{
-				//	if (menu.empty())
-				//		menu = menuMain;
-				//	menuSelectCounter++;
-				//	if (menuSelectCounter >= menu.size())
-				//		menuSelectCounter = 0;
-				//	currentMenu = menu.at(menuSelectCounter);
-				//	ScreenReader::getReader()->readScreen(menu.at(menuSelectCounter).c_str());
-				//}
 			}
 			break;
 		}
@@ -1245,8 +1235,6 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 			if (!event.KeyInput.PressedDown) {
 				if (menu.empty())
 					menu = menuMain;
-				if (mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX))
-					mainGame->env->removeFocus(mainGame->env->getFocus());
 				if (menu.at(0) == L"Duel") {
 					if (currentMenu == L"Duel" && !mainGame->wSinglePlay->isTrulyVisible()) {
 						menu = menuSinglePlayer;
@@ -1258,7 +1246,9 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 					}
 				}
 				else if (menu.at(0) == L"Host Duel") {
-					if (currentMenu == L"Host Duel" && !mainGame->btnCreateHost->isTrulyVisible()) {
+					if (currentMenu == L"Host Duel" && mainGame->btnCreateHost->isTrulyVisible()) {
+						menu = menuHostDuel;
+						menuSelectCounter = 0;
 						ClickButton(mainGame->btnCreateHost);
 					}
 					else if (currentMenu == L"Player Name" && mainGame->ebNickName->isTrulyVisible()) {
@@ -1266,12 +1256,14 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 					}
 				}
 				else if (menu.at(0) == L"Rules ok") {
-					if (currentMenu == L"Rules ok" && !mainGame->btnHostConfirm->isTrulyVisible()) {
+					if (currentMenu == L"Rules ok" && mainGame->btnHostConfirm->isTrulyVisible()) {
+						menu = menuRulesOk;
+						menuSelectCounter = 0;
 						ClickButton(mainGame->btnHostConfirm);
 					}
-					else if (currentMenu == L"Best of" && mainGame->ebBestOf->isTrulyVisible()) {
-						FocusTextBox(mainGame->ebBestOf);
-					}
+					//else if (currentMenu == L"Best of" && mainGame->ebBestOf->isTrulyVisible()) {
+					//	FocusTextBox(mainGame->ebBestOf);
+					//}
 					else if (currentMenu == L"Time Limit" && mainGame->ebTimeLimit->isTrulyVisible()) {
 						FocusTextBox(mainGame->ebTimeLimit);
 					}
@@ -1291,15 +1283,36 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 						CheckBox(mainGame->chkNoShuffleDeck);
 					}
 				}
-				else if (menu.at(0) == L"AI Ok") {
-					if (currentMenu == L"AI Ok" && !mainGame->gBot.btnAdd->isTrulyVisible()) {
+				else if (menu.at(0) == L"Start Duel") {
+					if (currentMenu == L"Start Duel" && mainGame->btnHostPrepReady->isTrulyVisible()) {
+						menu = menuSinglePlayer;
+						menuSelectCounter = 0;
+						ClickButton(mainGame->btnHostPrepReady);
+						ClickButton(mainGame->btnHostPrepStart);
 					}
-					else if (currentMenu == L"Select Deck" && !mainGame->gBot.cbBotDeck->isTrulyVisible()) {
+					else if (currentMenu == L"Select Deck" && mainGame->cbDeckSelect->isTrulyVisible()) {
+						mainGame->env->setFocus(mainGame->cbDeckSelect);
+						std::wstring nvdaString = fmt::format(L"Deck {}", mainGame->cbDeckSelect->getItem(mainGame->cbDeckSelect->getSelected()));
+						ScreenReader::getReader()->readScreen(nvdaString.c_str());
+					}
+					else if (currentMenu == L"Select AI" && mainGame->btnHostPrepWindBot->isTrulyVisible()) {
+						menu = menuSelectAI;
+						menuSelectCounter = 0;
+						ClickButton(mainGame->btnHostPrepWindBot);
+					}
+				}
+				else if (menu.at(0) == L"AI Ok") {
+					if (currentMenu == L"AI Ok") {
+						menu = menuRulesOk;
+						menuSelectCounter = 0;
+						ClickButton(mainGame->gBot.btnAdd);
+					}
+					else if (currentMenu == L"Select Deck" && mainGame->gBot.cbBotDeck->isTrulyVisible()) {
 						mainGame->env->setFocus(mainGame->gBot.cbBotDeck);
 						std::wstring nvdaString = fmt::format(L"Deck {}", mainGame->gBot.cbBotDeck->getItem(mainGame->gBot.cbBotDeck->getSelected()));
 						ScreenReader::getReader()->readScreen(nvdaString.c_str());
 					}
-					else if (currentMenu == L"Always throw Rock" && !mainGame->gBot.chkThrowRock->isTrulyVisible()) {
+					else if (currentMenu == L"Always throw Rock" && mainGame->gBot.chkThrowRock->isTrulyVisible()) {
 						CheckBox(mainGame->gBot.chkThrowRock);
 					}
 				}
@@ -1308,13 +1321,17 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 		}
 		case irr::KEY_KEY_0: {
 			if (!event.KeyInput.PressedDown && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
+				menuSelectCounter = 0;
 				if (mainGame->btnHostPrepCancel->isTrulyVisible()) {
+					menu = menuHostDuel;
 					ClickButton(mainGame->btnHostPrepCancel);
 				}
 				else if (mainGame->btnHostCancel->isTrulyVisible()) {
+					menu = menuSinglePlayer;
 					ClickButton(mainGame->btnHostCancel);
 				}
 				else if (mainGame->btnJoinCancel->isTrulyVisible()) {
+					menu = menuMain;
 					ClickButton(mainGame->btnJoinCancel);
 				}
 				else if (mainGame->btnModeExit->isTrulyVisible()) {

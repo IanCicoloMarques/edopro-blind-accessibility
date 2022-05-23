@@ -1091,17 +1091,20 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 			}
 			if(id >= BUTTON_DISPLAY_0 && id <= BUTTON_DISPLAY_4) {
 				int pos = mainGame->scrDisplayList->getPos() / 10;
-				ClientCard* mcard = display_cards[id - BUTTON_DISPLAY_0 + pos];
-				if(mcard) {
-					SetShowMark(mcard, true);
-					ShowCardInfoInList(mcard, mainGame->btnCardDisplay[id - BUTTON_DISPLAY_0], mainGame->wCardDisplay);
-					if(mcard->code) {
-						mainGame->ShowCardInfo(mcard->code);
-					} else {
-						if(mcard->cover)
-							mainGame->ShowCardInfo(mcard->cover, false, imgType::COVER);
-						else
-							mainGame->ClearCardInfo(mcard->controler);
+				int dpPos = id - BUTTON_DISPLAY_0 + pos;
+				if (!display_cards.empty() && display_cards.size() < dpPos) {
+					ClientCard* mcard = display_cards[dpPos];
+					if(mcard) {
+						SetShowMark(mcard, true);
+						ShowCardInfoInList(mcard, mainGame->btnCardDisplay[id - BUTTON_DISPLAY_0], mainGame->wCardDisplay);
+						if(mcard->code) {
+							mainGame->ShowCardInfo(mcard->code);
+						} else {
+							if(mcard->cover)
+								mainGame->ShowCardInfo(mcard->cover, false, imgType::COVER);
+							else
+								mainGame->ClearCardInfo(mcard->controler);
+						}
 					}
 				}
 			}
@@ -2513,7 +2516,6 @@ void ClientField::SelectFieldSlotNoPlayer(int slot) {
 	auto pos = cursor->getRelativePosition();
 	pos.X = GetXPosition(slot);
 	pos.Y = GetYPosition(slot);
-	auto test = matManager.vFieldMzone[1][0][2].Pos.X;
 	auto clamp = [](auto& val) { val = (val < 0.f) ? 0.f : (1.f < val) ? 1.f : val;	};
 	clamp(pos.X);
 	clamp(pos.Y);
@@ -2643,8 +2645,17 @@ int ClientField::SearchFieldSlot(const int& displayedField, ClientCard* card) {
 				fieldSlot = i + 1;
 			else if (i < 5)
 				fieldSlot = 5 - i;
-			else
-				fieldSlot = i;
+			else {
+				lookupFieldLocId = AccessibilityFieldFocus::FieldLookerLocId::LINK_ZONE;
+				if(displayedField == AccessibilityFieldFocus::DisplayedField::PLAYER)
+					fieldSlot = i - 4;
+				else {
+					if (i == 5)
+						fieldSlot = 2;
+					else
+						fieldSlot = 1;
+				}
+			}
 			break;
 		}
 	}
@@ -2652,9 +2663,8 @@ int ClientField::SearchFieldSlot(const int& displayedField, ClientCard* card) {
 }
 
 float ClientField::GetXPosition(int slot, const AccessibilityFieldFocus::DisplayedField& player) {
-	if (slot > 5 && lookupFieldLocId == AccessibilityFieldFocus::FieldLookerLocId::PLAYER_MONSTERS) {
+	if (lookupFieldLocId == AccessibilityFieldFocus::FieldLookerLocId::LINK_ZONE) {
 		cardType = AccessibilityFieldFocus::CardType::LINK;
-		slot = slot - 5;
 	}
 	else if (slot > 5 && lookupFieldLocId == AccessibilityFieldFocus::FieldLookerLocId::PLAYER_SPELLS) {
 		slot = -0.5;//041

@@ -1239,6 +1239,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 					if (currentMenu == L"Duel" && !mainGame->wSinglePlay->isTrulyVisible()) {
 						menu = menuSinglePlayer;
 						menuSelectCounter = 0;
+						currentMenu = menu.at(menuSelectCounter);
 						ClickButton(mainGame->btnLanMode);
 					}
 					else if (currentMenu == L"Deck Editor" && mainGame->btnDeckEdit->isTrulyVisible()) {
@@ -1249,6 +1250,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 					if (currentMenu == L"Host Duel" && mainGame->btnCreateHost->isTrulyVisible()) {
 						menu = menuHostDuel;
 						menuSelectCounter = 0;
+						currentMenu = menu.at(menuSelectCounter);
 						ClickButton(mainGame->btnCreateHost);
 					}
 					else if (currentMenu == L"Player Name" && mainGame->ebNickName->isTrulyVisible()) {
@@ -1259,6 +1261,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 					if (currentMenu == L"Rules ok" && mainGame->btnHostConfirm->isTrulyVisible()) {
 						menu = menuRulesOk;
 						menuSelectCounter = 0;
+						currentMenu = menu.at(menuSelectCounter);
 						ClickButton(mainGame->btnHostConfirm);
 					}
 					//else if (currentMenu == L"Best of" && mainGame->ebBestOf->isTrulyVisible()) {
@@ -1284,11 +1287,20 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 					}
 				}
 				else if (menu.at(0) == L"Start Duel") {
-					if (currentMenu == L"Start Duel" && mainGame->btnHostPrepReady->isTrulyVisible()) {
+					if (currentMenu == L"Start Duel" && mainGame->btnHostPrepStart->isEnabled()) {
 						menu = menuSinglePlayer;
 						menuSelectCounter = 0;
-						ClickButton(mainGame->btnHostPrepReady);
+						currentMenu = menu.at(menuSelectCounter);
 						ClickButton(mainGame->btnHostPrepStart);
+					}
+					else if (currentMenu == L"Start Duel" && !mainGame->btnHostPrepStart->isEnabled()) {
+						ScreenReader::getReader()->readScreen(L"Get ready and select enemy before start the game");
+					}
+					else if (currentMenu == L"Player Ready" && mainGame->btnHostPrepReady->isTrulyVisible()) {
+						ClickButton(mainGame->btnHostPrepReady);
+					}
+					else if (currentMenu == L"Player Ready" && mainGame->btnHostPrepNotReady->isTrulyVisible()) {
+						ClickButton(mainGame->btnHostPrepNotReady);
 					}
 					else if (currentMenu == L"Select Deck" && mainGame->cbDeckSelect->isTrulyVisible()) {
 						mainGame->env->setFocus(mainGame->cbDeckSelect);
@@ -1298,6 +1310,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 					else if (currentMenu == L"Select AI" && mainGame->btnHostPrepWindBot->isTrulyVisible()) {
 						menu = menuSelectAI;
 						menuSelectCounter = 0;
+						currentMenu = menu.at(menuSelectCounter);
 						ClickButton(mainGame->btnHostPrepWindBot);
 					}
 				}
@@ -1305,6 +1318,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 					if (currentMenu == L"AI Ok") {
 						menu = menuRulesOk;
 						menuSelectCounter = 0;
+						currentMenu = menu.at(menuSelectCounter);
 						ClickButton(mainGame->gBot.btnAdd);
 					}
 					else if (currentMenu == L"Select Deck" && mainGame->gBot.cbBotDeck->isTrulyVisible()) {
@@ -1324,14 +1338,17 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				menuSelectCounter = 0;
 				if (mainGame->btnHostPrepCancel->isTrulyVisible()) {
 					menu = menuHostDuel;
+					currentMenu = menu.at(menuSelectCounter);
 					ClickButton(mainGame->btnHostPrepCancel);
 				}
 				else if (mainGame->btnHostCancel->isTrulyVisible()) {
 					menu = menuSinglePlayer;
+					currentMenu = menu.at(menuSelectCounter);
 					ClickButton(mainGame->btnHostCancel);
 				}
 				else if (mainGame->btnJoinCancel->isTrulyVisible()) {
 					menu = menuMain;
+					currentMenu = menu.at(menuSelectCounter);
 					ClickButton(mainGame->btnJoinCancel);
 				}
 				else if (mainGame->btnModeExit->isTrulyVisible()) {

@@ -19,7 +19,7 @@ public:
 	std::vector<std::wstring> menuMain = { L"Duel", L"Deck Editor" };
 	std::vector<std::wstring> menuSinglePlayer = { L"Host Duel", L"Player Name" };
 	std::vector<std::wstring> menuHostDuel = { L"Rules ok", L"Best of", L"Time Limit", L"Starting LP", L"Starting Hand", L"Cards pew Draw", L"Don't check deck", L"Don't shuffle deck" };
-	std::vector<std::wstring> menuRulesOk = { L"Start Duel", L"Select Deck", L"Select AI" };
+	std::vector<std::wstring> menuRulesOk = { L"Start Duel", L"Select Deck", L"Player Ready", L"Select AI" };
 	std::vector<std::wstring> menuSelectAI = { L"AI Ok", L"Select Deck", L"Always throw Rock" };
 	std::wstring currentMenu = L"Duel";
 };

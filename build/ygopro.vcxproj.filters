@@ -1,304 +1,6 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="CGUICustomCheckBox">
-      <UniqueIdentifier>{8F17C0A0-7BFB-80F6-E45B-7B49D05E6B78}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="CGUICustomComboBox">
-      <UniqueIdentifier>{E11E31CE-CD02-F223-3663-EC762266DCA5}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="CGUICustomContextMenu">
-      <UniqueIdentifier>{02FD118B-6E69-CD85-375D-65E3A388EFED}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="CGUICustomTabControl">
-      <UniqueIdentifier>{8038D78E-6CC7-6058-15E6-7453015471FE}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="CGUICustomTable">
-      <UniqueIdentifier>{103C579A-7CC7-C45E-85D8-4753F1E2205F}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="CGUICustomText">
-      <UniqueIdentifier>{2D063933-19D4-2C39-0268-9D5FEED4089E}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="CGUIFileSelectListBox">
-      <UniqueIdentifier>{F26C1616-5ED9-D110-27CD-696E93F8F378}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="CGUIImageButton">
-      <UniqueIdentifier>{4CDF6206-B86A-D0CA-C17B-53BF2D862CCB}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="CGUISkinSystem">
-      <UniqueIdentifier>{67E22F9E-53B0-23A4-3C44-94CA28B1FF08}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="CGUITTFont">
-      <UniqueIdentifier>{6CDC35C2-5894-770F-C19B-506BAD721200}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="CProgressBar">
-      <UniqueIdentifier>{926CDC6D-7ECF-6B12-2755-A4C813973795}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="CXMLRegistry">
-      <UniqueIdentifier>{925012D0-7EB3-A174-2739-DA2A137B6DF7}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="IrrlichtCommonIncludes">
-      <UniqueIdentifier>{466D24BE-3267-4D10-1BD4-E320076DB37C}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="IrrlichtCommonIncludes1.9">
-      <UniqueIdentifier>{1E8690F7-8A48-C481-D3F8-520E3FFA9C5F}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="RNG">
-      <UniqueIdentifier>{0C1A880B-7823-887C-019F-9E7C6DA7937C}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="ResizeablePanel">
-      <UniqueIdentifier>{5BFE9C27-C789-0AEC-D09A-8DE03CA566EC}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="nonstd">
-      <UniqueIdentifier>{1B648D10-0706-B8E6-F0C0-CB3ADC013F37}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="ScreenReader">
-      <UniqueIdentifier>{275b8510-f786-44ca-9011-82176bfa7120}</UniqueIdentifier>
-    </Filter>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\gframe\Base64.h" />
-    <ClInclude Include="..\gframe\CGUICustomCheckBox\CGUICustomCheckBox.h">
-      <Filter>CGUICustomCheckBox</Filter>
-    </ClInclude>
-    <ClInclude Include="..\gframe\CGUICustomComboBox\CGUICustomComboBox.h">
-      <Filter>CGUICustomComboBox</Filter>
-    </ClInclude>
-    <ClInclude Include="..\gframe\CGUICustomContextMenu\CGUICustomContextMenu.h">
-      <Filter>CGUICustomContextMenu</Filter>
-    </ClInclude>
-    <ClInclude Include="..\gframe\CGUICustomContextMenu\CGUICustomMenu.h">
-      <Filter>CGUICustomContextMenu</Filter>
-    </ClInclude>
-    <ClInclude Include="..\gframe\CGUICustomTabControl\CGUICustomTabControl.h">
-      <Filter>CGUICustomTabControl</Filter>
-    </ClInclude>
-    <ClInclude Include="..\gframe\CGUICustomTable\CGUICustomTable.h">
-      <Filter>CGUICustomTable</Filter>
-    </ClInclude>
-    <ClInclude Include="..\gframe\CGUICustomText\CGUICustomText.h">
-      <Filter>CGUICustomText</Filter>
-    </ClInclude>
-    <ClInclude Include="..\gframe\CGUIFileSelectListBox\CGUIFileSelectListBox.h">
-      <Filter>CGUIFileSelectListBox</Filter>
-    </ClInclude>
-    <ClInclude Include="..\gframe\CGUIImageButton\CGUIImageButton.h">
-      <Filter>CGUIImageButton</Filter>
-    </ClInclude>
-    <ClInclude Include="..\gframe\CGUISkinSystem\CConfigMap.h">
-      <Filter>CGUISkinSystem</Filter>
-    </ClInclude>
-    <ClInclude Include="..\gframe\CGUISkinSystem\CGUIProgressBar.h">
-      <Filter>CGUISkinSystem</Filter>
-    </ClInclude>
-    <ClInclude Include="..\gframe\CGUISkinSystem\CGUISkinSystem.h">
-      <Filter>CGUISkinSystem</Filter>
-    </ClInclude>
-    <ClInclude Include="..\gframe\CGUISkinSystem\CImageGUISkin.h">
-      <Filter>CGUISkinSystem</Filter>
-    </ClInclude>
-    <ClInclude Include="..\gframe\CGUISkinSystem\clipRects.h">
-      <Filter>CGUISkinSystem</Filter>
-    </ClInclude>
-    <ClInclude Include="..\gframe\CGUITTFont\CGUITTFont.h">
-      <Filter>CGUITTFont</Filter>
-    </ClInclude>
-    <ClInclude Include="..\gframe\CGUITTFont\irrUString.h">
-      <Filter>CGUITTFont</Filter>
-    </ClInclude>
-    <ClInclude Include="..\gframe\CProgressBar\CProgressBar.h">
-      <Filter>CProgressBar</Filter>
-    </ClInclude>
-    <ClInclude Include="..\gframe\CXMLRegistry\CXMLNode.h">
-      <Filter>CXMLRegistry</Filter>
-    </ClInclude>
-    <ClInclude Include="..\gframe\CXMLRegistry\CXMLRegistry.h">
-      <Filter>CXMLRegistry</Filter>
-    </ClInclude>
-    <ClInclude Include="..\gframe\IrrlichtCommonIncludes\CCursorControl.h">
-      <Filter>IrrlichtCommonIncludes</Filter>
-    </ClInclude>
-    <ClInclude Include="..\gframe\IrrlichtCommonIncludes\CFileSystem.h">
-      <Filter>IrrlichtCommonIncludes</Filter>
-    </ClInclude>
-    <ClInclude Include="..\gframe\IrrlichtCommonIncludes\CGUIButton.h">
-      <Filter>IrrlichtCommonIncludes</Filter>
-    </ClInclude>
-    <ClInclude Include="..\gframe\IrrlichtCommonIncludes\CGUIScrollBar.h">
-      <Filter>IrrlichtCommonIncludes</Filter>
-    </ClInclude>
-    <ClInclude Include="..\gframe\IrrlichtCommonIncludes\CGUITabControl.h">
-      <Filter>IrrlichtCommonIncludes</Filter>
-    </ClInclude>
-    <ClInclude Include="..\gframe\IrrlichtCommonIncludes\os.h">
-      <Filter>IrrlichtCommonIncludes</Filter>
-    </ClInclude>
-    <ClInclude Include="..\gframe\IrrlichtCommonIncludes1.9\CCursorControl.h">
-      <Filter>IrrlichtCommonIncludes1.9</Filter>
-    </ClInclude>
-    <ClInclude Include="..\gframe\IrrlichtCommonIncludes1.9\CFileSystem.h">
-      <Filter>IrrlichtCommonIncludes1.9</Filter>
-    </ClInclude>
-    <ClInclude Include="..\gframe\IrrlichtCommonIncludes1.9\CGUIButton.h">
-      <Filter>IrrlichtCommonIncludes1.9</Filter>
-    </ClInclude>
-    <ClInclude Include="..\gframe\IrrlichtCommonIncludes1.9\CGUIListBox.h">
-      <Filter>IrrlichtCommonIncludes1.9</Filter>
-    </ClInclude>
-    <ClInclude Include="..\gframe\IrrlichtCommonIncludes1.9\CGUIScrollBar.h">
-      <Filter>IrrlichtCommonIncludes1.9</Filter>
-    </ClInclude>
-    <ClInclude Include="..\gframe\IrrlichtCommonIncludes1.9\CGUITabControl.h">
-      <Filter>IrrlichtCommonIncludes1.9</Filter>
-    </ClInclude>
-    <ClInclude Include="..\gframe\IrrlichtCommonIncludes1.9\CIrrDeviceStub.h">
-      <Filter>IrrlichtCommonIncludes1.9</Filter>
-    </ClInclude>
-    <ClInclude Include="..\gframe\IrrlichtCommonIncludes1.9\CVideoModeList.h">
-      <Filter>IrrlichtCommonIncludes1.9</Filter>
-    </ClInclude>
-    <ClInclude Include="..\gframe\IrrlichtCommonIncludes1.9\IImagePresenter.h">
-      <Filter>IrrlichtCommonIncludes1.9</Filter>
-    </ClInclude>
-    <ClInclude Include="..\gframe\IrrlichtCommonIncludes1.9\os.h">
-      <Filter>IrrlichtCommonIncludes1.9</Filter>
-    </ClInclude>
-    <ClInclude Include="..\gframe\ResizeablePanel\ResizeablePanel.h">
-      <Filter>ResizeablePanel</Filter>
-    </ClInclude>
-    <ClInclude Include="..\gframe\bufferio.h" />
-    <ClInclude Include="..\gframe\client_card.h" />
-    <ClInclude Include="..\gframe\client_field.h" />
-    <ClInclude Include="..\gframe\client_updater.h" />
-    <ClInclude Include="..\gframe\common.h" />
-    <ClInclude Include="..\gframe\config.h" />
-    <ClInclude Include="..\gframe\core_utils.h" />
-    <ClInclude Include="..\gframe\custom_skin_enum.h" />
-    <ClInclude Include="..\gframe\data_handler.h" />
-    <ClInclude Include="..\gframe\data_manager.h" />
-    <ClInclude Include="..\gframe\deck.h" />
-    <ClInclude Include="..\gframe\deck_con.h" />
-    <ClInclude Include="..\gframe\deck_manager.h" />
-    <ClInclude Include="..\gframe\discord_register.h" />
-    <ClInclude Include="..\gframe\discord_rpc.h" />
-    <ClInclude Include="..\gframe\discord_wrapper.h" />
-    <ClInclude Include="..\gframe\dllinterface.h" />
-    <ClInclude Include="..\gframe\duelclient.h" />
-    <ClInclude Include="..\gframe\game.h" />
-    <ClInclude Include="..\gframe\game_config.h" />
-    <ClInclude Include="..\gframe\generic_duel.h" />
-    <ClInclude Include="..\gframe\image_downloader.h" />
-    <ClInclude Include="..\gframe\image_manager.h" />
-    <ClInclude Include="..\gframe\ireadfile_sqlite.h" />
-    <ClInclude Include="..\gframe\joystick_wrapper.h" />
-    <ClInclude Include="..\gframe\libgit2.hpp" />
-    <ClInclude Include="..\gframe\log.h" />
-    <ClInclude Include="..\gframe\logging.h" />
-    <ClInclude Include="..\gframe\materials.h" />
-    <ClInclude Include="..\gframe\menu_handler.h" />
-    <ClInclude Include="..\gframe\mysignal.h" />
-    <ClInclude Include="..\gframe\netserver.h" />
-    <ClInclude Include="..\gframe\network.h" />
-    <ClInclude Include="..\gframe\nonstd\string_view.hpp">
-      <Filter>nonstd</Filter>
-    </ClInclude>
-    <ClInclude Include="..\gframe\ocgapi_types.h" />
-    <ClInclude Include="..\gframe\osx_menu.h" />
-    <ClInclude Include="..\gframe\progressivebuffer.h" />
-    <ClInclude Include="..\gframe\random_fwd.h" />
-    <ClInclude Include="..\gframe\replay.h" />
-    <ClInclude Include="..\gframe\replay_mode.h" />
-    <ClInclude Include="..\gframe\repo_manager.h" />
-    <ClInclude Include="..\gframe\server_lobby.h" />
-    <ClInclude Include="..\gframe\settings_window.h" />
-    <ClInclude Include="..\gframe\single_mode.h" />
-    <ClInclude Include="..\gframe\sound_backend.h" />
-    <ClInclude Include="..\gframe\sound_manager.h" />
-    <ClInclude Include="..\gframe\sound_sfml.h" />
-    <ClInclude Include="..\gframe\sound_threaded_backend.h" />
-    <ClInclude Include="..\gframe\text_types.h" />
-    <ClInclude Include="..\gframe\utils.h" />
-    <ClInclude Include="..\gframe\utils_gui.h" />
-    <ClInclude Include="..\gframe\windbot.h" />
-    <ClInclude Include="..\gframe\windbot_panel.h" />
-    <ClInclude Include="..\gframe\ScreenReader\IScreenReader.h">
-      <Filter>ScreenReader</Filter>
-    </ClInclude>
-    <ClInclude Include="..\gframe\ScreenReader\NVDA.h">
-    <ClInclude Include="..\gframe\FieldFocus\AccessibilityFieldFocus.h" />
-    <ClInclude Include="..\gframe\random_fwd.h" />
-    <ClInclude Include="..\gframe\ScreenReader\TolkController.h">
-      <Filter>ScreenReader</Filter>
-    </ClInclude>
-    <ClInclude Include="..\gframe\ScreenReader\ScreenReader.h">
-      <Filter>ScreenReader</Filter>
-    </ClInclude>
-    <ClInclude Include="..\gframe\ScreenReader\StringBuilder.h">
-      <Filter>ScreenReader</Filter>
-    </ClInclude>
-    <ClInclude Include="..\gframe\ScreenReader\TolkController.h">
-    <ClInclude Include="..\gframe\ScreenReader\IScreenReader.h">
-      <Filter>ScreenReader</Filter>
-    </ClInclude>
-    <ClInclude Include="..\gframe\ScreenReader\NVDA.h">
-      <Filter>ScreenReader</Filter>
-    </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="..\gframe\CGUICustomCheckBox\CGUICustomCheckBox.cpp">
-      <Filter>CGUICustomCheckBox</Filter>
-    </ClCompile>
-    <ClCompile Include="..\gframe\CGUICustomComboBox\CGUICustomComboBox.cpp">
-      <Filter>CGUICustomComboBox</Filter>
-    </ClCompile>
-    <ClCompile Include="..\gframe\CGUICustomContextMenu\CGUICustomContextMenu.cpp">
-      <Filter>CGUICustomContextMenu</Filter>
-    </ClCompile>
-    <ClCompile Include="..\gframe\CGUICustomContextMenu\CGUICustomMenu.cpp">
-      <Filter>CGUICustomContextMenu</Filter>
-    </ClCompile>
-    <ClCompile Include="..\gframe\CGUICustomTabControl\CGUICustomTabControl.cpp">
-      <Filter>CGUICustomTabControl</Filter>
-    </ClCompile>
-    <ClCompile Include="..\gframe\CGUICustomTable\CGUICustomTable.cpp">
-      <Filter>CGUICustomTable</Filter>
-    </ClCompile>
-    <ClCompile Include="..\gframe\CGUICustomText\CGUICustomText.cpp">
-      <Filter>CGUICustomText</Filter>
-    </ClCompile>
-    <ClCompile Include="..\gframe\CGUIFileSelectListBox\CGUIFileSelectListBox.cpp">
-      <Filter>CGUIFileSelectListBox</Filter>
-    </ClCompile>
-    <ClCompile Include="..\gframe\CGUIImageButton\CGUIImageButton.cpp">
-      <Filter>CGUIImageButton</Filter>
-    </ClCompile>
-    <ClCompile Include="..\gframe\CGUISkinSystem\CConfigMap.cpp">
-      <Filter>CGUISkinSystem</Filter>
-    </ClCompile>
-    <ClCompile Include="..\gframe\CGUISkinSystem\CGUIProgressBar.cpp">
-      <Filter>CGUISkinSystem</Filter>
-    </ClCompile>
-    <ClCompile Include="..\gframe\CGUISkinSystem\CGUISkinSystem.cpp">
-      <Filter>CGUISkinSystem</Filter>
-    </ClCompile>
-    <ClCompile Include="..\gframe\CGUISkinSystem\CImageGUISkin.cpp">
-      <Filter>CGUISkinSystem</Filter>
-    </ClCompile>
-    <ClCompile Include="..\gframe\CGUITTFont\CGUITTFont.cpp">
-      <Filter>CGUITTFont</Filter>
-    </ClCompile>
-    <ClCompile Include="..\gframe\CProgressBar\CProgressBar.cpp">
-      <Filter>CProgressBar</Filter>
-    </ClCompile>
-    <ClCompile Include="..\gframe\CXMLRegistry\CXMLNode.cpp">
-      <Filter>CXMLRegistry</Filter>
-    </ClCompile>
-    <ClCompile Include="..\gframe\CXMLRegistry\CXMLRegistry.cpp">
-      <Filter>CXMLRegistry</Filter>
-    </ClCompile>
-    <ClCompile Include="..\gframe\ResizeablePanel\ResizeablePanel.cpp">
-      <Filter>ResizeablePanel</Filter>
-    </ClCompile>
     <ClCompile Include="..\gframe\client_card.cpp" />
     <ClCompile Include="..\gframe\client_field.cpp" />
     <ClCompile Include="..\gframe\client_updater.cpp" />
@@ -339,26 +41,312 @@
     <ClCompile Include="..\gframe\utils_gui.cpp" />
     <ClCompile Include="..\gframe\windbot.cpp" />
     <ClCompile Include="..\gframe\windbot_panel.cpp" />
+    <ClCompile Include="..\gframe\CGUICustomCheckBox\CGUICustomCheckBox.cpp">
+      <Filter>CGUICustomCheckBox</Filter>
+    </ClCompile>
+    <ClCompile Include="..\gframe\CGUICustomComboBox\CGUICustomComboBox.cpp">
+      <Filter>CGUICustomComboBox</Filter>
+    </ClCompile>
+    <ClCompile Include="..\gframe\CGUICustomContextMenu\CGUICustomContextMenu.cpp">
+      <Filter>CGUICustomContextMenu</Filter>
+    </ClCompile>
+    <ClCompile Include="..\gframe\CGUICustomContextMenu\CGUICustomMenu.cpp">
+      <Filter>CGUICustomContextMenu</Filter>
+    </ClCompile>
+    <ClCompile Include="..\gframe\CGUICustomTabControl\CGUICustomTabControl.cpp">
+      <Filter>CGUICustomTabControl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\gframe\CGUICustomTable\CGUICustomTable.cpp">
+      <Filter>CGUICustomTable</Filter>
+    </ClCompile>
+    <ClCompile Include="..\gframe\CGUICustomText\CGUICustomText.cpp">
+      <Filter>CGUICustomText</Filter>
+    </ClCompile>
+    <ClCompile Include="..\gframe\CGUIFileSelectListBox\CGUIFileSelectListBox.cpp">
+      <Filter>CGUIFileSelectListBox</Filter>
+    </ClCompile>
+    <ClCompile Include="..\gframe\CGUIImageButton\CGUIImageButton.cpp">
+      <Filter>CGUIImageButton</Filter>
+    </ClCompile>
+    <ClCompile Include="..\gframe\CGUISkinSystem\CGUISkinSystem.cpp">
+      <Filter>CGUISkinSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="..\gframe\CGUITTFont\CGUITTFont.cpp">
+      <Filter>CGUITTFont</Filter>
+    </ClCompile>
+    <ClCompile Include="..\gframe\CGUISkinSystem\CConfigMap.cpp">
+      <Filter>CGUISkinSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="..\gframe\CGUISkinSystem\CImageGUISkin.cpp">
+      <Filter>CGUISkinSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="..\gframe\CGUISkinSystem\CGUIProgressBar.cpp">
+      <Filter>CGUISkinSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="..\gframe\CProgressBar\CProgressBar.cpp">
+      <Filter>CProgressBar</Filter>
+    </ClCompile>
+    <ClCompile Include="..\gframe\CXMLRegistry\CXMLNode.cpp">
+      <Filter>CXMLRegistry</Filter>
+    </ClCompile>
+    <ClCompile Include="..\gframe\CXMLRegistry\CXMLRegistry.cpp">
+      <Filter>CXMLRegistry</Filter>
+    </ClCompile>
+    <ClCompile Include="..\gframe\ResizeablePanel\ResizeablePanel.cpp">
+      <Filter>ResizeablePanel</Filter>
+    </ClCompile>
     <ClCompile Include="..\gframe\ScreenReader\NVDA.cpp">
-    <ClCompile Include="..\gframe\sound_sfml.cpp" />
-    <ClCompile Include="..\gframe\ScreenReader\TolkController.cpp">
       <Filter>ScreenReader</Filter>
     </ClCompile>
-    <ClCompile Include="..\gframe\ScreenReader\ScreenReader.cpp">
+    <ClCompile Include="..\gframe\ScreenReader\TolkController.cpp">
       <Filter>ScreenReader</Filter>
     </ClCompile>
     <ClCompile Include="..\gframe\ScreenReader\StringBuilder.cpp">
       <Filter>ScreenReader</Filter>
     </ClCompile>
-    <ClCompile Include="..\gframe\ScreenReader\TolkController.cpp">
-    <ClCompile Include="..\gframe\ScreenReader\NVDA.cpp">
+    <ClCompile Include="..\gframe\ScreenReader\ScreenReader.cpp">
       <Filter>ScreenReader</Filter>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\gframe\Base64.h" />
+    <ClInclude Include="..\gframe\CGUISkinSystem\clipRects.h" />
+    <ClInclude Include="..\gframe\IrrlichtCommonIncludes1.9\CCursorControl.h" />
+    <ClInclude Include="..\gframe\IrrlichtCommonIncludes1.9\CIrrDeviceStub.h" />
+    <ClInclude Include="..\gframe\IrrlichtCommonIncludes1.9\CVideoModeList.h" />
+    <ClInclude Include="..\gframe\IrrlichtCommonIncludes1.9\IImagePresenter.h" />
+    <ClInclude Include="..\gframe\bufferio.h" />
+    <ClInclude Include="..\gframe\client_card.h" />
+    <ClInclude Include="..\gframe\client_field.h" />
+    <ClInclude Include="..\gframe\client_updater.h" />
+    <ClInclude Include="..\gframe\common.h" />
+    <ClInclude Include="..\gframe\config.h" />
+    <ClInclude Include="..\gframe\core_utils.h" />
+    <ClInclude Include="..\gframe\custom_skin_enum.h" />
+    <ClInclude Include="..\gframe\data_handler.h" />
+    <ClInclude Include="..\gframe\data_manager.h" />
+    <ClInclude Include="..\gframe\deck_con.h" />
+    <ClInclude Include="..\gframe\deck_manager.h" />
+    <ClInclude Include="..\gframe\discord_register.h" />
+    <ClInclude Include="..\gframe\discord_rpc.h" />
+    <ClInclude Include="..\gframe\discord_wrapper.h" />
+    <ClInclude Include="..\gframe\dllinterface.h" />
+    <ClInclude Include="..\gframe\duelclient.h" />
+    <ClInclude Include="..\gframe\game.h" />
+    <ClInclude Include="..\gframe\game_config.h" />
+    <ClInclude Include="..\gframe\generic_duel.h" />
+    <ClInclude Include="..\gframe\image_downloader.h" />
+    <ClInclude Include="..\gframe\image_manager.h" />
+    <ClInclude Include="..\gframe\ireadfile_sqlite.h" />
+    <ClInclude Include="..\gframe\joystick_wrapper.h" />
+    <ClInclude Include="..\gframe\libgit2.hpp" />
+    <ClInclude Include="..\gframe\log.h" />
+    <ClInclude Include="..\gframe\logging.h" />
+    <ClInclude Include="..\gframe\materials.h" />
+    <ClInclude Include="..\gframe\menu_handler.h" />
+    <ClInclude Include="..\gframe\mysignal.h" />
+    <ClInclude Include="..\gframe\netserver.h" />
+    <ClInclude Include="..\gframe\network.h" />
+    <ClInclude Include="..\gframe\ocgapi_types.h" />
+    <ClInclude Include="..\gframe\osx_menu.h" />
+    <ClInclude Include="..\gframe\progressivebuffer.h" />
+    <ClInclude Include="..\gframe\random_fwd.h" />
+    <ClInclude Include="..\gframe\replay.h" />
+    <ClInclude Include="..\gframe\replay_mode.h" />
+    <ClInclude Include="..\gframe\repo_manager.h" />
+    <ClInclude Include="..\gframe\server_lobby.h" />
+    <ClInclude Include="..\gframe\settings_window.h" />
+    <ClInclude Include="..\gframe\single_mode.h" />
+    <ClInclude Include="..\gframe\sound_backend.h" />
+    <ClInclude Include="..\gframe\sound_manager.h" />
+    <ClInclude Include="..\gframe\sound_sfml.h" />
+    <ClInclude Include="..\gframe\sound_threaded_backend.h" />
+    <ClInclude Include="..\gframe\text_types.h" />
+    <ClInclude Include="..\gframe\utils.h" />
+    <ClInclude Include="..\gframe\utils_gui.h" />
+    <ClInclude Include="..\gframe\windbot.h" />
+    <ClInclude Include="..\gframe\windbot_panel.h" />
+    <ClInclude Include="..\gframe\CGUICustomCheckBox\CGUICustomCheckBox.h">
+      <Filter>CGUICustomCheckBox</Filter>
+    </ClInclude>
+    <ClInclude Include="..\gframe\CGUICustomComboBox\CGUICustomComboBox.h">
+      <Filter>CGUICustomComboBox</Filter>
+    </ClInclude>
+    <ClInclude Include="..\gframe\CGUICustomContextMenu\CGUICustomContextMenu.h">
+      <Filter>CGUICustomContextMenu</Filter>
+    </ClInclude>
+    <ClInclude Include="..\gframe\CGUICustomContextMenu\CGUICustomMenu.h">
+      <Filter>CGUICustomContextMenu</Filter>
+    </ClInclude>
+    <ClInclude Include="..\gframe\CGUICustomTabControl\CGUICustomTabControl.h">
+      <Filter>CGUICustomTabControl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\gframe\CGUICustomTable\CGUICustomTable.h">
+      <Filter>CGUICustomTable</Filter>
+    </ClInclude>
+    <ClInclude Include="..\gframe\CGUICustomText\CGUICustomText.h">
+      <Filter>CGUICustomText</Filter>
+    </ClInclude>
+    <ClInclude Include="..\gframe\CGUIFileSelectListBox\CGUIFileSelectListBox.h">
+      <Filter>CGUIFileSelectListBox</Filter>
+    </ClInclude>
+    <ClInclude Include="..\gframe\CGUIImageButton\CGUIImageButton.h">
+      <Filter>CGUIImageButton</Filter>
+    </ClInclude>
+    <ClInclude Include="..\gframe\CGUISkinSystem\CGUISkinSystem.h">
+      <Filter>CGUISkinSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="..\gframe\CGUITTFont\CGUITTFont.h">
+      <Filter>CGUITTFont</Filter>
+    </ClInclude>
+    <ClInclude Include="..\gframe\CGUITTFont\irrUString.h">
+      <Filter>CGUITTFont</Filter>
+    </ClInclude>
+    <ClInclude Include="..\gframe\CGUISkinSystem\CConfigMap.h">
+      <Filter>CGUISkinSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="..\gframe\CGUISkinSystem\CImageGUISkin.h">
+      <Filter>CGUISkinSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="..\gframe\CGUISkinSystem\CGUIProgressBar.h">
+      <Filter>CGUISkinSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="..\gframe\CProgressBar\CProgressBar.h">
+      <Filter>CProgressBar</Filter>
+    </ClInclude>
+    <ClInclude Include="..\gframe\CXMLRegistry\CXMLNode.h">
+      <Filter>CXMLRegistry</Filter>
+    </ClInclude>
+    <ClInclude Include="..\gframe\CXMLRegistry\CXMLRegistry.h">
+      <Filter>CXMLRegistry</Filter>
+    </ClInclude>
+    <ClInclude Include="..\gframe\IrrlichtCommonIncludes\CCursorControl.h">
+      <Filter>IrrlichtCommonIncludes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\gframe\IrrlichtCommonIncludes\CFileSystem.h">
+      <Filter>IrrlichtCommonIncludes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\gframe\IrrlichtCommonIncludes\CGUIButton.h">
+      <Filter>IrrlichtCommonIncludes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\gframe\IrrlichtCommonIncludes\CGUIScrollBar.h">
+      <Filter>IrrlichtCommonIncludes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\gframe\IrrlichtCommonIncludes\CGUITabControl.h">
+      <Filter>IrrlichtCommonIncludes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\gframe\IrrlichtCommonIncludes\os.h">
+      <Filter>IrrlichtCommonIncludes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\gframe\IrrlichtCommonIncludes1.9\CFileSystem.h">
+      <Filter>IrrlichtCommonIncludes1.9</Filter>
+    </ClInclude>
+    <ClInclude Include="..\gframe\IrrlichtCommonIncludes1.9\CGUIButton.h">
+      <Filter>IrrlichtCommonIncludes1.9</Filter>
+    </ClInclude>
+    <ClInclude Include="..\gframe\IrrlichtCommonIncludes1.9\CGUIListBox.h">
+      <Filter>IrrlichtCommonIncludes1.9</Filter>
+    </ClInclude>
+    <ClInclude Include="..\gframe\IrrlichtCommonIncludes1.9\CGUIScrollBar.h">
+      <Filter>IrrlichtCommonIncludes1.9</Filter>
+    </ClInclude>
+    <ClInclude Include="..\gframe\IrrlichtCommonIncludes1.9\CGUITabControl.h">
+      <Filter>IrrlichtCommonIncludes1.9</Filter>
+    </ClInclude>
+    <ClInclude Include="..\gframe\IrrlichtCommonIncludes1.9\os.h">
+      <Filter>IrrlichtCommonIncludes1.9</Filter>
+    </ClInclude>
+    <ClInclude Include="..\gframe\nonstd\string_view.hpp">
+      <Filter>nonstd</Filter>
+    </ClInclude>
+    <ClInclude Include="..\gframe\ResizeablePanel\ResizeablePanel.h">
+      <Filter>ResizeablePanel</Filter>
+    </ClInclude>
+    <ClInclude Include="..\gframe\RNG\mt19937.h">
+      <Filter>RNG</Filter>
+    </ClInclude>
+    <ClInclude Include="..\gframe\RNG\SplitMix64.hpp">
+      <Filter>RNG</Filter>
+    </ClInclude>
+    <ClInclude Include="..\gframe\RNG\Xoshiro256.hpp">
+      <Filter>RNG</Filter>
+    </ClInclude>
+    <ClInclude Include="..\gframe\ScreenReader\NVDA.h">
+      <Filter>ScreenReader</Filter>
+    </ClInclude>
+    <ClInclude Include="..\gframe\ScreenReader\TolkController.h">
+      <Filter>ScreenReader</Filter>
+    </ClInclude>
+    <ClInclude Include="..\gframe\ScreenReader\StringBuilder.h">
+      <Filter>ScreenReader</Filter>
+    </ClInclude>
+    <ClInclude Include="..\gframe\ScreenReader\ScreenReader.h">
+      <Filter>ScreenReader</Filter>
+    </ClInclude>
+    <ClInclude Include="..\gframe\ScreenReader\IScreenReader.h">
+      <Filter>ScreenReader</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="..\gframe\ygopro.rc" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\gframe\dpiawarescaling.manifest" />
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="..\gframe\ygopro.rc" />
+    <Filter Include="CGUICustomCheckBox">
+      <UniqueIdentifier>{19159b13-17db-44de-b3dc-ed7b92ccd226}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CGUICustomComboBox">
+      <UniqueIdentifier>{6e5b4f22-4579-4491-8807-35b41de07e48}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CGUICustomContextMenu">
+      <UniqueIdentifier>{9d0fb469-cb69-4240-9926-94a6653decfe}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CGUICustomTabControl">
+      <UniqueIdentifier>{ba4582d5-e497-461d-ae7b-86ed7471930d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CGUICustomTable">
+      <UniqueIdentifier>{a271f940-4ada-46c0-a026-f7c28e3f3ad2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CGUICustomText">
+      <UniqueIdentifier>{2c6f2746-f6af-4019-8511-b76c096a83e7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CGUIFileSelectListBox">
+      <UniqueIdentifier>{c549c317-bf36-481f-9abe-d430b0aa48c7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CGUIImageButton">
+      <UniqueIdentifier>{c917d412-db2a-47db-a565-fcf93fcca0d0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CGUISkinSystem">
+      <UniqueIdentifier>{a3851464-e021-47de-b80d-8dabee34a7c5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CGUITTFont">
+      <UniqueIdentifier>{dd8d3f50-e38a-486e-afcd-e4fa2d25878f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CProgressBar">
+      <UniqueIdentifier>{8b3b4351-8a2c-429b-bae0-74b34235f22b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CXMLRegistry">
+      <UniqueIdentifier>{166d1711-ab4e-4e87-9a0a-21142eb16e32}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="IrrlichtCommonIncludes">
+      <UniqueIdentifier>{ee30d25d-8525-4de1-a422-634faf4983be}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="IrrlichtCommonIncludes1.9">
+      <UniqueIdentifier>{a94ea5ed-c5ce-4511-b210-1c4bfe168290}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="nonstd">
+      <UniqueIdentifier>{7f43ae0d-168e-4f28-937b-8dca7a6f0fd7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ResizeablePanel">
+      <UniqueIdentifier>{30195f33-8616-4af6-a6e5-b1a00781e306}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="RNG">
+      <UniqueIdentifier>{10ba5d0e-ab5f-4947-97fe-acba9c549ff7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ScreenReader">
+      <UniqueIdentifier>{b3be143c-2551-4a38-aa90-d22bf08dacf7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
 </Project>

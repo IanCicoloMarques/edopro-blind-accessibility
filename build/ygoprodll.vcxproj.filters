@@ -43,6 +43,9 @@
     <Filter Include="IrrlichtCommonIncludes1.9">
       <UniqueIdentifier>{1E8690F7-8A48-C481-D3F8-520E3FFA9C5F}</UniqueIdentifier>
     </Filter>
+    <Filter Include="RNG">
+      <UniqueIdentifier>{0C1A880B-7823-887C-019F-9E7C6DA7937C}</UniqueIdentifier>
+    </Filter>
     <Filter Include="ResizeablePanel">
       <UniqueIdentifier>{5BFE9C27-C789-0AEC-D09A-8DE03CA566EC}</UniqueIdentifier>
     </Filter>
@@ -127,9 +130,6 @@
     <ClInclude Include="..\gframe\IrrlichtCommonIncludes\os.h">
       <Filter>IrrlichtCommonIncludes</Filter>
     </ClInclude>
-    <ClInclude Include="..\gframe\IrrlichtCommonIncludes1.9\CCursorControl.h">
-      <Filter>IrrlichtCommonIncludes1.9</Filter>
-    </ClInclude>
     <ClInclude Include="..\gframe\IrrlichtCommonIncludes1.9\CFileSystem.h">
       <Filter>IrrlichtCommonIncludes1.9</Filter>
     </ClInclude>
@@ -145,17 +145,17 @@
     <ClInclude Include="..\gframe\IrrlichtCommonIncludes1.9\CGUITabControl.h">
       <Filter>IrrlichtCommonIncludes1.9</Filter>
     </ClInclude>
-    <ClInclude Include="..\gframe\IrrlichtCommonIncludes1.9\CIrrDeviceStub.h">
-      <Filter>IrrlichtCommonIncludes1.9</Filter>
-    </ClInclude>
-    <ClInclude Include="..\gframe\IrrlichtCommonIncludes1.9\CVideoModeList.h">
-      <Filter>IrrlichtCommonIncludes1.9</Filter>
-    </ClInclude>
-    <ClInclude Include="..\gframe\IrrlichtCommonIncludes1.9\IImagePresenter.h">
-      <Filter>IrrlichtCommonIncludes1.9</Filter>
-    </ClInclude>
     <ClInclude Include="..\gframe\IrrlichtCommonIncludes1.9\os.h">
       <Filter>IrrlichtCommonIncludes1.9</Filter>
+    </ClInclude>
+    <ClInclude Include="..\gframe\RNG\SplitMix64.hpp">
+      <Filter>RNG</Filter>
+    </ClInclude>
+    <ClInclude Include="..\gframe\RNG\Xoshiro256.hpp">
+      <Filter>RNG</Filter>
+    </ClInclude>
+    <ClInclude Include="..\gframe\RNG\mt19937.h">
+      <Filter>RNG</Filter>
     </ClInclude>
     <ClInclude Include="..\gframe\ResizeablePanel\ResizeablePanel.h">
       <Filter>ResizeablePanel</Filter>
@@ -170,6 +170,7 @@
     <ClInclude Include="..\gframe\custom_skin_enum.h" />
     <ClInclude Include="..\gframe\data_handler.h" />
     <ClInclude Include="..\gframe\data_manager.h" />
+    <ClInclude Include="..\gframe\deck.h" />
     <ClInclude Include="..\gframe\deck_con.h" />
     <ClInclude Include="..\gframe\deck_manager.h" />
     <ClInclude Include="..\gframe\discord_register.h" />
@@ -198,7 +199,6 @@
     <ClInclude Include="..\gframe\ocgapi_types.h" />
     <ClInclude Include="..\gframe\osx_menu.h" />
     <ClInclude Include="..\gframe\progressivebuffer.h" />
-    <ClInclude Include="..\gframe\random_fwd.h" />
     <ClInclude Include="..\gframe\replay.h" />
     <ClInclude Include="..\gframe\replay_mode.h" />
     <ClInclude Include="..\gframe\repo_manager.h" />
@@ -207,7 +207,6 @@
     <ClInclude Include="..\gframe\single_mode.h" />
     <ClInclude Include="..\gframe\sound_backend.h" />
     <ClInclude Include="..\gframe\sound_manager.h" />
-    <ClInclude Include="..\gframe\sound_sfml.h" />
     <ClInclude Include="..\gframe\sound_threaded_backend.h" />
     <ClInclude Include="..\gframe\text_types.h" />
     <ClInclude Include="..\gframe\utils.h" />
@@ -304,7 +303,6 @@
     <ClCompile Include="..\gframe\settings_window.cpp" />
     <ClCompile Include="..\gframe\single_mode.cpp" />
     <ClCompile Include="..\gframe\sound_manager.cpp" />
-    <ClCompile Include="..\gframe\sound_sfml.cpp" />
     <ClCompile Include="..\gframe\sound_threaded_backend.cpp" />
     <ClCompile Include="..\gframe\utils.cpp" />
     <ClCompile Include="..\gframe\utils_gui.cpp" />

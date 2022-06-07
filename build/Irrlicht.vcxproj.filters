@@ -726,6 +726,9 @@
     <ClInclude Include="..\irrlicht\src\CDepthBuffer.h">
       <Filter>src</Filter>
     </ClInclude>
+    <ClInclude Include="..\irrlicht\src\CDriverCreationPrototypes.h">
+      <Filter>src</Filter>
+    </ClInclude>
     <ClInclude Include="..\irrlicht\src\CDummyTransformationSceneNode.h">
       <Filter>src</Filter>
     </ClInclude>
@@ -907,6 +910,9 @@
       <Filter>src</Filter>
     </ClInclude>
     <ClInclude Include="..\irrlicht\src\CIrrDeviceSDL.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\irrlicht\src\CIrrDeviceSDL2.h">
       <Filter>src</Filter>
     </ClInclude>
     <ClInclude Include="..\irrlicht\src\CIrrDeviceStub.h">
@@ -1161,6 +1167,9 @@
     <ClInclude Include="..\irrlicht\src\CReadFile.h">
       <Filter>src</Filter>
     </ClInclude>
+    <ClInclude Include="..\irrlicht\src\CSDL2ContextManager.h">
+      <Filter>src</Filter>
+    </ClInclude>
     <ClInclude Include="..\irrlicht\src\CSDLContextManager.h">
       <Filter>src</Filter>
     </ClInclude>
@@ -1287,6 +1296,9 @@
     <ClInclude Include="..\irrlicht\src\CWebGLExtensionHandler.h">
       <Filter>src</Filter>
     </ClInclude>
+    <ClInclude Include="..\irrlicht\src\CWin32DropTarget.h">
+      <Filter>src</Filter>
+    </ClInclude>
     <ClInclude Include="..\irrlicht\src\CWriteFile.h">
       <Filter>src</Filter>
     </ClInclude>
@@ -1306,6 +1318,9 @@
       <Filter>src</Filter>
     </ClInclude>
     <ClInclude Include="..\irrlicht\src\CZipReader.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\irrlicht\src\DbusLoader.h">
       <Filter>src</Filter>
     </ClInclude>
     <ClInclude Include="..\irrlicht\src\EGL\egl.h">
@@ -1363,6 +1378,9 @@
       <Filter>src\KHR</Filter>
     </ClInclude>
     <ClInclude Include="..\irrlicht\src\LibX11Loader.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\irrlicht\src\LibdecorLoader.h">
       <Filter>src</Filter>
     </ClInclude>
     <ClInclude Include="..\irrlicht\src\Octree.h">
@@ -1467,13 +1485,13 @@
     <ClInclude Include="..\irrlicht\src\wglext.h">
       <Filter>src</Filter>
     </ClInclude>
-    <ClInclude Include="..\irrlicht\src\win_drag_n_dropper.h">
-      <Filter>src</Filter>
-    </ClInclude>
     <ClInclude Include="..\irrlicht\src\xdg_decoration_unstable_v1_client_protocol.h">
       <Filter>src</Filter>
     </ClInclude>
     <ClInclude Include="..\irrlicht\src\xdg_shell_client_protocol.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\irrlicht\src\ztext_input_unstable_v3_client_protocol.h">
       <Filter>src</Filter>
     </ClInclude>
     <ClInclude Include="..\irrlicht\src\zxdg_shell_unstable_v6_client_protocol.h">
@@ -1760,6 +1778,9 @@
     <ClCompile Include="..\irrlicht\src\CIrrDeviceSDL.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="..\irrlicht\src\CIrrDeviceSDL2.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
     <ClCompile Include="..\irrlicht\src\CIrrDeviceStub.cpp">
       <Filter>src</Filter>
     </ClCompile>
@@ -1970,6 +1991,9 @@
     <ClCompile Include="..\irrlicht\src\CReadFile.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="..\irrlicht\src\CSDL2ContextManager.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
     <ClCompile Include="..\irrlicht\src\CSDLContextManager.cpp">
       <Filter>src</Filter>
     </ClCompile>
@@ -2177,6 +2201,9 @@
     <ClCompile Include="..\irrlicht\src\CWebGL1Driver.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="..\irrlicht\src\CWin32DropTarget.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
     <ClCompile Include="..\irrlicht\src\CWriteFile.cpp">
       <Filter>src</Filter>
     </ClCompile>
@@ -2195,6 +2222,9 @@
     <ClCompile Include="..\irrlicht\src\CZipReader.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="..\irrlicht\src\DbusLoader.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
     <ClCompile Include="..\irrlicht\src\IBurningShader.cpp">
       <Filter>src</Filter>
     </ClCompile>
@@ -2202,6 +2232,9 @@
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="..\irrlicht\src\LibX11Loader.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\irrlicht\src\LibdecorLoader.cpp">
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="..\irrlicht\src\aesGladman\aescrypt.cpp">
@@ -2252,13 +2285,13 @@
     <ClCompile Include="..\irrlicht\src\utf8.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="..\irrlicht\src\win_drag_n_dropper.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
     <ClCompile Include="..\irrlicht\src\xdg_decoration_unstable_v1_protocol.c">
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="..\irrlicht\src\xdg_shell_protocol.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\irrlicht\src\ztext_input_unstable_v3_client_protocol.cpp">
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="..\irrlicht\src\zxdg_shell_unstable_v6_client_protocol.cpp">

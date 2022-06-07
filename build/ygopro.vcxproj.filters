@@ -53,7 +53,7 @@
       <UniqueIdentifier>{1B648D10-0706-B8E6-F0C0-CB3ADC013F37}</UniqueIdentifier>
     </Filter>
     <Filter Include="ScreenReader">
-      <UniqueIdentifier>{cd9471ce-73cb-44e5-9748-9d04fbdda6f0}</UniqueIdentifier>
+      <UniqueIdentifier>{275b8510-f786-44ca-9011-82176bfa7120}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -151,17 +151,17 @@
     <ClInclude Include="..\gframe\IrrlichtCommonIncludes1.9\CGUITabControl.h">
       <Filter>IrrlichtCommonIncludes1.9</Filter>
     </ClInclude>
-    <ClInclude Include="..\gframe\IrrlichtCommonIncludes1.9\os.h">
+    <ClInclude Include="..\gframe\IrrlichtCommonIncludes1.9\CIrrDeviceStub.h">
       <Filter>IrrlichtCommonIncludes1.9</Filter>
     </ClInclude>
-    <ClInclude Include="..\gframe\RNG\SplitMix64.hpp">
-      <Filter>RNG</Filter>
+    <ClInclude Include="..\gframe\IrrlichtCommonIncludes1.9\CVideoModeList.h">
+      <Filter>IrrlichtCommonIncludes1.9</Filter>
     </ClInclude>
-    <ClInclude Include="..\gframe\RNG\Xoshiro256.hpp">
-      <Filter>RNG</Filter>
+    <ClInclude Include="..\gframe\IrrlichtCommonIncludes1.9\IImagePresenter.h">
+      <Filter>IrrlichtCommonIncludes1.9</Filter>
     </ClInclude>
-    <ClInclude Include="..\gframe\RNG\mt19937.h">
-      <Filter>RNG</Filter>
+    <ClInclude Include="..\gframe\IrrlichtCommonIncludes1.9\os.h">
+      <Filter>IrrlichtCommonIncludes1.9</Filter>
     </ClInclude>
     <ClInclude Include="..\gframe\ResizeablePanel\ResizeablePanel.h">
       <Filter>ResizeablePanel</Filter>

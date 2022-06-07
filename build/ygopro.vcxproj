@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -59,9 +59,6 @@
     <IntDir>..\obj\Release\ygopro\</IntDir>
     <TargetName>ygopro</TargetName>
     <TargetExt>.exe</TargetExt>
-  </PropertyGroup>
-  <PropertyGroup Label="Vcpkg">
-    <VcpkgEnableManifest>false</VcpkgEnableManifest>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -295,20 +292,20 @@
     <ResourceCompile Include="..\gframe\ygopro.rc" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="freetype.vcxproj">
-      <Project>{89895bd8-7556-b6e3-9e6f-a48b8a9beb71}</Project>
-    </ProjectReference>
     <ProjectReference Include="ocgcore.vcxproj">
       <Project>{07B8AE52-7397-2DEE-7CAF-B8C4E80D944F}</Project>
     </ProjectReference>
     <ProjectReference Include="clzma.vcxproj">
       <Project>{5CC83B0F-C8DC-63C0-915E-0720FD3160F1}</Project>
     </ProjectReference>
+    <ProjectReference Include="freetype.vcxproj">
+      <Project>{89895BD8-7556-B6E3-9E6F-A48B8A9BEB71}</Project>
+    </ProjectReference>
     <ProjectReference Include="Irrlicht.vcxproj">
       <Project>{06C1B133-F28D-0C3F-1BA7-FAE607D341CD}</Project>
     </ProjectReference>
     <ProjectReference Include="sfAudio.vcxproj">
-      <Project>{b030f18a-1c10-7026-2528-fbfc9186d687}</Project>
+      <Project>{B030F18A-1C10-7026-2528-FBFC9186D687}</Project>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

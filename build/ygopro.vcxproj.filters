@@ -43,6 +43,9 @@
     <Filter Include="IrrlichtCommonIncludes1.9">
       <UniqueIdentifier>{1E8690F7-8A48-C481-D3F8-520E3FFA9C5F}</UniqueIdentifier>
     </Filter>
+    <Filter Include="RNG">
+      <UniqueIdentifier>{0C1A880B-7823-887C-019F-9E7C6DA7937C}</UniqueIdentifier>
+    </Filter>
     <Filter Include="ResizeablePanel">
       <UniqueIdentifier>{5BFE9C27-C789-0AEC-D09A-8DE03CA566EC}</UniqueIdentifier>
     </Filter>
@@ -50,7 +53,7 @@
       <UniqueIdentifier>{1B648D10-0706-B8E6-F0C0-CB3ADC013F37}</UniqueIdentifier>
     </Filter>
     <Filter Include="ScreenReader">
-      <UniqueIdentifier>{275b8510-f786-44ca-9011-82176bfa7120}</UniqueIdentifier>
+      <UniqueIdentifier>{cd9471ce-73cb-44e5-9748-9d04fbdda6f0}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -148,17 +151,17 @@
     <ClInclude Include="..\gframe\IrrlichtCommonIncludes1.9\CGUITabControl.h">
       <Filter>IrrlichtCommonIncludes1.9</Filter>
     </ClInclude>
-    <ClInclude Include="..\gframe\IrrlichtCommonIncludes1.9\CIrrDeviceStub.h">
-      <Filter>IrrlichtCommonIncludes1.9</Filter>
-    </ClInclude>
-    <ClInclude Include="..\gframe\IrrlichtCommonIncludes1.9\CVideoModeList.h">
-      <Filter>IrrlichtCommonIncludes1.9</Filter>
-    </ClInclude>
-    <ClInclude Include="..\gframe\IrrlichtCommonIncludes1.9\IImagePresenter.h">
-      <Filter>IrrlichtCommonIncludes1.9</Filter>
-    </ClInclude>
     <ClInclude Include="..\gframe\IrrlichtCommonIncludes1.9\os.h">
       <Filter>IrrlichtCommonIncludes1.9</Filter>
+    </ClInclude>
+    <ClInclude Include="..\gframe\RNG\SplitMix64.hpp">
+      <Filter>RNG</Filter>
+    </ClInclude>
+    <ClInclude Include="..\gframe\RNG\Xoshiro256.hpp">
+      <Filter>RNG</Filter>
+    </ClInclude>
+    <ClInclude Include="..\gframe\RNG\mt19937.h">
+      <Filter>RNG</Filter>
     </ClInclude>
     <ClInclude Include="..\gframe\ResizeablePanel\ResizeablePanel.h">
       <Filter>ResizeablePanel</Filter>
@@ -173,6 +176,7 @@
     <ClInclude Include="..\gframe\custom_skin_enum.h" />
     <ClInclude Include="..\gframe\data_handler.h" />
     <ClInclude Include="..\gframe\data_manager.h" />
+    <ClInclude Include="..\gframe\deck.h" />
     <ClInclude Include="..\gframe\deck_con.h" />
     <ClInclude Include="..\gframe\deck_manager.h" />
     <ClInclude Include="..\gframe\discord_register.h" />
@@ -221,6 +225,9 @@
       <Filter>ScreenReader</Filter>
     </ClInclude>
     <ClInclude Include="..\gframe\ScreenReader\NVDA.h">
+    <ClInclude Include="..\gframe\FieldFocus\AccessibilityFieldFocus.h" />
+    <ClInclude Include="..\gframe\random_fwd.h" />
+    <ClInclude Include="..\gframe\ScreenReader\TolkController.h">
       <Filter>ScreenReader</Filter>
     </ClInclude>
     <ClInclude Include="..\gframe\ScreenReader\ScreenReader.h">
@@ -230,6 +237,10 @@
       <Filter>ScreenReader</Filter>
     </ClInclude>
     <ClInclude Include="..\gframe\ScreenReader\TolkController.h">
+    <ClInclude Include="..\gframe\ScreenReader\IScreenReader.h">
+      <Filter>ScreenReader</Filter>
+    </ClInclude>
+    <ClInclude Include="..\gframe\ScreenReader\NVDA.h">
       <Filter>ScreenReader</Filter>
     </ClInclude>
   </ItemGroup>
@@ -329,6 +340,8 @@
     <ClCompile Include="..\gframe\windbot.cpp" />
     <ClCompile Include="..\gframe\windbot_panel.cpp" />
     <ClCompile Include="..\gframe\ScreenReader\NVDA.cpp">
+    <ClCompile Include="..\gframe\sound_sfml.cpp" />
+    <ClCompile Include="..\gframe\ScreenReader\TolkController.cpp">
       <Filter>ScreenReader</Filter>
     </ClCompile>
     <ClCompile Include="..\gframe\ScreenReader\ScreenReader.cpp">
@@ -338,6 +351,7 @@
       <Filter>ScreenReader</Filter>
     </ClCompile>
     <ClCompile Include="..\gframe\ScreenReader\TolkController.cpp">
+    <ClCompile Include="..\gframe\ScreenReader\NVDA.cpp">
       <Filter>ScreenReader</Filter>
     </ClCompile>
   </ItemGroup>

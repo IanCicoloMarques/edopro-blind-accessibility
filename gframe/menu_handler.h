@@ -3,8 +3,6 @@
 
 #include "config.h"
 #include <IEventReceiver.h>
-#include <string>
-#include <vector>
 
 namespace ygo {
 
@@ -22,6 +20,7 @@ public:
 	std::vector<std::wstring> menuRulesOk = { L"Start Duel", L"Select Deck", L"Player Ready", L"Select AI" };
 	std::vector<std::wstring> menuSelectAI = { L"AI Ok", L"Select Deck", L"Always throw Rock" };
 	std::wstring currentMenu = L"Duel";
+
 };
 
 // These are passed to Irrlicht constructors as IDs and useful for identifying spawned GUI events

@@ -42,18 +42,14 @@
 #include <IGUITabControl.h>
 #include <IGUIScrollBar.h>
 #include "joystick_wrapper.h"
-#include <../gframe/ScreenReader/TolkController.h>
+#include "FieldFocus/AccessibilityFieldFocus.h"
 #include "ScreenReader/ScreenReader.h"
-using namespace irr;
 
 namespace ygo {
 
 std::string showing_repo = "";
+
 static AccessibilityFieldFocus::FieldLookerLocId lookupFieldLocId;
-//IScreenReader* ScreenReader::getReader() = ScreenReader::getReader();
-//static int indexLookedUpCard = 0;
-
-
 
 irr::core::vector3df MouseToPlane(const irr::core::vector2d<irr::s32>& mouse, const irr::core::plane3d<irr::f32>& plane) {
 	const auto collmanager = mainGame->smgr->getSceneCollisionManager();
@@ -76,10 +72,6 @@ static inline void TriggerEvent(irr::gui::IGUIElement* target, irr::gui::EGUI_EV
 	event.GUIEvent.Caller = target;
 	ygo::mainGame->device->postEventFromUser(event);
 }
-
-//static inline void ClickButton(irr::gui::IGUIElement* btn) {
-//	TriggerEvent(btn, irr::gui::EGET_BUTTON_CLICKED);
-//}
 
 bool ClientField::OnEvent(const irr::SEvent& event) {
 	bool stopPropagation = false;
@@ -209,8 +201,6 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 						mainGame->ShowElement(mainGame->wLanWindow);
 					}
 					mainGame->SetMessageWindow();
-					if(exit_on_return)
-						mainGame->device->closeDevice();
 				} else {
 					DuelClient::SendPacketToServer(CTOS_SURRENDER);
 				}
@@ -579,23 +569,27 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 						break;
 					}
 				}
-				bool hasMonster = false;
-				for (auto it = mzone[AccessibilityFieldFocus::DisplayedField::ENEMY_PLAYER].begin(); it != mzone[AccessibilityFieldFocus::DisplayedField::ENEMY_PLAYER].end(); ++it) {
-					if (*it) {
-						hasMonster = true;
-						break;
+				//This changes the cards to the enemy field when attacking a monster, so the player doesn't have to do this manually
+				if (accessibilityFocus) {
+					bool hasMonster = false;
+					for (auto it = mzone[AccessibilityFieldFocus::DisplayedField::ENEMY_PLAYER].begin(); it != mzone[AccessibilityFieldFocus::DisplayedField::ENEMY_PLAYER].end(); ++it) {
+						if (*it) {
+							hasMonster = true;
+							break;
+						}
 					}
-				}
-				if (hasMonster) {
-					displayedField = AccessibilityFieldFocus::DisplayedField::ENEMY_PLAYER;
-					if (CheckIfCanViewCards(event)) {
-						lookupFieldLocId = AccessibilityFieldFocus::FieldLookerLocId::PLAYER_MONSTERS;
-						cardType = AccessibilityFieldFocus::CardType::MONSTER;
-						DisplayCards(mzone[displayedField], fmt::format(L"Monster Zone"));
+					if (hasMonster) {
+						displayedField = AccessibilityFieldFocus::DisplayedField::ENEMY_PLAYER;
+						if (CheckIfCanViewCards(event)) {
+							lookupFieldLocId = AccessibilityFieldFocus::FieldLookerLocId::PLAYER_MONSTERS;
+							cardType = AccessibilityFieldFocus::CardType::MONSTER;
+							DisplayCards(mzone[displayedField], fmt::format(L"Monster Zone"));
+						}
 					}
+					else
+						displayedField = AccessibilityFieldFocus::DisplayedField::PLAYER;
 				}
-				else
-					displayedField = AccessibilityFieldFocus::DisplayedField::PLAYER;
+				
 				break;
 			}
 			case BUTTON_CMD_SHOWLIST: {
@@ -960,7 +954,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 							text = fmt::to_wstring(sort_list[pos + i]);
 					} else {
 						if(conti_selecting)
-							text = DataManager::unknown_string;
+							text = std::wstring{ DataManager::unknown_string };
 						else if(curcard->location == LOCATION_OVERLAY) {
 							text = fmt::format(L"{}[{}]({})", gDataManager->FormatLocation(curcard->overlayTarget->location, curcard->overlayTarget->sequence),
 								curcard->overlayTarget->sequence + 1, curcard->sequence + 1);
@@ -1092,15 +1086,17 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 			if(id >= BUTTON_DISPLAY_0 && id <= BUTTON_DISPLAY_4) {
 				int pos = mainGame->scrDisplayList->getPos() / 10;
 				int dpPos = id - BUTTON_DISPLAY_0 + pos;
+				//Checks if the position of the card exists in the displayed cards and if the pos isn't negative
 				if (!display_cards.empty() && display_cards.size() < dpPos) {
 					ClientCard* mcard = display_cards[dpPos];
-					if(mcard) {
+					if (mcard) {
 						SetShowMark(mcard, true);
 						ShowCardInfoInList(mcard, mainGame->btnCardDisplay[id - BUTTON_DISPLAY_0], mainGame->wCardDisplay);
-						if(mcard->code) {
+						if (mcard->code) {
 							mainGame->ShowCardInfo(mcard->code);
-						} else {
-							if(mcard->cover)
+						}
+						else {
+							if (mcard->cover)
 								mainGame->ShowCardInfo(mcard->cover, false, imgType::COVER);
 							else
 								mainGame->ClearCardInfo(mcard->controler);
@@ -1650,7 +1646,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 								if(mcard->alias && (mcard->alias < mcard->code - 10 || mcard->alias > mcard->code + 10)) {
 									str.append(fmt::format(L"\n({})", gDataManager->GetName(mcard->alias)));
 								}
-								if(mcard->location == LOCATION_SZONE && mcard->lscale) {
+								if(mcard->location == LOCATION_SZONE && (mcard->type & TYPE_PENDULUM)) {
 									str.append(fmt::format(L"\n{}/{}", mcard->lscale, mcard->rscale));
 								}
 							}
@@ -1751,7 +1747,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 			}
 			break;
 		}
-		case irr::KEY_KEY_W: {
+						   case irr::KEY_KEY_W: {
 			if (!event.KeyInput.PressedDown) {
 				bool canViewCards = CheckIfCanViewCards(event);
 				if (canViewCards) {
@@ -2076,7 +2072,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					indexLookedUpCard = 0;
 				else if (!display_cards.empty() && indexLookedUpCard < display_cards.size()-1)
 					indexLookedUpCard++;
-				else if (mainGame->scrCardList->isTrulyVisible()) {
+				else if (!display_cards.empty() &&mainGame->scrCardList->isTrulyVisible()) {
 					int pos = mainGame->scrCardList->getPos();
 					mainGame->scrCardList->setPos(pos + 10);
 					int cardPos = (mainGame->scrCardList->getPos() / 10) + 4;
@@ -2100,7 +2096,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					indexLookedUpCard = 0;
 				else if (display_cards.size() && indexLookedUpCard <= display_cards.size() && indexLookedUpCard > 0)
 					indexLookedUpCard--;
-				else if (mainGame->scrCardList->isTrulyVisible()) {
+				else if (!display_cards.empty() && mainGame->scrCardList->isTrulyVisible()) {
 					int pos = mainGame->scrCardList->getPos();
 					mainGame->scrCardList->setPos(pos - 10);
 					int cardPos = (mainGame->scrCardList->getPos() / 10);
@@ -2352,7 +2348,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 void ClientField::ChangeField(const AccessibilityFieldFocus::CardType& cardField) {
 	std::wstring nvdaString = L"";
 	cardType = cardField;
-	if (cardType == AccessibilityFieldFocus::CardType::LINK){
+	if (cardType == AccessibilityFieldFocus::CardType::LINK) {
 		lookupFieldLocId = AccessibilityFieldFocus::PLAYER_MONSTERS;
 		nvdaString = fmt::format(L"Link Field");
 	}
@@ -2395,7 +2391,7 @@ bool ClientField::UseCard(const AccessibilityFieldFocus::UseType& useType, irr::
 		}
 		case AccessibilityFieldFocus::UseType::ACTIVATE: {
 			lookupFieldLocId = AccessibilityFieldFocus::FieldLookerLocId::SELECTABLE_CARDS;
-			if(mainGame->btnActivate->isVisible())
+			if (mainGame->btnActivate->isVisible())
 				TriggerEvent(mainGame->btnActivate, irr::gui::EGET_BUTTON_CLICKED);
 			break;
 		}
@@ -2421,7 +2417,7 @@ bool ClientField::UseCard(const AccessibilityFieldFocus::UseType& useType, irr::
 			SelectFieldSlotNoPlayer(SearchFieldSlot(displayedField));
 			MouseClick(event);
 			break;
-		}					
+		}
 		default:
 			if (indexLookedUpCard < display_cards.size() && mainGame->btnCardSelect[indexLookedUpCard]->isTrulyVisible()) {
 				TriggerEvent(mainGame->btnCardSelect[indexLookedUpCard], irr::gui::EGET_BUTTON_CLICKED);
@@ -2442,8 +2438,8 @@ void ClientField::CloseDialog() {
 
 void ClientField::ScrollCardList() {
 	if (mainGame->btnCardSelect[0]->isTrulyVisible()) {
-		SEvent newEvent;
-		newEvent.EventType = EET_GUI_EVENT;
+		irr::SEvent newEvent;
+		newEvent.EventType = irr::EEVENT_TYPE::EET_GUI_EVENT;
 		newEvent.GUIEvent.Caller = mainGame->scrCardList;
 		newEvent.GUIEvent.Element = 0;
 		newEvent.GUIEvent.EventType = irr::gui::EGUI_EVENT_TYPE::EGET_SCROLL_BAR_CHANGED;
@@ -2460,7 +2456,7 @@ bool ClientField::CheckIfCanViewCards(irr::SEvent event) {
 	return canViewCards;
 }
 
-void ClientField::DisplayCards(const std::vector<ClientCard*> &field, const std::wstring& text) {
+void ClientField::DisplayCards(const std::vector<ClientCard*>& field, const std::wstring& text) {
 	display_cards.clear();
 	indexLookedUpCard = 0;
 	for (auto it = field.begin(); it != field.end(); ++it) {
@@ -2519,7 +2515,7 @@ void ClientField::SelectFieldSlotNoPlayer(int slot) {
 	auto clamp = [](auto& val) { val = (val < 0.f) ? 0.f : (1.f < val) ? 1.f : val;	};
 	clamp(pos.X);
 	clamp(pos.Y);
-	if(GetCardField() == AccessibilityFieldFocus::DisplayedCards::DISPLAY_HAND)
+	if (GetCardField() == AccessibilityFieldFocus::DisplayedCards::DISPLAY_HAND)
 		cursor->setPosition(clicked_card->hand_collision.getCenter());
 	else
 		cursor->setPosition(pos.X, pos.Y);
@@ -2558,7 +2554,7 @@ void ClientField::ChangeFieldByCard() {
 
 AccessibilityFieldFocus::DisplayedCards ClientField::GetCardField() {
 	for (int i = 0; i < hand[0].size(); i++) {
-		
+
 		if (hand[0].size() > i && hand[0][i] == clicked_card) {
 			return AccessibilityFieldFocus::DisplayedCards::DISPLAY_HAND;
 		}
@@ -2647,7 +2643,7 @@ int ClientField::SearchFieldSlot(const int& displayedField, ClientCard* card) {
 				fieldSlot = 5 - i;
 			else {
 				lookupFieldLocId = AccessibilityFieldFocus::FieldLookerLocId::LINK_ZONE;
-				if(displayedField == AccessibilityFieldFocus::DisplayedField::PLAYER)
+				if (displayedField == AccessibilityFieldFocus::DisplayedField::PLAYER)
 					fieldSlot = i - 4;
 				else {
 					if (i == 5)
@@ -2676,7 +2672,7 @@ float ClientField::GetXPosition(int slot, const AccessibilityFieldFocus::Display
 		fieldSlotSize = 0.073f;
 		startPosition = 0.43f;
 	}
-	if (cardType == AccessibilityFieldFocus::CardType::MONSTER || cardType == AccessibilityFieldFocus::CardType::SPELL) 
+	if (cardType == AccessibilityFieldFocus::CardType::MONSTER || cardType == AccessibilityFieldFocus::CardType::SPELL)
 		posX = startPosition + (slot * fieldSlotSize);
 	else if (cardType == AccessibilityFieldFocus::CardType::LINK) {
 		switch (slot)
@@ -3170,16 +3166,13 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event, bool& stopPropagation)
 			return false;
 		}
 		case irr::KEY_KEY_R: {
-			if (!accessibilityFocus) {
-				if (event.KeyInput.Control) {
-					mainGame->should_reload_skin = true;
-					return true;
-				}
-				if (!event.KeyInput.PressedDown && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX))
-					mainGame->textFont->setTransparency(true);
+			if(event.KeyInput.Control) {
+				mainGame->should_reload_skin = true;
 				return true;
 			}
-			break;
+			if(!event.KeyInput.PressedDown && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX))
+				mainGame->textFont->setTransparency(true);
+			return true;
 		}
 		case irr::KEY_KEY_O: {
 			if (event.KeyInput.Control && !event.KeyInput.PressedDown) {
@@ -3312,7 +3305,7 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event, bool& stopPropagation)
 				auto path = mainGame->FindScript(fmt::format(EPRO_TEXT("c{}.lua"), mainGame->showingcard));
 				if(path.empty()) {
 					auto cd = gDataManager->GetCardData(mainGame->showingcard);
-					if(cd && cd->alias && (cd->alias - mainGame->showingcard < CARD_ARTWORK_VERSIONS_OFFSET || mainGame->showingcard - cd->alias < CARD_ARTWORK_VERSIONS_OFFSET))
+					if(cd && cd->IsInArtworkOffsetRange())
 						path = mainGame->FindScript(fmt::format(EPRO_TEXT("c{}.lua"), cd->alias));
 				}
 				if(path.size() && path != EPRO_TEXT("archives"))
@@ -3421,7 +3414,6 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event, bool& stopPropagation)
 
 bool CheckHand(const irr::core::vector2d<irr::s32>& mouse, std::vector<ClientCard*>& hand) {
 	if(hand.empty()) return false;
-	auto height = hand.front()->hand_collision.UpperLeftCorner;
 	irr::core::recti rect{ hand.front()->hand_collision.UpperLeftCorner, hand.back()->hand_collision.LowerRightCorner };
 	if(!rect.isValid())
 		rect = { hand.back()->hand_collision.UpperLeftCorner, hand.front()->hand_collision.LowerRightCorner };
@@ -3773,62 +3765,70 @@ void ClientField::ShowCardInfoInList(ClientCard* pcard, irr::gui::IGUIElement* e
 		mainGame->stCardListTip->setVisible(true);
 	}
 }
-int GetSuitableReturn(uint32_t maxseq, size_t size) {
-	int32_t bitvaluesize = maxseq;
-	int32_t uint8size = (maxseq < 255) ? size * 8 : -1;
-	int32_t uint16size = (maxseq < 65535) ? size * 16 : -1;
-	int32_t uint32size = (maxseq < 4294967295) ? size * 32 : -1;
-	int32_t res = std::min<uint32_t>(bitvaluesize, std::min<uint32_t>(uint8size, std::min<uint32_t>(uint16size, uint32size)));
-	if(res == bitvaluesize)
-		return 1;
-	if(res == uint8size)
-		return 2;
-	if(res == uint16size)
-		return 3;
-	if(res == uint32size)
-		return 4;
-	return 1;
+static int GetSuitableReturn(uint32_t maxseq, uint32_t size) {
+	using nl8 = std::numeric_limits<uint8_t>;
+	using nl16 = std::numeric_limits<uint16_t>;
+	using nl32 = std::numeric_limits<uint32_t>;
+	if(maxseq < nl8::max()) {
+		if(maxseq >= size * nl8::digits)
+			return 2;
+	} else if(maxseq < nl16::max()) {
+		if(maxseq >= size * nl16::digits)
+			return 1;
+	}
+	else if(maxseq < nl32::max()) {
+		if(maxseq >= size * nl32::digits)
+			return 0;
+	}
+	return 3;
+}
+template<typename T>
+static inline void WriteCard(ProgressiveBuffer& buffer, uint32_t i, uint32_t value) {
+	static constexpr auto off = 8 >> (sizeof(T) / 2);
+	buffer.at<T>(i + off) = static_cast<T>(value);
 }
 void ClientField::SetResponseSelectedCards() const {
 	if (!mainGame->dInfo.compat_mode) {
 		if(mainGame->dInfo.curMsg == MSG_SELECT_UNSELECT_CARD) {
 			uint32_t respbuf[] = { 1, selected_cards[0]->select_seq };
-			DuelClient::SetResponseB((char*)respbuf, sizeof(respbuf));
+			DuelClient::SetResponseB(respbuf, sizeof(respbuf));
 		} else {
 			uint32_t maxseq = 0;
-			size_t size = selected_cards.size();
+			uint32_t size = static_cast<uint32_t>(selected_cards.size());
 			for(auto& c : selected_cards) {
 				maxseq = std::max(maxseq, c->select_seq);
 			}
 			ProgressiveBuffer ret;
 			switch(GetSuitableReturn(maxseq, size)) {
-				case 1: {
+				case 3: {
 					ret.at<int32_t>(0) = 3;
 					for(auto c : selected_cards)
-						ret.bitSet(c->select_seq + (sizeof(int) * 8));
+						ret.bitSet(c->select_seq + (sizeof(int32_t) * 8));
 					break;
 				}
 				case 2:	{
 					ret.at<int32_t>(0) = 2;
-					ret.at<int32_t>(1) = size;
-					for(size_t i = 0; i < size; ++i)
-						ret.at<int8_t>(i + 8) = selected_cards[i]->select_seq;
+					ret.at<uint32_t>(1) = size;
+					for(uint32_t i = 0; i < size; ++i)
+						WriteCard<uint8_t>(ret, i, selected_cards[i]->select_seq);
 					break;
 				}
-				case 3:	{
+				case 1:	{
 					ret.at<int32_t>(0) = 1;
-					ret.at<int32_t>(1) = size;
-					for(size_t i = 0; i < size; ++i)
-						ret.at<int16_t>(i + 4) = selected_cards[i]->select_seq;
+					ret.at<uint32_t>(1) = size;
+					for(uint32_t i = 0; i < size; ++i)
+						WriteCard<uint16_t>(ret, i, selected_cards[i]->select_seq);
 					break;
 				}
-				case 4:	{
+				case 0:	{
 					ret.at<int32_t>(0) = 0;
-					ret.at<int32_t>(1) = size;
-					for(size_t i = 0; i < size; ++i)
-						ret.at<int32_t>(i + 2) = selected_cards[i]->select_seq;
+					ret.at<uint32_t>(1) = size;
+					for(uint32_t i = 0; i < size; ++i)
+						WriteCard<uint32_t>(ret, i, selected_cards[i]->select_seq);
 					break;
 				}
+				default:
+					unreachable();
 			}
 			DuelClient::SetResponseB(ret.data.data(), ret.data.size());
 		}

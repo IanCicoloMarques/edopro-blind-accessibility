@@ -66,12 +66,6 @@ public:
 		return Parent;
 	}
 
-	void setParent(IGUIElement* parent)
-	{
-		if(this)
-			this->Parent = parent;
-	}
-
 	//! Returns the relative rectangle of this element.
 	core::rect<s32> getRelativePosition() const
 	{

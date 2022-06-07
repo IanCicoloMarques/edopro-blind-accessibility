@@ -1091,7 +1091,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 		}
 		case irr::KEY_KEY_D: {
 			if (!event.KeyInput.PressedDown && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
-				if (mainGame->btnHostPrepWindBot->isTrulyVisible() && mainGame->btnHostPrepStart->isEnabled()) {
+				/*if (mainGame->btnHostPrepWindBot->isTrulyVisible() && mainGame->btnHostPrepStart->isEnabled()) {
 					ClickButton(mainGame->btnHostPrepStart);
 				}
 				else if (!mainGame->wSinglePlay->isTrulyVisible()) {
@@ -1111,7 +1111,18 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				}
 				else if (mainGame->btnHostPrepWindBot->isTrulyVisible()) {
 					ClickButton(mainGame->btnHostPrepWindBot);
+				}*/
+
+				if (mainGame->roomListTable->isTrulyVisible()) {
+					ScreenReader::getReader()->textToSpeech(fmt::format(L"{} games", mainGame->roomListTable->getRowCount()));
+					mainGame->roomListTable->setSelected(0);
+					mainGame->roomListTable->setActiveColumn(5);
+					std::wstring numberPlayers = std::wstring(mainGame->roomListTable->getCellText(0, 5));
+					int numPlayers = std::count(numberPlayers.begin(), numberPlayers.end(), ',') + 1;
+					ScreenReader::getReader()->textToSpeech(fmt::format(L"{} Player {}", numPlayers, mainGame->roomListTable->getCellText(0,5)));
+					ClickButton(mainGame->btnJoinHost2);
 				}
+				
 			}
 			break;
 		}

@@ -705,6 +705,7 @@ void DuelClient::HandleSTOCPacketLanAsync(const std::vector<uint8_t>& data) {
 		mainGame->dInfo.isFirst = (mainGame->dInfo.player_type < mainGame->dInfo.team1) || (mainGame->dInfo.player_type >=7);
 		mainGame->dInfo.isTeam1 = mainGame->dInfo.isFirst;
 		mainGame->SetMessageWindow();
+		ScreenReader::getReader()->readScreen(L"Go to next match");
 		break;
 	}
 	case STOC_WAITING_SIDE:

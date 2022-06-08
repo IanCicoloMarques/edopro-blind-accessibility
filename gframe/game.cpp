@@ -419,11 +419,11 @@ bool Game::Initialize() {
 	ebDrawCount->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
 	tmpptr = env->addStaticText(gDataManager->GetSysString(1234).data(), Scale(10, 330, 220, 350), false, false, wCreateHost);
 	defaultStrings.emplace_back(tmpptr, 1234);
-	ebServerName = env->addEditBox(gGameConfig->gamename.data(), Scale(110, 325, 250, 350), true, wCreateHost);
+	ebServerName = env->addEditBox(gGameConfig->gamename.data(), Scale(110, 325, 250, 350), true, wCreateHost, EDITBOX_TEXT);
 	ebServerName->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
  	tmpptr = env->addStaticText(gDataManager->GetSysString(1235).data(), Scale(10, 360, 220, 380), false, false, wCreateHost);
 	defaultStrings.emplace_back(tmpptr, 1235);
-	ebServerPass = env->addEditBox(L"", Scale(110, 355, 250, 380), true, wCreateHost);
+	ebServerPass = env->addEditBox(L"", Scale(110, 355, 250, 380), true, wCreateHost, EDITBOX_TEXT);
 	ebServerPass->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
 	btnHostConfirm = env->addButton(Scale(260, 355, 370, 380), wCreateHost, BUTTON_HOST_CONFIRM, gDataManager->GetSysString(1211).data());
 	defaultStrings.emplace_back(btnHostConfirm, 1211);

@@ -2046,7 +2046,6 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 		}
 		case irr::KEY_RETURN: {
 			if (!event.KeyInput.PressedDown) {
-				mainGame->always_chain = true;
 				if (mainGame->btnBP->isEnabled() && battlePhase != AccessibilityFieldFocus::BattleStep::MP1) {
 					battlePhase = AccessibilityFieldFocus::BattleStep::MP1;
 				}

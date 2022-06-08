@@ -958,6 +958,34 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				auto elem = static_cast<irr::gui::IGUIEditBox*>(event.GUIEvent.Caller);
 				auto target = (elem == mainGame->ebNickNameOnline) ? mainGame->ebNickName : mainGame->ebNickNameOnline;
 				target->setText(elem->getText());
+				ScreenReader::getReader()->readScreen(fmt::format(L"Set Player name as {}", elem->getText()));
+				break;
+			}
+			case EDITBOX_NUMERIC: {
+				auto elem = static_cast<irr::gui::IGUIEditBox*>(event.GUIEvent.Caller);
+				std::wstring screenReaderString;
+				if (elem == mainGame->ebStartLP)
+					screenReaderString = fmt::format(L"Starting lifepoints set as {}", elem->getText());
+				else if (elem == mainGame->ebStartHand)
+					screenReaderString = fmt::format(L"Starting cards on hand set as {}", elem->getText());
+				else if (elem == mainGame->ebDrawCount)
+					screenReaderString = fmt::format(L"Draw count set as {}", elem->getText());
+				else if (elem == mainGame->ebServerName)
+					screenReaderString = fmt::format(L"Room name set as {}", elem->getText());
+				else if (elem == mainGame->ebServerPass)
+					screenReaderString = fmt::format(L"Room password set as {}", elem->getText());
+				ScreenReader::getReader()->readScreen(screenReaderString);
+				break;
+			}
+			case EDITBOX_TEXT: {
+				auto elem = static_cast<irr::gui::IGUIEditBox*>(event.GUIEvent.Caller);
+				std::wstring screenReaderString;
+				if (elem == mainGame->ebServerName)
+					screenReaderString = fmt::format(L"Room name set as {}", elem->getText());
+				else if (elem == mainGame->ebServerPass)
+					screenReaderString = fmt::format(L"Room password set as {}", elem->getText());
+				ScreenReader::getReader()->readScreen(screenReaderString);
+
 				break;
 			}
 			}
@@ -1085,8 +1113,10 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 			break;
 		}
 		case irr::KEY_F5: {
-			if(!event.KeyInput.PressedDown && mainGame->wRoomListPlaceholder->isVisible())
+			if (!event.KeyInput.PressedDown && mainGame->wRoomListPlaceholder->isVisible()) {
+				onlineMatchCounter = 0;
 				ServerLobby::RefreshRooms();
+			}
 			break;
 		}
 		case irr::KEY_KEY_D: {
@@ -1194,7 +1224,22 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 			}
 			break;
 		}
-		case irr::KEY_DOWN:
+		case irr::KEY_DOWN: {
+			if (!event.KeyInput.PressedDown) {
+				if (mainGame->roomListTable->isTrulyVisible() && currentMenu == L"Rooms") {
+					if (onlineMatchCounter < mainGame->roomListTable->getRowCount() - 1)
+						onlineMatchCounter++;
+					mainGame->roomListTable->setSelected(onlineMatchCounter);
+					std::wstring numberPlayers = std::wstring(mainGame->roomListTable->getCellText(onlineMatchCounter, 5));
+					int numPlayers = std::count(numberPlayers.begin(), numberPlayers.end(), ',') + 1;
+					if (numPlayers > 1)
+						ScreenReader::getReader()->textToSpeech(fmt::format(L"{} Players {}", numPlayers, mainGame->roomListTable->getCellText(onlineMatchCounter, 5)));
+					else
+						ScreenReader::getReader()->textToSpeech(fmt::format(L"{} Player {}", numPlayers, mainGame->roomListTable->getCellText(onlineMatchCounter, 5)));
+				}
+			}
+			break;
+		}
 		case irr::KEY_UP: {
 			if (!event.KeyInput.PressedDown) {
 				if (mainGame->env->hasFocus(mainGame->cbDeckSelect)) {
@@ -1205,11 +1250,23 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 					std::wstring nvdaString = fmt::format(L"Deck {}", mainGame->gBot.cbBotDeck->getItem(mainGame->gBot.cbBotDeck->getSelected()));
 					ScreenReader::getReader()->readScreen(nvdaString.c_str());
 				}
+				else if (mainGame->roomListTable->isTrulyVisible() && currentMenu == L"Rooms") {
+					if (onlineMatchCounter > 0)
+						onlineMatchCounter--;
+					mainGame->roomListTable->setSelected(onlineMatchCounter);
+					std::wstring numberPlayers = std::wstring(mainGame->roomListTable->getCellText(onlineMatchCounter, 5));
+					int numPlayers = std::count(numberPlayers.begin(), numberPlayers.end(), ',') + 1;
+					if (numPlayers > 1)
+						ScreenReader::getReader()->textToSpeech(fmt::format(L"{} Players {}", numPlayers, mainGame->roomListTable->getCellText(onlineMatchCounter, 5)));
+					else
+						ScreenReader::getReader()->textToSpeech(fmt::format(L"{} Player {}", numPlayers, mainGame->roomListTable->getCellText(onlineMatchCounter, 5)));
+				}
 			}
 			break;
 		}
 		case irr::KEY_RIGHT: {
 			if (!event.KeyInput.PressedDown) {
+				mainGame->env->removeFocus(mainGame->env->getFocus());
 				if (menu.empty())
 					menu = menuMain;
 				menuSelectCounter++;
@@ -1222,6 +1279,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 		}
 		case irr::KEY_LEFT: {
 			if (!event.KeyInput.PressedDown) {
+				mainGame->env->removeFocus(mainGame->env->getFocus());
 				if (menu.empty())
 					menu = menuMain;
 				menuSelectCounter--;
@@ -1234,10 +1292,18 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 		}
 		case irr::KEY_RETURN: {
 			if (!event.KeyInput.PressedDown) {
+				if (mainGame->btnRPYes->isTrulyVisible())
+					ClickButton(mainGame->btnRPYes);
 				if (menu.empty())
 					menu = menuMain;
-				if (menu.at(0) == L"Duel") {
-					if (currentMenu == L"Duel" && !mainGame->wSinglePlay->isTrulyVisible()) {
+				if (menu.at(0) == L"Online Duel") {
+					if (currentMenu == L"Online Duel" && mainGame->btnOnlineMode->isTrulyVisible()) {
+						menu = menuOnline;
+						menuSelectCounter = 0;
+						currentMenu = menu.at(menuSelectCounter);
+						ClickButton(mainGame->btnOnlineMode);
+					}
+					else if (currentMenu == L"Duel" && !mainGame->wSinglePlay->isTrulyVisible()) {
 						menu = menuSinglePlayer;
 						menuSelectCounter = 0;
 						currentMenu = menu.at(menuSelectCounter);
@@ -1252,6 +1318,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 						menu = menuHostDuel;
 						menuSelectCounter = 0;
 						currentMenu = menu.at(menuSelectCounter);
+						oldMenu = L"SinglePlayer";
 						ClickButton(mainGame->btnCreateHost);
 					}
 					else if (currentMenu == L"Player Name" && mainGame->ebNickName->isTrulyVisible()) {
@@ -1260,14 +1327,17 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				}
 				else if (menu.at(0) == L"Rules ok") {
 					if (currentMenu == L"Rules ok" && mainGame->btnHostConfirm->isTrulyVisible()) {
-						menu = menuRulesOk;
+						if (oldMenu == L"SinglePlayer")
+							menu = menuRulesOk;
+						else
+							menu = menuRulesOkOnline;
 						menuSelectCounter = 0;
 						currentMenu = menu.at(menuSelectCounter);
 						ClickButton(mainGame->btnHostConfirm);
 					}
-					//else if (currentMenu == L"Best of" && mainGame->ebBestOf->isTrulyVisible()) {
-					//	FocusTextBox(mainGame->ebBestOf);
-					//}
+					else if (currentMenu == L"Best of" && mainGame->ebBestOf->isTrulyVisible()) {
+						FocusTextBox(mainGame->ebBestOf);
+					}
 					else if (currentMenu == L"Time Limit" && mainGame->ebTimeLimit->isTrulyVisible()) {
 						FocusTextBox(mainGame->ebTimeLimit);
 					}
@@ -1286,6 +1356,12 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 					else if (currentMenu == L"Don't shuffle deck" && mainGame->chkNoShuffleDeck->isTrulyVisible()) {
 						CheckBox(mainGame->chkNoShuffleDeck);
 					}
+					else if (currentMenu == L"Room Name" && mainGame->ebServerName->isTrulyVisible()) {
+						FocusTextBox(mainGame->ebServerName);
+					}
+					else if (currentMenu == L"Room Password" && mainGame->ebServerPass->isTrulyVisible()) {
+						FocusTextBox(mainGame->ebServerPass);
+					}
 				}
 				else if (menu.at(0) == L"Start Duel") {
 					if (currentMenu == L"Start Duel" && mainGame->btnHostPrepStart->isEnabled()) {
@@ -1295,7 +1371,12 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 						ClickButton(mainGame->btnHostPrepStart);
 					}
 					else if (currentMenu == L"Start Duel" && !mainGame->btnHostPrepStart->isEnabled()) {
-						ScreenReader::getReader()->readScreen(L"Get ready and select enemy before start the game");
+						std::wstring nvdaString; 
+						if (oldMenu == L"SinglePlayer")
+							nvdaString = L"Get ready and select enemy before start the game";
+						else
+							nvdaString = L"Get ready before start the game";
+						ScreenReader::getReader()->readScreen(nvdaString);
 					}
 					else if (currentMenu == L"Player Ready" && mainGame->btnHostPrepReady->isTrulyVisible()) {
 						ClickButton(mainGame->btnHostPrepReady);
@@ -1331,19 +1412,63 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 						CheckBox(mainGame->gBot.chkThrowRock);
 					}
 				}
+				else if (menu.at(0) == L"Host") {
+					if (currentMenu == L"Host" && mainGame->btnCreateHost2->isEnabled()) {
+						menu = menuHostDuel;
+						menuSelectCounter = 0;
+						currentMenu = menu.at(menuSelectCounter);
+						oldMenu = L"Online";
+						ClickButton(mainGame->btnCreateHost2);
+					}
+					else if (currentMenu == L"Refresh" && mainGame->btnLanRefresh2->isEnabled()) {
+						onlineMatchCounter = 0;
+						ServerLobby::RefreshRooms();
+					}
+					else if (currentMenu == L"Rooms" && mainGame->btnJoinHost2->isEnabled()) {
+						onlineMatchCounter = 0;
+						ClickButton(mainGame->btnJoinHost2);
+					}
+					else if (currentMenu == L"Server" && mainGame->serverChoice->isVisible()) {
+						mainGame->env->setFocus(mainGame->serverChoice);
+						ScreenReader::getReader()->readScreen(fmt::format(L"Server {}", mainGame->serverChoice->getItem(mainGame->serverChoice->getSelected())));
+					}
+					else if (currentMenu == L"Player Name" && mainGame->ebNickNameOnline->isTrulyVisible()) {
+						FocusTextBox(mainGame->ebNickNameOnline);
+					}
+					else if (currentMenu == L"Allowed Cards" && mainGame->cbFilterRule->isVisible()) {
+						mainGame->env->setFocus(mainGame->cbFilterRule);
+						ScreenReader::getReader()->readScreen(fmt::format(L"{}", mainGame->cbFilterRule->getItem(mainGame->cbFilterRule->getSelected())));
+					}
+					else if (currentMenu == L"Forbidden List" && mainGame->cbFilterBanlist->isVisible()) {
+						mainGame->env->setFocus(mainGame->cbFilterBanlist);
+						ScreenReader::getReader()->readScreen(fmt::format(L"{}", mainGame->cbFilterBanlist->getItem(mainGame->cbFilterBanlist->getSelected())));
+					}
+					else if (currentMenu == L"Show Locked Rooms" && mainGame->chkShowPassword->isTrulyVisible()) {
+						CheckBox(mainGame->chkShowPassword);
+					}
+					else if (currentMenu == L"Show Started Rooms" && mainGame->chkShowActiveRooms->isTrulyVisible()) {
+						CheckBox(mainGame->chkShowActiveRooms);
+					}
+				}
 			}
 			break;
 		}
 		case irr::KEY_KEY_0: {
 			if (!event.KeyInput.PressedDown && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
 				menuSelectCounter = 0;
-				if (mainGame->btnHostPrepCancel->isTrulyVisible()) {
+				onlineMatchCounter = 0;
+				if (mainGame->btnRPNo->isTrulyVisible())
+					ClickButton(mainGame->btnRPNo);
+				else if (mainGame->btnHostPrepCancel->isTrulyVisible()) {
 					menu = menuHostDuel;
 					currentMenu = menu.at(menuSelectCounter);
 					ClickButton(mainGame->btnHostPrepCancel);
 				}
 				else if (mainGame->btnHostCancel->isTrulyVisible()) {
-					menu = menuSinglePlayer;
+					if (oldMenu == L"SinglePlayer")
+						menu = menuSinglePlayer;
+					else
+						menu = menuOnline;
 					currentMenu = menu.at(menuSelectCounter);
 					ClickButton(mainGame->btnHostCancel);
 				}
@@ -1351,6 +1476,11 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 					menu = menuMain;
 					currentMenu = menu.at(menuSelectCounter);
 					ClickButton(mainGame->btnJoinCancel);
+				}
+				else if (mainGame->btnJoinCancel2->isTrulyVisible()) {
+					menu = menuMain;
+					currentMenu = menu.at(menuSelectCounter);
+					ClickButton(mainGame->btnJoinCancel2);
 				}
 				else if (mainGame->btnModeExit->isTrulyVisible()) {
 					ClickButton(mainGame->btnModeExit);

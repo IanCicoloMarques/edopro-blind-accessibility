@@ -873,6 +873,11 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 					ImportDeck();
 				break;
 			}
+			case irr::KEY_RETURN: {
+				if (mainGame->btnSideOK->isTrulyVisible())
+					TriggerEvent(mainGame->btnSideOK, irr::gui::EGET_BUTTON_CLICKED);
+				break;
+			}
 			default:
 				break;
 			}

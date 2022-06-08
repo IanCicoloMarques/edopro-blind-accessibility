@@ -13,13 +13,18 @@ public:
 	int prev_sel;
 	int menuSelectCounter = 0;
 	int subMenuSelectCounter = 0;
+	int onlineMatchCounter = 0;
 	std::vector<std::wstring> menu;
-	std::vector<std::wstring> menuMain = { L"Duel", L"Deck Editor" };
+	std::vector<std::wstring> menuMain = { L"Online Duel", L"Duel", L"Deck Editor" };
 	std::vector<std::wstring> menuSinglePlayer = { L"Host Duel", L"Player Name" };
-	std::vector<std::wstring> menuHostDuel = { L"Rules ok", L"Best of", L"Time Limit", L"Starting LP", L"Starting Hand", L"Cards pew Draw", L"Don't check deck", L"Don't shuffle deck" };
+	std::vector<std::wstring> menuHostDuel = { L"Rules ok", L"Best of", L"Time Limit", L"Starting LP", L"Starting Hand", L"Cards pew Draw", L"Don't check deck", L"Don't shuffle deck", L"Room Name", L"Room Password"};
 	std::vector<std::wstring> menuRulesOk = { L"Start Duel", L"Select Deck", L"Player Ready", L"Select AI" };
+	std::vector<std::wstring> menuRulesOkOnline = { L"Start Duel", L"Select Deck", L"Player Ready"};
 	std::vector<std::wstring> menuSelectAI = { L"AI Ok", L"Select Deck", L"Always throw Rock" };
+	std::vector<std::wstring> menuOnline = { L"Host", L"Refresh", L"Rooms", L"Server", L"Player Name", L"Allowed Cards", L"Forbidden List", L"Show Locked Rooms", L"Show Started Rooms"};
+	std::vector<std::wstring> menuPassword = { L"OK", L"Cancel" };
 	std::wstring currentMenu = L"Duel";
+	std::wstring oldMenu = L"Duel";
 
 };
 
@@ -61,6 +66,7 @@ enum GUI {
 	BUTTON_SHARE_REPLAY,
 	EDITBOX_TEAM_COUNT,
 	EDITBOX_NUMERIC,
+	EDITBOX_TEXT,
 	BUTTON_HP_AI_TOGGLE,
 	BUTTON_BOT_ADD,
 	EDITBOX_CHAT,

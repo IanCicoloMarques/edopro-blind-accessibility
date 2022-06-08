@@ -17,6 +17,7 @@
 #include "utils_gui.h"
 #include "custom_skin_enum.h"
 #include "game_config.h"
+#include "ScreenReader/ScreenReader.h"
 
 namespace ygo {
 
@@ -292,6 +293,10 @@ void ServerLobby::JoinServer(bool host) {
 			return;
 		if(room->locked) {
 			if(!mainGame->wRoomPassword->isVisible()) {
+				ScreenReader::getReader()->readScreen(L"Write room password");
+				mainGame->ebRPName->setText(L"");
+				//mainGame->ebNickNameOnline->setText(L"");
+				mainGame->env->setFocus(mainGame->ebRPName);
 				mainGame->wRoomPassword->setVisible(true);
 				return;
 			}

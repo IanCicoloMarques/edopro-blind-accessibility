@@ -1121,7 +1121,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 		}
 		case irr::KEY_KEY_D: {
 			if (!event.KeyInput.PressedDown && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
-				/*if (mainGame->btnHostPrepWindBot->isTrulyVisible() && mainGame->btnHostPrepStart->isEnabled()) {
+				if (mainGame->btnHostPrepWindBot->isTrulyVisible() && mainGame->btnHostPrepStart->isEnabled()) {
 					ClickButton(mainGame->btnHostPrepStart);
 				}
 				else if (!mainGame->wSinglePlay->isTrulyVisible()) {
@@ -1141,60 +1141,27 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				}
 				else if (mainGame->btnHostPrepWindBot->isTrulyVisible()) {
 					ClickButton(mainGame->btnHostPrepWindBot);
-				}*/
-
-				if (mainGame->roomListTable->isTrulyVisible()) {
-					ScreenReader::getReader()->textToSpeech(fmt::format(L"{} games", mainGame->roomListTable->getRowCount()));
-					mainGame->roomListTable->setSelected(0);
-					mainGame->roomListTable->setActiveColumn(5);
-					std::wstring numberPlayers = std::wstring(mainGame->roomListTable->getCellText(0, 5));
-					int numPlayers = std::count(numberPlayers.begin(), numberPlayers.end(), ',') + 1;
-					ScreenReader::getReader()->textToSpeech(fmt::format(L"{} Player {}", numPlayers, mainGame->roomListTable->getCellText(0,5)));
-					ClickButton(mainGame->btnJoinHost2);
 				}
-				
 			}
 			break;
 		}
-						   //	case irr::KEY_KEY_P: {
-						   //		if (!event.KeyInput.PressedDown) {
-						   //			if (mainGame->ebNickName->isTrulyVisible()) {
-						   //				mainGame->ebNickName->setText(L"");
-						   //				//mainGame->ebNickNameOnline->setText(L"");
-						   //				mainGame->env->setFocus(mainGame->ebNickName);
-						   //			}
-						   //			/*if (mainGame->ebBestOf->isTrulyVisible()) {
-						   //				mainGame->ebBestOf->setText(L"");
-						   //				mainGame->env->setFocus(mainGame->ebBestOf);
-						   //			}*/
-						   //			/*if (mainGame->ebTimeLimit->isTrulyVisible()) {
-						   //				mainGame->ebTimeLimit->setText(L"");
-						   //				mainGame->env->setFocus(mainGame->ebTimeLimit);
-						   //			}*/
-						   ///*			if (mainGame->chkNoCheckDeck->isTrulyVisible()) {
-						   //				mainGame->chkNoCheckDeck->setChecked(!mainGame->chkNoCheckDeck->isChecked());
-						   //			}*/
-						   //			if (mainGame->chkNoShuffleDeck->isTrulyVisible()) {
-						   //				mainGame->chkNoShuffleDeck->setChecked(!mainGame->chkNoShuffleDeck->isChecked());
-						   //			}
-						   //			if (mainGame->gBot.chkThrowRock->isTrulyVisible()) {
-						   //				mainGame->gBot.chkThrowRock->setChecked(!mainGame->gBot.chkThrowRock->isChecked());
-						   //			}
-						   //			
-						   //			//ebStartLP
-						   //			//	ebStartHand
-						   //			//	ebDrawCount
-						   //			//	ebServerName
-						   //			//	ebServerPass
-						   //		}
-
-						   //		break;
-						   //	}
 		case irr::KEY_KEY_G: {
 			if (!event.KeyInput.PressedDown && mainGame->btnDeckEdit->isTrulyVisible()) {
 				ClickButton(mainGame->btnDeckEdit);
 			}
 
+			break;
+		}
+		case irr::KEY_KEY_I: {
+			if (!event.KeyInput.PressedDown) {
+				//ScreenReader::getReader()->textToSpeech(fmt::format(L"Player {}", mainGame->roomListTable->getCellData(onlineMatchCounter, 0)));
+				ScreenReader::getReader()->textToSpeech(fmt::format(L"Allowed Cards {}", mainGame->roomListTable->getCellText(onlineMatchCounter, 1)));
+				ScreenReader::getReader()->textToSpeech(fmt::format(L"Duel Mode {}", mainGame->roomListTable->getCellText(onlineMatchCounter, 2)));
+				ScreenReader::getReader()->textToSpeech(fmt::format(L"Rule {}", mainGame->roomListTable->getCellText(onlineMatchCounter, 3)));
+				ScreenReader::getReader()->textToSpeech(fmt::format(L"Forbidden List {}", mainGame->roomListTable->getCellText(onlineMatchCounter, 4)));
+				ScreenReader::getReader()->textToSpeech(fmt::format(L"Status {}", mainGame->roomListTable->getCellText(onlineMatchCounter, 5)));
+				ScreenReader::getReader()->textToSpeech(fmt::format(L"Notes {}", mainGame->roomListTable->getCellText(onlineMatchCounter, 6)));
+			}
 			break;
 		}
 		case irr::KEY_KEY_F: {
@@ -1274,6 +1241,8 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 					menuSelectCounter = 0;
 				currentMenu = menu.at(menuSelectCounter);
 				ScreenReader::getReader()->readScreen(menu.at(menuSelectCounter).c_str());
+				if (menu.at(menuSelectCounter) == L"Rooms")
+					ScreenReader::getReader()->textToSpeech(fmt::format(L"{} games", mainGame->roomListTable->getRowCount()));
 			}
 			break;
 		}
@@ -1287,6 +1256,8 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 					menuSelectCounter = menu.size() - 1;
 				currentMenu = menu.at(menuSelectCounter);
 				ScreenReader::getReader()->readScreen(menu.at(menuSelectCounter).c_str());
+				if(menu.at(menuSelectCounter) == L"Rooms")
+					ScreenReader::getReader()->textToSpeech(fmt::format(L"{} games", mainGame->roomListTable->getRowCount()));
 			}
 			break;
 		}
@@ -1336,18 +1307,23 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 						ClickButton(mainGame->btnHostConfirm);
 					}
 					else if (currentMenu == L"Best of" && mainGame->ebBestOf->isTrulyVisible()) {
+						ScreenReader::getReader()->readScreen(L"Type number of matches");
 						FocusTextBox(mainGame->ebBestOf);
 					}
 					else if (currentMenu == L"Time Limit" && mainGame->ebTimeLimit->isTrulyVisible()) {
+						ScreenReader::getReader()->readScreen(L"Type number of time limit");
 						FocusTextBox(mainGame->ebTimeLimit);
 					}
 					else if (currentMenu == L"Starting LP" && mainGame->ebStartLP->isTrulyVisible()) {
+						ScreenReader::getReader()->readScreen(L"Type number of starting Life points");
 						FocusTextBox(mainGame->ebStartLP);
 					}
 					else if (currentMenu == L"Starting Hand" && mainGame->ebStartHand->isTrulyVisible()) {
+						ScreenReader::getReader()->readScreen(L"Type starting number of cards on had");
 						FocusTextBox(mainGame->ebStartHand);
 					}
-					else if (currentMenu == L"Cards pew Draw" && mainGame->ebDrawCount->isTrulyVisible()) {
+					else if (currentMenu == L"Cards per Draw" && mainGame->ebDrawCount->isTrulyVisible()) {
+						ScreenReader::getReader()->readScreen(L"Type number of cards per draw");
 						FocusTextBox(mainGame->ebDrawCount);
 					}
 					else if (currentMenu == L"Don't check deck" && mainGame->chkNoCheckDeck->isTrulyVisible()) {
@@ -1357,9 +1333,11 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 						CheckBox(mainGame->chkNoShuffleDeck);
 					}
 					else if (currentMenu == L"Room Name" && mainGame->ebServerName->isTrulyVisible()) {
+						ScreenReader::getReader()->readScreen(L"Type room's name");
 						FocusTextBox(mainGame->ebServerName);
 					}
 					else if (currentMenu == L"Room Password" && mainGame->ebServerPass->isTrulyVisible()) {
+						ScreenReader::getReader()->readScreen(L"Type room's password");
 						FocusTextBox(mainGame->ebServerPass);
 					}
 				}

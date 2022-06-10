@@ -286,6 +286,9 @@
     <ClInclude Include="..\gframe\ScreenReader\IScreenReader.h">
       <Filter>ScreenReader</Filter>
     </ClInclude>
+    <ClInclude Include="MenuType.h">
+      <Filter>Accessibility</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="..\gframe\ygopro.rc" />
@@ -347,6 +350,9 @@
     </Filter>
     <Filter Include="ScreenReader">
       <UniqueIdentifier>{b3be143c-2551-4a38-aa90-d22bf08dacf7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Accessibility">
+      <UniqueIdentifier>{e59163e0-a5a6-40ab-8fb3-c4b7528a9120}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

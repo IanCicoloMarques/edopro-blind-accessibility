@@ -218,6 +218,7 @@
     <ClInclude Include="..\gframe\utils_gui.h" />
     <ClInclude Include="..\gframe\windbot.h" />
     <ClInclude Include="..\gframe\windbot_panel.h" />
+    <ClInclude Include="MenuType.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\gframe\CGUICustomCheckBox\CGUICustomCheckBox.cpp" />

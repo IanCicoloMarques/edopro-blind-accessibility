@@ -983,7 +983,7 @@ namespace ygo {
 					target->setText(elem->getText());
 					break;
 				}
-				case EDITBOX_NUMERIC: {
+				/*case EDITBOX_NUMERIC: {
 					auto elem = static_cast<irr::gui::IGUIEditBox*>(event.GUIEvent.Caller);
 					std::wstring screenReaderString;
 					if (elem == mainGame->ebStartLP)
@@ -1009,7 +1009,7 @@ namespace ygo {
 					ScreenReader::getReader()->readScreen(screenReaderString);
 
 					break;
-				}
+				}*/
 				}
 				if (caller->getParent() == mainGame->wRoomListPlaceholder)
 					ServerLobby::FillOnlineRooms();
@@ -1285,10 +1285,10 @@ namespace ygo {
 				}
 				break;
 			}
-							  //Dividir os menus em funções - void OnlineDuel()
-							  //Trocar as strings por enums
-							  //Trocar ifs por switch
-							  //Colocar nome do jogador na partida
+			//Dividir os menus em funções - void OnlineDuel()
+			//Trocar as strings por enums
+			//Trocar ifs por switch
+			//Colocar nome do jogador na partida
 			case irr::KEY_RETURN: {
 				if (!event.KeyInput.PressedDown) {
 					if (mainGame->btnRPYes->isTrulyVisible())
@@ -1576,17 +1576,19 @@ namespace ygo {
 			else {
 				typing = false;
 				mainGame->env->removeFocus(mainGame->env->getFocus());
+				ScreenReader::getReader()->readScreen(fmt::format(L"Set number of matches as {}", mainGame->ebBestOf->getText()));
 			}
 		}
 		else if (menuSelectCounter == MenuType::HostDuel::TIME_LIMIT && mainGame->ebTimeLimit->isTrulyVisible()) {
 			if (!typing) {
-				ScreenReader::getReader()->readScreen(std::wstring(L"Type number of time limit").c_str());
+				ScreenReader::getReader()->readScreen(std::wstring(L"Type limit of time, in seconds, per turn").c_str());
 				FocusTextBox(mainGame->ebTimeLimit);
 				typing = true;
 			}
 			else {
 				typing = false;
 				mainGame->env->removeFocus(mainGame->env->getFocus());
+				ScreenReader::getReader()->readScreen(fmt::format(L"Set limit of time as {} seconds", mainGame->ebTimeLimit->getText()));
 			}
 		}
 		else if (menuSelectCounter == MenuType::HostDuel::STARTING_LP && mainGame->ebStartLP->isTrulyVisible()) {
@@ -1598,17 +1600,19 @@ namespace ygo {
 			else {
 				typing = false;
 				mainGame->env->removeFocus(mainGame->env->getFocus());
+				ScreenReader::getReader()->readScreen(fmt::format(L"Set starting life points as {}", mainGame->ebStartLP->getText()));
 			}
 		}
 		else if (menuSelectCounter == MenuType::HostDuel::STARTING_HAND && mainGame->ebStartHand->isTrulyVisible()) {
 			if (!typing) {
-				ScreenReader::getReader()->readScreen(L"Type starting number of cards on had");
+				ScreenReader::getReader()->readScreen(L"Type starting number of cards on hand");
 				FocusTextBox(mainGame->ebStartHand);
 				typing = true;
 			}
 			else {
 				typing = false;
 				mainGame->env->removeFocus(mainGame->env->getFocus());
+				ScreenReader::getReader()->readScreen(fmt::format(L"Set starting cards on hand as {}", mainGame->ebStartHand->getText()));
 			}
 		}
 		else if (menuSelectCounter == MenuType::HostDuel::CARDS_DRAW && mainGame->ebDrawCount->isTrulyVisible()) {
@@ -1620,6 +1624,7 @@ namespace ygo {
 			else {
 				typing = false;
 				mainGame->env->removeFocus(mainGame->env->getFocus());
+				ScreenReader::getReader()->readScreen(fmt::format(L"Set cards per draw as {}", mainGame->ebDrawCount->getText()));
 			}
 		}
 		else if (menuSelectCounter == MenuType::HostDuel::CHECK_DECK && mainGame->chkNoCheckDeck->isTrulyVisible()) {
@@ -1637,6 +1642,7 @@ namespace ygo {
 			else {
 				typing = false;
 				mainGame->env->removeFocus(mainGame->env->getFocus());
+				ScreenReader::getReader()->readScreen(fmt::format(L"Set room's name as {}", mainGame->ebServerName->getText()));
 			}
 		}
 		else if (menuSelectCounter == MenuType::HostDuel::ROOM_PASSWORD && mainGame->ebServerPass->isTrulyVisible()) {
@@ -1648,6 +1654,7 @@ namespace ygo {
 			else {
 				typing = false;
 				mainGame->env->removeFocus(mainGame->env->getFocus());
+				ScreenReader::getReader()->readScreen(fmt::format(L"Set password as {}", mainGame->ebServerPass->getText()));
 			}
 		}
 	}

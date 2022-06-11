@@ -21,42 +21,23 @@ namespace ygo {
 		std::vector<std::wstring> menuHostDuel = { L"Rules ok", L"Best of", L"Time Limit", L"Starting LP", L"Starting Hand", L"Cards per Draw", L"Don't check deck", L"Don't shuffle deck", L"Room Name", L"Room Password" };
 		std::vector<std::wstring> menuRulesOk = { L"Start Duel", L"Select Deck", L"Player Ready", L"Select AI" };
 		std::vector<std::wstring> menuRulesOkOnline = { L"Start Duel", L"Select Deck", L"Player Ready", L"Enter Duel mode", L"Enter Spectate mode" };
+		std::vector<std::wstring> menuJoinHostOnline = { L"Select Deck", L"Player Ready", L"Enter Duel mode", L"Enter Spectate mode" };
 		std::vector<std::wstring> menuSelectAI = { L"AI Ok", L"Select Deck", L"Always throw Rock" };
 		std::vector<std::wstring> menuOnline = { L"Host", L"Refresh", L"Rooms", L"Server", L"Player Name", L"Allowed Cards", L"Forbidden List", L"Show Locked Rooms", L"Show Started Rooms" };
 		std::vector<std::wstring> menuPassword = { L"OK", L"Cancel" };
+		std::vector<std::wstring> menuDeckEditor = { L"OK", L"Cancel" };
 		std::wstring currentMenu = L"Online Duel";
 		std::wstring oldMenu = L"Online Duel";
-		MenuType::MainMenu selectedMenu = MenuType::MainMenu::MAIN_MENU;
+		MenuType::MenuList selectedMenu = MenuType::MenuList::MAIN_MENU;
 		int currentSelectedSubMenu = 0;
 		int oldSelectedSubMenu = 0;
-
-		void GoToMenu(MenuType::MainMenu menuType, int subMenu = 0);
+		void MainMenu();
 		void HostDuel();
+		void DuelMenu();
+		void SPDuel();
+		void AIConfigMenu();
 		void OnlineDuel();
 	};
-
-	//enum MainMenu {
-	//	MAIN,
-	//	SINGLE_PLAYER,
-	//	HOST_DUEL,
-	//	RULES_OK,
-	//	RULES_OK_ONLINE,
-	//	SELECT_AI,
-	//	ONLINE,
-	//	ROOM_PASSWORD
-	//};
-
-	//enum OnlineMenuEnum {
-	//	HOST = 0,
-	//	REFRESH = 1,
-	//	ROOM = 2,
-	//	SERVER = 3,
-	//	PLAYER_NAME = 4,
-	//	ALLOWED_CARDS = 5,
-	//	FORBIDDEN_LIST = 6,
-	//	LOCKED_ROOMS = 7,
-	//	STARTED_ROOMS = 8,
-	//};
 
 	// These are passed to Irrlicht constructors as IDs and useful for identifying spawned GUI events
 	enum GUI {
@@ -101,6 +82,7 @@ namespace ygo {
 		BUTTON_BOT_ADD,
 		EDITBOX_CHAT,
 		EDITBOX_PORT_BOX,
+		COMBOBOX_PLAYER_DECK,
 		COMBOBOX_BOT_DECK,
 		COMBOBOX_BOT_ENGINE,
 		EDITBOX_NICKNAME,

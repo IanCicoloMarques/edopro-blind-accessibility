@@ -493,7 +493,7 @@ namespace ygo {
 		stHostPrepRule->setWordWrap(true);
 		stDeckSelect = env->addStaticText(gDataManager->GetSysString(1254).data(), Scale(10, 235, 110, 255), false, false, wHostPrepare);
 		defaultStrings.emplace_back(stDeckSelect, 1254);
-		cbDeckSelect = AddComboBox(env, Scale(120, 230, 270, 255), wHostPrepare);
+		cbDeckSelect = AddComboBox(env, Scale(120, 230, 270, 255), wHostPrepare, COMBOBOX_PLAYER_DECK);
 		cbDeckSelect->setMaxSelectionRows(10);
 		cbDeckSelect2 = AddComboBox(env, Scale(280, 230, 430, 255), wHostPrepare);
 		cbDeckSelect2->setMaxSelectionRows(10);
@@ -1813,7 +1813,8 @@ namespace ygo {
 			}
 			if (waitFrame >= 0.0f) {
 				waitFrame += (float)delta_time * 60.0f / 1000.0f;
-				if ((int)std::round(waitFrame) % 90 == 0) {
+				if ((int)std::round(waitFrame) % 90 == 0) {//a
+
 					stHintMsg->setText(gDataManager->GetSysString(1390).data());
 				}
 				else if ((int)std::round(waitFrame) % 90 == 30) {

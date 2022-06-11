@@ -168,6 +168,9 @@ namespace ygo {
 					mainGame->isHostingOnline = true;
 					mainGame->HideElement(mainGame->wMainMenu);
 					mainGame->ShowElement(mainGame->wRoomListPlaceholder);
+					menu = menuOnline;
+					menuSelectCounter = 0;
+					currentMenu = menu.at(menuSelectCounter);
 					break;
 				}
 				case BUTTON_LAN_REFRESH2: {
@@ -182,12 +185,16 @@ namespace ygo {
 					if (mainGame->roomListTable->getSelected() >= 0) {
 						mainGame->HideElement(mainGame->wRoomListPlaceholder);
 						ServerLobby::JoinServer(false);
+						menu = menuJoinHostOnline;
+						menuSelectCounter = 0;
+						currentMenu = menu.at(menuSelectCounter);
 					}
 					break;
 				}
 				case BUTTON_JOIN_CANCEL2: {
 					mainGame->HideElement(mainGame->wRoomListPlaceholder);
 					mainGame->ShowElement(mainGame->wMainMenu);
+					menu = menuMain;
 					break;
 				}
 				case BUTTON_ROOMPASSWORD_OK: {
@@ -207,6 +214,9 @@ namespace ygo {
 					mainGame->btnJoinCancel->setEnabled(true);
 					mainGame->HideElement(mainGame->wMainMenu);
 					mainGame->ShowElement(mainGame->wLanWindow);
+					menu = menuSinglePlayer;
+					menuSelectCounter = 0;
+					currentMenu = menu.at(menuSelectCounter);
 					break;
 				}
 				case BUTTON_JOIN_HOST: {
@@ -230,6 +240,7 @@ namespace ygo {
 				case BUTTON_JOIN_CANCEL: {
 					mainGame->HideElement(mainGame->wLanWindow);
 					mainGame->ShowElement(mainGame->wMainMenu);
+					menu = menuMain;
 					break;
 				}
 				case BUTTON_LAN_REFRESH: {
@@ -238,20 +249,28 @@ namespace ygo {
 				}
 				case BUTTON_CREATE_HOST: {
 					if (wcslen(mainGame->ebNickName->getText())) {
-						ScreenReader::getReader()->readScreen(L"Host game");
-						mainGame->isHostingOnline = false;
-						mainGame->btnHostConfirm->setEnabled(true);
-						mainGame->btnHostCancel->setEnabled(true);
-						mainGame->HideElement(mainGame->wLanWindow);
-						mainGame->stHostPort->setVisible(true);
-						mainGame->ebHostPort->setVisible(true);
-						mainGame->stHostNotes->setVisible(false);
-						mainGame->ebHostNotes->setVisible(false);
-						mainGame->ShowElement(mainGame->wCreateHost);
+						mainGame->ebNickName->setText(L"Player");
 					}
+					ScreenReader::getReader()->readScreen(L"Host game");
+					mainGame->isHostingOnline = false;
+					mainGame->btnHostConfirm->setEnabled(true);
+					mainGame->btnHostCancel->setEnabled(true);
+					mainGame->HideElement(mainGame->wLanWindow);
+					mainGame->stHostPort->setVisible(true);
+					mainGame->ebHostPort->setVisible(true);
+					mainGame->stHostNotes->setVisible(false);
+					mainGame->ebHostNotes->setVisible(false);
+					mainGame->ShowElement(mainGame->wCreateHost);
+					menu = menuHostDuel;
+					menuSelectCounter = 0;
+					currentMenu = menu.at(menuSelectCounter);
 					break;
 				}
 				case BUTTON_CREATE_HOST2: {
+					if (wcslen(mainGame->ebNickName->getText())) {
+						mainGame->ebNickName->setText(L"Player");
+					}
+					ScreenReader::getReader()->readScreen(L"Host online game");
 					mainGame->isHostingOnline = true;
 					mainGame->btnHostConfirm->setEnabled(true);
 					mainGame->btnHostCancel->setEnabled(true);
@@ -261,6 +280,9 @@ namespace ygo {
 					mainGame->stHostNotes->setVisible(true);
 					mainGame->ebHostNotes->setVisible(true);
 					mainGame->ShowElement(mainGame->wCreateHost);
+					menu = menuHostDuel;
+					menuSelectCounter = 0;
+					currentMenu = menu.at(menuSelectCounter);
 					break;
 				}
 				case BUTTON_RULE_CARDS: {
@@ -330,6 +352,7 @@ namespace ygo {
 					DuelClient::is_local_host = false;
 					if (mainGame->isHostingOnline) {
 						ServerLobby::JoinServer(true);
+						menu = menuRulesOkOnline;
 					}
 					else {
 						uint16_t host_port;
@@ -351,7 +374,10 @@ namespace ygo {
 						mainGame->btnHostConfirm->setEnabled(false);
 						mainGame->btnHostCancel->setEnabled(false);
 						mainGame->gBot.Refresh(gGameConfig->filterBot * (mainGame->cbDuelRule->getSelected() + 1), gGameConfig->lastBot);
+						menu = menuRulesOk;
 					}
+					menuSelectCounter = 0;
+					currentMenu = menu.at(menuSelectCounter);
 					break;
 				}
 				case BUTTON_HOST_CANCEL: {
@@ -366,9 +392,11 @@ namespace ygo {
 					mainGame->HideElement(mainGame->wCreateHost);
 					if (mainGame->isHostingOnline) {
 						mainGame->ShowElement(mainGame->wRoomListPlaceholder);
+						menu = menuOnline;
 					}
 					else {
 						mainGame->ShowElement(mainGame->wLanWindow);
+						menu = menuSinglePlayer;
 					}
 					break;
 				}
@@ -413,6 +441,7 @@ namespace ygo {
 					break;
 				}
 				case BUTTON_HP_NOTREADY: {
+					ScreenReader::getReader()->readScreen(L"Player not ready");
 					DuelClient::SendPacketToServer(CTOS_HS_NOTREADY);
 					mainGame->cbDeckSelect->setEnabled(true);
 					mainGame->cbDeckSelect2->setEnabled(true);
@@ -437,10 +466,14 @@ namespace ygo {
 						mainGame->HideElement(mainGame->wHostPrepareR);
 					if (mainGame->wHostPrepareL->isVisible())
 						mainGame->HideElement(mainGame->wHostPrepareL);
-					if (mainGame->isHostingOnline)
+					if (mainGame->isHostingOnline) {
 						mainGame->ShowElement(mainGame->wRoomListPlaceholder);
-					else
+						menu = menuOnline;
+					}
+					else {
 						mainGame->ShowElement(mainGame->wLanWindow);
+						menu = menuHostDuel;
+					}
 					mainGame->wChat->setVisible(false);
 					break;
 				}
@@ -515,24 +548,33 @@ namespace ygo {
 					break;
 				}
 				case BUTTON_HP_AI_TOGGLE: {
-					ScreenReader::getReader()->readScreen(L"Select bot deck");
+					ScreenReader::getReader()->readScreen(L"Bot Configuration");
 					if (mainGame->gBot.window->isVisible()) {
 						mainGame->HideElement(mainGame->gBot.window);
 					}
 					else {
 						mainGame->ShowElement(mainGame->gBot.window);
 					}
+					menu = menuSelectAI;
+					menuSelectCounter = 0;
+					currentMenu = menu.at(menuSelectCounter);
 					break;
 				}
 				case BUTTON_BOT_ADD: {
 					try {
-						ScreenReader::getReader()->readScreen(L"Add Bot");
+						ScreenReader::getReader()->readScreen(L"Added Bot");
 						int port = std::stoi(gGameConfig->serverport);
+						menu = menuRulesOk;
+						menuSelectCounter = 0;
+						currentMenu = menu.at(menuSelectCounter);
 						if (mainGame->gBot.LaunchSelected(port, mainGame->dInfo.secret.pass))
 							break;
 					}
 					catch (...) {}
 					mainGame->PopupMessage(L"Failed to launch windbot");
+					menu = menuRulesOk;
+					menuSelectCounter = 0;
+					currentMenu = menu.at(menuSelectCounter);
 					break;
 				}
 				case BUTTON_EXPORT_DECK: {
@@ -631,6 +673,9 @@ namespace ygo {
 					}
 					mainGame->HideElement(mainGame->wMainMenu);
 					mainGame->deckBuilder.Initialize();
+					menu = menuDeckEditor;
+					menuSelectCounter = 0;
+					currentMenu = menu.at(menuSelectCounter);
 					break;
 				}
 				case BUTTON_MSG_OK: {
@@ -1083,9 +1128,14 @@ namespace ygo {
 						mainGame->chkTypeLimit[i]->setChecked(mainGame->forbiddentypes & limits[i]);
 					break;
 				}
+				case COMBOBOX_PLAYER_DECK: {
+					std::wstring nvdaString = fmt::format(L"Deck {}", mainGame->cbDeckSelect->getItem(mainGame->cbDeckSelect->getSelected()));
+					ScreenReader::getReader()->readScreen(nvdaString.c_str());
+					break;
+				}
 				case COMBOBOX_BOT_DECK: {
-					gGameConfig->lastBot = mainGame->gBot.CurrentIndex();
-					mainGame->gBot.UpdateEngine();
+					std::wstring nvdaString = fmt::format(L"Deck {}", mainGame->gBot.cbBotDeck->getItem(mainGame->gBot.cbBotDeck->getSelected()));
+					ScreenReader::getReader()->readScreen(nvdaString.c_str());
 					break;
 				}
 				case COMBOBOX_BOT_ENGINE: {
@@ -1093,8 +1143,20 @@ namespace ygo {
 					break;
 				}
 				case SERVER_CHOICE: {
+					std::wstring nvdaString = fmt::format(L"{}", mainGame->serverChoice->getItem(mainGame->serverChoice->getSelected()));
+					ScreenReader::getReader()->readScreen(nvdaString.c_str());
 					ServerLobby::RefreshRooms();
 					return false;
+				}
+				case CB_FILTER_ALLOWED_CARDS: {
+					std::wstring nvdaString = fmt::format(L"{}", mainGame->cbFilterRule->getItem(mainGame->cbFilterRule->getSelected()));
+					ScreenReader::getReader()->readScreen(nvdaString.c_str());
+					break;
+				}
+				case CB_FILTER_BANLIST: {
+					std::wstring nvdaString = fmt::format(L"{}", mainGame->cbFilterBanlist->getItem(mainGame->cbFilterBanlist->getSelected()));
+					ScreenReader::getReader()->readScreen(nvdaString.c_str());
+					break;
 				}
 				default: break;
 				}
@@ -1168,14 +1230,14 @@ namespace ygo {
 				break;
 			}
 			case irr::KEY_KEY_G: {
-				if (!event.KeyInput.PressedDown && mainGame->btnDeckEdit->isTrulyVisible()) {
+				if (!event.KeyInput.PressedDown && mainGame->btnDeckEdit->isTrulyVisible() && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
 					ClickButton(mainGame->btnDeckEdit);
 				}
 
 				break;
 			}
 			case irr::KEY_KEY_I: {
-				if (!event.KeyInput.PressedDown) {
+				if (!event.KeyInput.PressedDown && mainGame->roomListTable->isTrulyVisible() && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
 					//ScreenReader::getReader()->textToSpeech(fmt::format(L"Player {}", mainGame->roomListTable->getCellData(onlineMatchCounter, 0)));
 					ScreenReader::getReader()->textToSpeech(fmt::format(L"Allowed Cards {}", mainGame->roomListTable->getCellText(onlineMatchCounter, 1)));
 					ScreenReader::getReader()->textToSpeech(fmt::format(L"Duel Mode {}", mainGame->roomListTable->getCellText(onlineMatchCounter, 2)));
@@ -1187,12 +1249,12 @@ namespace ygo {
 				break;
 			}
 			case irr::KEY_KEY_F: {
-				if (!event.KeyInput.PressedDown && mainGame->btnHostPrepNotReady->isEnabled())
+				if (!event.KeyInput.PressedDown && mainGame->btnHostPrepNotReady->isEnabled() && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX))
 					ClickButton(mainGame->btnHostPrepNotReady);
 				break;
 			}
 			case irr::KEY_KEY_C: {
-				if (!event.KeyInput.PressedDown && mainGame->cbDeckSelect->isTrulyVisible()) {
+				if (!event.KeyInput.PressedDown && mainGame->cbDeckSelect->isTrulyVisible() && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
 					mainGame->env->setFocus(mainGame->cbDeckSelect);
 					std::wstring nvdaString = fmt::format(L"Deck {}", mainGame->cbDeckSelect->getItem(mainGame->cbDeckSelect->getSelected()));
 					ScreenReader::getReader()->readScreen(nvdaString.c_str());
@@ -1200,7 +1262,7 @@ namespace ygo {
 				break;
 			}
 			case irr::KEY_KEY_V: {
-				if (!event.KeyInput.PressedDown && mainGame->gBot.cbBotDeck->isTrulyVisible()) {
+				if (!event.KeyInput.PressedDown && mainGame->gBot.cbBotDeck->isTrulyVisible() && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
 					mainGame->env->setFocus(mainGame->gBot.cbBotDeck);
 					std::wstring nvdaString = fmt::format(L"Deck {}", mainGame->gBot.cbBotDeck->getItem(mainGame->gBot.cbBotDeck->getSelected()));
 					ScreenReader::getReader()->readScreen(nvdaString.c_str());
@@ -1208,7 +1270,7 @@ namespace ygo {
 				break;
 			}
 			case irr::KEY_KEY_B: {
-				if (!event.KeyInput.PressedDown) {
+				if (!event.KeyInput.PressedDown && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
 					ScreenReader::getReader()->readLastMessage();
 				}
 				break;
@@ -1231,15 +1293,7 @@ namespace ygo {
 			}
 			case irr::KEY_UP: {
 				if (!event.KeyInput.PressedDown) {
-					if (mainGame->env->hasFocus(mainGame->cbDeckSelect)) {
-						std::wstring nvdaString = fmt::format(L"Deck {}", mainGame->cbDeckSelect->getItem(mainGame->cbDeckSelect->getSelected()));
-						ScreenReader::getReader()->readScreen(nvdaString.c_str());
-					}
-					else if (mainGame->env->hasFocus(mainGame->gBot.cbBotDeck)) {
-						std::wstring nvdaString = fmt::format(L"Deck {}", mainGame->gBot.cbBotDeck->getItem(mainGame->gBot.cbBotDeck->getSelected()));
-						ScreenReader::getReader()->readScreen(nvdaString.c_str());
-					}
-					else if (mainGame->roomListTable->isTrulyVisible() && currentMenu == L"Rooms") {
+					if (mainGame->roomListTable->isTrulyVisible() && currentMenu == L"Rooms") {
 						if (onlineMatchCounter > 0)
 							onlineMatchCounter--;
 						mainGame->roomListTable->setSelected(onlineMatchCounter);
@@ -1285,9 +1339,6 @@ namespace ygo {
 				}
 				break;
 			}
-			//Dividir os menus em funções - void OnlineDuel()
-			//Trocar as strings por enums
-			//Trocar ifs por switch
 			//Colocar nome do jogador na partida
 			case irr::KEY_RETURN: {
 				if (!event.KeyInput.PressedDown) {
@@ -1296,113 +1347,29 @@ namespace ygo {
 					if (menu.empty())
 						menu = menuMain;
 					if (menu.at(0) == L"Online Duel") {
-						if (currentMenu == L"Online Duel" && mainGame->btnOnlineMode->isTrulyVisible()) {
-							menu = menuOnline;
-							menuSelectCounter = 0;
-							currentMenu = menu.at(menuSelectCounter);
-							ClickButton(mainGame->btnOnlineMode);
-						}
-						else if (currentMenu == L"Duel" && !mainGame->wSinglePlay->isTrulyVisible()) {
-							menu = menuSinglePlayer;
-							menuSelectCounter = 0;
-							currentMenu = menu.at(menuSelectCounter);
-							ClickButton(mainGame->btnLanMode);
-						}
-						else if (currentMenu == L"Deck Editor" && mainGame->btnDeckEdit->isTrulyVisible()) {
-							ClickButton(mainGame->btnDeckEdit);
-						}
+						MainMenu();
 					}
+					//else if (selectedMenu == MainMenu::MAIN_MENU) {
 					else if (menu.at(0) == L"Host Duel") {
-						if (currentMenu == L"Host Duel" && mainGame->btnCreateHost->isTrulyVisible()) {
-							menu = menuHostDuel;
-							menuSelectCounter = 0;
-							currentMenu = menu.at(menuSelectCounter);
-							oldMenu = L"SinglePlayer";
-							ClickButton(mainGame->btnCreateHost);
-						}
-						else if (currentMenu == L"Player Name" && mainGame->ebNickName->isTrulyVisible()) {
-							FocusTextBox(mainGame->ebNickName);
-						}
+						SPDuel();
 					}
 					//else if (selectedMenu == MainMenu::HOST_DUEL) {
 					else if (menu.at(0) == L"Rules ok") {
 						HostDuel();
 					}
+					//else if (selectedMenu == MainMenu::DUEL_MENU) {
 					else if (menu.at(0) == L"Start Duel") {
-						if (currentMenu == L"Start Duel" && mainGame->btnHostPrepStart->isEnabled()) {
-							menu = menuSinglePlayer;
-							menuSelectCounter = 0;
-							currentMenu = menu.at(menuSelectCounter);
-							ClickButton(mainGame->btnHostPrepStart);
-						}
-						else if (currentMenu == L"Start Duel" && !mainGame->btnHostPrepStart->isEnabled()) {
-							std::wstring nvdaString;
-							if (oldMenu == L"SinglePlayer")
-								nvdaString = L"Get ready and select enemy before start the game";
-							else
-								nvdaString = L"Get ready and wait for enemy before start the game";
-							ScreenReader::getReader()->readScreen(nvdaString);
-						}
-						else if (currentMenu == L"Player Ready" && mainGame->btnHostPrepReady->isEnabled()) {
-							ClickButton(mainGame->btnHostPrepReady);
-						}
-						else if (currentMenu == L"Player Ready" && mainGame->btnHostPrepNotReady->isEnabled()) {
-							ClickButton(mainGame->btnHostPrepNotReady);
-						}
-						else if (currentMenu == L"Select Deck" && mainGame->cbDeckSelect->isTrulyVisible()) {
-							mainGame->env->setFocus(mainGame->cbDeckSelect);
-							std::wstring nvdaString = fmt::format(L"Deck {}", mainGame->cbDeckSelect->getItem(mainGame->cbDeckSelect->getSelected()));
-							ScreenReader::getReader()->readScreen(nvdaString.c_str());
-						}
-						else if (currentMenu == L"Select AI" && mainGame->btnHostPrepWindBot->isTrulyVisible()) {
-							menu = menuSelectAI;
-							menuSelectCounter = 0;
-							currentMenu = menu.at(menuSelectCounter);
-							ClickButton(mainGame->btnHostPrepWindBot);
-						}
-						else if (currentMenu == L"Enter Duel mode" && mainGame->btnHostPrepDuelist->isEnabled()) {
-							ClickButton(mainGame->btnHostPrepDuelist);
-						}
-						else if (currentMenu == L"Enter Duel mode" && !mainGame->btnHostPrepDuelist->isEnabled()) {
-							ScreenReader::getReader()->readScreen(L"Not able to go to duel mode");
-						}
-						else if (currentMenu == L"Enter Spectate mode" && mainGame->btnHostPrepOB->isEnabled()) {
-							ClickButton(mainGame->btnHostPrepOB);
-						}
-						else if (currentMenu == L"Enter Spectate mode" && !mainGame->btnHostPrepOB->isEnabled()) {
-							ScreenReader::getReader()->readScreen(L"Not able to go to spectator mode");
-						}
+						DuelMenu();
 					}
+					//else if (selectedMenu == MainMenu::AI_CONFIGURATION) {
 					else if (menu.at(0) == L"AI Ok") {
-						if (currentMenu == L"AI Ok") {
-							menu = menuRulesOk;
-							menuSelectCounter = 0;
-							currentMenu = menu.at(menuSelectCounter);
-							ClickButton(mainGame->gBot.btnAdd);
-						}
-						else if (currentMenu == L"Select Deck" && mainGame->gBot.cbBotDeck->isTrulyVisible()) {
-							mainGame->env->setFocus(mainGame->gBot.cbBotDeck);
-							std::wstring nvdaString = fmt::format(L"Deck {}", mainGame->gBot.cbBotDeck->getItem(mainGame->gBot.cbBotDeck->getSelected()));
-							ScreenReader::getReader()->readScreen(nvdaString.c_str());
-						}
-						else if (currentMenu == L"Always throw Rock" && mainGame->gBot.chkThrowRock->isTrulyVisible()) {
-							CheckBox(mainGame->gBot.chkThrowRock);
-						}
+						AIConfigMenu();
 					}
 					//else if (selectedMenu == MainMenu::ONLINE) {
 					else if (menu.at(0) == L"Host") {
 						OnlineDuel();
 					}
 				}
-				break;
-			}
-			case irr::KEY_KEY_1: {
-				if (!event.KeyInput.PressedDown ) {
-					if (menu.at(0) == L"Host") {
-						OnlineDuel();
-					}
-				}
-
 				break;
 			}
 			case irr::KEY_KEY_0: {
@@ -1412,34 +1379,21 @@ namespace ygo {
 					if (mainGame->btnRPNo->isTrulyVisible())
 						ClickButton(mainGame->btnRPNo);
 					else if (mainGame->btnHostPrepCancel->isTrulyVisible()) {
-						if (oldMenu == L"SinglePlayer")
-							menu = menuHostDuel;
-						else
-							menu = menuOnline;
-						currentMenu = menu.at(menuSelectCounter);
 						ClickButton(mainGame->btnHostPrepCancel);
 					}
 					else if (mainGame->btnHostCancel->isTrulyVisible()) {
-						if (oldMenu == L"SinglePlayer")
-							menu = menuSinglePlayer;
-						else
-							menu = menuOnline;
-						currentMenu = menu.at(menuSelectCounter);
 						ClickButton(mainGame->btnHostCancel);
 					}
 					else if (mainGame->btnJoinCancel->isTrulyVisible()) {
-						menu = menuMain;
-						currentMenu = menu.at(menuSelectCounter);
 						ClickButton(mainGame->btnJoinCancel);
 					}
 					else if (mainGame->btnJoinCancel2->isTrulyVisible()) {
-						menu = menuMain;
-						currentMenu = menu.at(menuSelectCounter);
 						ClickButton(mainGame->btnJoinCancel2);
 					}
 					else if (mainGame->btnModeExit->isTrulyVisible()) {
 						ClickButton(mainGame->btnModeExit);
 					}
+					currentMenu = menu.at(menuSelectCounter);
 				}
 
 				break;
@@ -1506,65 +1460,106 @@ namespace ygo {
 		return false;
 	}
 
-	void MenuHandler::GoToMenu(MenuType::MainMenu menuType, int subMenu) {
-		oldSelectedSubMenu = menuSelectCounter;
-		menuSelectCounter = 0;
-		//oldSelectedSubMenu = currentSelectedSubMenu;
-		//currentSelectedSubMenu = 0;
-		selectedMenu = menuType;
-		switch (menuType)
-		{
-		case MenuType::MainMenu::ONLINE_MENU: {
-			oldMenu = currentMenu;
-			currentMenu = menu.at(menuSelectCounter);
-			selectedMenu = MenuType::MainMenu::ONLINE_MENU;
-			switch (subMenu)
-			{
-			case MenuType::OnlineMenu::HOST:{
-				menu = menuHostDuel;
-				break;
-			}
-			case MenuType::OnlineMenu::HOST_ONLINE_DUEL: {
-				menu = menuRulesOkOnline;
-				break;
-			}
-			default:
-				break;
-			}
-			break;
+	void MenuHandler::MainMenu() {
+		if (menuSelectCounter == MenuType::MainMenu::MM_ONLINE_DUEL && mainGame->btnOnlineMode->isEnabled()) {
+			ClickButton(mainGame->btnOnlineMode);
 		}
-		case MenuType::MainMenu::SINGLE_PLAYER_MENU: {
-			oldMenu = currentMenu;
-			currentMenu = menu.at(menuSelectCounter);
-			selectedMenu = MenuType::MainMenu::SINGLE_PLAYER_MENU;
-			switch (subMenu)
-			{
-			case MenuType::OnlineMenu::HOST: {
-				menu = menuHostDuel;
-				break;
-			}
-			case MenuType::OnlineMenu::HOST_ONLINE_DUEL: {
-				menu = menuRulesOkOnline;
-				break;
-			}
-			default:
-				break;
-			}
-			break;
+		else if (menuSelectCounter == MenuType::MainMenu::MM_SP_DUEL && mainGame->btnLanMode->isEnabled()) {
+			ClickButton(mainGame->btnLanMode);
 		}
-		default:
-			break;
+		else if (menuSelectCounter == MenuType::MainMenu::MM_DECK_EDITOR && mainGame->btnDeckEdit->isEnabled()) {
+			ClickButton(mainGame->btnDeckEdit);
+		}
+	}
+
+	void MenuHandler::AIConfigMenu() {
+		if (currentMenu == L"AI Ok") {
+			menu = menuRulesOk;
+			menuSelectCounter = 0;
+			currentMenu = menu.at(menuSelectCounter);
+			ClickButton(mainGame->gBot.btnAdd);
+		}
+		else if (currentMenu == L"Select Deck" && mainGame->gBot.cbBotDeck->isTrulyVisible()) {
+			mainGame->env->setFocus(mainGame->gBot.cbBotDeck);
+			std::wstring nvdaString = fmt::format(L"Deck {}", mainGame->gBot.cbBotDeck->getItem(mainGame->gBot.cbBotDeck->getSelected()));
+			ScreenReader::getReader()->readScreen(nvdaString.c_str());
+		}
+		else if (currentMenu == L"Always throw Rock" && mainGame->gBot.chkThrowRock->isTrulyVisible()) {
+			CheckBox(mainGame->gBot.chkThrowRock);
+		}
+		if (menuSelectCounter == MenuType::AIConfigMenu::AIC_OK && mainGame->gBot.btnAdd->isTrulyVisible() && mainGame->gBot.btnAdd->isEnabled()) {
+			ClickButton(mainGame->gBot.btnAdd);
+		}
+		else if (menuSelectCounter == MenuType::AIConfigMenu::AIC_SELECT_DECK && mainGame->gBot.cbBotDeck->isTrulyVisible()) {
+			mainGame->env->setFocus(mainGame->gBot.cbBotDeck);
+			std::wstring nvdaString = fmt::format(L"Deck {}", mainGame->gBot.cbBotDeck->getItem(mainGame->gBot.cbBotDeck->getSelected()));
+			ScreenReader::getReader()->readScreen(nvdaString.c_str());
+		}
+		else if (menuSelectCounter == MenuType::AIConfigMenu::AIC_ATR && mainGame->gBot.chkThrowRock->isTrulyVisible()) {
+			CheckBox(mainGame->gBot.chkThrowRock);
+		}
+	}
+
+	void MenuHandler::SPDuel() {
+		if (menuSelectCounter == MenuType::SinglePlayerMenu::SP_HOST && mainGame->btnCreateHost->isEnabled()) {
+			ClickButton(mainGame->btnCreateHost);
+		}
+		else if (menuSelectCounter == MenuType::SinglePlayerMenu::SP_PLAYER_NAME && mainGame->ebNickName->isTrulyVisible()) {
+			if (!typing) {
+				ScreenReader::getReader()->readScreen(std::wstring(L"Type limit of time, in seconds, per turn").c_str());
+				FocusTextBox(mainGame->ebNickName);
+				typing = true;
+			}
+			else {
+				typing = false;
+				mainGame->env->removeFocus(mainGame->env->getFocus());
+				ScreenReader::getReader()->readScreen(fmt::format(L"Set limit of time as {} seconds", mainGame->ebNickName->getText()));
+			}
+		}
+	}
+
+	void MenuHandler::DuelMenu() {
+		if (menuSelectCounter == MenuType::PlayerDuel::PD_START_DUEL && mainGame->btnHostPrepStart->isEnabled()) {
+			ClickButton(mainGame->btnHostPrepStart);
+		}
+		else if (menuSelectCounter == MenuType::PlayerDuel::PD_START_DUEL && !mainGame->btnHostPrepStart->isEnabled()) {
+			std::wstring nvdaString;
+			if (oldMenu == L"SinglePlayer")
+				nvdaString = L"Get ready and select enemy before start the game";
+			else
+				nvdaString = L"Get ready and wait for enemy before start the game";
+			ScreenReader::getReader()->readScreen(nvdaString);
+		}
+		else if (menuSelectCounter == MenuType::PlayerDuel::PD_PLAYER_READY && mainGame->btnHostPrepReady->isTrulyVisible() && mainGame->btnHostPrepReady->isEnabled()) {
+			ClickButton(mainGame->btnHostPrepReady);
+		}
+		else if (menuSelectCounter == MenuType::PlayerDuel::PD_PLAYER_READY && mainGame->btnHostPrepNotReady->isEnabled()) {
+			ClickButton(mainGame->btnHostPrepNotReady);
+		}
+		else if (menuSelectCounter == MenuType::PlayerDuel::PD_SELECT_DECK && mainGame->cbDeckSelect->isTrulyVisible()) {
+			mainGame->env->setFocus(mainGame->cbDeckSelect);
+			std::wstring nvdaString = fmt::format(L"Deck {}", mainGame->cbDeckSelect->getItem(mainGame->cbDeckSelect->getSelected()));
+			ScreenReader::getReader()->readScreen(nvdaString.c_str());
+		}
+		else if (menuSelectCounter == MenuType::SinglePlayerDuel::SP_AI_MENU && mainGame->btnHostPrepWindBot->isEnabled()) {
+			ClickButton(mainGame->btnHostPrepWindBot);
+		}
+		else if (menuSelectCounter == MenuType::OnlineDuel::OD_DUEL_MODE && mainGame->btnHostPrepDuelist->isEnabled()) {
+			ClickButton(mainGame->btnHostPrepDuelist);
+		}
+		else if (menuSelectCounter == MenuType::OnlineDuel::OD_DUEL_MODE && !mainGame->btnHostPrepDuelist->isEnabled()) {
+			ScreenReader::getReader()->readScreen(L"Not able to go to duel mode");
+		}
+		else if (menuSelectCounter == MenuType::OnlineDuel::OD_SPECTATE_MODE && mainGame->btnHostPrepOB->isEnabled()) {
+			ClickButton(mainGame->btnHostPrepOB);
+		}
+		else if (menuSelectCounter == MenuType::OnlineDuel::OD_SPECTATE_MODE && !mainGame->btnHostPrepOB->isEnabled()) {
+			ScreenReader::getReader()->readScreen(L"Not able to go to spectator mode");
 		}
 	}
 
 	void MenuHandler::HostDuel() {
-		menu = menuHostDuel;
-
 		if (menuSelectCounter == MenuType::HostDuel::RULES_OK && mainGame->btnHostConfirm->isEnabled()) {
-			if (selectedMenu == MenuType::MainMenu::ONLINE_MENU)
-				GoToMenu(MenuType::MainMenu::ONLINE_MENU, MenuType::OnlineDuel::OD_START_DUEL);
-			else if (selectedMenu == MenuType::MainMenu::SINGLE_PLAYER_MENU)
-				GoToMenu(MenuType::MainMenu::SINGLE_PLAYER_MENU, MenuType::SinglePlayerDuel::SP_START_DUEL);
 			ClickButton(mainGame->btnHostConfirm);
 		}
 		else if (menuSelectCounter == MenuType::HostDuel::BEST_OF && mainGame->ebBestOf->isTrulyVisible()) {
@@ -1662,7 +1657,6 @@ namespace ygo {
 	void MenuHandler::OnlineDuel() {
 		menu = menuOnline;
 		if (menuSelectCounter == MenuType::OnlineMenu::HOST && mainGame->btnCreateHost2->isEnabled()) {
-			GoToMenu(MenuType::MainMenu::ONLINE_MENU, MenuType::OnlineMenu::HOST);
 			ClickButton(mainGame->btnCreateHost2);
 		}
 		else if (menuSelectCounter == MenuType::OnlineMenu::REFRESH && mainGame->btnLanRefresh2->isEnabled()) {
@@ -1670,7 +1664,6 @@ namespace ygo {
 			ServerLobby::RefreshRooms();
 		}
 		else if (menuSelectCounter == MenuType::OnlineMenu::HOST_ONLINE_DUEL && mainGame->btnJoinHost2->isEnabled()) {
-			GoToMenu(MenuType::MainMenu::ONLINE_MENU, MenuType::OnlineMenu::HOST_ONLINE_DUEL);
 			ClickButton(mainGame->btnJoinHost2);
 		}
 		else if (menuSelectCounter == MenuType::OnlineMenu::SERVER && mainGame->serverChoice->isTrulyVisible()) {

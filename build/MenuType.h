@@ -22,15 +22,22 @@ namespace ygo {
 		//static int subMenuSelectCounter;// = 0;
 		//static int onlineMatchCounter;// = 0;
 
-		static enum MainMenu {
+		enum MenuList {
 			MAIN_MENU,
 			SINGLE_PLAYER_MENU,
 			HOST_DUEL_MENU,
-			SINGLE_PLAYER_DUEL_MENU,
-			ONLINE_DUEL_MENU,
+			DUEL_MENU,
 			SELECT_AI_MENU,
 			ONLINE_MENU,
-			ROOM_PASSWORD_MENU
+			ROOM_PASSWORD_MENU,
+			DECK_EDITOR,
+			AI_CONFIGURATION
+		};
+
+		enum MainMenu {
+			MM_ONLINE_DUEL,
+			MM_SP_DUEL,
+			MM_DECK_EDITOR
 		};
 
 		enum HostDuel {
@@ -46,31 +53,46 @@ namespace ygo {
 			ROOM_PASSWORD = 9,
 		};
 
+		enum SinglePlayerMenu {
+			SP_HOST,
+			SP_PLAYER_NAME
+		};
+
+		enum PlayerDuel {
+			PD_START_DUEL,
+			PD_SELECT_DECK,
+			PD_PLAYER_READY
+		};
+
 		enum SinglePlayerDuel {
-			SP_START_DUEL = 0,
-			SP_SELECT_DECK = 1,
-			SP_PLAYER_READY = 2,
 			SP_AI_MENU = 3
 		};
 
+		enum AIConfigMenu {
+			AIC_OK,
+			AIC_SELECT_DECK,
+			AIC_ATR
+		};
+
 		enum OnlineDuel {
-			OD_START_DUEL = 0,
-			OD_SELECT_DECK = 1,
-			OD_PLAYER_READY = 2,
 			OD_DUEL_MODE = 3,
 			OD_SPECTATE_MODE = 4,
 		};
 
 		enum OnlineMenu{
-			HOST = 0,
-			REFRESH = 1,
-			HOST_ONLINE_DUEL = 2,
-			SERVER = 3,
-			PLAYER_NAME = 4,
-			ALLOWED_CARDS = 5,
-			FORBIDDEN_LIST = 6,
-			LOCKED_ROOMS = 7,
-			STARTED_ROOMS = 8,
+			HOST,
+			REFRESH,
+			HOST_ONLINE_DUEL,
+			SERVER,
+			PLAYER_NAME,
+			ALLOWED_CARDS,
+			FORBIDDEN_LIST,
+			LOCKED_ROOMS,
+			STARTED_ROOMS,
+		};
+
+		enum DeckEditorMenu {
+			DE_NEW_DECK
 		};
 	};
 }

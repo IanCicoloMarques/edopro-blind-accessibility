@@ -1908,14 +1908,19 @@ catch(...) { what = def; }
 			if (desc == 0) {
 				text = fmt::format(L"{}\n{}", event_string,
 					fmt::sprintf(gDataManager->GetSysString(200), gDataManager->GetName(code), gDataManager->FormatLocation(info.location, info.sequence)));
+				std::wstring nvdaString = fmt::format(L"Use {} from {}?", gDataManager->GetName(code), gDataManager->FormatLocation(info.location, info.sequence));
+				ScreenReader::getReader()->readScreen(nvdaString.c_str());
 			}
 			else if (desc == 221) {
 				text = fmt::format(L"{}\n{}\n{}", event_string,
 					fmt::sprintf(gDataManager->GetSysString(221), gDataManager->GetName(code), gDataManager->FormatLocation(info.location, info.sequence)),
 					gDataManager->GetSysString(223));
+				std::wstring nvdaString = fmt::format(L"Trigger {} from {}?", gDataManager->GetName(code), gDataManager->FormatLocation(info.location, info.sequence));
+				ScreenReader::getReader()->readScreen(nvdaString.c_str());
 			}
 			else {
 				text = fmt::sprintf(gDataManager->GetDesc(desc, mainGame->dInfo.compat_mode), gDataManager->GetName(code));
+				ScreenReader::getReader()->readScreen(text.c_str());
 			}
 			std::lock_guard<std::mutex> lock(mainGame->gMutex);
 			ClientCard* pcard = mainGame->dField.GetCard(info.controler, info.location, info.sequence);

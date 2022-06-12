@@ -1940,6 +1940,8 @@ catch(...) { what = def; }
 			std::lock_guard<std::mutex> lock(mainGame->gMutex);
 			mainGame->dField.highlighting_card = 0;
 			mainGame->stQMessage->setText(gDataManager->GetDesc(desc, mainGame->dInfo.compat_mode).data());
+			std::wstring nvdaString = fmt::format(gDataManager->GetDesc(desc, mainGame->dInfo.compat_mode).data());
+			ScreenReader::getReader()->readScreen(nvdaString.c_str());
 			mainGame->PopupElement(mainGame->wQuery);
 			return false;
 		}

@@ -115,6 +115,8 @@ namespace ygo {
 
 	bool MenuHandler::OnEvent(const irr::SEvent& event) {
 		bool stopPropagation = false;
+		if (menu.empty())
+			menu = menuMain;
 		if (mainGame->dField.OnCommonEvent(event, stopPropagation))
 			return stopPropagation;
 		switch (event.EventType) {
@@ -692,8 +694,8 @@ namespace ygo {
 					mainGame->HideElement(mainGame->wMainMenu);
 					mainGame->deckBuilder.Initialize();
 					//menu = menuDeckEditor;
-					menuSelectCounter = 0;
-					currentMenu = menu.at(menuSelectCounter);
+					//menuSelectCounter = 0;
+					//currentMenu = menu.at(menuSelectCounter);
 					break;
 				}
 				case BUTTON_MSG_OK: {

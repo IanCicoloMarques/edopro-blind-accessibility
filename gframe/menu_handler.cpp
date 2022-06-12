@@ -185,9 +185,16 @@ namespace ygo {
 					if (mainGame->roomListTable->getSelected() >= 0) {
 						mainGame->HideElement(mainGame->wRoomListPlaceholder);
 						ServerLobby::JoinServer(false);
-						menu = menuJoinHostOnline;
-						menuSelectCounter = 0;
-						currentMenu = menu.at(menuSelectCounter);
+						if (mainGame->ebRPName->isTrulyVisible()) {
+							menu = menuPassword;
+							menuSelectCounter = 0;
+							currentMenu = menu.at(menuSelectCounter);
+						}
+						else{
+							menu = menuJoinHostOnline;
+							menuSelectCounter = 0;
+							currentMenu = menu.at(menuSelectCounter);
+						}
 					}
 					break;
 				}
@@ -199,11 +206,22 @@ namespace ygo {
 				}
 				case BUTTON_ROOMPASSWORD_OK: {
 					ServerLobby::JoinServer(false);
+					menuSelectCounter = 0;
+					currentMenu = menu.at(menuSelectCounter);
+					if (mainGame->cbDeckSelect->isTrulyVisible()) {
+						menu = menuJoinHostOnline;
+					}
+					else{
+						menu = menuOnline;
+					}
 					break;
 				}
 				case BUTTON_ROOMPASSWORD_CANCEL: {
 					mainGame->wRoomPassword->setVisible(false);
 					mainGame->ShowElement(mainGame->wRoomListPlaceholder);
+					menu = menuJoinHostOnline;
+					menuSelectCounter = 0;
+					currentMenu = menu.at(menuSelectCounter);
 					break;
 				}
 				case BUTTON_LAN_MODE: {
@@ -348,7 +366,7 @@ namespace ygo {
 					break;
 				}
 				case BUTTON_HOST_CONFIRM: {
-					ScreenReader::getReader()->readScreen(L"Rules ok. Select Deck");
+					ScreenReader::getReader()->readScreen(L"Rules ok.");
 					DuelClient::is_local_host = false;
 					if (mainGame->isHostingOnline) {
 						ServerLobby::JoinServer(true);
@@ -673,7 +691,7 @@ namespace ygo {
 					}
 					mainGame->HideElement(mainGame->wMainMenu);
 					mainGame->deckBuilder.Initialize();
-					menu = menuDeckEditor;
+					//menu = menuDeckEditor;
 					menuSelectCounter = 0;
 					currentMenu = menu.at(menuSelectCounter);
 					break;
@@ -1342,8 +1360,6 @@ namespace ygo {
 			//Colocar nome do jogador na partida
 			case irr::KEY_RETURN: {
 				if (!event.KeyInput.PressedDown) {
-					if (mainGame->btnRPYes->isTrulyVisible())
-						ClickButton(mainGame->btnRPYes);
 					if (menu.empty())
 						menu = menuMain;
 					if (menu.at(0) == L"Online Duel") {
@@ -1358,7 +1374,7 @@ namespace ygo {
 						HostDuel();
 					}
 					//else if (selectedMenu == MainMenu::DUEL_MENU) {
-					else if (menu.at(0) == L"Start Duel") {
+					else if (menu.at(0) == L"Start Duel" || menu.at(1) == L"Select Deck") {
 						DuelMenu();
 					}
 					//else if (selectedMenu == MainMenu::AI_CONFIGURATION) {
@@ -1368,6 +1384,10 @@ namespace ygo {
 					//else if (selectedMenu == MainMenu::ONLINE) {
 					else if (menu.at(0) == L"Host") {
 						OnlineDuel();
+					}
+					//else if (selectedMenu == MainMenu::ONLINE) {
+					else if (menu.at(0) == L"Change Password") {
+						PasswordMenu();
 					}
 				}
 				break;
@@ -1472,21 +1492,28 @@ namespace ygo {
 		}
 	}
 
+	void MenuHandler::PasswordMenu() {
+		if (menuSelectCounter == MenuType::PasswordMenu::PASS_SET_PASSWORD && mainGame->ebRPName->isTrulyVisible()) {
+			if (!typing) {
+				ScreenReader::getReader()->readScreen(std::wstring(L"Type the password").c_str());
+				FocusTextBox(mainGame->ebRPName);
+				typing = true;
+			}
+			else {
+				typing = false;
+				mainGame->env->removeFocus(mainGame->env->getFocus());
+				ScreenReader::getReader()->readScreen(fmt::format(L"Password: {}", mainGame->ebRPName->getText()));
+			}
+		}
+		else if (menuSelectCounter == MenuType::PasswordMenu::PASS_OK && mainGame->btnRPYes->isEnabled()) {
+			ClickButton(mainGame->btnRPYes);
+		}
+		else if (menuSelectCounter == MenuType::PasswordMenu::PASS_CANCEL && mainGame->btnRPNo->isEnabled()) {
+			ClickButton(mainGame->btnRPNo);
+		}
+	}
+
 	void MenuHandler::AIConfigMenu() {
-		if (currentMenu == L"AI Ok") {
-			menu = menuRulesOk;
-			menuSelectCounter = 0;
-			currentMenu = menu.at(menuSelectCounter);
-			ClickButton(mainGame->gBot.btnAdd);
-		}
-		else if (currentMenu == L"Select Deck" && mainGame->gBot.cbBotDeck->isTrulyVisible()) {
-			mainGame->env->setFocus(mainGame->gBot.cbBotDeck);
-			std::wstring nvdaString = fmt::format(L"Deck {}", mainGame->gBot.cbBotDeck->getItem(mainGame->gBot.cbBotDeck->getSelected()));
-			ScreenReader::getReader()->readScreen(nvdaString.c_str());
-		}
-		else if (currentMenu == L"Always throw Rock" && mainGame->gBot.chkThrowRock->isTrulyVisible()) {
-			CheckBox(mainGame->gBot.chkThrowRock);
-		}
 		if (menuSelectCounter == MenuType::AIConfigMenu::AIC_OK && mainGame->gBot.btnAdd->isTrulyVisible() && mainGame->gBot.btnAdd->isEnabled()) {
 			ClickButton(mainGame->gBot.btnAdd);
 		}
@@ -1522,7 +1549,7 @@ namespace ygo {
 		if (menuSelectCounter == MenuType::PlayerDuel::PD_START_DUEL && mainGame->btnHostPrepStart->isEnabled()) {
 			ClickButton(mainGame->btnHostPrepStart);
 		}
-		else if (menuSelectCounter == MenuType::PlayerDuel::PD_START_DUEL && !mainGame->btnHostPrepStart->isEnabled()) {
+		else if (menuSelectCounter == MenuType::PlayerDuel::PD_START_DUEL && !mainGame->btnHostPrepStart->isEnabled() && mainGame->btnHostPrepStart->isTrulyVisible()) {
 			std::wstring nvdaString;
 			if (oldMenu == L"SinglePlayer")
 				nvdaString = L"Get ready and select enemy before start the game";

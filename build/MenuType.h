@@ -94,6 +94,12 @@ namespace ygo {
 		enum DeckEditorMenu {
 			DE_NEW_DECK
 		};
+
+		enum PasswordMenu {
+			PASS_SET_PASSWORD,
+			PASS_OK,
+			PASS_CANCEL
+		};
 	};
 }
 //static std::vector<std::wstring> menuMain = { L"Online Duel", L"Duel", L"Deck Editor" };

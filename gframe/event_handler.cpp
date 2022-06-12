@@ -3201,7 +3201,7 @@ namespace ygo {
 		}
 		case irr::EET_KEY_INPUT_EVENT: {
 			switch (event.KeyInput.Key) {
-			case irr::KEY_KEY_C: {
+			/*case irr::KEY_KEY_C: {
 				if (event.KeyInput.Control && mainGame->HasFocus(irr::gui::EGUIET_LIST_BOX)) {
 					auto focus = static_cast<irr::gui::IGUIListBox*>(mainGame->env->getFocus());
 					int sel = focus->getSelected();
@@ -3229,7 +3229,7 @@ namespace ygo {
 						mainGame->PopupElement(mainGame->gSettings.window);
 				}
 				return true;
-			}
+			}*/
 			case irr::KEY_ESCAPE: {
 				if (!mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX))
 					mainGame->device->minimizeWindow();
@@ -3263,31 +3263,31 @@ namespace ygo {
 					GUIUtils::TakeScreenshot(mainGame->device);
 				return true;
 			}
-			case irr::KEY_KEY_1: {
-				if (event.KeyInput.Control && !event.KeyInput.PressedDown)
-					mainGame->wInfos->setActiveTab(0);
-				break;
-			}
-			case irr::KEY_KEY_2: {
-				if (event.KeyInput.Control && !event.KeyInput.PressedDown)
-					mainGame->wInfos->setActiveTab(1);
-				break;
-			}
-			case irr::KEY_KEY_3: {
-				if (event.KeyInput.Control && !event.KeyInput.PressedDown)
-					mainGame->wInfos->setActiveTab(2);
-				break;
-			}
-			case irr::KEY_KEY_4: {
-				if (event.KeyInput.Control && !event.KeyInput.PressedDown)
-					mainGame->wInfos->setActiveTab(3);
-				break;
-			}
-			case irr::KEY_KEY_5: {
-				if (event.KeyInput.Control && !event.KeyInput.PressedDown)
-					mainGame->wInfos->setActiveTab(4);
-				break;
-			}
+			//case irr::KEY_KEY_1: {
+			//	if (event.KeyInput.Control && !event.KeyInput.PressedDown)
+			//		mainGame->wInfos->setActiveTab(0);
+			//	break;
+			//}
+			//case irr::KEY_KEY_2: {
+			//	if (event.KeyInput.Control && !event.KeyInput.PressedDown)
+			//		mainGame->wInfos->setActiveTab(1);
+			//	break;
+			//}
+			//case irr::KEY_KEY_3: {
+			//	if (event.KeyInput.Control && !event.KeyInput.PressedDown)
+			//		mainGame->wInfos->setActiveTab(2);
+			//	break;
+			//}
+			//case irr::KEY_KEY_4: {
+			//	if (event.KeyInput.Control && !event.KeyInput.PressedDown)
+			//		mainGame->wInfos->setActiveTab(3);
+			//	break;
+			//}
+			//case irr::KEY_KEY_5: {
+			//	if (event.KeyInput.Control && !event.KeyInput.PressedDown)
+			//		mainGame->wInfos->setActiveTab(4);
+			//	break;
+			//}
 			default: break;
 			}
 			break;
@@ -3968,6 +3968,7 @@ namespace ygo {
 		}
 		switch (mainGame->dInfo.curMsg) {
 		case MSG_WAITING: {
+			ScreenReader::getReader()->readScreen(L"Waiting...");
 			if (mainGame->wCardSelect->isVisible()) {
 				mainGame->HideElement(mainGame->wCardSelect);
 				ShowCancelOrFinishButton(0);

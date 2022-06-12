@@ -298,11 +298,10 @@ namespace ygo {
 				return;
 			if (room->locked) {
 				if (!mainGame->wRoomPassword->isVisible()) {
-					ScreenReader::getReader()->readScreen(L"Write room password");
 					mainGame->ebRPName->setText(L"");
 					//mainGame->ebNickNameOnline->setText(L"");
-					mainGame->env->setFocus(mainGame->ebRPName);
 					mainGame->wRoomPassword->setVisible(true);
+					mainGame->env->setFocus(mainGame->ebRPName);
 					return;
 				}
 				auto text = mainGame->ebRPName->getText();

@@ -1109,6 +1109,7 @@ catch(...) { what = def; }
 			mainGame->stHostPrepDuelist[pkt.pos]->setText(name);
 			mainGame->btnHostPrepStart->setVisible(is_host);
 			mainGame->btnHostPrepStart->setEnabled(is_host && CheckReady());
+			ScreenReader::getReader()->readScreen(fmt::format(L"{} joined the game", mainGame->stHostPrepDuelist[pkt.pos]->getText()));
 			break;
 		}
 		case STOC_HS_PLAYER_CHANGE: {
@@ -1132,8 +1133,10 @@ catch(...) { what = def; }
 					mainGame->dInfo.selfnames[state] = prename;
 				else
 					mainGame->dInfo.opponames[state - mainGame->dInfo.team1] = prename;
+
 			}
 			else if (state == PLAYERCHANGE_READY) {
+				ScreenReader::getReader()->readScreen(fmt::format(L"{} is ready", mainGame->stHostPrepDuelist[pos]->getText()));
 				mainGame->chkHostPrepReady[pos]->setChecked(true);
 				if (pos == selftype) {
 					mainGame->btnHostPrepReady->setVisible(false);
@@ -1141,6 +1144,7 @@ catch(...) { what = def; }
 				}
 			}
 			else if (state == PLAYERCHANGE_NOTREADY) {
+				ScreenReader::getReader()->readScreen(fmt::format(L"{} is not ready", mainGame->stHostPrepDuelist[pos]->getText()));
 				mainGame->chkHostPrepReady[pos]->setChecked(false);
 				if (pos == selftype) {
 					mainGame->btnHostPrepReady->setVisible(true);
@@ -1148,10 +1152,12 @@ catch(...) { what = def; }
 				}
 			}
 			else if (state == PLAYERCHANGE_LEAVE) {
+				ScreenReader::getReader()->readScreen(fmt::format(L"{} left the game", mainGame->stHostPrepDuelist[pos]->getText()));
 				mainGame->stHostPrepDuelist[pos]->setText(L"");
 				mainGame->chkHostPrepReady[pos]->setChecked(false);
 			}
 			else if (state == PLAYERCHANGE_OBSERVE) {
+				ScreenReader::getReader()->readScreen(fmt::format(L"{} is observing the game", mainGame->stHostPrepDuelist[pos]->getText()));
 				watching++;
 				mainGame->stHostPrepDuelist[pos]->setText(L"");
 				mainGame->chkHostPrepReady[pos]->setChecked(false);
@@ -1582,8 +1588,10 @@ catch(...) { what = def; }
 			}
 			mainGame->showcard = 101;
 			mainGame->WaitFrameSignal(120, lock);
+			ScreenReader::getReader()->readScreen(fmt::format(L"Victory! {}", mainGame->dInfo.vic_string));
 			mainGame->dInfo.vic_string = L"";
 			mainGame->showcard = 0;
+
 			break;
 		}
 		case MSG_WAITING: {
@@ -1591,6 +1599,7 @@ catch(...) { what = def; }
 			mainGame->waitFrame = 0;
 			mainGame->stHintMsg->setText(gDataManager->GetSysString(1390).data());
 			mainGame->stHintMsg->setVisible(true);
+			ScreenReader::getReader()->readScreen(L"Waiting other player...");
 			return true;
 		}
 		case MSG_START: {

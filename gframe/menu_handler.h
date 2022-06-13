@@ -21,7 +21,6 @@ namespace ygo {
 		std::vector<std::wstring> menuHostDuel = { L"Rules ok", L"Num Players Team 1", L"Num Players Team 2", L"Best of", L"Time Limit", L"Starting LP", L"Starting Hand", L"Cards per Draw", L"Don't check deck", L"Don't shuffle deck", L"Room Name", L"Room Password" };
 		std::vector<std::wstring> menuRulesOk = { L"Start Duel", L"Select Deck", L"Player Ready", L"Select AI" };
 		std::vector<std::wstring> menuRulesOkOnline = { L"Start Duel", L"Select Deck", L"Player Ready", L"Enter Duel mode", L"Enter Spectate mode" };
-		std::vector<std::wstring> menuJoinHostOnline = { L"", L"Select Deck", L"Player Ready", L"Enter Duel mode", L"Enter Spectate mode" };
 		std::vector<std::wstring> menuSelectAI = { L"AI Ok", L"Select Deck", L"Always throw Rock" };
 		std::vector<std::wstring> menuOnline = { L"Host", L"Refresh", L"Rooms", L"Server", L"Player Name", L"Allowed Cards", L"Forbidden List", L"Show Locked Rooms", L"Show Started Rooms" };
 		std::vector<std::wstring> menuPassword = { L"Change Password", L"OK", L"Cancel"};

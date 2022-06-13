@@ -193,7 +193,7 @@ namespace ygo {
 							currentMenu = menu.at(menuSelectCounter);
 						}
 						else{
-							menu = menuJoinHostOnline;
+							menu = menuRulesOkOnline;
 							menuSelectCounter = 0;
 							currentMenu = menu.at(menuSelectCounter);
 						}
@@ -211,7 +211,7 @@ namespace ygo {
 					menuSelectCounter = 0;
 					currentMenu = menu.at(menuSelectCounter);
 					if (mainGame->cbDeckSelect->isTrulyVisible()) {
-						menu = menuJoinHostOnline;
+						menu = menuRulesOkOnline;
 					}
 					else{
 						menu = menuOnline;
@@ -221,7 +221,7 @@ namespace ygo {
 				case BUTTON_ROOMPASSWORD_CANCEL: {
 					mainGame->wRoomPassword->setVisible(false);
 					mainGame->ShowElement(mainGame->wRoomListPlaceholder);
-					menu = menuJoinHostOnline;
+					menu = menuRulesOkOnline;
 					menuSelectCounter = 0;
 					currentMenu = menu.at(menuSelectCounter);
 					break;
@@ -1378,7 +1378,7 @@ namespace ygo {
 						HostDuel();
 					}
 					//else if (selectedMenu == MainMenu::DUEL_MENU) {
-					else if (menu.at(0) == L"Start Duel" || menu.at(1) == L"Select Deck") {
+					else if (menu.at(0) == L"Start Duel") {
 						DuelMenu();
 					}
 					//else if (selectedMenu == MainMenu::AI_CONFIGURATION) {
@@ -1492,11 +1492,16 @@ namespace ygo {
 			menu = menuPassword;
 		else if (mainGame->btnCreateHost->isEnabled() && mainGame->btnCreateHost->isTrulyVisible())
 			menu = menuSinglePlayer;
+		else if (mainGame->gBot.btnAdd->isEnabled() && mainGame->gBot.btnAdd->isTrulyVisible())
+			menu = menuSelectAI;
 		else if (mainGame->btnHostPrepWindBot->isEnabled() && mainGame->btnHostPrepWindBot->isTrulyVisible())
 			menu = menuRulesOk;
+		else if (mainGame->btnCreateHost2->isEnabled() && mainGame->btnCreateHost2->isTrulyVisible())
+			menu = menuOnline;
 		else if ((mainGame->btnHostPrepDuelist->isEnabled() && mainGame->btnHostPrepDuelist->isTrulyVisible()) ||
 				  mainGame->btnHostPrepOB->isEnabled() && mainGame->btnHostPrepOB->isTrulyVisible())
-			menu = menuJoinHostOnline;
+			menu = menuRulesOkOnline;
+		
 	}
 
 	void MenuHandler::MainMenu() {

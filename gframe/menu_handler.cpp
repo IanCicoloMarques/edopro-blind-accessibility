@@ -1156,6 +1156,8 @@ namespace ygo {
 				case COMBOBOX_BOT_DECK: {
 					std::wstring nvdaString = fmt::format(L"Deck {}", mainGame->gBot.cbBotDeck->getItem(mainGame->gBot.cbBotDeck->getSelected()));
 					ScreenReader::getReader()->readScreen(nvdaString.c_str());
+					gGameConfig->lastBot = mainGame->gBot.CurrentIndex();
+					mainGame->gBot.UpdateEngine();
 					break;
 				}
 				case COMBOBOX_BOT_ENGINE: {

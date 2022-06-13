@@ -368,7 +368,6 @@ namespace ygo {
 					break;
 				}
 				case BUTTON_HOST_CONFIRM: {
-					ScreenReader::getReader()->readScreen(L"Rules ok.");
 					DuelClient::is_local_host = false;
 					if (mainGame->isHostingOnline) {
 						ServerLobby::JoinServer(true);
@@ -395,6 +394,7 @@ namespace ygo {
 						mainGame->btnHostCancel->setEnabled(false);
 						mainGame->gBot.Refresh(gGameConfig->filterBot * (mainGame->cbDuelRule->getSelected() + 1), gGameConfig->lastBot);
 						menu = menuRulesOk;
+						ScreenReader::getReader()->readScreen(L"Rules ok.");
 					}
 					menuSelectCounter = 0;
 					currentMenu = menu.at(menuSelectCounter);

@@ -582,13 +582,15 @@ namespace ygo {
 				}
 				case BUTTON_BOT_ADD: {
 					try {
-						ScreenReader::getReader()->readScreen(L"Added Bot");
 						int port = std::stoi(gGameConfig->serverport);
 						menu = menuRulesOk;
 						menuSelectCounter = 0;
 						currentMenu = menu.at(menuSelectCounter);
-						if (mainGame->gBot.LaunchSelected(port, mainGame->dInfo.secret.pass))
+						ScreenReader::getReader()->readScreen(L"Added Bot");
+						if (mainGame->gBot.LaunchSelected(port, mainGame->dInfo.secret.pass)) {
+							mainGame->HideElement(mainGame->gBot.window);
 							break;
+						}
 					}
 					catch (...) {}
 					mainGame->PopupMessage(L"Failed to launch windbot");

@@ -117,6 +117,7 @@ namespace ygo {
 		prev_operation = 0;
 		mainGame->SetMessageWindow();
 		mainGame->device->setEventReceiver(this);
+		mainGame->env->removeFocus(mainGame->env->getFocus());
 	}
 	void DeckBuilder::Terminate(bool showmenu) {
 		mainGame->is_building = false;

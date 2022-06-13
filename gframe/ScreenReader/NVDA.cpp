@@ -4,13 +4,14 @@ void NVDA::readScreen()
 {
 }
 
-void NVDA::textToSpeech(std::wstring string)
+void NVDA::textToSpeech(std::wstring string, bool saveHistory = true)
 {
-	lastMessage = string;
+	if(saveHistory)
+		lastMessage = string;
 	nvdaController_speakText(string.c_str());
 }
 
-void NVDA::textToBraile(std::wstring string)
+void NVDA::textToBraile(std::wstring string, bool saveHistory = true)
 {
 	nvdaController_brailleMessage(string.c_str());
 }

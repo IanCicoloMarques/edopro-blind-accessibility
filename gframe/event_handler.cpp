@@ -357,6 +357,7 @@ namespace ygo {
 				}
 				case BUTTON_ANNUMBER_OK: {
 					DuelClient::SetResponseI(mainGame->cbANNumber->getSelected());
+					ScreenReader::getReader()->textToSpeech(fmt::format(L"Selected {}", mainGame->cbANNumber->getText()));
 					mainGame->HideElement(mainGame->wANNumber, true);
 					break;
 				}
@@ -1973,7 +1974,7 @@ namespace ygo {
 					if (mainGame->btnYes->isTrulyVisible()) {
 						TriggerEvent(mainGame->btnYes, irr::gui::EGET_BUTTON_CLICKED);
 						std::wstring nvdaString = fmt::format(L"Yes");
-						ScreenReader::getReader()->readScreen(nvdaString.c_str());
+						ScreenReader::getReader()->readScreen(nvdaString.c_str(), false);
 					}
 					else if (mainGame->btnFirst->isTrulyVisible()) {
 						TriggerEvent(mainGame->btnFirst, irr::gui::EGET_BUTTON_CLICKED);
@@ -1983,12 +1984,12 @@ namespace ygo {
 					else if (mainGame->btnPSAU->isTrulyVisible()) {
 						TriggerEvent(mainGame->btnPSAU, irr::gui::EGET_BUTTON_CLICKED);
 						std::wstring nvdaString = fmt::format(L"Attack Up");
-						ScreenReader::getReader()->readScreen(nvdaString.c_str());
+						ScreenReader::getReader()->readScreen(nvdaString.c_str(), false);
 					}
 					else if (mainGame->btnPSAD->isTrulyVisible()) {
 						TriggerEvent(mainGame->btnPSAU, irr::gui::EGET_BUTTON_CLICKED);
 						std::wstring nvdaString = fmt::format(L"Attack Down");
-						ScreenReader::getReader()->readScreen(nvdaString.c_str());
+						ScreenReader::getReader()->readScreen(nvdaString.c_str(), false);
 					}
 					else {
 						MouseClick(event, true);
@@ -2001,12 +2002,12 @@ namespace ygo {
 					if (mainGame->btnFileSaveNo->isTrulyVisible()) {
 						TriggerEvent(mainGame->btnFileSaveNo, irr::gui::EGET_BUTTON_CLICKED);
 						std::wstring nvdaString = fmt::format(L"No");
-						ScreenReader::getReader()->readScreen(nvdaString.c_str());
+						ScreenReader::getReader()->readScreen(nvdaString.c_str(), false);
 					}
 					else if (mainGame->btnNo->isTrulyVisible()) {
 						TriggerEvent(mainGame->btnNo, irr::gui::EGET_BUTTON_CLICKED);
 						std::wstring nvdaString = fmt::format(L"No");
-						ScreenReader::getReader()->readScreen(nvdaString.c_str());
+						ScreenReader::getReader()->readScreen(nvdaString.c_str(), false);
 					}
 					else if (mainGame->btnSecond->isTrulyVisible()) {
 						TriggerEvent(mainGame->btnSecond, irr::gui::EGET_BUTTON_CLICKED);
@@ -2016,12 +2017,12 @@ namespace ygo {
 					else if (mainGame->btnPSDU->isTrulyVisible()) {
 						TriggerEvent(mainGame->btnPSDU, irr::gui::EGET_BUTTON_CLICKED);
 						std::wstring nvdaString = fmt::format(L"Defense Up");
-						ScreenReader::getReader()->readScreen(nvdaString.c_str());
+						ScreenReader::getReader()->readScreen(nvdaString.c_str(), false);
 					}
 					else if (mainGame->btnPSDD->isTrulyVisible()) {
 						TriggerEvent(mainGame->btnPSDD, irr::gui::EGET_BUTTON_CLICKED);
 						std::wstring nvdaString = fmt::format(L"Defense Down");
-						ScreenReader::getReader()->readScreen(nvdaString.c_str());
+						ScreenReader::getReader()->readScreen(nvdaString.c_str(), false);
 					}
 				}
 				break;
@@ -2043,33 +2044,42 @@ namespace ygo {
 						std::wstring fieldSlot = fmt::format(L"Zone {}", SearchFieldSlot(displayedField, selectedCard));
 
 						//selectedCard->lscstring
-						ScreenReader::getReader()->readScreen(cardName.c_str());
+						ScreenReader::getReader()->readScreen(cardName.c_str(), false);
 						if (fieldSlot.compare(L"Slot 0") != 0)
-							ScreenReader::getReader()->readScreen(fieldSlot.c_str());
+							ScreenReader::getReader()->readScreen(fieldSlot.c_str(), false);
 						if (selectedCard->position != 10)
-							ScreenReader::getReader()->readScreen(position.c_str());
-						ScreenReader::getReader()->readScreen(cardType.c_str());
+							ScreenReader::getReader()->readScreen(position.c_str(), false);
+						ScreenReader::getReader()->readScreen(cardType.c_str(), false);
 						if (cardType.find(L"Spell") == std::string::npos && cardType.find(L"Trap") == std::string::npos) {
-							ScreenReader::getReader()->readScreen(cardLevel.c_str());
-							ScreenReader::getReader()->readScreen(cardRace.c_str());
-							ScreenReader::getReader()->readScreen(cardAttack.c_str());
-							ScreenReader::getReader()->readScreen(cardDefense.c_str());
+							ScreenReader::getReader()->readScreen(cardLevel.c_str(), false);
+							ScreenReader::getReader()->readScreen(cardRace.c_str(), false);
+							ScreenReader::getReader()->readScreen(cardAttack.c_str(), false);
+							ScreenReader::getReader()->readScreen(cardDefense.c_str(), false);
 						}
 						if (leftScale.compare(L"Left Scale 0") != 0)
-							ScreenReader::getReader()->readScreen(leftScale.c_str());
+							ScreenReader::getReader()->readScreen(leftScale.c_str(), false);
 						if (rightScale.compare(L"Right Scale 0") != 0)
-							ScreenReader::getReader()->readScreen(rightScale.c_str());
-						ScreenReader::getReader()->readScreen(cardEffect.c_str());
+							ScreenReader::getReader()->readScreen(rightScale.c_str(), false);
+						ScreenReader::getReader()->readScreen(cardEffect.c_str(), false);
 					}
 					else if (!display_cards.empty() && indexLookedUpCard <= display_cards.size() && display_cards[indexLookedUpCard]->code == 0)
-						ScreenReader::getReader()->readScreen(fmt::format(L"Face-down Zone {}", SearchFieldSlot(displayedField, display_cards[indexLookedUpCard])));
+						ScreenReader::getReader()->readScreen(fmt::format(L"Face-down Zone {}", SearchFieldSlot(displayedField, display_cards[indexLookedUpCard])), false);
 				}
 				break;
 			}
 			case irr::KEY_KEY_L: {
 				if (!event.KeyInput.PressedDown) {
-					ScreenReader::getReader()->readScreen(fmt::format(L"Player: {} LP", mainGame->dInfo.lp[AccessibilityFieldFocus::DisplayedField::PLAYER]).c_str());
-					ScreenReader::getReader()->readScreen(fmt::format(L"Enemy: {} LP", mainGame->dInfo.lp[AccessibilityFieldFocus::DisplayedField::ENEMY_PLAYER]).c_str());
+					ScreenReader::getReader()->readScreen(fmt::format(L"Player: {} LP", mainGame->dInfo.lp[AccessibilityFieldFocus::DisplayedField::PLAYER]).c_str(), false);
+					ScreenReader::getReader()->readScreen(fmt::format(L"Enemy: {} LP", mainGame->dInfo.lp[AccessibilityFieldFocus::DisplayedField::ENEMY_PLAYER]).c_str(), false);
+				}
+				break;
+			}
+			case irr::KEY_KEY_H: {
+				if (!event.KeyInput.PressedDown) {
+					if (mainGame->btnEP->isVisible() && mainGame->btnEP->isEnabled() && mainGame->dInfo.selfnames.size() > 0)
+						ScreenReader::getReader()->readScreen(fmt::format(L"Your turn", mainGame->dInfo.selfnames.at(0)), false);
+					else if(mainGame->dInfo.opponames.size() > 0)
+						ScreenReader::getReader()->readScreen(fmt::format(L"Opponent turn", mainGame->dInfo.opponames.at(0)), false);
 				}
 				break;
 			}
@@ -2094,12 +2104,13 @@ namespace ygo {
 			}
 			case irr::KEY_RETURN: {
 				if (!event.KeyInput.PressedDown) {
-					if (mainGame->btnBP->isEnabled() && battlePhase != AccessibilityFieldFocus::BattleStep::MP1) {
+					if (mainGame->btnBP->isEnabled() && battlePhase != AccessibilityFieldFocus::BattleStep::MP1)
 						battlePhase = AccessibilityFieldFocus::BattleStep::MP1;
-					}
-					if (mainGame->btnMsgOK->isTrulyVisible()) {
+					if (mainGame->btnMsgOK->isTrulyVisible())
 						TriggerEvent(mainGame->btnMsgOK, irr::gui::EGET_BUTTON_CLICKED);
-					}
+					if(mainGame->btnANNumberOK->isTrulyVisible())
+						TriggerEvent(mainGame->btnANNumberOK, irr::gui::EGET_BUTTON_CLICKED);
+					
 					else if (!display_cards.empty() && indexLookedUpCard <= display_cards.size()) {
 						clicked_card = display_cards[indexLookedUpCard];
 						std::wstring cardName = fmt::format(L"Selected {}", gDataManager->GetName(clicked_card->code));
@@ -2110,6 +2121,17 @@ namespace ygo {
 							UseCard(AccessibilityFieldFocus::UseType::SELECT_CARD, event);
 					}
 					CloseDialog();
+				}
+				break;
+			}
+			case irr::KEY_SPACE: {
+				if (!event.KeyInput.PressedDown) {
+					if (mainGame->cbANNumber->isTrulyVisible()) {
+						if (!mainGame->env->hasFocus(mainGame->cbANNumber))
+							mainGame->env->setFocus(mainGame->cbANNumber);
+						std::wstring nvdaString = fmt::format(L"{}", mainGame->cbANNumber->getItem(mainGame->cbANNumber->getSelected()));
+						ScreenReader::getReader()->readScreen(nvdaString.c_str(), false);
+					}
 				}
 				break;
 			}
@@ -2129,7 +2151,6 @@ namespace ygo {
 							display_cards.erase(display_cards.begin());
 						}
 					}
-
 					if (!display_cards.empty()) {
 						mainGame->ShowCardInfo(display_cards[indexLookedUpCard]->code);
 						ReadCardName();
@@ -2162,12 +2183,7 @@ namespace ygo {
 			}
 			case irr::KEY_UP: {
 				if (!event.KeyInput.PressedDown) {
-					if (displayedField != AccessibilityFieldFocus::DisplayedField::PLAYER) {
-						displayedField = AccessibilityFieldFocus::DisplayedField::PLAYER;
-						std::wstring nvdaString = fmt::format(L"Player Field");
-						ScreenReader::getReader()->readScreen(nvdaString.c_str());
-					}
-					else {
+					if (displayedField != AccessibilityFieldFocus::DisplayedField::ENEMY_PLAYER) {
 						displayedField = AccessibilityFieldFocus::DisplayedField::ENEMY_PLAYER;
 						std::wstring nvdaString = fmt::format(L"Enemy Player Field");
 						ScreenReader::getReader()->readScreen(nvdaString.c_str());
@@ -2175,12 +2191,33 @@ namespace ygo {
 				}
 				break;
 			}
+			case irr::KEY_DOWN: {
+				if (!event.KeyInput.PressedDown) {
+					if (displayedField != AccessibilityFieldFocus::DisplayedField::PLAYER) {
+						displayedField = AccessibilityFieldFocus::DisplayedField::PLAYER;
+						std::wstring nvdaString = fmt::format(L"Player Field");
+						ScreenReader::getReader()->readScreen(nvdaString.c_str());
+					}
+					else {
+						if (mainGame->cbANNumber->isTrulyVisible()) {
+							if (!mainGame->env->hasFocus(mainGame->cbANNumber))
+								mainGame->env->setFocus(mainGame->cbANNumber);
+							std::wstring nvdaString = fmt::format(L"{}", mainGame->cbANNumber->getItem(mainGame->cbANNumber->getSelected()));
+							ScreenReader::getReader()->readScreen(nvdaString.c_str(), false);
+						}
+
+					}
+				}
+				break;
+			}
 			case irr::KEY_KEY_1: {
 				if (!event.KeyInput.PressedDown) {
+					if (mainGame->btnDisplayOK->isTrulyVisible())
+						TriggerEvent(mainGame->btnDisplayOK, irr::gui::EGET_BUTTON_CLICKED);
 					if (mainGame->btnHand[0]->isTrulyVisible()) {
 						TriggerEvent(mainGame->btnHand[0], irr::gui::EGET_BUTTON_CLICKED);
 						std::wstring nvdaString = fmt::format(L"SCISSORS");
-						ScreenReader::getReader()->readScreen(nvdaString.c_str());
+						ScreenReader::getReader()->readScreen(nvdaString.c_str(), false);
 					}
 					else if (mainGame->btnOption[0]->isTrulyVisible()) {
 						selected_option = 0;
@@ -2199,7 +2236,7 @@ namespace ygo {
 					if (mainGame->btnHand[1]->isTrulyVisible()) {
 						TriggerEvent(mainGame->btnHand[1], irr::gui::EGET_BUTTON_CLICKED);
 						std::wstring nvdaString = fmt::format(L"ROCK");
-						ScreenReader::getReader()->readScreen(nvdaString.c_str());
+						ScreenReader::getReader()->readScreen(nvdaString.c_str(), false);
 					}
 					else if (mainGame->btnOption[1]->isTrulyVisible()) {
 						selected_option = 1;
@@ -2207,6 +2244,8 @@ namespace ygo {
 					}
 					else
 					{
+						if (mainGame->btnDisplayOK->isTrulyVisible())
+							TriggerEvent(mainGame->btnDisplayOK, irr::gui::EGET_BUTTON_CLICKED);
 						SelectFieldSlot(2, displayedField);
 						MouseClick(event);
 					}
@@ -2218,7 +2257,7 @@ namespace ygo {
 					if (mainGame->btnHand[2]->isTrulyVisible()) {
 						TriggerEvent(mainGame->btnHand[2], irr::gui::EGET_BUTTON_CLICKED);
 						std::wstring nvdaString = fmt::format(L"Paper");
-						ScreenReader::getReader()->readScreen(nvdaString.c_str());
+						ScreenReader::getReader()->readScreen(nvdaString.c_str(), false);
 					}
 					else if (mainGame->btnOption[2]->isTrulyVisible()) {
 						selected_option = 2;
@@ -2226,6 +2265,8 @@ namespace ygo {
 					}
 					else
 					{
+						if (mainGame->btnDisplayOK->isTrulyVisible())
+							TriggerEvent(mainGame->btnDisplayOK, irr::gui::EGET_BUTTON_CLICKED);
 						SelectFieldSlot(3, displayedField);
 						MouseClick(event);
 					}
@@ -2239,6 +2280,8 @@ namespace ygo {
 						SetResponseSelectedOption();
 					}
 					else {
+						if (mainGame->btnDisplayOK->isTrulyVisible())
+							TriggerEvent(mainGame->btnDisplayOK, irr::gui::EGET_BUTTON_CLICKED);
 						SelectFieldSlot(4, displayedField);
 						MouseClick(event);
 					}
@@ -2252,6 +2295,8 @@ namespace ygo {
 						SetResponseSelectedOption();
 					}
 					else {
+						if (mainGame->btnDisplayOK->isTrulyVisible())
+							TriggerEvent(mainGame->btnDisplayOK, irr::gui::EGET_BUTTON_CLICKED);
 						SelectFieldSlot(5, displayedField);
 						MouseClick(event);
 					}
@@ -2263,7 +2308,7 @@ namespace ygo {
 					if (mainGame->btnLeaveGame->isTrulyVisible()) {
 						TriggerEvent(mainGame->btnLeaveGame, irr::gui::EGET_BUTTON_CLICKED);
 						std::wstring nvdaString = fmt::format(L"Surrender");
-						ScreenReader::getReader()->readScreen(nvdaString.c_str());
+						ScreenReader::getReader()->readScreen(nvdaString.c_str(), false);
 					}
 				}
 				break;
@@ -2286,33 +2331,6 @@ namespace ygo {
 				}
 				break;
 			}
-							  //case irr::KEY_KEY_A: {
-							  //	if(!mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
-							  //		mainGame->always_chain = event.KeyInput.PressedDown;
-							  //		mainGame->ignore_chain = false;
-							  //		mainGame->chain_when_avail = false;
-							  //		UpdateChainButtons();
-							  //	}
-							  //	break;
-							  //}
-							  //case irr::KEY_KEY_S: {
-							  //	if(!mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
-							  //		mainGame->ignore_chain = event.KeyInput.PressedDown;
-							  //		mainGame->always_chain = false;
-							  //		mainGame->chain_when_avail = false;
-							  //		UpdateChainButtons();
-							  //	}
-							  //	break;
-							  //}
-							  //case irr::KEY_KEY_D: {
-							  //	if(!mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
-							  //		mainGame->chain_when_avail = event.KeyInput.PressedDown;
-							  //		mainGame->always_chain = false;
-							  //		mainGame->ignore_chain = false;
-							  //		UpdateChainButtons();
-							  //	}
-							  //	break;
-							  //}
 			case irr::KEY_F1:
 			case irr::KEY_F2:
 			case irr::KEY_F3:
@@ -2515,14 +2533,14 @@ namespace ygo {
 			mainGame->wCardDisplay->setText(fmt::format(L"{}({})", text, display_cards.size()).data());
 			ShowLocationCard();
 			if (text.compare(L"") != 0) {
-				ScreenReader::getReader()->readScreen(fmt::format(L"{}{} cards", text, display_cards.size()).data());
+				ScreenReader::getReader()->readScreen(fmt::format(L"{}{} cards", text, display_cards.size()).data(), false);
 			}
 			mainGame->ShowCardInfo(display_cards[0]->code);
 		}
 		else
 		{
 			std::wstring nvdaString = fmt::format(L"There are no cards to display");
-			ScreenReader::getReader()->readScreen(nvdaString.c_str());
+			ScreenReader::getReader()->readScreen(nvdaString.c_str(), false);
 		}
 	}
 
@@ -2662,7 +2680,7 @@ namespace ygo {
 		SetLookUpField();
 		if (lookupFieldLocId == AccessibilityFieldFocus::FieldLookerLocId::PLAYER_MONSTERS || lookupFieldLocId == AccessibilityFieldFocus::FieldLookerLocId::PLAYER_SPELLS) {
 			if (display_cards[indexLookedUpCard]->code != 0)
-				nvdaString = fmt::format(L"{} zone {}", gDataManager->GetName(display_cards[indexLookedUpCard]->code), SearchFieldSlot(displayedField, display_cards[indexLookedUpCard]));
+				nvdaString = fmt::format(L"{} {} attack {} defense zone {}", gDataManager->GetName(display_cards[indexLookedUpCard]->code), gDataManager->GetCardData(display_cards[indexLookedUpCard]->code)->attack, gDataManager->GetCardData(display_cards[indexLookedUpCard]->code)->defense, SearchFieldSlot(displayedField, display_cards[indexLookedUpCard]));
 			else
 				nvdaString = fmt::format(L"Face-down zone {}", SearchFieldSlot(displayedField, display_cards[indexLookedUpCard]));
 		}
@@ -3968,7 +3986,6 @@ namespace ygo {
 		}
 		switch (mainGame->dInfo.curMsg) {
 		case MSG_WAITING: {
-			ScreenReader::getReader()->readScreen(L"Waiting...");
 			if (mainGame->wCardSelect->isVisible()) {
 				mainGame->HideElement(mainGame->wCardSelect);
 				ShowCancelOrFinishButton(0);

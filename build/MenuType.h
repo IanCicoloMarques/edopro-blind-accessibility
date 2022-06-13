@@ -41,16 +41,18 @@ namespace ygo {
 		};
 
 		enum HostDuel {
-			RULES_OK = 0,
-			BEST_OF = 1,
-			TIME_LIMIT = 2,
-			STARTING_LP = 3,
-			STARTING_HAND = 4,
-			CARDS_DRAW = 5,
-			CHECK_DECK = 6,
-			SHUFFLE_DECK = 7,
-			ROOM_NAME = 8,
-			ROOM_PASSWORD = 9,
+			RULES_OK,
+			NUM_PLAYERS_T1,
+			NUM_PLAYERS_T2,
+			BEST_OF,
+			TIME_LIMIT,
+			STARTING_LP,
+			STARTING_HAND,
+			CARDS_DRAW,
+			CHECK_DECK,
+			SHUFFLE_DECK,
+			ROOM_NAME,
+			ROOM_PASSWORD,
 		};
 
 		enum SinglePlayerMenu {

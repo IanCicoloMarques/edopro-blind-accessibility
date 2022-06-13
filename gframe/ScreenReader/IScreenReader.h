@@ -10,12 +10,12 @@
 class IScreenReader {
 public:
 
-	void readScreen(std::wstring string) {
-		textToSpeech(StringBuilder::parseInput(string));
+	void readScreen(std::wstring string, bool saveHistory = true) {
+		textToSpeech(StringBuilder::parseInput(string), saveHistory);
 	}
 
-	virtual void textToSpeech(std::wstring string) = 0;
-	virtual void textToBraile(std::wstring string) = 0;
+	virtual void textToSpeech(std::wstring string, bool saveHistory = false) = 0;
+	virtual void textToBraile(std::wstring string, bool saveHistory = false) = 0;
 	virtual void readLastMessage() = 0;
 };
 

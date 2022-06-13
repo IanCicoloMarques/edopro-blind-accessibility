@@ -298,6 +298,7 @@ namespace ygo {
 				return;
 			if (room->locked) {
 				if (!mainGame->wRoomPassword->isVisible()) {
+					ScreenReader::getReader()->readScreen(L"Use the arrow keys to set the password");
 					mainGame->ebRPName->setText(L"");
 					//mainGame->ebNickNameOnline->setText(L"");
 					mainGame->wRoomPassword->setVisible(true);

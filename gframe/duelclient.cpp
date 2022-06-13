@@ -41,6 +41,7 @@ namespace ygo {
 	bool DuelClient::is_host = false;
 	bool DuelClient::is_local_host = false;
 	std::atomic<bool> DuelClient::answered{ false };
+	bool DuelClient::waitingForOponent{false};
 	event_base* DuelClient::client_base = nullptr;
 	bufferevent* DuelClient::client_bev = nullptr;
 	bool DuelClient::is_closing = false;
@@ -715,7 +716,7 @@ catch(...) { what = def; }
 			mainGame->dInfo.isFirst = (mainGame->dInfo.player_type < mainGame->dInfo.team1) || (mainGame->dInfo.player_type >= 7);
 			mainGame->dInfo.isTeam1 = mainGame->dInfo.isFirst;
 			mainGame->SetMessageWindow();
-			ScreenReader::getReader()->readScreen(L"Go to next match");
+			ScreenReader::getReader()->readScreen(L"Press enter to go to the next match");
 			break;
 		}
 		case STOC_WAITING_SIDE:
@@ -1276,6 +1277,14 @@ catch(...) { what = def; }
 			len--;
 			if (mainGame->dInfo.curMsg != MSG_WAITING) {
 				replay_stream.emplace_back(mainGame->dInfo.curMsg, pbuf, len);
+				if (mainGame->dInfo.curMsg == MSG_SELECT_IDLECMD) {
+					Play(SoundManager::SFX::COUNTER_ADD);
+					waitingForOponent = false;
+				}
+			}
+			else if(waitingForOponent == false) {
+				Play(SoundManager::SFX::COUNTER_REMOVE);
+				waitingForOponent = true;
 			}
 		}
 		mainGame->wCmdMenu->setVisible(false);
@@ -1599,7 +1608,6 @@ catch(...) { what = def; }
 			mainGame->waitFrame = 0;
 			mainGame->stHintMsg->setText(gDataManager->GetSysString(1390).data());
 			mainGame->stHintMsg->setVisible(true);
-			ScreenReader::getReader()->readScreen(L"Waiting other player...");
 			return true;
 		}
 		case MSG_START: {
@@ -3104,7 +3112,6 @@ catch(...) { what = def; }
 				mainGame->btnEP->setEnabled(false);
 				mainGame->showcardcode = 9;
 				ScreenReader::getReader()->readScreen(L"End Phase");
-
 				break;
 			}
 			if (!mainGame->dInfo.isCatchingUp) {

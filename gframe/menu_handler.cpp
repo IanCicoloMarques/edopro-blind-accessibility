@@ -1329,6 +1329,7 @@ namespace ygo {
 			}
 			case irr::KEY_RIGHT: {
 				if (!event.KeyInput.PressedDown) {
+					CheckMenu();
 					typing = false;
 					mainGame->env->removeFocus(mainGame->env->getFocus());
 					if (menu.empty())
@@ -1345,6 +1346,7 @@ namespace ygo {
 			}
 			case irr::KEY_LEFT: {
 				if (!event.KeyInput.PressedDown) {
+					CheckMenu();		
 					typing = false;
 					mainGame->env->removeFocus(mainGame->env->getFocus());
 					if (menu.empty())
@@ -1482,6 +1484,21 @@ namespace ygo {
 		return false;
 	}
 
+
+	void MenuHandler::CheckMenu(){
+		if (mainGame->btnOnlineMode->isEnabled() && mainGame->btnOnlineMode->isTrulyVisible())
+			menu = menuMain;
+		else if (mainGame->ebRPName->isEnabled() && mainGame->ebRPName->isTrulyVisible())
+			menu = menuPassword;
+		else if (mainGame->btnCreateHost->isEnabled() && mainGame->btnCreateHost->isTrulyVisible())
+			menu = menuSinglePlayer;
+		else if (mainGame->btnHostPrepWindBot->isEnabled() && mainGame->btnHostPrepWindBot->isTrulyVisible())
+			menu = menuRulesOk;
+		else if ((mainGame->btnHostPrepDuelist->isEnabled() && mainGame->btnHostPrepDuelist->isTrulyVisible()) ||
+				  mainGame->btnHostPrepOB->isEnabled() && mainGame->btnHostPrepOB->isTrulyVisible())
+			menu = menuJoinHostOnline;
+	}
+
 	void MenuHandler::MainMenu() {
 		if (menuSelectCounter == MenuType::MainMenu::MM_ONLINE_DUEL && mainGame->btnOnlineMode->isEnabled()) {
 			ClickButton(mainGame->btnOnlineMode);
@@ -1535,14 +1552,14 @@ namespace ygo {
 		}
 		else if (menuSelectCounter == MenuType::SinglePlayerMenu::SP_PLAYER_NAME && mainGame->ebNickName->isTrulyVisible()) {
 			if (!typing) {
-				ScreenReader::getReader()->readScreen(std::wstring(L"Type limit of time, in seconds, per turn").c_str());
+				ScreenReader::getReader()->readScreen(std::wstring(L"Type your name").c_str());
 				FocusTextBox(mainGame->ebNickName);
 				typing = true;
 			}
 			else {
 				typing = false;
 				mainGame->env->removeFocus(mainGame->env->getFocus());
-				ScreenReader::getReader()->readScreen(fmt::format(L"Set limit of time as {} seconds", mainGame->ebNickName->getText()));
+				ScreenReader::getReader()->readScreen(fmt::format(L"Set name as {}", mainGame->ebNickName->getText()));
 			}
 		}
 	}
@@ -1570,26 +1587,50 @@ namespace ygo {
 			std::wstring nvdaString = fmt::format(L"Deck {}", mainGame->cbDeckSelect->getItem(mainGame->cbDeckSelect->getSelected()));
 			ScreenReader::getReader()->readScreen(nvdaString.c_str());
 		}
-		else if (menuSelectCounter == MenuType::SinglePlayerDuel::SP_AI_MENU && mainGame->btnHostPrepWindBot->isEnabled()) {
+		else if (menuSelectCounter == MenuType::SinglePlayerDuel::SP_AI_MENU && mainGame->btnHostPrepWindBot->isTrulyVisible() && mainGame->btnHostPrepWindBot->isEnabled()) {
 			ClickButton(mainGame->btnHostPrepWindBot);
 		}
-		else if (menuSelectCounter == MenuType::OnlineDuel::OD_DUEL_MODE && mainGame->btnHostPrepDuelist->isEnabled()) {
+		else if (menuSelectCounter == MenuType::OnlineDuel::OD_DUEL_MODE && mainGame->btnHostPrepDuelist->isTrulyVisible() && mainGame->btnHostPrepDuelist->isEnabled()) {
 			ClickButton(mainGame->btnHostPrepDuelist);
 		}
-		else if (menuSelectCounter == MenuType::OnlineDuel::OD_DUEL_MODE && !mainGame->btnHostPrepDuelist->isEnabled()) {
-			ScreenReader::getReader()->readScreen(L"Not able to go to duel mode");
+		else if (menuSelectCounter == MenuType::OnlineDuel::OD_DUEL_MODE && mainGame->btnHostPrepDuelist->isTrulyVisible() && !mainGame->btnHostPrepDuelist->isEnabled()) {
+			ScreenReader::getReader()->readScreen(L"You are already on duel mode");
 		}
-		else if (menuSelectCounter == MenuType::OnlineDuel::OD_SPECTATE_MODE && mainGame->btnHostPrepOB->isEnabled()) {
+		else if (menuSelectCounter == MenuType::OnlineDuel::OD_SPECTATE_MODE && mainGame->btnHostPrepOB->isTrulyVisible() && mainGame->btnHostPrepOB->isEnabled()) {
 			ClickButton(mainGame->btnHostPrepOB);
 		}
-		else if (menuSelectCounter == MenuType::OnlineDuel::OD_SPECTATE_MODE && !mainGame->btnHostPrepOB->isEnabled()) {
-			ScreenReader::getReader()->readScreen(L"Not able to go to spectator mode");
+		else if (menuSelectCounter == MenuType::OnlineDuel::OD_SPECTATE_MODE && mainGame->btnHostPrepOB->isTrulyVisible() && !mainGame->btnHostPrepOB->isEnabled()) {
+			ScreenReader::getReader()->readScreen(L"You are already on spectator mode");
 		}
 	}
 
 	void MenuHandler::HostDuel() {
 		if (menuSelectCounter == MenuType::HostDuel::RULES_OK && mainGame->btnHostConfirm->isEnabled()) {
 			ClickButton(mainGame->btnHostConfirm);
+		}
+		else if (menuSelectCounter == MenuType::HostDuel::NUM_PLAYERS_T1 && mainGame->ebTeam1->isTrulyVisible()) {
+			if (!typing) {
+				ScreenReader::getReader()->readScreen(std::wstring(L"Type number of players in the team 1").c_str());
+				FocusTextBox(mainGame->ebTeam1);
+				typing = true;
+			}
+			else {
+				typing = false;
+				mainGame->env->removeFocus(mainGame->env->getFocus());
+				ScreenReader::getReader()->readScreen(fmt::format(L"Set number of players as {}", mainGame->ebTeam1->getText()));
+			}
+		}
+		else if (menuSelectCounter == MenuType::HostDuel::NUM_PLAYERS_T2 && mainGame->ebTeam2->isTrulyVisible()) {
+			if (!typing) {
+				ScreenReader::getReader()->readScreen(std::wstring(L"Type number of players in the team 2").c_str());
+				FocusTextBox(mainGame->ebTeam2);
+				typing = true;
+			}
+			else {
+				typing = false;
+				mainGame->env->removeFocus(mainGame->env->getFocus());
+				ScreenReader::getReader()->readScreen(fmt::format(L"Set number of players as {}", mainGame->ebTeam2->getText()));
+			}
 		}
 		else if (menuSelectCounter == MenuType::HostDuel::BEST_OF && mainGame->ebBestOf->isTrulyVisible()) {
 			if (!typing) {

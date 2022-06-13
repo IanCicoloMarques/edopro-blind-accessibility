@@ -1920,7 +1920,13 @@ namespace ygo {
 					if (canViewCards) {
 						cardType = AccessibilityFieldFocus::CardType::MONSTER;
 						lookupFieldLocId = AccessibilityFieldFocus::FieldLookerLocId::SELECTABLE_CARDS;
-						DisplayCards(selectable_cards, fmt::format(L"Selectable Cards"));
+						if (mainGame->wCardSelect->isTrulyVisible()) {
+							display_cards = selectable_cards;
+							ScreenReader::getReader()->readScreen(fmt::format(L"Selectable Cards {} cards", display_cards.size()).data(), false);
+							mainGame->env->setFocus(mainGame->wCardSelect);
+						}
+						else
+							DisplayCards(selectable_cards, fmt::format(L"Selectable Cards"));
 					}
 					else
 						CloseDialog();
@@ -1933,7 +1939,13 @@ namespace ygo {
 					if (canViewCards) {
 						cardType = AccessibilityFieldFocus::CardType::MONSTER;
 						lookupFieldLocId = AccessibilityFieldFocus::FieldLookerLocId::PLAYER_SPECIAL_SUMMONABLE_MONSTERS;
-						DisplayCards(spsummonable_cards, fmt::format(L"Special Summonable Cards"));
+						if (mainGame->wCardSelect->isTrulyVisible()) {
+							display_cards = selectable_cards;
+							ScreenReader::getReader()->readScreen(fmt::format(L"Special Summonable Cards {} cards", display_cards.size()).data(), false);
+							mainGame->env->setFocus(mainGame->wCardSelect);
+						}
+						else
+							DisplayCards(spsummonable_cards, fmt::format(L"Special Summonable Cards"));
 					}
 					else
 						CloseDialog();

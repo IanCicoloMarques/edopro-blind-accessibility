@@ -141,7 +141,7 @@ irr::IrrlichtDevice* GUIUtils::CreateDevice(GameConfig* configs) {
 #endif
 	driver->setTextureCreationFlag(irr::video::ETCF_CREATE_MIP_MAPS, false);
 	driver->setTextureCreationFlag(irr::video::ETCF_OPTIMIZED_FOR_QUALITY, true);
-	device->setWindowCaption(L"Project Ignis: EDOPro - Accessibility Project");
+	device->setWindowCaption(L"EDOPro - Accessibility Project");
 #if !(IRRLICHT_VERSION_MAJOR==1 && IRRLICHT_VERSION_MINOR==9)
 	device->setResizable(true);
 #endif

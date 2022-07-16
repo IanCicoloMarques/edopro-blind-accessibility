@@ -1308,9 +1308,9 @@ namespace ygo {
 						std::wstring numberPlayers = std::wstring(mainGame->roomListTable->getCellText(onlineMatchCounter, 5));
 						int numPlayers = std::count(numberPlayers.begin(), numberPlayers.end(), ',') + 1;
 						if (numPlayers > 1)
-							ScreenReader::getReader()->textToSpeech(fmt::format(L"{} Players {}", numPlayers, mainGame->roomListTable->getCellText(onlineMatchCounter, 5)));
+							ScreenReader::getReader()->textToSpeech(fmt::format(L"{} Players {}, {}", numPlayers, mainGame->roomListTable->getCellText(onlineMatchCounter, 5), mainGame->roomListTable->getCellText(onlineMatchCounter, 6)));
 						else
-							ScreenReader::getReader()->textToSpeech(fmt::format(L"{} Player {}", numPlayers, mainGame->roomListTable->getCellText(onlineMatchCounter, 5)));
+							ScreenReader::getReader()->textToSpeech(fmt::format(L"{} Player {}, {}", numPlayers, mainGame->roomListTable->getCellText(onlineMatchCounter, 5), mainGame->roomListTable->getCellText(onlineMatchCounter, 6)));
 					}
 				}
 				break;
@@ -1324,9 +1324,9 @@ namespace ygo {
 						std::wstring numberPlayers = std::wstring(mainGame->roomListTable->getCellText(onlineMatchCounter, 5));
 						int numPlayers = std::count(numberPlayers.begin(), numberPlayers.end(), ',') + 1;
 						if (numPlayers > 1)
-							ScreenReader::getReader()->textToSpeech(fmt::format(L"{} Players {}", numPlayers, mainGame->roomListTable->getCellText(onlineMatchCounter, 5)));
+							ScreenReader::getReader()->textToSpeech(fmt::format(L"{} Players {}, {}", numPlayers, mainGame->roomListTable->getCellText(onlineMatchCounter, 5), mainGame->roomListTable->getCellText(onlineMatchCounter, 6)));
 						else
-							ScreenReader::getReader()->textToSpeech(fmt::format(L"{} Player {}", numPlayers, mainGame->roomListTable->getCellText(onlineMatchCounter, 5)));
+							ScreenReader::getReader()->textToSpeech(fmt::format(L"{} Player {}, {}", numPlayers, mainGame->roomListTable->getCellText(onlineMatchCounter, 5), mainGame->roomListTable->getCellText(onlineMatchCounter, 6)));
 					}
 				}
 				break;
@@ -1707,16 +1707,16 @@ namespace ygo {
 		else if (menuSelectCounter == MenuType::HostDuel::SHUFFLE_DECK && mainGame->chkNoShuffleDeck->isTrulyVisible()) {
 			CheckBox(mainGame->chkNoShuffleDeck);
 		}
-		else if (menuSelectCounter == MenuType::HostDuel::ROOM_NAME && mainGame->ebServerName->isTrulyVisible()) {
+		else if (menuSelectCounter == MenuType::HostDuel::ROOM_NAME && mainGame->ebHostNotes->isTrulyVisible()) {
 			if (!typing) {
 				ScreenReader::getReader()->readScreen(L"Type room's name");
-				FocusTextBox(mainGame->ebServerName);
+				FocusTextBox(mainGame->ebHostNotes);
 				typing = true;
 			}
 			else {
 				typing = false;
 				mainGame->env->removeFocus(mainGame->env->getFocus());
-				ScreenReader::getReader()->readScreen(fmt::format(L"Set room's name as {}", mainGame->ebServerName->getText()));
+				ScreenReader::getReader()->readScreen(fmt::format(L"Set room's name as {}", mainGame->ebHostNotes->getText()));
 			}
 		}
 		else if (menuSelectCounter == MenuType::HostDuel::ROOM_PASSWORD && mainGame->ebServerPass->isTrulyVisible()) {

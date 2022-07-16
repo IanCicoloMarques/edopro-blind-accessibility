@@ -2342,6 +2342,7 @@ catch(...) { what = def; }
 			if (mainGame->dInfo.curMsg == MSG_SELECT_PLACE) {
 				if (select_hint) {
 					text = fmt::sprintf(gDataManager->GetSysString(569), gDataManager->GetName(select_hint));
+					mainGame->dField.selectZone = true;
 				}
 				else
 					text = gDataManager->GetDesc(560, mainGame->dInfo.compat_mode).data();
@@ -2354,7 +2355,6 @@ catch(...) { what = def; }
 			ScreenReader::getReader()->readScreen(text.c_str());
 			ScreenReader::getReader()->cleanBuiltMessage();
 			ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
-			mainGame->dField.selectZone = true;
 			if (mainGame->dInfo.curMsg == MSG_SELECT_PLACE && (
 				(mainGame->tabSettings.chkMAutoPos->isChecked() && mainGame->dField.selectable_field & 0x7f007f) ||
 				(mainGame->tabSettings.chkSTAutoPos->isChecked() && !(mainGame->dField.selectable_field & 0x7f007f)))) {
@@ -3553,6 +3553,7 @@ catch(...) { what = def; }
 		}
 		case MSG_SET: {
 			Play(SoundManager::SFX::SET);
+			mainGame->dField.selectZone = false;
 			/*const auto code = BufferIO::Read<uint32_t>(pbuf);*/
 			/*CoreUtils::loc_info info = CoreUtils::ReadLocInfo(pbuf, mainGame->dInfo.compat_mode);*/
 			event_string = gDataManager->GetSysString(1601).data();
@@ -3602,8 +3603,10 @@ catch(...) { what = def; }
 		case MSG_SUMMONING: {
 			const auto code = BufferIO::Read<uint32_t>(pbuf);
 			/*CoreUtils::loc_info info = CoreUtils::ReadLocInfo(pbuf, mainGame->dInfo.compat_mode);*/
-			if (!PlayChant(SoundManager::CHANT::SUMMON, code))
+			if (!PlayChant(SoundManager::CHANT::SUMMON, code)) {
 				Play(SoundManager::SFX::SUMMON);
+				mainGame->dField.selectZone = false;
+			}
 			if (!mainGame->dInfo.isCatchingUp) {
 				std::unique_lock<std::mutex> lock(mainGame->gMutex);
 				event_string = fmt::sprintf(gDataManager->GetSysString(1603), gDataManager->GetName(code));
@@ -3627,8 +3630,10 @@ catch(...) { what = def; }
 		case MSG_SPSUMMONING: {
 			const auto code = BufferIO::Read<uint32_t>(pbuf);
 			/*CoreUtils::loc_info info = CoreUtils::ReadLocInfo(pbuf, mainGame->dInfo.compat_mode);*/
-			if (!PlayChant(SoundManager::CHANT::SUMMON, code))
+			if (!PlayChant(SoundManager::CHANT::SUMMON, code)) {
 				Play(SoundManager::SFX::SPECIAL_SUMMON);
+				mainGame->dField.selectZone = false;
+			}
 			if (!mainGame->dInfo.isCatchingUp) {
 				std::unique_lock<std::mutex> lock(mainGame->gMutex);
 				event_string = fmt::sprintf(gDataManager->GetSysString(1605), gDataManager->GetName(code));
@@ -4378,6 +4383,7 @@ catch(...) { what = def; }
 			ScreenReader::getReader()->readScreen(fmt::format(gDataManager->GetDesc(select_hint ? select_hint : 566, mainGame->dInfo.compat_mode)));
 			ScreenReader::getReader()->cleanBuiltMessage();
 			ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
+			ScreenReader::getReader()->buildMessage(L"Press space to focus on the options and use the arrow keys to navigate");
 
 			mainGame->PopupElement(mainGame->wANNumber);
 			select_hint = 0;

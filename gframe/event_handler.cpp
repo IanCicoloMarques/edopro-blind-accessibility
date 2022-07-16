@@ -1465,6 +1465,10 @@ namespace ygo {
 							}
 						}
 					}
+					else {
+						if (!mainGame->dInfo.isCatchingUp)
+							gSoundManager->PlaySoundEffect(SoundManager::SFX::NP);
+					}
 					break;
 				}
 				case MSG_SELECT_CARD:
@@ -1517,9 +1521,13 @@ namespace ygo {
 					if (!(hovered_location & 0xe) || !clicked_card || !clicked_card->is_selectable)
 						break;
 					if (clicked_card->is_selected) {
+						if (!mainGame->dInfo.isCatchingUp)
+							gSoundManager->PlaySoundEffect(SoundManager::SFX::UNCONFIRM);
 						clicked_card->is_selected = false;
 					}
 					else {
+						if (!mainGame->dInfo.isCatchingUp)
+							gSoundManager->PlaySoundEffect(SoundManager::SFX::CONFIRM);
 						clicked_card->is_selected = true;
 					}
 					selected_cards.push_back(clicked_card);
@@ -2045,7 +2053,9 @@ namespace ygo {
 						auto selectedCard = display_cards[indexLookedUpCard];
 						std::wstring cardName = fmt::format(L"{}", gDataManager->GetName(selectedCard->code));
 						std::wstring cardType = fmt::format(L"{}", gDataManager->FormatType(selectedCard->type));
-						std::wstring cardLevel = fmt::format(L"Level {}", gDataManager->GetCardData(selectedCard->code)->level);
+						std::wstring cardLevel = selectedCard->link_marker != 0 ?
+							fmt::format(L"Link {}", gDataManager->GetCardData(selectedCard->code)->level) :
+							fmt::format(L"Level {}", gDataManager->GetCardData(selectedCard->code)->level);
 						std::wstring cardRace = fmt::format(L"{}", gDataManager->FormatRace(selectedCard->race));
 						std::wstring cardAttack = fmt::format(L"Attack {}", selectedCard->attack);
 						std::wstring cardDefense = fmt::format(L"Defense: {}", selectedCard->defense);
@@ -2054,6 +2064,7 @@ namespace ygo {
 						std::wstring leftScale = fmt::format(L"Left Scale {}", selectedCard->lscstring);
 						std::wstring rightScale = fmt::format(L"Right Scale {}", selectedCard->rscstring);
 						std::wstring fieldSlot = fmt::format(L"Zone {}", SearchFieldSlot(displayedField, selectedCard));
+						std::wstring linkMarks = GetLinkMarks(selectedCard);
 
 						//selectedCard->lscstring
 						ScreenReader::getReader()->readScreen(cardName.c_str(), false);
@@ -2068,9 +2079,11 @@ namespace ygo {
 							ScreenReader::getReader()->readScreen(cardAttack.c_str(), false);
 							ScreenReader::getReader()->readScreen(cardDefense.c_str(), false);
 						}
-						if (leftScale.compare(L"Left Scale") != 0)
+						if (!linkMarks.empty())
+							ScreenReader::getReader()->readScreen(fmt::format(L"Link Marks {}", linkMarks), false);
+						if (leftScale.compare(L"Left Scale ") != 0)
 							ScreenReader::getReader()->readScreen(leftScale.c_str(), false);
-						if (rightScale.compare(L"Right Scale") != 0)
+						if (rightScale.compare(L"Right Scale ") != 0)
 							ScreenReader::getReader()->readScreen(rightScale.c_str(), false);
 						ScreenReader::getReader()->readScreen(cardEffect.c_str(), false);
 					}
@@ -2219,6 +2232,14 @@ namespace ygo {
 						std::wstring nvdaString = fmt::format(L"Enemy Player Field");
 						ScreenReader::getReader()->readScreen(nvdaString.c_str());
 					}
+					else {
+						if (mainGame->cbANNumber->isTrulyVisible()) {
+							if (!mainGame->env->hasFocus(mainGame->cbANNumber))
+								mainGame->env->setFocus(mainGame->cbANNumber);
+							std::wstring nvdaString = fmt::format(L"{}", mainGame->cbANNumber->getItem(mainGame->cbANNumber->getSelected()));
+							ScreenReader::getReader()->readScreen(nvdaString.c_str(), false);
+						}
+					}
 				}
 				break;
 			}
@@ -2256,15 +2277,15 @@ namespace ygo {
 					}
 					else
 					{
-						if (selectZone) {
-							bool zoneIsFree = CheckIfFieldSlotIsFree(0, displayedField, cardType);
-							if (!zoneIsFree) {
-								if (!mainGame->dInfo.isCatchingUp)
-									gSoundManager->PlaySoundEffect(SoundManager::SFX::NP);
-							}
-							else
-								selectZone = false;
-						}
+						//if (selectZone) {
+						//	bool zoneIsFree = CheckIfFieldSlotIsFree(0, displayedField, cardType);
+						//	if (!zoneIsFree) {
+						//		if (!mainGame->dInfo.isCatchingUp)
+						//			gSoundManager->PlaySoundEffect(SoundManager::SFX::NP);
+						//	}
+						//	else
+						//		selectZone = false;
+						//}
 						SelectFieldSlot(1, displayedField);
 						MouseClick(event);
 					}
@@ -2286,15 +2307,15 @@ namespace ygo {
 					{
 						if (mainGame->btnDisplayOK->isTrulyVisible())
 							TriggerEvent(mainGame->btnDisplayOK, irr::gui::EGET_BUTTON_CLICKED);
-						if (selectZone) {
-							bool zoneIsFree = CheckIfFieldSlotIsFree(1, displayedField, cardType);
-							if (!zoneIsFree) {
-								if (!mainGame->dInfo.isCatchingUp)
-									gSoundManager->PlaySoundEffect(SoundManager::SFX::NP);
-							}
-							else
-								selectZone = false;
-						}
+						//if (selectZone) {
+						//	bool zoneIsFree = CheckIfFieldSlotIsFree(1, displayedField, cardType);
+						//	if (!zoneIsFree) {
+						//		if (!mainGame->dInfo.isCatchingUp)
+						//			gSoundManager->PlaySoundEffect(SoundManager::SFX::NP);
+						//	}
+						//	else
+						//		selectZone = false;
+						//}
 						SelectFieldSlot(2, displayedField);
 						MouseClick(event);
 					}
@@ -2316,15 +2337,15 @@ namespace ygo {
 					{
 						if (mainGame->btnDisplayOK->isTrulyVisible())
 							TriggerEvent(mainGame->btnDisplayOK, irr::gui::EGET_BUTTON_CLICKED);
-						if (selectZone) {
-							bool zoneIsFree = CheckIfFieldSlotIsFree(2, displayedField, cardType);
-							if (!zoneIsFree) {
-								if (!mainGame->dInfo.isCatchingUp)
-									gSoundManager->PlaySoundEffect(SoundManager::SFX::NP);
-							}
-							else
-								selectZone = false;
-						}
+						//if (selectZone) {
+						//	bool zoneIsFree = CheckIfFieldSlotIsFree(2, displayedField, cardType);
+						//	if (!zoneIsFree) {
+						//		if (!mainGame->dInfo.isCatchingUp)
+						//			gSoundManager->PlaySoundEffect(SoundManager::SFX::NP);
+						//	}
+						//	else
+						//		selectZone = false;
+						//}
 						SelectFieldSlot(3, displayedField);
 						MouseClick(event);
 					}
@@ -2340,15 +2361,15 @@ namespace ygo {
 					else {
 						if (mainGame->btnDisplayOK->isTrulyVisible())
 							TriggerEvent(mainGame->btnDisplayOK, irr::gui::EGET_BUTTON_CLICKED);
-						if (selectZone) {
-							bool zoneIsFree = CheckIfFieldSlotIsFree(3, displayedField, cardType);
-							if (!zoneIsFree) {
-								if (!mainGame->dInfo.isCatchingUp)
-									gSoundManager->PlaySoundEffect(SoundManager::SFX::NP);
-							}
-							else
-								selectZone = false;
-						}
+						//if (selectZone) {
+						//	bool zoneIsFree = CheckIfFieldSlotIsFree(3, displayedField, cardType);
+						//	if (!zoneIsFree) {
+						//		if (!mainGame->dInfo.isCatchingUp)
+						//			gSoundManager->PlaySoundEffect(SoundManager::SFX::NP);
+						//	}
+						//	else
+						//		selectZone = false;
+						//}
 						SelectFieldSlot(4, displayedField);
 						MouseClick(event);
 					}
@@ -2364,15 +2385,15 @@ namespace ygo {
 					else {
 						if (mainGame->btnDisplayOK->isTrulyVisible())
 							TriggerEvent(mainGame->btnDisplayOK, irr::gui::EGET_BUTTON_CLICKED);
-						if (selectZone) {
-							bool zoneIsFree = CheckIfFieldSlotIsFree(4, displayedField, cardType);
-							if (!zoneIsFree) {
-								if (!mainGame->dInfo.isCatchingUp)
-									gSoundManager->PlaySoundEffect(SoundManager::SFX::NP);
-							}
-							else
-								selectZone = false;
-						}
+						//if (selectZone) {
+						//	bool zoneIsFree = CheckIfFieldSlotIsFree(4, displayedField, cardType);
+						//	if (!zoneIsFree) {
+						//		if (!mainGame->dInfo.isCatchingUp)
+						//			gSoundManager->PlaySoundEffect(SoundManager::SFX::NP);
+						//	}
+						//	else
+						//		selectZone = false;
+						//}
 						SelectFieldSlot(5, displayedField);
 						MouseClick(event);
 					}
@@ -2383,15 +2404,15 @@ namespace ygo {
 				if (!event.KeyInput.PressedDown) {
 					if (mainGame->btnDisplayOK->isTrulyVisible())
 						TriggerEvent(mainGame->btnDisplayOK, irr::gui::EGET_BUTTON_CLICKED);
-					if (selectZone) {
-						bool zoneIsFree = CheckIfFieldSlotIsFree(5, displayedField, cardType);
-						if (!zoneIsFree) {
-							if (!mainGame->dInfo.isCatchingUp)
-								gSoundManager->PlaySoundEffect(SoundManager::SFX::NP);
-						}
-						else
-							selectZone = false;
-					}
+					//if (selectZone) {
+					//	bool zoneIsFree = CheckIfFieldSlotIsFree(5, displayedField, cardType);
+					//	if (!zoneIsFree) {
+					//		if (!mainGame->dInfo.isCatchingUp)
+					//			gSoundManager->PlaySoundEffect(SoundManager::SFX::NP);
+					//	}
+					//	else
+					//		selectZone = false;
+					//}
 					SelectFieldSlot(6, displayedField);
 					MouseClick(event);
 				}
@@ -2401,15 +2422,13 @@ namespace ygo {
 				if (!event.KeyInput.PressedDown) {
 					if (mainGame->btnDisplayOK->isTrulyVisible())
 						TriggerEvent(mainGame->btnDisplayOK, irr::gui::EGET_BUTTON_CLICKED);
-					if (selectZone) {
-						bool zoneIsFree = CheckIfFieldSlotIsFree(6, displayedField, cardType);
-						if (!zoneIsFree) {
-							if (!mainGame->dInfo.isCatchingUp)
-								gSoundManager->PlaySoundEffect(SoundManager::SFX::NP);
-						}
-						else
-							selectZone = false;
-					}
+					//if (selectZone) {
+					//	bool zoneIsFree = CheckIfFieldSlotIsFree(6, displayedField, cardType);
+					//	if (!zoneIsFree) {
+					//	}
+					//	else
+					//		selectZone = false;
+					//}
 					SelectFieldSlot(7, displayedField);
 					MouseClick(event);
 				}
@@ -2773,6 +2792,31 @@ namespace ygo {
 			break;
 		}
 		return free;
+	}
+
+	std::wstring ClientField::GetLinkMarks(ClientCard* card)
+	{
+		std::wstring linkMark = std::wstring();
+		const int mark = card->link_marker;
+		if (mark & LINK_MARKER_BOTTOM_LEFT) {
+			linkMark += L"Bottom Left\n";
+		}
+		if (mark & LINK_MARKER_BOTTOM) {
+			linkMark += L"Bottom\n";
+		}
+		if (mark & LINK_MARKER_BOTTOM_RIGHT) {
+			linkMark += L"Bottom Right\n";
+		}
+		if (mark & LINK_MARKER_TOP_LEFT) {
+			linkMark += L"Bottom\n";
+		}
+		if (mark & LINK_MARKER_TOP) {
+			linkMark += L"Bottom\n";
+		}
+		if (mark & LINK_MARKER_TOP_RIGHT) {
+			linkMark += L"Bottom\n";
+		}
+		return linkMark;
 	}
 
 	void ClientField::SetLookUpField() {

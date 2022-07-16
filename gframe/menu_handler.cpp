@@ -102,6 +102,10 @@ namespace ygo {
 
 	static inline void CheckBox(irr::gui::IGUICheckBox* chkbox) {
 		if (chkbox->isTrulyVisible()) {
+			if (chkbox->isChecked())
+				mainGame->PlaySoundEffect(SoundManager::SFX::UNCONFIRM);
+			else
+				mainGame->PlaySoundEffect(SoundManager::SFX::CONFIRM);
 			chkbox->setChecked(!chkbox->isChecked());
 		}
 	}

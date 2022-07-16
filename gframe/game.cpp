@@ -3533,6 +3533,11 @@ namespace ygo {
 		// current file in archive
 		game->updateProgressBottom->setProgress(payload->percentage);
 	}
+	void Game::PlaySoundEffect(SoundManager::SFX sound)
+	{
+		if (!mainGame->dInfo.isCatchingUp)
+			gSoundManager->PlaySoundEffect(sound);
+	}
 	void Game::PopulateResourcesDirectories() {
 		script_dirs.push_back(EPRO_TEXT("./expansions/script/"));
 		auto expansions_subdirs = Utils::FindSubfolders(EPRO_TEXT("./expansions/script/"));

@@ -19,6 +19,7 @@
 #include "discord_wrapper.h"
 #include "windbot_panel.h"
 #include "ocgapi_types.h"
+#include "sound_manager.h"
 
 struct unzip_payload;
 class CGUISkinSystem;
@@ -227,6 +228,7 @@ namespace ygo {
 		static void MessageHandler(void* payload, const char* string, int type);
 		static void UpdateDownloadBar(int percentage, int cur, int tot, const char* filename, bool is_new, void* payload);
 		static void UpdateUnzipBar(unzip_payload* payload);
+		void PlaySoundEffect(SoundManager::SFX sound);
 
 		std::mutex gMutex;
 		Signal frameSignal;

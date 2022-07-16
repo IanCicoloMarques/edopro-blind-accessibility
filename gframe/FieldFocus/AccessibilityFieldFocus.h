@@ -25,6 +25,7 @@ namespace ygo {
 			SELECTED_CARDS = 14,
 			MUST_SELECT_CARDS = 15,
 			LINK_ZONE = 25,
+			CHAINED_CARDS = 26
 		};
 
 		enum DisplayedField
@@ -68,7 +69,8 @@ namespace ygo {
 			LINK = 5,
 			GRAVEYARD = 6,
 			BANNED = 7,
-			DECK = 8
+			DECK = 8,
+			CHAIN = 9
 		};
 
 		enum BattleStep

@@ -20,3 +20,34 @@ void NVDA::readLastMessage()
 {
 	nvdaController_speakText(lastMessage.c_str());
 }
+
+void NVDA::setHelpMessage(std::wstring string)
+{
+	helpMessage = string;
+}
+
+void NVDA::readHelpMessage()
+{
+	nvdaController_speakText(helpMessage.c_str());
+}
+
+void NVDA::buildMessage(std::wstring string)
+{
+	builtMessage += string;
+	builtMessage += L"\n";
+}
+
+void NVDA::cleanBuiltMessage()
+{
+	builtMessage = std::wstring();
+}
+
+std::wstring NVDA::getBuiltMessage()
+{
+	return builtMessage;
+}
+
+std::wstring NVDA::getLastMessage()
+{
+	return lastMessage;
+}

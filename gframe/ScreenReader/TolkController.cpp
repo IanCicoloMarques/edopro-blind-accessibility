@@ -20,3 +20,34 @@ void TolkController::readLastMessage()
 {
 	Tolk_Output(lastMessage.c_str());
 }
+
+void TolkController::readHelpMessage()
+{
+	Tolk_Output(helpMessage.c_str());
+}
+
+void TolkController::setHelpMessage(std::wstring string)
+{
+	helpMessage = string;
+}
+
+void TolkController::buildMessage(std::wstring string)
+{
+	builtMessage += string;
+	builtMessage += L"\n";
+}
+
+void TolkController::cleanBuiltMessage()
+{
+	builtMessage = std::wstring();
+}
+
+std::wstring TolkController::getBuiltMessage()
+{
+	return builtMessage;
+}
+
+std::wstring TolkController::getLastMessage()
+{
+	return lastMessage;
+}

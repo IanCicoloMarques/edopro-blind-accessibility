@@ -36,6 +36,7 @@ public:
 		PHASE,
 		PLAYER_ENTER,
 		CHAT,
+		NP,
 		SFX_TOTAL_SIZE
 	};
 	enum BGM {

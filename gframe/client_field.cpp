@@ -626,9 +626,12 @@ namespace ygo {
 			}
 		}
 		ScreenReader::getReader()->readScreen(L"Select a option");
+		ScreenReader::getReader()->cleanBuiltMessage();
+		ScreenReader::getReader()->buildMessage(L"Use the number keys to select an option");
 		for (int i = 0; (i < count) && (i < 5) && quickmode; i++) {
 			mainGame->btnOption[i]->setText(gDataManager->GetDesc(select_options[i], mainGame->dInfo.compat_mode).data());
 			ScreenReader::getReader()->readScreen(fmt::format(L"{} - {}", i + 1, gDataManager->GetDesc(select_options[i], mainGame->dInfo.compat_mode).data()));
+			ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
 		}
 		irr::core::recti pos = mainGame->wOptions->getRelativePosition();
 		if (count > 5 && quickmode)

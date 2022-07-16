@@ -19,8 +19,17 @@ private:
 
 	void textToSpeech(std::wstring string, bool saveHistory);
 	void textToBraile(std::wstring string, bool saveHistory);
+	void setHelpMessage(std::wstring string);
+	void buildMessage(std::wstring string);
+	void cleanBuiltMessage();
+	std::wstring getBuiltMessage();
+	std::wstring getLastMessage();
+	void readHelpMessage();
 	void readLastMessage();
 	std::wstring lastMessage;
+	std::wstring helpMessage;
+	std::wstring builtMessage;
+
 
 };
 #endif

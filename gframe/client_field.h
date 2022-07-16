@@ -150,6 +150,7 @@ public:
 
 	//Accessibility Focus
 	bool accessibilityFocus = true; //TODO- FAZER UMA CONFIGURAÇÃO NO MENU PRA ISSO
+	bool selectZone = false;
 	int cardSelectPosition = 0;
 	int indexLookedUpCard = 0;
 	AccessibilityFieldFocus::DisplayedField displayedField = AccessibilityFieldFocus::DisplayedField::PLAYER;
@@ -159,7 +160,7 @@ public:
 	void CloseDialog();
 	void ScrollCardList();
 	void DisplayCards(const std::vector<ClientCard*>& field, const std::wstring & = L"");
-	void DisplayCards(const std::vector<ChainInfo>& field);
+	void DisplayCards(const std::vector<ChainInfo>& field, const std::wstring & = L"");
 	bool UseCard(const AccessibilityFieldFocus::UseType& useType, irr::SEvent event);
 	bool CheckIfCanViewCards(irr::SEvent event);
 	void SelectFieldSlot(int slot, const AccessibilityFieldFocus::DisplayedField& player = AccessibilityFieldFocus::DisplayedField::PLAYER, const AccessibilityFieldFocus::CardType& cardType = AccessibilityFieldFocus::CardType::NO_CARD_TYPE);
@@ -177,6 +178,7 @@ public:
 	void SetMouseOnCard();
 	void SetLookUpField();
 	void ReadCardName();
+	bool CheckIfFieldSlotIsFree(const int& slot, const AccessibilityFieldFocus::DisplayedField& player = AccessibilityFieldFocus::DisplayedField::PLAYER, const int& cardType = AccessibilityFieldFocus::CardType::NO_CARD_TYPE);
 };
 
 }

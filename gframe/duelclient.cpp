@@ -93,6 +93,7 @@ namespace ygo {
 
 	bool DuelClient::StartClient(uint32_t ip, uint16_t port, uint32_t gameid, bool create_game) {
 		ScreenReader::setReader();
+
 		if (connect_state)
 			return false;
 		client_base = event_base_new();
@@ -495,6 +496,8 @@ catch(...) { what = def; }
 				if (stringid < 1406) {
 					mainGame->PopupMessage(gDataManager->GetSysString(stringid));
 					ScreenReader::getReader()->readScreen(fmt::format(gDataManager->GetSysString(stringid)));
+					ScreenReader::getReader()->cleanBuiltMessage();
+					ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
 				}
 				connect_state |= 0x100;
 				event_base_loopbreak(client_base);
@@ -582,6 +585,8 @@ catch(...) { what = def; }
 				}
 				mainGame->PopupMessage(text);
 				ScreenReader::getReader()->readScreen(text.c_str());
+				ScreenReader::getReader()->cleanBuiltMessage();
+				ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
 
 				mainGame->cbDeckSelect->setEnabled(true);
 				mainGame->cbDeckSelect2->setEnabled(true);
@@ -593,6 +598,8 @@ catch(...) { what = def; }
 				std::lock_guard<std::mutex> lock(mainGame->gMutex);
 				mainGame->PopupMessage(gDataManager->GetSysString(1408));
 				ScreenReader::getReader()->readScreen(fmt::format(gDataManager->GetSysString(1408)));
+				ScreenReader::getReader()->cleanBuiltMessage();
+				ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
 
 				break;
 			}
@@ -612,10 +619,14 @@ catch(...) { what = def; }
 							version.client.major, version.client.minor,
 							version.core.major, version.core.minor));
 						ScreenReader::getReader()->readScreen(L"Client needs update.");
+						ScreenReader::getReader()->cleanBuiltMessage();
+						ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
 					}
 					else {
 						mainGame->PopupMessage(fmt::sprintf(gDataManager->GetSysString(1411), _pkt.code >> 12, (_pkt.code >> 4) & 0xff, _pkt.code & 0xf));
 						ScreenReader::getReader()->readScreen(L"Version mismatch.");
+						ScreenReader::getReader()->cleanBuiltMessage();
+						ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
 					}
 					if (mainGame->isHostingOnline) {
 #define HIDE_AND_CHECK(obj) if(obj->isVisible()) mainGame->HideElement(obj);
@@ -642,12 +653,21 @@ catch(...) { what = def; }
 		}
 		case STOC_SELECT_HAND: {
 			ScreenReader::getReader()->readScreen(L"SCISSORS ROCK PAPER");
+			ScreenReader::getReader()->cleanBuiltMessage();
+			ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
+			ScreenReader::getReader()->buildMessage(L"Press key number 1 to SCISSORS");
+			ScreenReader::getReader()->buildMessage(L"Press key number 2 to ROCK");
+			ScreenReader::getReader()->buildMessage(L"Press key number 3 to PAPER");
 			mainGame->wHand->setVisible(true);
 			break;
 		}
 		case STOC_SELECT_TP: {
 			std::lock_guard<std::mutex> lock(mainGame->gMutex);
 			ScreenReader::getReader()->readScreen(L"Select your turn");
+			ScreenReader::getReader()->cleanBuiltMessage();
+			ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
+			ScreenReader::getReader()->buildMessage(L"Press key comma to play first");
+			ScreenReader::getReader()->buildMessage(L"Press key dot to play second");
 			mainGame->PopupElement(mainGame->wFTSelect);
 			break;
 		}
@@ -717,6 +737,8 @@ catch(...) { what = def; }
 			mainGame->dInfo.isTeam1 = mainGame->dInfo.isFirst;
 			mainGame->SetMessageWindow();
 			ScreenReader::getReader()->readScreen(L"Press enter to go to the next match");
+			ScreenReader::getReader()->cleanBuiltMessage();
+			ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
 			break;
 		}
 		case STOC_WAITING_SIDE:
@@ -725,6 +747,8 @@ catch(...) { what = def; }
 			mainGame->dField.Clear();
 			mainGame->stHintMsg->setText(gDataManager->GetSysString(pktType == STOC_WAITING_SIDE ? 1409 : 1424).data());
 			ScreenReader::getReader()->readScreen(fmt::format(gDataManager->GetSysString(pktType == STOC_WAITING_SIDE ? 1409 : 1424).data()));
+			ScreenReader::getReader()->cleanBuiltMessage();
+			ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
 
 			mainGame->stHintMsg->setVisible(true);
 			break;
@@ -1138,6 +1162,9 @@ catch(...) { what = def; }
 			}
 			else if (state == PLAYERCHANGE_READY) {
 				ScreenReader::getReader()->readScreen(fmt::format(L"{} is ready", mainGame->stHostPrepDuelist[pos]->getText()));
+				ScreenReader::getReader()->cleanBuiltMessage();
+				ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
+				ScreenReader::getReader()->buildMessage(L"You can start the game when both players are ready");
 				mainGame->chkHostPrepReady[pos]->setChecked(true);
 				if (pos == selftype) {
 					mainGame->btnHostPrepReady->setVisible(false);
@@ -1146,6 +1173,9 @@ catch(...) { what = def; }
 			}
 			else if (state == PLAYERCHANGE_NOTREADY) {
 				ScreenReader::getReader()->readScreen(fmt::format(L"{} is not ready", mainGame->stHostPrepDuelist[pos]->getText()));
+				ScreenReader::getReader()->cleanBuiltMessage();
+				ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
+				ScreenReader::getReader()->buildMessage(L"You can start the game when both players are ready");
 				mainGame->chkHostPrepReady[pos]->setChecked(false);
 				if (pos == selftype) {
 					mainGame->btnHostPrepReady->setVisible(true);
@@ -1154,11 +1184,16 @@ catch(...) { what = def; }
 			}
 			else if (state == PLAYERCHANGE_LEAVE) {
 				ScreenReader::getReader()->readScreen(fmt::format(L"{} left the game", mainGame->stHostPrepDuelist[pos]->getText()));
+				ScreenReader::getReader()->cleanBuiltMessage();
+				ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
 				mainGame->stHostPrepDuelist[pos]->setText(L"");
 				mainGame->chkHostPrepReady[pos]->setChecked(false);
 			}
 			else if (state == PLAYERCHANGE_OBSERVE) {
 				ScreenReader::getReader()->readScreen(fmt::format(L"{} is observing the game", mainGame->stHostPrepDuelist[pos]->getText()));
+				ScreenReader::getReader()->cleanBuiltMessage();
+				ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
+				ScreenReader::getReader()->buildMessage(L"The player will not participate in the match, but will be able to watch");
 				watching++;
 				mainGame->stHostPrepDuelist[pos]->setText(L"");
 				mainGame->chkHostPrepReady[pos]->setChecked(false);
@@ -1918,6 +1953,10 @@ catch(...) { what = def; }
 					fmt::sprintf(gDataManager->GetSysString(200), gDataManager->GetName(code), gDataManager->FormatLocation(info.location, info.sequence)));
 				std::wstring nvdaString = fmt::format(L"Use {} from {}?", gDataManager->GetName(code), gDataManager->FormatLocation(info.location, info.sequence));
 				ScreenReader::getReader()->readScreen(nvdaString.c_str());
+				ScreenReader::getReader()->cleanBuiltMessage();
+				ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
+				ScreenReader::getReader()->buildMessage(L"Press key comma to select yes");
+				ScreenReader::getReader()->buildMessage(L"Press key dot to select no");
 			}
 			else if (desc == 221) {
 				text = fmt::format(L"{}\n{}\n{}", event_string,
@@ -1925,10 +1964,16 @@ catch(...) { what = def; }
 					gDataManager->GetSysString(223));
 				std::wstring nvdaString = fmt::format(L"Trigger {} from {}?", gDataManager->GetName(code), gDataManager->FormatLocation(info.location, info.sequence));
 				ScreenReader::getReader()->readScreen(nvdaString.c_str());
+				ScreenReader::getReader()->cleanBuiltMessage();
+				ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
+				ScreenReader::getReader()->buildMessage(L"Press key comma to select yes");
+				ScreenReader::getReader()->buildMessage(L"Press key dot to select no");
 			}
 			else {
 				text = fmt::sprintf(gDataManager->GetDesc(desc, mainGame->dInfo.compat_mode), gDataManager->GetName(code));
 				ScreenReader::getReader()->readScreen(text.c_str());
+				ScreenReader::getReader()->cleanBuiltMessage();
+				ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
 			}
 			std::lock_guard<std::mutex> lock(mainGame->gMutex);
 			ClientCard* pcard = mainGame->dField.GetCard(info.controler, info.location, info.sequence);
@@ -1950,6 +1995,10 @@ catch(...) { what = def; }
 			mainGame->stQMessage->setText(gDataManager->GetDesc(desc, mainGame->dInfo.compat_mode).data());
 			std::wstring nvdaString = fmt::format(gDataManager->GetDesc(desc, mainGame->dInfo.compat_mode).data());
 			ScreenReader::getReader()->readScreen(nvdaString.c_str());
+			ScreenReader::getReader()->cleanBuiltMessage();
+			ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
+			ScreenReader::getReader()->buildMessage(L"Press key comma to select yes");
+			ScreenReader::getReader()->buildMessage(L"Press key dot to select no");
 			mainGame->PopupElement(mainGame->wQuery);
 			return false;
 		}
@@ -2013,6 +2062,8 @@ catch(...) { what = def; }
 			std::wstring text = fmt::format(L"{}({}-{})", gDataManager->GetDesc(select_hint ? select_hint : 560, mainGame->dInfo.compat_mode),
 				mainGame->dField.select_min, mainGame->dField.select_max);
 			ScreenReader::getReader()->readScreen(fmt::format(L"{}", gDataManager->GetDesc(select_hint ? select_hint : 560, mainGame->dInfo.compat_mode)));
+			ScreenReader::getReader()->cleanBuiltMessage();
+			ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
 			std::lock_guard<std::mutex> lock(mainGame->gMutex);
 			select_hint = 0;
 			if (panelmode) {
@@ -2034,6 +2085,8 @@ catch(...) { what = def; }
 			}
 			mainGame->ShowCardInfo(mainGame->dField.display_cards[mainGame->dField.indexLookedUpCard]->code);
 			ScreenReader::getReader()->readScreen(fmt::format(L"{}", gDataManager->GetName(mainGame->dField.display_cards[mainGame->dField.indexLookedUpCard]->code)));
+			ScreenReader::getReader()->cleanBuiltMessage();
+			ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
 			return false;
 		}
 		case MSG_SELECT_UNSELECT_CARD: {
@@ -2111,6 +2164,8 @@ catch(...) { what = def; }
 				mainGame->dField.select_min, mainGame->dField.select_max);
 			std::lock_guard<std::mutex> lock(mainGame->gMutex);
 			ScreenReader::getReader()->readScreen(fmt::format(L"{}", gDataManager->GetName(mainGame->dField.display_cards[mainGame->dField.indexLookedUpCard]->code)));
+			ScreenReader::getReader()->cleanBuiltMessage();
+			ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
 			select_hint = 0;
 			if (panelmode) {
 				mainGame->wCardSelect->setText(text.data());
@@ -2221,10 +2276,14 @@ catch(...) { what = def; }
 			if (!conti_exist) {
 				mainGame->stHintMsg->setText(gDataManager->GetSysString(550).data());
 				ScreenReader::getReader()->readScreen(gDataManager->GetSysString(550).data());
+				ScreenReader::getReader()->cleanBuiltMessage();
+				ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
 			}
 			else {
 				mainGame->stHintMsg->setText(gDataManager->GetSysString(556).data());
 				ScreenReader::getReader()->readScreen(gDataManager->GetSysString(556).data());
+				ScreenReader::getReader()->cleanBuiltMessage();
+				ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
 			}
 			mainGame->stHintMsg->setVisible(true);
 			if (panelmode) {
@@ -2240,14 +2299,27 @@ catch(...) { what = def; }
 					if (count == 0) {
 						mainGame->stQMessage->setText(fmt::format(L"{}\n{}", gDataManager->GetSysString(201), gDataManager->GetSysString(202)).data());
 						ScreenReader::getReader()->readScreen(fmt::format(L"{}", gDataManager->GetSysString(202)).data());
+						ScreenReader::getReader()->cleanBuiltMessage();
+						ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
+						ScreenReader::getReader()->buildMessage(L"Press key comma to select yes");
+						ScreenReader::getReader()->buildMessage(L"Press key dot to select no");
 					}
 					else if (select_trigger) {
 						mainGame->stQMessage->setText(fmt::format(L"{}\n{}\n{}", event_string, gDataManager->GetSysString(222), gDataManager->GetSysString(223)).data());
 						ScreenReader::getReader()->readScreen(fmt::format(L"{}", gDataManager->GetSysString(222)).data());
+						ScreenReader::getReader()->cleanBuiltMessage();
+						ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
+						ScreenReader::getReader()->buildMessage(L"Press key comma to select yes");
+						ScreenReader::getReader()->buildMessage(L"Press key dot to select no");
+
 					}
 					else {
 						mainGame->stQMessage->setText(fmt::format(L"{}\n{}", event_string, gDataManager->GetSysString(203)).data());
 						ScreenReader::getReader()->readScreen(fmt::format(L"{}", gDataManager->GetSysString(203)).data());
+						ScreenReader::getReader()->cleanBuiltMessage();
+						ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
+						ScreenReader::getReader()->buildMessage(L"Press key comma to select yes");
+						ScreenReader::getReader()->buildMessage(L"Press key dot to select no");
 					}
 					mainGame->PopupElement(mainGame->wQuery);
 				}
@@ -2280,6 +2352,9 @@ catch(...) { what = def; }
 			mainGame->stHintMsg->setText(text.data());
 			mainGame->stHintMsg->setVisible(true);
 			ScreenReader::getReader()->readScreen(text.c_str());
+			ScreenReader::getReader()->cleanBuiltMessage();
+			ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
+			mainGame->dField.selectZone = true;
 			if (mainGame->dInfo.curMsg == MSG_SELECT_PLACE && (
 				(mainGame->tabSettings.chkMAutoPos->isChecked() && mainGame->dField.selectable_field & 0x7f007f) ||
 				(mainGame->tabSettings.chkSTAutoPos->isChecked() && !(mainGame->dField.selectable_field & 0x7f007f)))) {
@@ -2359,6 +2434,10 @@ catch(...) { what = def; }
 			}
 
 			ScreenReader::getReader()->readScreen(L"Select position");
+			ScreenReader::getReader()->cleanBuiltMessage();
+			ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
+			ScreenReader::getReader()->buildMessage(L"Press key comma to select attack mode");
+			ScreenReader::getReader()->buildMessage(L"Press key dot to select defense mode");
 
 			int count = 0, filter = 0x1, startpos;
 			while (filter != 0x10) {
@@ -2427,6 +2506,12 @@ catch(...) { what = def; }
 			std::lock_guard<std::mutex> lock(mainGame->gMutex);
 			mainGame->stHintMsg->setText(fmt::format(L"{}({}-{})", gDataManager->GetDesc(select_hint ? select_hint : 531, mainGame->dInfo.compat_mode), mainGame->dField.select_min, mainGame->dField.select_max).data());
 			ScreenReader::getReader()->readScreen(fmt::format(L"{}({}-{})", gDataManager->GetDesc(select_hint ? select_hint : 531, mainGame->dInfo.compat_mode), mainGame->dField.select_min, mainGame->dField.select_max).data());
+			ScreenReader::getReader()->cleanBuiltMessage();
+			ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
+			ScreenReader::getReader()->buildMessage(L"Press key comma to cancel or");
+			ScreenReader::getReader()->buildMessage(L"Press key w to see the monsters");
+			ScreenReader::getReader()->buildMessage(L"Press key enter to select the choosen monsters");
+			ScreenReader::getReader()->buildMessage(L"Press key p to confirm");
 
 			mainGame->stHintMsg->setVisible(true);
 			if (mainGame->dField.select_cancelable) {
@@ -2460,6 +2545,8 @@ catch(...) { what = def; }
 			std::lock_guard<std::mutex> lock(mainGame->gMutex);
 			mainGame->stHintMsg->setText(fmt::sprintf(gDataManager->GetSysString(204), mainGame->dField.select_counter_count, gDataManager->GetCounterName(mainGame->dField.select_counter_type)).data());
 			ScreenReader::getReader()->readScreen(fmt::sprintf(gDataManager->GetSysString(204), mainGame->dField.select_counter_count, gDataManager->GetCounterName(mainGame->dField.select_counter_type)).data());
+			ScreenReader::getReader()->cleanBuiltMessage();
+			ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
 			mainGame->stHintMsg->setVisible(true);
 			return false;
 		}
@@ -2522,6 +2609,8 @@ catch(...) { what = def; }
 			std::sort(mainGame->dField.selectsum_all.begin(), mainGame->dField.selectsum_all.end(), ClientCard::client_card_sort);
 			std::wstring text = fmt::format(L"{}({})", gDataManager->GetDesc(select_hint ? select_hint : 560, mainGame->dInfo.compat_mode), mainGame->dField.select_sumval);
 			ScreenReader::getReader()->readScreen(text.c_str());
+			ScreenReader::getReader()->cleanBuiltMessage();
+			ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
 
 			select_hint = 0;
 			mainGame->wCardSelect->setText(text.data());
@@ -2556,10 +2645,14 @@ catch(...) { what = def; }
 			if (mainGame->dInfo.curMsg == MSG_SORT_CHAIN) {
 				mainGame->wCardSelect->setText(gDataManager->GetSysString(206).data());
 				ScreenReader::getReader()->readScreen(L"Select chain order");
+				ScreenReader::getReader()->cleanBuiltMessage();
+				ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
 			}
 			else {
 				mainGame->wCardSelect->setText(gDataManager->GetSysString(205).data());
 				ScreenReader::getReader()->readScreen(L"Select from top to bottom");
+				ScreenReader::getReader()->cleanBuiltMessage();
+				ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
 			}
 			mainGame->dField.select_min = 0;
 			mainGame->dField.select_max = count;
@@ -2623,6 +2716,8 @@ catch(...) { what = def; }
 				std::unique_lock<std::mutex> lock(mainGame->gMutex);
 				mainGame->AddLog(fmt::format(L"*[{}]", gDataManager->GetName(pcard->code)), pcard->code);
 				ScreenReader::getReader()->readScreen(fmt::format(L"{}", gDataManager->GetName(pcard->code)));
+				ScreenReader::getReader()->cleanBuiltMessage();
+				ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
 
 				constexpr float milliseconds = 5.0f * 1000.0f / 60.0f;
 				if (player == 0)
@@ -2789,6 +2884,8 @@ catch(...) { what = def; }
 				}
 			}
 			ScreenReader::getReader()->readScreen(fmt::format(L"Deck {} shuffled.", player + 1));
+			ScreenReader::getReader()->cleanBuiltMessage();
+			ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
 
 			return true;
 		}
@@ -2865,6 +2962,8 @@ catch(...) { what = def; }
 				if (!(pcard->position & POS_FACEUP))
 					pcard->SetCode(BufferIO::Read<uint32_t>(pbuf));
 			ScreenReader::getReader()->readScreen(fmt::format(L"Extra Deck {} shuffled.", player + 1));
+			ScreenReader::getReader()->cleanBuiltMessage();
+			ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
 
 			return true;
 		}
@@ -3023,6 +3122,8 @@ catch(...) { what = def; }
 				mainGame->showcard = 0;
 			}
 			ScreenReader::getReader()->readScreen(L"Next turn.");
+			ScreenReader::getReader()->cleanBuiltMessage();
+			ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
 
 			return true;
 		}
@@ -3066,6 +3167,8 @@ catch(...) { what = def; }
 				mainGame->btnDP->setSubElement(true);
 				mainGame->showcardcode = 4;
 				ScreenReader::getReader()->readScreen(L"Draw Phase.");
+				ScreenReader::getReader()->cleanBuiltMessage();
+				ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
 
 				break;
 			case PHASE_STANDBY:
@@ -3074,6 +3177,8 @@ catch(...) { what = def; }
 				mainGame->btnSP->setSubElement(true);
 				mainGame->showcardcode = 5;
 				ScreenReader::getReader()->readScreen(L"Standby Phase.");
+				ScreenReader::getReader()->cleanBuiltMessage();
+				ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
 
 				break;
 			case PHASE_MAIN1:
@@ -3082,6 +3187,8 @@ catch(...) { what = def; }
 				mainGame->btnM1->setSubElement(true);
 				mainGame->showcardcode = 6;
 				ScreenReader::getReader()->readScreen(L"Main Phase One");
+				ScreenReader::getReader()->cleanBuiltMessage();
+				ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
 
 				break;
 			case PHASE_BATTLE_START:
@@ -3092,6 +3199,8 @@ catch(...) { what = def; }
 				mainGame->btnBP->setEnabled(false);
 				mainGame->showcardcode = 7;
 				ScreenReader::getReader()->readScreen(L"Battle Phase");
+				ScreenReader::getReader()->cleanBuiltMessage();
+				ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
 
 				break;
 			case PHASE_MAIN2:
@@ -3102,6 +3211,8 @@ catch(...) { what = def; }
 				mainGame->btnM2->setEnabled(false);
 				mainGame->showcardcode = 8;
 				ScreenReader::getReader()->readScreen(L"Main Phase Two");
+				ScreenReader::getReader()->cleanBuiltMessage();
+				ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
 
 				break;
 			case PHASE_END:
@@ -3112,6 +3223,8 @@ catch(...) { what = def; }
 				mainGame->btnEP->setEnabled(false);
 				mainGame->showcardcode = 9;
 				ScreenReader::getReader()->readScreen(L"End Phase");
+				ScreenReader::getReader()->cleanBuiltMessage();
+				ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
 				break;
 			}
 			if (!mainGame->dInfo.isCatchingUp) {
@@ -3229,6 +3342,8 @@ catch(...) { what = def; }
 				if (!redundantInfo) {
 					mainGame->AddLog(nvdaString);
 					ScreenReader::getReader()->readScreen(nvdaString);
+					ScreenReader::getReader()->cleanBuiltMessage();
+					ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
 				}
 			}
 			auto lock = LockIf();
@@ -3431,6 +3546,8 @@ catch(...) { what = def; }
 				mainGame->WaitFrameSignal(11, lock);
 			}
 			ScreenReader::getReader()->readScreen(nvdaString);
+			ScreenReader::getReader()->cleanBuiltMessage();
+			ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
 
 			return true;
 		}
@@ -3440,6 +3557,8 @@ catch(...) { what = def; }
 			/*CoreUtils::loc_info info = CoreUtils::ReadLocInfo(pbuf, mainGame->dInfo.compat_mode);*/
 			event_string = gDataManager->GetSysString(1601).data();
 			ScreenReader::getReader()->readScreen(event_string);
+			ScreenReader::getReader()->cleanBuiltMessage();
+			ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
 
 			return true;
 		}
@@ -3454,6 +3573,8 @@ catch(...) { what = def; }
 			ClientCard* pc1 = mainGame->dField.GetCard(info1.controler, info1.location, info1.sequence);
 			ClientCard* pc2 = mainGame->dField.GetCard(info2.controler, info2.location, info2.sequence);
 			ScreenReader::getReader()->readScreen(fmt::format(L"{} control changed", gDataManager->GetName(pc1->alias)));
+			ScreenReader::getReader()->cleanBuiltMessage();
+			ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
 
 			auto lock = LockIf();
 			mainGame->dField.RemoveCard(info1.controler, info1.location, info1.sequence);
@@ -3494,6 +3615,8 @@ catch(...) { what = def; }
 				mainGame->showcard = 0;
 				mainGame->WaitFrameSignal(11, lock);
 				ScreenReader::getReader()->readScreen(fmt::format(L"{} is summoning {}", mainGame->LocalPlayer(BufferIO::Read<uint8_t>(pbuf)) + 1, gDataManager->GetName(code)));
+				ScreenReader::getReader()->cleanBuiltMessage();
+				ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
 			}
 			return true;
 		}
@@ -3516,6 +3639,8 @@ catch(...) { what = def; }
 				mainGame->showcard = 0;
 				mainGame->WaitFrameSignal(11, lock);
 				ScreenReader::getReader()->readScreen(fmt::format(L"{} is special summoning {}", mainGame->LocalPlayer(BufferIO::Read<uint8_t>(pbuf)) + 1, gDataManager->GetName(code)));
+				ScreenReader::getReader()->cleanBuiltMessage();
+				ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
 			}
 			return true;
 		}
@@ -3545,6 +3670,8 @@ catch(...) { what = def; }
 				mainGame->showcard = 0;
 				mainGame->WaitFrameSignal(11, lock);
 				ScreenReader::getReader()->readScreen(fmt::format(L"{} is flip summoning {}", mainGame->LocalPlayer(BufferIO::Read<uint8_t>(pbuf)) + 1, gDataManager->GetName(code)));
+				ScreenReader::getReader()->cleanBuiltMessage();
+				ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
 			}
 			return true;
 		}
@@ -3622,6 +3749,8 @@ catch(...) { what = def; }
 			auto lock = LockIf();
 			event_string = fmt::sprintf(gDataManager->GetSysString(1609), gDataManager->GetName(mainGame->dField.current_chain.code));
 			ScreenReader::getReader()->readScreen(event_string);
+			ScreenReader::getReader()->cleanBuiltMessage();
+			ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
 
 			mainGame->dField.chains.push_back(mainGame->dField.current_chain);
 			if (ct > 1 && !mainGame->dInfo.isCatchingUp)
@@ -3692,6 +3821,8 @@ catch(...) { what = def; }
 					pcard = mainGame->dField.GetCard(info.controler, info.location, info.sequence);
 				pcard->is_highlighting = true;
 				ScreenReader::getReader()->readScreen(fmt::format(L"{} selected", gDataManager->GetName(pcard->alias)));
+				ScreenReader::getReader()->cleanBuiltMessage();
+				ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
 			}
 			mainGame->WaitFrameSignal(30, lock);
 			for (auto& pcard : pcards)
@@ -3733,6 +3864,8 @@ catch(...) { what = def; }
 					mainGame->WaitFrameSignal(30, lock);
 				mainGame->AddLog(fmt::sprintf(gDataManager->GetSysString((mainGame->dInfo.curMsg == MSG_BECOME_TARGET) ? 1610 : 1680), gDataManager->GetName(pcard->code), gDataManager->FormatLocation(info.location, info.sequence), info.sequence + 1), pcard->code);
 				ScreenReader::getReader()->readScreen(fmt::format(L"{} {}{} selected", gDataManager->GetName(pcard->code), gDataManager->FormatLocation(info.location, info.sequence), info.sequence + 1));
+				ScreenReader::getReader()->cleanBuiltMessage();
+				ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
 
 				pcard->is_highlighting = false;
 			}
@@ -3768,6 +3901,8 @@ catch(...) { what = def; }
 			}
 			event_string = fmt::sprintf(gDataManager->GetSysString(1611 + player), count);
 			ScreenReader::getReader()->readScreen(fmt::format(L"Player {} drew {}", player + 1, count));
+			ScreenReader::getReader()->cleanBuiltMessage();
+			ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
 
 			return true;
 		}
@@ -3794,6 +3929,8 @@ catch(...) { what = def; }
 			mainGame->dInfo.lp[player] = final;
 			mainGame->dInfo.strLP[player] = fmt::to_wstring(mainGame->dInfo.lp[player]);
 			ScreenReader::getReader()->readScreen(fmt::format(L"Player {} LP minus {}, {} LP remaining", player + 1, val, mainGame->dInfo.lp[player]));
+			ScreenReader::getReader()->cleanBuiltMessage();
+			ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
 
 			return true;
 		}
@@ -3818,6 +3955,8 @@ catch(...) { what = def; }
 			mainGame->dInfo.lp[player] = final;
 			mainGame->dInfo.strLP[player] = fmt::to_wstring(mainGame->dInfo.lp[player]);
 			ScreenReader::getReader()->readScreen(fmt::format(L"Player {} LP plus {}, {} LP remaining", player + 1, val, mainGame->dInfo.lp[player]));
+			ScreenReader::getReader()->cleanBuiltMessage();
+			ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
 
 			return true;
 		}
@@ -3843,6 +3982,8 @@ catch(...) { what = def; }
 					pc1->is_showequip = true;
 			}
 			ScreenReader::getReader()->readScreen(fmt::format(L"{}{} equipped with {}{}", pc2->location, gDataManager->GetName(pc2->alias), pc1->location, gDataManager->GetName(pc1->alias)));
+			ScreenReader::getReader()->cleanBuiltMessage();
+			ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
 
 			return true;
 		}
@@ -3859,6 +4000,8 @@ catch(...) { what = def; }
 			mainGame->dInfo.lp[player] = val;
 			mainGame->dInfo.strLP[player] = fmt::to_wstring(mainGame->dInfo.lp[player]);
 			ScreenReader::getReader()->readScreen(fmt::format(L"Player {} LP set to {}", player + 1, val));
+			ScreenReader::getReader()->cleanBuiltMessage();
+			ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
 
 			return true;
 		}
@@ -3930,6 +4073,8 @@ catch(...) { what = def; }
 			mainGame->dInfo.lp[player] = final;
 			mainGame->dInfo.strLP[player] = fmt::to_wstring(mainGame->dInfo.lp[player]);
 			ScreenReader::getReader()->readScreen(fmt::format(L"Player {} LP minus {}, {} LP remaining", player + 1, cost, mainGame->dInfo.lp[player]));
+			ScreenReader::getReader()->cleanBuiltMessage();
+			ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
 
 			return true;
 		}
@@ -3950,6 +4095,8 @@ catch(...) { what = def; }
 			pc->is_highlighting = true;
 			mainGame->stACMessage->setText(fmt::format(gDataManager->GetSysString(1617), gDataManager->GetName(pc->code), gDataManager->GetCounterName(type), count).data());
 			ScreenReader::getReader()->readScreen(fmt::format(gDataManager->GetSysString(1617), gDataManager->GetName(pc->code), gDataManager->GetCounterName(type), count));
+			ScreenReader::getReader()->cleanBuiltMessage();
+			ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
 			mainGame->PopupElement(mainGame->wACMessage, 20);
 			mainGame->WaitFrameSignal(40, lock);
 			pc->is_highlighting = false;
@@ -3972,6 +4119,8 @@ catch(...) { what = def; }
 			pc->is_highlighting = true;
 			mainGame->stACMessage->setText(fmt::format(gDataManager->GetSysString(1618), gDataManager->GetName(pc->code), gDataManager->GetCounterName(type), count).data());
 			ScreenReader::getReader()->readScreen(fmt::format(gDataManager->GetSysString(1618), gDataManager->GetName(pc->code), gDataManager->GetCounterName(type), count));
+			ScreenReader::getReader()->cleanBuiltMessage();
+			ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
 			mainGame->PopupElement(mainGame->wACMessage, 20);
 			mainGame->WaitFrameSignal(40, lock);
 			pc->is_highlighting = false;
@@ -4006,6 +4155,8 @@ catch(...) { what = def; }
 				yd = (info1.controler == 0) ? -3.5f : 3.5f;
 			}
 			ScreenReader::getReader()->readScreen(event_string);
+			ScreenReader::getReader()->cleanBuiltMessage();
+			ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
 
 			sy = std::sqrt((xa - xd) * (xa - xd) + (ya - yd) * (ya - yd)) / 2.0f;
 			mainGame->atk_t.set((xa + xd) / 2, (ya + yd) / 2, 0);
@@ -4058,15 +4209,21 @@ catch(...) { what = def; }
 		case MSG_ATTACK_DISABLED: {
 			event_string = fmt::sprintf(gDataManager->GetSysString(1621), gDataManager->GetName(mainGame->dField.attacker->code));
 			ScreenReader::getReader()->readScreen(L"Negated");
+			ScreenReader::getReader()->cleanBuiltMessage();
+			ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
 
 			return true;
 		}
 		case MSG_DAMAGE_STEP_START: {
 			ScreenReader::getReader()->readScreen(L"Damage step start");
+			ScreenReader::getReader()->cleanBuiltMessage();
+			ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
 			return true;
 		}
 		case MSG_DAMAGE_STEP_END: {
 			ScreenReader::getReader()->readScreen(L"Damage step end");
+			ScreenReader::getReader()->cleanBuiltMessage();
+			ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
 			return true;
 		}
 		case MSG_MISSED_EFFECT: {
@@ -4077,12 +4234,14 @@ catch(...) { what = def; }
 			std::unique_lock<std::mutex> lock(mainGame->gMutex);
 			mainGame->AddLog(fmt::sprintf(gDataManager->GetSysString(1622), gDataManager->GetName(code)), code);
 			ScreenReader::getReader()->readScreen(fmt::format(gDataManager->GetSysString(1622), gDataManager->GetName(code)));
+			ScreenReader::getReader()->cleanBuiltMessage();
+			ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
 			return true;
 		}
 		case MSG_TOSS_COIN: {
 			if (mainGame->dInfo.isCatchingUp)
 				return true;
-			Play(SoundManager::SFX::COIN);
+			//Play(SoundManager::SFX::COIN);
 			/*const auto player = */mainGame->LocalPlayer(BufferIO::Read<uint8_t>(pbuf));
 			const auto count = BufferIO::Read<uint8_t>(pbuf);
 			std::wstring text(gDataManager->GetSysString(1623));
@@ -4090,6 +4249,8 @@ catch(...) { what = def; }
 				bool res = !!BufferIO::Read<uint8_t>(pbuf);
 				text += fmt::format(L"[{}]", gDataManager->GetSysString(res ? 60 : 61));
 				ScreenReader::getReader()->readScreen(text);
+				ScreenReader::getReader()->cleanBuiltMessage();
+				ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
 			}
 			std::unique_lock<std::mutex> lock(mainGame->gMutex);
 			mainGame->AddLog(text);
@@ -4101,7 +4262,7 @@ catch(...) { what = def; }
 		case MSG_TOSS_DICE: {
 			if (mainGame->dInfo.isCatchingUp)
 				return true;
-			Play(SoundManager::SFX::DICE);
+			//Play(SoundManager::SFX::DICE);
 			/*const auto player = */mainGame->LocalPlayer(BufferIO::Read<uint8_t>(pbuf));
 			const auto count = BufferIO::Read<uint8_t>(pbuf);
 			std::wstring text(gDataManager->GetSysString(1624));
@@ -4109,6 +4270,8 @@ catch(...) { what = def; }
 				uint8_t res = BufferIO::Read<uint8_t>(pbuf);
 				text += fmt::format(L"[{}]", res);
 				ScreenReader::getReader()->readScreen(text);
+				ScreenReader::getReader()->cleanBuiltMessage();
+				ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
 			}
 			std::unique_lock<std::mutex> lock(mainGame->gMutex);
 			mainGame->AddLog(text);
@@ -4156,6 +4319,8 @@ catch(...) { what = def; }
 			std::unique_lock<std::mutex> lock(mainGame->gMutex);
 			mainGame->wANRace->setText(gDataManager->GetDesc(select_hint ? select_hint : 563, mainGame->dInfo.compat_mode).data());
 			ScreenReader::getReader()->readScreen(fmt::format(gDataManager->GetDesc(select_hint ? select_hint : 563, mainGame->dInfo.compat_mode)));
+			ScreenReader::getReader()->cleanBuiltMessage();
+			ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
 
 			mainGame->PopupElement(mainGame->wANRace);
 			select_hint = 0;
@@ -4174,6 +4339,8 @@ catch(...) { what = def; }
 			std::unique_lock<std::mutex> lock(mainGame->gMutex);
 			mainGame->wANAttribute->setText(gDataManager->GetDesc(select_hint ? select_hint : 562, mainGame->dInfo.compat_mode).data());
 			ScreenReader::getReader()->readScreen(fmt::format(gDataManager->GetDesc(select_hint ? select_hint : 562, mainGame->dInfo.compat_mode)));
+			ScreenReader::getReader()->cleanBuiltMessage();
+			ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
 
 			mainGame->PopupElement(mainGame->wANAttribute);
 			select_hint = 0;
@@ -4189,6 +4356,8 @@ catch(...) { what = def; }
 			mainGame->ebANCard->setText(L"");
 			mainGame->wANCard->setText(gDataManager->GetDesc(select_hint ? select_hint : 564, mainGame->dInfo.compat_mode).data());
 			ScreenReader::getReader()->readScreen(fmt::format(gDataManager->GetDesc(select_hint ? select_hint : 564, mainGame->dInfo.compat_mode)));
+			ScreenReader::getReader()->cleanBuiltMessage();
+			ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
 
 			mainGame->dField.UpdateDeclarableList();
 			mainGame->PopupElement(mainGame->wANCard);
@@ -4207,6 +4376,8 @@ catch(...) { what = def; }
 			mainGame->cbANNumber->setSelected(0);
 			mainGame->wANNumber->setText(gDataManager->GetDesc(select_hint ? select_hint : 565, mainGame->dInfo.compat_mode).data());
 			ScreenReader::getReader()->readScreen(fmt::format(gDataManager->GetDesc(select_hint ? select_hint : 566, mainGame->dInfo.compat_mode)));
+			ScreenReader::getReader()->cleanBuiltMessage();
+			ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
 
 			mainGame->PopupElement(mainGame->wANNumber);
 			select_hint = 0;
@@ -4518,6 +4689,8 @@ catch(...) { what = def; }
 				event_string = fmt::sprintf(gDataManager->GetSysString(1609), gDataManager->GetName(mainGame->dField.current_chain.code));
 				mainGame->dField.last_chain = true;
 				ScreenReader::getReader()->readScreen(event_string);
+				ScreenReader::getReader()->cleanBuiltMessage();
+				ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
 			}
 			break;
 		}

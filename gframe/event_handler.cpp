@@ -2047,9 +2047,9 @@ namespace ygo {
 						std::wstring cardType = fmt::format(L"{}", gDataManager->FormatType(selectedCard->type));
 						std::wstring cardLevel = fmt::format(L"Level {}", gDataManager->GetCardData(selectedCard->code)->level);
 						std::wstring cardRace = fmt::format(L"{}", gDataManager->FormatRace(selectedCard->race));
-						std::wstring cardAttack = fmt::format(L"Attack {}", gDataManager->GetCardData(selectedCard->code)->attack);
-						std::wstring cardDefense = fmt::format(L"Defense: {}", gDataManager->GetCardData(selectedCard->code)->defense);
-						std::wstring cardEffect = fmt::format(L"{}", gDataManager->GetText(selectedCard->code));
+						std::wstring cardAttack = fmt::format(L"Attack {}", selectedCard->attack);
+						std::wstring cardDefense = fmt::format(L"Defense: {}", selectedCard->defense);
+						std::wstring cardEffect  = fmt::format(L"{}", gDataManager->GetText(selectedCard->code));
 						std::wstring position = selectedCard->position == 1 ? fmt::format(L"Attack Position") : fmt::format(L"Defense Position");
 						std::wstring leftScale = fmt::format(L"Left Scale {}", selectedCard->lscstring);
 						std::wstring rightScale = fmt::format(L"Right Scale {}", selectedCard->rscstring);
@@ -2068,9 +2068,9 @@ namespace ygo {
 							ScreenReader::getReader()->readScreen(cardAttack.c_str(), false);
 							ScreenReader::getReader()->readScreen(cardDefense.c_str(), false);
 						}
-						if (leftScale.compare(L"Left Scale 0") != 0)
+						if (leftScale.compare(L"Left Scale") != 0)
 							ScreenReader::getReader()->readScreen(leftScale.c_str(), false);
-						if (rightScale.compare(L"Right Scale 0") != 0)
+						if (rightScale.compare(L"Right Scale") != 0)
 							ScreenReader::getReader()->readScreen(rightScale.c_str(), false);
 						ScreenReader::getReader()->readScreen(cardEffect.c_str(), false);
 					}
@@ -2088,6 +2088,12 @@ namespace ygo {
 			}
 			case irr::KEY_KEY_H: {
 				if (!event.KeyInput.PressedDown) {
+					ScreenReader::getReader()->readScreen(ScreenReader::getReader()->getBuiltMessage(), false);
+				}
+				break;
+			}
+			case irr::KEY_KEY_J: {
+				if (!event.KeyInput.PressedDown) {
 					if (mainGame->btnEP->isVisible() && mainGame->btnEP->isEnabled() && mainGame->dInfo.selfnames.size() > 0)
 						ScreenReader::getReader()->readScreen(fmt::format(L"Your turn", mainGame->dInfo.selfnames.at(0)), false);
 					else if(mainGame->dInfo.opponames.size() > 0)
@@ -2099,6 +2105,19 @@ namespace ygo {
 				if (!event.KeyInput.PressedDown) {
 					ChangeFieldByCard();
 					MouseClick(event);
+				}
+				break;
+			}
+			case irr::KEY_KEY_N: {
+				if (!event.KeyInput.PressedDown) {
+					bool canViewCards = CheckIfCanViewCards(event);
+					if (canViewCards) {
+						cardType = AccessibilityFieldFocus::CardType::CHAIN;
+						lookupFieldLocId = AccessibilityFieldFocus::FieldLookerLocId::CHAINED_CARDS;
+						DisplayCards(chains, fmt::format(L"Chained Cards"));
+					}
+					else
+						CloseDialog();
 				}
 				break;
 			}
@@ -2237,6 +2256,15 @@ namespace ygo {
 					}
 					else
 					{
+						if (selectZone) {
+							bool zoneIsFree = CheckIfFieldSlotIsFree(0, displayedField, cardType);
+							if (!zoneIsFree) {
+								if (!mainGame->dInfo.isCatchingUp)
+									gSoundManager->PlaySoundEffect(SoundManager::SFX::NP);
+							}
+							else
+								selectZone = false;
+						}
 						SelectFieldSlot(1, displayedField);
 						MouseClick(event);
 					}
@@ -2258,6 +2286,15 @@ namespace ygo {
 					{
 						if (mainGame->btnDisplayOK->isTrulyVisible())
 							TriggerEvent(mainGame->btnDisplayOK, irr::gui::EGET_BUTTON_CLICKED);
+						if (selectZone) {
+							bool zoneIsFree = CheckIfFieldSlotIsFree(1, displayedField, cardType);
+							if (!zoneIsFree) {
+								if (!mainGame->dInfo.isCatchingUp)
+									gSoundManager->PlaySoundEffect(SoundManager::SFX::NP);
+							}
+							else
+								selectZone = false;
+						}
 						SelectFieldSlot(2, displayedField);
 						MouseClick(event);
 					}
@@ -2279,6 +2316,15 @@ namespace ygo {
 					{
 						if (mainGame->btnDisplayOK->isTrulyVisible())
 							TriggerEvent(mainGame->btnDisplayOK, irr::gui::EGET_BUTTON_CLICKED);
+						if (selectZone) {
+							bool zoneIsFree = CheckIfFieldSlotIsFree(2, displayedField, cardType);
+							if (!zoneIsFree) {
+								if (!mainGame->dInfo.isCatchingUp)
+									gSoundManager->PlaySoundEffect(SoundManager::SFX::NP);
+							}
+							else
+								selectZone = false;
+						}
 						SelectFieldSlot(3, displayedField);
 						MouseClick(event);
 					}
@@ -2294,6 +2340,15 @@ namespace ygo {
 					else {
 						if (mainGame->btnDisplayOK->isTrulyVisible())
 							TriggerEvent(mainGame->btnDisplayOK, irr::gui::EGET_BUTTON_CLICKED);
+						if (selectZone) {
+							bool zoneIsFree = CheckIfFieldSlotIsFree(3, displayedField, cardType);
+							if (!zoneIsFree) {
+								if (!mainGame->dInfo.isCatchingUp)
+									gSoundManager->PlaySoundEffect(SoundManager::SFX::NP);
+							}
+							else
+								selectZone = false;
+						}
 						SelectFieldSlot(4, displayedField);
 						MouseClick(event);
 					}
@@ -2309,9 +2364,54 @@ namespace ygo {
 					else {
 						if (mainGame->btnDisplayOK->isTrulyVisible())
 							TriggerEvent(mainGame->btnDisplayOK, irr::gui::EGET_BUTTON_CLICKED);
+						if (selectZone) {
+							bool zoneIsFree = CheckIfFieldSlotIsFree(4, displayedField, cardType);
+							if (!zoneIsFree) {
+								if (!mainGame->dInfo.isCatchingUp)
+									gSoundManager->PlaySoundEffect(SoundManager::SFX::NP);
+							}
+							else
+								selectZone = false;
+						}
 						SelectFieldSlot(5, displayedField);
 						MouseClick(event);
 					}
+				}
+				break;
+			}
+			case irr::KEY_KEY_6: {
+				if (!event.KeyInput.PressedDown) {
+					if (mainGame->btnDisplayOK->isTrulyVisible())
+						TriggerEvent(mainGame->btnDisplayOK, irr::gui::EGET_BUTTON_CLICKED);
+					if (selectZone) {
+						bool zoneIsFree = CheckIfFieldSlotIsFree(5, displayedField, cardType);
+						if (!zoneIsFree) {
+							if (!mainGame->dInfo.isCatchingUp)
+								gSoundManager->PlaySoundEffect(SoundManager::SFX::NP);
+						}
+						else
+							selectZone = false;
+					}
+					SelectFieldSlot(6, displayedField);
+					MouseClick(event);
+				}
+				break;
+			}
+			case irr::KEY_KEY_7: {
+				if (!event.KeyInput.PressedDown) {
+					if (mainGame->btnDisplayOK->isTrulyVisible())
+						TriggerEvent(mainGame->btnDisplayOK, irr::gui::EGET_BUTTON_CLICKED);
+					if (selectZone) {
+						bool zoneIsFree = CheckIfFieldSlotIsFree(6, displayedField, cardType);
+						if (!zoneIsFree) {
+							if (!mainGame->dInfo.isCatchingUp)
+								gSoundManager->PlaySoundEffect(SoundManager::SFX::NP);
+						}
+						else
+							selectZone = false;
+					}
+					SelectFieldSlot(7, displayedField);
+					MouseClick(event);
 				}
 				break;
 			}
@@ -2486,7 +2586,7 @@ namespace ygo {
 				break;
 			}
 			case AccessibilityFieldFocus::UseType::CHANGE_MODE: {
-				if (mainGame->btnRepos->isVisible())
+				if (mainGame->btnRepos->isVisible()) 
 					TriggerEvent(mainGame->btnRepos, irr::gui::EGET_BUTTON_CLICKED);
 				break;
 			}
@@ -2556,7 +2656,7 @@ namespace ygo {
 		}
 	}
 
-	void ClientField::DisplayCards(const std::vector<ChainInfo>& field) {
+	void ClientField::DisplayCards(const std::vector<ChainInfo>& field, const std::wstring& text) {
 		display_cards.clear();
 		indexLookedUpCard = 0;
 		for (auto it = field.begin(); it != field.end(); ++it) {
@@ -2657,6 +2757,24 @@ namespace ygo {
 		return fieldSlot;
 	}
 
+	bool ClientField::CheckIfFieldSlotIsFree(const int& slot, const AccessibilityFieldFocus::DisplayedField& player, const int& cardType) {
+		ClientCard* x;
+		bool free = false;
+		switch (cardType)
+		{
+		case AccessibilityFieldFocus::CardType::MONSTER:
+			if (mzone[player][slot] == NULL)
+				free = true;
+			break;
+		case AccessibilityFieldFocus::CardType::SPELL:
+			x = szone[player][slot];
+			break;
+		default:
+			break;
+		}
+		return free;
+	}
+
 	void ClientField::SetLookUpField() {
 		//if (clicked_card && clicked_card->location == AccessibilityFieldFocus::PLAYER_DECK) {
 		//	lookupFieldLocId = AccessibilityFieldFocus::PLAYER_DECK;
@@ -2751,11 +2869,11 @@ namespace ygo {
 		else if (cardType == AccessibilityFieldFocus::CardType::LINK) {
 			switch (slot)
 			{
-			case 1: {
+			case 6: {
 				posX = 0.40 + (2 * fieldSlotSize);
 				break;
 			}
-			case 2: {
+			case 7: {
 				posX = 0.40 + (4 * fieldSlotSize);
 				break;
 			}

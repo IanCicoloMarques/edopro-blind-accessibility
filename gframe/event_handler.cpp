@@ -2231,6 +2231,9 @@ namespace ygo {
 						displayedField = AccessibilityFieldFocus::DisplayedField::ENEMY_PLAYER;
 						std::wstring nvdaString = fmt::format(L"Enemy Player Field");
 						ScreenReader::getReader()->readScreen(nvdaString.c_str());
+						CloseDialog();
+						MouseClick(event, true);
+						ChangeFieldAndLook();
 					}
 					else {
 						if (mainGame->cbANNumber->isTrulyVisible()) {
@@ -2249,6 +2252,9 @@ namespace ygo {
 						displayedField = AccessibilityFieldFocus::DisplayedField::PLAYER;
 						std::wstring nvdaString = fmt::format(L"Player Field");
 						ScreenReader::getReader()->readScreen(nvdaString.c_str());
+						CloseDialog();
+						MouseClick(event, true);
+						ChangeFieldAndLook();
 					}
 					else {
 						if (mainGame->cbANNumber->isTrulyVisible()) {
@@ -2277,15 +2283,6 @@ namespace ygo {
 					}
 					else
 					{
-						//if (selectZone) {
-						//	bool zoneIsFree = CheckIfFieldSlotIsFree(0, displayedField, cardType);
-						//	if (!zoneIsFree) {
-						//		if (!mainGame->dInfo.isCatchingUp)
-						//			gSoundManager->PlaySoundEffect(SoundManager::SFX::NP);
-						//	}
-						//	else
-						//		selectZone = false;
-						//}
 						SelectFieldSlot(1, displayedField);
 						MouseClick(event);
 					}
@@ -2307,15 +2304,6 @@ namespace ygo {
 					{
 						if (mainGame->btnDisplayOK->isTrulyVisible())
 							TriggerEvent(mainGame->btnDisplayOK, irr::gui::EGET_BUTTON_CLICKED);
-						//if (selectZone) {
-						//	bool zoneIsFree = CheckIfFieldSlotIsFree(1, displayedField, cardType);
-						//	if (!zoneIsFree) {
-						//		if (!mainGame->dInfo.isCatchingUp)
-						//			gSoundManager->PlaySoundEffect(SoundManager::SFX::NP);
-						//	}
-						//	else
-						//		selectZone = false;
-						//}
 						SelectFieldSlot(2, displayedField);
 						MouseClick(event);
 					}
@@ -2337,15 +2325,6 @@ namespace ygo {
 					{
 						if (mainGame->btnDisplayOK->isTrulyVisible())
 							TriggerEvent(mainGame->btnDisplayOK, irr::gui::EGET_BUTTON_CLICKED);
-						//if (selectZone) {
-						//	bool zoneIsFree = CheckIfFieldSlotIsFree(2, displayedField, cardType);
-						//	if (!zoneIsFree) {
-						//		if (!mainGame->dInfo.isCatchingUp)
-						//			gSoundManager->PlaySoundEffect(SoundManager::SFX::NP);
-						//	}
-						//	else
-						//		selectZone = false;
-						//}
 						SelectFieldSlot(3, displayedField);
 						MouseClick(event);
 					}
@@ -2361,15 +2340,6 @@ namespace ygo {
 					else {
 						if (mainGame->btnDisplayOK->isTrulyVisible())
 							TriggerEvent(mainGame->btnDisplayOK, irr::gui::EGET_BUTTON_CLICKED);
-						//if (selectZone) {
-						//	bool zoneIsFree = CheckIfFieldSlotIsFree(3, displayedField, cardType);
-						//	if (!zoneIsFree) {
-						//		if (!mainGame->dInfo.isCatchingUp)
-						//			gSoundManager->PlaySoundEffect(SoundManager::SFX::NP);
-						//	}
-						//	else
-						//		selectZone = false;
-						//}
 						SelectFieldSlot(4, displayedField);
 						MouseClick(event);
 					}
@@ -2385,15 +2355,6 @@ namespace ygo {
 					else {
 						if (mainGame->btnDisplayOK->isTrulyVisible())
 							TriggerEvent(mainGame->btnDisplayOK, irr::gui::EGET_BUTTON_CLICKED);
-						//if (selectZone) {
-						//	bool zoneIsFree = CheckIfFieldSlotIsFree(4, displayedField, cardType);
-						//	if (!zoneIsFree) {
-						//		if (!mainGame->dInfo.isCatchingUp)
-						//			gSoundManager->PlaySoundEffect(SoundManager::SFX::NP);
-						//	}
-						//	else
-						//		selectZone = false;
-						//}
 						SelectFieldSlot(5, displayedField);
 						MouseClick(event);
 					}
@@ -2404,15 +2365,6 @@ namespace ygo {
 				if (!event.KeyInput.PressedDown) {
 					if (mainGame->btnDisplayOK->isTrulyVisible())
 						TriggerEvent(mainGame->btnDisplayOK, irr::gui::EGET_BUTTON_CLICKED);
-					//if (selectZone) {
-					//	bool zoneIsFree = CheckIfFieldSlotIsFree(5, displayedField, cardType);
-					//	if (!zoneIsFree) {
-					//		if (!mainGame->dInfo.isCatchingUp)
-					//			gSoundManager->PlaySoundEffect(SoundManager::SFX::NP);
-					//	}
-					//	else
-					//		selectZone = false;
-					//}
 					SelectFieldSlot(6, displayedField);
 					MouseClick(event);
 				}
@@ -2422,13 +2374,6 @@ namespace ygo {
 				if (!event.KeyInput.PressedDown) {
 					if (mainGame->btnDisplayOK->isTrulyVisible())
 						TriggerEvent(mainGame->btnDisplayOK, irr::gui::EGET_BUTTON_CLICKED);
-					//if (selectZone) {
-					//	bool zoneIsFree = CheckIfFieldSlotIsFree(6, displayedField, cardType);
-					//	if (!zoneIsFree) {
-					//	}
-					//	else
-					//		selectZone = false;
-					//}
 					SelectFieldSlot(7, displayedField);
 					MouseClick(event);
 				}
@@ -2672,6 +2617,7 @@ namespace ygo {
 		{
 			std::wstring nvdaString = fmt::format(L"There are no cards to display");
 			ScreenReader::getReader()->readScreen(nvdaString.c_str(), false);
+			CloseDialog();
 		}
 	}
 
@@ -2865,6 +2811,24 @@ namespace ygo {
 				nvdaString = fmt::format(L"Face-down slot {}", indexLookedUpCard);
 		}
 		ScreenReader::getReader()->readScreen(nvdaString.c_str());
+	}
+
+	void ClientField::ChangeFieldAndLook()
+	{
+		if(lookupFieldLocId == AccessibilityFieldFocus::FieldLookerLocId::PLAYER_HAND)
+			DisplayCards(hand[displayedField], fmt::format(L"Hand"));
+		else if (lookupFieldLocId == AccessibilityFieldFocus::FieldLookerLocId::PLAYER_MONSTERS)
+			DisplayCards(mzone[displayedField], fmt::format(L"Monster Zone"));
+		else if (lookupFieldLocId == AccessibilityFieldFocus::FieldLookerLocId::PLAYER_SPELLS)
+			DisplayCards(szone[displayedField], fmt::format(L"Spells"));
+		else if (lookupFieldLocId == AccessibilityFieldFocus::FieldLookerLocId::PLAYER_EXTRA_DECK)
+			DisplayCards(extra[displayedField], fmt::format(L"Extra Deck"));
+		else if (lookupFieldLocId == AccessibilityFieldFocus::FieldLookerLocId::PLAYER_GRAVEYARD)
+			DisplayCards(grave[displayedField], fmt::format(L"Graveyard"));
+		else if (lookupFieldLocId == AccessibilityFieldFocus::FieldLookerLocId::PLAYER_BANNED_CARDS)
+			DisplayCards(remove[displayedField], fmt::format(L"Removed Cards"));
+		else if (lookupFieldLocId == AccessibilityFieldFocus::FieldLookerLocId::PLAYER_DECK)
+			DisplayCards(deck[displayedField], fmt::format(L"Deck"));
 	}
 
 	int ClientField::SearchFieldSlot(const int& displayedField, ClientCard* card) {

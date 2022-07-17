@@ -45,7 +45,7 @@
 #include "FieldFocus/AccessibilityFieldFocus.h"
 #include "ScreenReader/ScreenReader.h"
 
-namespace ygo {
+namespace ygo  {
 	std::string showing_repo = "";
 
 	static AccessibilityFieldFocus::FieldLookerLocId lookupFieldLocId;
@@ -2150,11 +2150,13 @@ namespace ygo {
 				if (!event.KeyInput.PressedDown) {
 					if (mainGame->btnBP->isEnabled() && battlePhase != AccessibilityFieldFocus::BattleStep::MP1)
 						battlePhase = AccessibilityFieldFocus::BattleStep::MP1;
+					//Criar função de trigger ok vai quebrar algo?
 					if (mainGame->btnMsgOK->isTrulyVisible())
 						TriggerEvent(mainGame->btnMsgOK, irr::gui::EGET_BUTTON_CLICKED);
+					if (mainGame->btnOptionOK->isVisible())
+						TriggerEvent(mainGame->btnOptionOK, irr::gui::EGET_BUTTON_CLICKED);
 					if(mainGame->btnANNumberOK->isTrulyVisible())
 						TriggerEvent(mainGame->btnANNumberOK, irr::gui::EGET_BUTTON_CLICKED);
-					
 					else if (!display_cards.empty() && indexLookedUpCard <= display_cards.size()) {
 						clicked_card = display_cards[indexLookedUpCard];
 						std::wstring cardName = fmt::format(L"Selected {}", gDataManager->GetName(clicked_card->code));
@@ -2491,6 +2493,7 @@ namespace ygo {
 		cardType = cardField;
 		if (cardType == AccessibilityFieldFocus::CardType::LINK) {
 			lookupFieldLocId = AccessibilityFieldFocus::PLAYER_MONSTERS;
+			cardType = AccessibilityFieldFocus::LINK;
 			nvdaString = fmt::format(L"Link Field");
 		}
 		else if (cardType == AccessibilityFieldFocus::CardType::MONSTER) {
@@ -2709,8 +2712,11 @@ namespace ygo {
 	int ClientField::GetFieldSlot(const int& slot, const AccessibilityFieldFocus::DisplayedField& player, const AccessibilityFieldFocus::CardType& cardType) {
 		if (player == AccessibilityFieldFocus::DisplayedField::PLAYER && cardType == AccessibilityFieldFocus::CardType::NO_CARD_TYPE)
 			return slot;
-		else if (player == AccessibilityFieldFocus::DisplayedField::ENEMY_PLAYER && cardType == AccessibilityFieldFocus::CardType::NO_CARD_TYPE)
+		else if (player == AccessibilityFieldFocus::DisplayedField::ENEMY_PLAYER && cardType == AccessibilityFieldFocus::CardType::NO_CARD_TYPE) {
+			if (slot > 5)
+				return slot;
 			return 6 - slot;
+		}
 
 		int fieldSlot = 1;
 		for (int i = 0; i < 5; i++) {
@@ -2800,7 +2806,7 @@ namespace ygo {
 		SetLookUpField();
 		if (lookupFieldLocId == AccessibilityFieldFocus::FieldLookerLocId::PLAYER_MONSTERS || lookupFieldLocId == AccessibilityFieldFocus::FieldLookerLocId::PLAYER_SPELLS) {
 			if (display_cards[indexLookedUpCard]->code != 0)
-				nvdaString = fmt::format(L"{} {} attack {} defense zone {}", gDataManager->GetName(display_cards[indexLookedUpCard]->code), gDataManager->GetCardData(display_cards[indexLookedUpCard]->code)->attack, gDataManager->GetCardData(display_cards[indexLookedUpCard]->code)->defense, SearchFieldSlot(displayedField, display_cards[indexLookedUpCard]));
+				nvdaString = fmt::format(L"{} {} attack {} defense zone {}", gDataManager->GetName(display_cards[indexLookedUpCard]->code), display_cards[indexLookedUpCard]->attack, display_cards[indexLookedUpCard]->defense, SearchFieldSlot(displayedField, display_cards[indexLookedUpCard]));
 			else
 				nvdaString = fmt::format(L"Face-down zone {}", SearchFieldSlot(displayedField, display_cards[indexLookedUpCard]));
 		}
@@ -2811,6 +2817,10 @@ namespace ygo {
 				nvdaString = fmt::format(L"Face-down slot {}", indexLookedUpCard);
 		}
 		ScreenReader::getReader()->readScreen(nvdaString.c_str());
+	}
+
+	void ClientField::TriggerOkButton()
+	{
 	}
 
 	void ClientField::ChangeFieldAndLook()
@@ -2868,7 +2878,7 @@ namespace ygo {
 		float posX = 0.f;
 		auto fieldSlotSize = 0.08;
 		float startPosition = 0.40f;
-		if (player == AccessibilityFieldFocus::DisplayedField::ENEMY_PLAYER) {
+		if (player == AccessibilityFieldFocus::DisplayedField::ENEMY_PLAYER && cardType != AccessibilityFieldFocus::CardType::LINK) {
 			fieldSlotSize = 0.073f;
 			startPosition = 0.43f;
 		}

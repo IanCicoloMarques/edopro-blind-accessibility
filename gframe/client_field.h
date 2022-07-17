@@ -178,9 +178,11 @@ public:
 	void SetMouseOnCard();
 	void SetLookUpField();
 	void ReadCardName();
+	void TriggerOkButton();
 	void ChangeFieldAndLook();
 	bool CheckIfFieldSlotIsFree(const int& slot, const AccessibilityFieldFocus::DisplayedField& player = AccessibilityFieldFocus::DisplayedField::PLAYER, const int& cardType = AccessibilityFieldFocus::CardType::NO_CARD_TYPE);
 	std::wstring GetLinkMarks(ClientCard* card);
+	std::wstring GetOverlayedCards(ClientCard* card);
 };
 
 }

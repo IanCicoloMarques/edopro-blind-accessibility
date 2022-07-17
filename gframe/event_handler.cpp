@@ -2050,9 +2050,11 @@ namespace ygo  {
 			case irr::KEY_KEY_I: {
 				if (!event.KeyInput.PressedDown) {
 					if (!display_cards.empty() && indexLookedUpCard <= display_cards.size() && display_cards[indexLookedUpCard]->code != 0) {
+						//Talvez fosse melhor montar um objeto e mandar para uma função de leitura. Posso até fazer usando o messageBuilder
 						auto selectedCard = display_cards[indexLookedUpCard];
 						std::wstring cardName = fmt::format(L"{}", gDataManager->GetName(selectedCard->code));
 						std::wstring cardType = fmt::format(L"{}", gDataManager->FormatType(selectedCard->type));
+						std::wstring cardAttribute = fmt::format(L"{}", gDataManager->FormatAttribute(selectedCard->attribute));
 						std::wstring cardLevel = selectedCard->link_marker != 0 ?
 							fmt::format(L"Link {}", gDataManager->GetCardData(selectedCard->code)->level) :
 							fmt::format(L"Level {}", gDataManager->GetCardData(selectedCard->code)->level);
@@ -2065,14 +2067,15 @@ namespace ygo  {
 						std::wstring rightScale = fmt::format(L"Right Scale {}", selectedCard->rscstring);
 						std::wstring fieldSlot = fmt::format(L"Zone {}", SearchFieldSlot(displayedField, selectedCard));
 						std::wstring linkMarks = GetLinkMarks(selectedCard);
+						std::wstring overlayedCards = GetOverlayedCards(selectedCard);
 
-						//selectedCard->lscstring
 						ScreenReader::getReader()->readScreen(cardName.c_str(), false);
 						if (fieldSlot.compare(L"Slot 0") != 0)
 							ScreenReader::getReader()->readScreen(fieldSlot.c_str(), false);
 						if (selectedCard->position != 10)
 							ScreenReader::getReader()->readScreen(position.c_str(), false);
 						ScreenReader::getReader()->readScreen(cardType.c_str(), false);
+						ScreenReader::getReader()->readScreen(cardAttribute.c_str(), false);
 						if (cardType.find(L"Spell") == std::string::npos && cardType.find(L"Trap") == std::string::npos) {
 							ScreenReader::getReader()->readScreen(cardLevel.c_str(), false);
 							ScreenReader::getReader()->readScreen(cardRace.c_str(), false);
@@ -2080,7 +2083,9 @@ namespace ygo  {
 							ScreenReader::getReader()->readScreen(cardDefense.c_str(), false);
 						}
 						if (!linkMarks.empty())
-							ScreenReader::getReader()->readScreen(fmt::format(L"Link Marks {}", linkMarks), false);
+							ScreenReader::getReader()->readScreen(fmt::format(L"Link Marks: {}", linkMarks), false);
+						if (!overlayedCards.empty())
+							ScreenReader::getReader()->readScreen(fmt::format(L"Overlayed Cards: {}", overlayedCards), false);
 						if (leftScale.compare(L"Left Scale ") != 0)
 							ScreenReader::getReader()->readScreen(leftScale.c_str(), false);
 						if (rightScale.compare(L"Right Scale ") != 0)
@@ -2751,24 +2756,37 @@ namespace ygo  {
 		std::wstring linkMark = std::wstring();
 		const int mark = card->link_marker;
 		if (mark & LINK_MARKER_BOTTOM_LEFT) {
-			linkMark += L"Bottom Left\n";
+			linkMark += L"Bottom Left,";
 		}
 		if (mark & LINK_MARKER_BOTTOM) {
-			linkMark += L"Bottom\n";
+			linkMark += L"Bottom, ";
 		}
 		if (mark & LINK_MARKER_BOTTOM_RIGHT) {
-			linkMark += L"Bottom Right\n";
+			linkMark += L"Bottom Right, ";
 		}
 		if (mark & LINK_MARKER_TOP_LEFT) {
-			linkMark += L"Bottom\n";
+			linkMark += L"Top Left, ";
 		}
 		if (mark & LINK_MARKER_TOP) {
-			linkMark += L"Bottom\n";
+			linkMark += L"Top, ";
 		}
 		if (mark & LINK_MARKER_TOP_RIGHT) {
-			linkMark += L"Bottom\n";
+			linkMark += L"Top Right, ";
 		}
 		return linkMark;
+	}
+
+	std::wstring ClientField::GetOverlayedCards(ClientCard* card)
+	{
+		std::wstring overlayedCards = std::wstring();
+		if (card->overlayed.size() > 0) {
+			for (auto it = card->overlayed.begin(); it != card->overlayed.end(); ++it) {
+				if (*it) {
+					overlayedCards += fmt::format(L"{}, ",gDataManager->GetName((*it)->code));
+				}
+			}
+		}
+		return overlayedCards;
 	}
 
 	void ClientField::SetLookUpField() {

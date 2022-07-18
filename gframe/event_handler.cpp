@@ -2549,6 +2549,9 @@ namespace ygo  {
 					displayedField == AccessibilityFieldFocus::DisplayedField::ENEMY_PLAYER) {
 					displayedField = AccessibilityFieldFocus::DisplayedField::PLAYER;
 					MouseClick(event);
+					displayedField = AccessibilityFieldFocus::DisplayedField::PLAYER;
+					std::wstring nvdaString = fmt::format(L"Player Field");
+					ChangeFieldAndLook();
 				}
 				else {
 					ShowMenu(64, 500, 500);
@@ -2718,8 +2721,8 @@ namespace ygo  {
 		if (player == AccessibilityFieldFocus::DisplayedField::PLAYER && cardType == AccessibilityFieldFocus::CardType::NO_CARD_TYPE)
 			return slot;
 		else if (player == AccessibilityFieldFocus::DisplayedField::ENEMY_PLAYER && cardType == AccessibilityFieldFocus::CardType::NO_CARD_TYPE) {
-			if (slot > 5)
-				return slot;
+			//if (slot > 5)
+			//	return slot;
 			return 6 - slot;
 		}
 
@@ -2905,12 +2908,20 @@ namespace ygo  {
 		else if (cardType == AccessibilityFieldFocus::CardType::LINK) {
 			switch (slot)
 			{
-			case 6: {
+			case 1: {
 				posX = 0.40 + (2 * fieldSlotSize);
 				break;
 			}
-			case 7: {
+			case 2: {
 				posX = 0.40 + (4 * fieldSlotSize);
+				break;
+			}
+			case 4: {
+				posX = 0.40 + (4 * fieldSlotSize);
+				break;
+			}
+			case 5: {
+				posX = 0.40 + (2 * fieldSlotSize);
 				break;
 			}
 			default:

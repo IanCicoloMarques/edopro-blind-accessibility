@@ -1522,6 +1522,9 @@ namespace ygo {
 		else if (menuSelectCounter == MenuType::MainMenu::MM_DECK_EDITOR && mainGame->btnDeckEdit->isEnabled()) {
 			ClickButton(mainGame->btnDeckEdit);
 		}
+		else if (menuSelectCounter == MenuType::MainMenu::MM_ACCESSILITY_KEYS) {
+			ScreenReader::getReader()->readScreen(StringBuilder::getBuiltMessage());
+		}
 	}
 
 	void MenuHandler::PasswordMenu() {

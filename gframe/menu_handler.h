@@ -16,7 +16,7 @@ namespace ygo {
 		int onlineMatchCounter = 0;
 		bool typing = false;
 		std::vector<std::wstring> menu;
-		std::vector<std::wstring> menuMain = { L"Online Duel", L"Duel", L"Deck Editor" };
+		std::vector<std::wstring> menuMain = { L"Online Duel", L"Duel", L"Deck Editor", L"Accessibility"};
 		std::vector<std::wstring> menuSinglePlayer = { L"Host Duel", L"Player Name" };
 		std::vector<std::wstring> menuHostDuel = { L"Rules ok", L"Num Players Team 1", L"Num Players Team 2", L"Best of", L"Time Limit", L"Starting LP", L"Starting Hand", L"Cards per Draw", L"Don't check deck", L"Don't shuffle deck", L"Room Name", L"Room Password" };
 		std::vector<std::wstring> menuRulesOk = { L"Start Duel", L"Select Deck", L"Player Ready", L"Select AI" };

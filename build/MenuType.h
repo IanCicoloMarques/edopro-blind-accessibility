@@ -31,13 +31,15 @@ namespace ygo {
 			ONLINE_MENU,
 			ROOM_PASSWORD_MENU,
 			DECK_EDITOR,
-			AI_CONFIGURATION
+			AI_CONFIGURATION,
+			ACCESSILITY_KEYS
 		};
 
 		enum MainMenu {
 			MM_ONLINE_DUEL,
 			MM_SP_DUEL,
-			MM_DECK_EDITOR
+			MM_DECK_EDITOR,
+			MM_ACCESSILITY_KEYS
 		};
 
 		enum HostDuel {

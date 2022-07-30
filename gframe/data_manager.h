@@ -144,6 +144,9 @@ public:
 	inline int GetAccessibilityStringSize()  const {
 		return _accessibilityStrings.map.size();
 	}
+	inline epro::wstringview GetAccessibilityTipsString(uint32_t code)  const {
+		return _accessibilityTipsStrings.GetLocale(code);
+	}
 
 	std::vector<uint16_t> GetSetCode(const std::vector<std::wstring>& setname) const;
 	std::wstring GetNumString(int num, bool bracket = false) const;
@@ -200,6 +203,7 @@ private:
 	LocaleStringHelper _setnameStrings;
 	LocaleStringHelper _sysStrings;
 	LocaleStringHelper _accessibilityStrings;
+	LocaleStringHelper _accessibilityTipsStrings;
 	std::string cur_database;
 	std::map<uint32_t, uint32_t> mapped_ids;
 };

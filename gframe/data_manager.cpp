@@ -258,6 +258,9 @@ bool DataManager::LoadStrings(const epro::path_string& file) {
 			else if (type == "accessibility") {
 				_accessibilityStrings.SetMain(std::stoi(value), BufferIO::DecodeUTF8(str));
 			}
+			else if (type == "accessibilitytips") {
+				_accessibilityTipsStrings.SetMain(std::stoi(value), BufferIO::DecodeUTF8(str));
+			}
 			else {
 				LocaleStringHelper* obj;
 				if(type == "victory")

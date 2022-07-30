@@ -224,6 +224,7 @@ bool DataManager::ParseLocaleDB(sqlite3* pDB) {
 	sqlite3_close(pDB);
 	return true;
 }
+
 bool DataManager::LoadStrings(const epro::path_string& file) {
 #if defined(__MINGW32__) && defined(UNICODE)
 	auto fd = _wopen(file.data(), _O_RDONLY);
@@ -253,7 +254,11 @@ bool DataManager::LoadStrings(const epro::path_string& file) {
 		try {
 			if(type == "system") {
 				_sysStrings.SetMain(std::stoi(value), BufferIO::DecodeUTF8(str));
-			} else {
+			}
+			else if (type == "accessibility") {
+				_accessibilityStrings.SetMain(std::stoi(value), BufferIO::DecodeUTF8(str));
+			}
+			else {
 				LocaleStringHelper* obj;
 				if(type == "victory")
 					obj = &_victoryStrings;

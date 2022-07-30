@@ -38,6 +38,7 @@
 #include "utils_gui.h"
 #include "custom_skin_enum.h"
 #include "joystick_wrapper.h"
+#include "ScreenReader/StringBuilder.h"
 #if defined(__MINGW32__) && defined(UNICODE)
 #include <fcntl.h>
 #include <ext/stdio_filebuf.h>
@@ -207,12 +208,27 @@ namespace ygo {
 		((irr::gui::CGUICustomText*)stAbout)->setWordWrap(true);
 		((irr::gui::CGUICustomContextMenu*)mAbout)->addItem(wAbout, -1);
 		wAbout->setRelativePosition(irr::core::recti(0, 0, std::min(Scale(450), stAbout->getTextWidth() + Scale(20)), std::min(stAbout->getTextHeight() + Scale(20), Scale(700))));
-		mVersion = mTopMenu->getSubMenu(mTopMenu->addItem(gDataManager->GetSysString(2040).data(), 3, true, true));
-		wVersion = env->addWindow(Scale(0, 0, 300, 135), false, L"", mVersion);
+		mVersion = mTopMenu->getSubMenu(mTopMenu->addItem(gDataManager->GetSysString(1970).data(), 2, true, true));
+		wVersion = env->addWindow(Scale(0, 0, 450, 700), false, L"", mVersion);
 		wVersion->getCloseButton()->setVisible(false);
 		wVersion->setDraggable(false);
 		wVersion->setDrawTitlebar(false);
 		wVersion->setDrawBackground(false);
+		StringBuilder::cleanBuiltMessage();
+		mAccessibility = mTopMenu->getSubMenu(mTopMenu->addItem(L"Accessibility", 2, true, true));
+		wAccessibility = env->addWindow(Scale(0, 0, 450, 700), false, L"", mAccessibility);
+		wAccessibility->getCloseButton()->setVisible(false);
+		wAccessibility->setDraggable(false);
+		wAccessibility->setDrawTitlebar(false);
+		wAccessibility->setDrawBackground(false);
+		for (int i = 0; i < gDataManager->GetAccessibilityStringSize(); i++) {
+			StringBuilder::AddLine(gDataManager->GetAccessibilityString(i).data());
+		}
+		stAccessibility = irr::gui::CGUICustomText::addCustomText(StringBuilder::getBuiltMessage().c_str(), false, env, wAccessibility, -1, Scale(10, 10, 440, 690));
+		((irr::gui::CGUICustomText*)stAccessibility)->enableScrollBar();
+		((irr::gui::CGUICustomText*)stAccessibility)->setWordWrap(true);
+		((irr::gui::CGUICustomContextMenu*)mAccessibility)->addItem(wAccessibility, -1);
+		wAccessibility->setRelativePosition(irr::core::recti(0, 0, std::min(Scale(450), stAccessibility->getTextWidth() + Scale(20)), std::min(stAccessibility->getTextHeight() + Scale(20), Scale(700))));
 		stVersion = env->addStaticText(EDOPRO_VERSION_STRING, Scale(10, 10, 290, 35), false, false, wVersion);
 		int titleWidth = stVersion->getTextWidth();
 		stVersion->setRelativePosition(irr::core::recti(Scale(10), Scale(10), titleWidth + Scale(10), Scale(35)));
@@ -2067,6 +2083,9 @@ namespace ygo {
 			reapply_colors();
 		if (wAbout)
 			wAbout->setRelativePosition(irr::core::recti(0, 0, std::min(Scale(450), stAbout->getTextWidth() + Scale(20)), std::min(stAbout->getTextHeight() + Scale(40), Scale(700))));
+		if (wAccessibility)
+			wAccessibility->setRelativePosition(irr::core::recti(0, 0, std::min(Scale(450), stAccessibility->getTextWidth() + Scale(20)), std::min(stAccessibility->getTextHeight() + Scale(40), Scale(700))));
+
 		if (dpi_scale > 1.5f) {
 			auto* sprite_texture = imageManager.GetCheckboxScaledTexture(dpi_scale);
 			if (sprite_texture) {
@@ -3130,6 +3149,11 @@ namespace ygo {
 			std::min<uint32_t>(Scale(440), stAbout->getTextWidth() + Scale(10))),
 			std::min<uint32_t>(window_size.Height - waboutpos.UpperLeftCorner.Y,
 				std::min<uint32_t>(stAbout->getTextHeight() + Scale(10), Scale(690)))));
+		const auto waccessibilitypos = wAccessibility->getAbsolutePosition();
+		stAccessibility->setRelativePosition(irr::core::recti(10, 10, std::min<uint32_t>(window_size.Width - waccessibilitypos.UpperLeftCorner.X,
+			std::min<uint32_t>(Scale(440), stAccessibility->getTextWidth() + Scale(10))),
+			std::min<uint32_t>(window_size.Height - waccessibilitypos.UpperLeftCorner.Y,
+				std::min<uint32_t>(stAccessibility->getTextHeight() + Scale(10), Scale(690)))));
 		wRoomListPlaceholder->setRelativePosition(irr::core::recti(0, 0, window_size.Width, window_size.Height));
 		wMainMenu->setRelativePosition(ResizeWin(mainMenuLeftX, 200, mainMenuRightX, 450));
 		wBtnSettings->setRelativePosition(ResizeWin(0, 610, 30, 640));

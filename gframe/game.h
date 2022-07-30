@@ -375,7 +375,10 @@ namespace ygo {
 		irr::gui::IGUIContextMenu* mTopMenu;
 		irr::gui::IGUIContextMenu* mRepositoriesInfo;
 		irr::gui::IGUIContextMenu* mAbout;
+		irr::gui::IGUIContextMenu* mAccessibility;
 		irr::gui::IGUIWindow* wAbout;
+		irr::gui::IGUIWindow* wAccessibility;
+		irr::gui::IGUIStaticText* stAccessibility;
 		irr::gui::IGUIStaticText* stAbout;
 		irr::gui::IGUIContextMenu* mVersion;
 		irr::gui::IGUIWindow* wVersion;

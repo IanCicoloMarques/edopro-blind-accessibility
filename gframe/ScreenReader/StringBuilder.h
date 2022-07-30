@@ -1,7 +1,7 @@
-#pragma once
+#ifndef STRINGBUILDER_H
+#define STRINGBUILDER_H
 
 #include <string>
-#include "../duelclient.h"
 
 class StringBuilder
 {
@@ -9,6 +9,11 @@ class StringBuilder
 		static std::wstring parseInput(std::wstring string){
 			return string;
 		}
-
+		static std::wstring getBuiltMessage();
+		static void AddLine(std::wstring string);
+		static void cleanBuiltMessage();
+private:
+		static std::wstring builtMessage;
 };
 
+#endif

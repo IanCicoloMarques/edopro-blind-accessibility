@@ -13,12 +13,14 @@
 #include "server_lobby.h"
 #include "utils_gui.h"
 #include "CGUIFileSelectListBox/CGUIFileSelectListBox.h"
+#include "CGUIImageButton/CGUIImageButton.h"
 #include "CGUITTFont/CGUITTFont.h"
 #include <IrrlichtDevice.h>
 #include <IGUIEnvironment.h>
 #include <IGUIButton.h>
 #include <IGUICheckBox.h>
 #include <IGUIComboBox.h>
+#include <IGUIScrollBar.h>
 #include <IGUIContextMenu.h>
 #include <IGUIEditBox.h>
 #include <IGUIStaticText.h>
@@ -26,8 +28,37 @@
 #include <IGUITable.h>
 #include <IGUIWindow.h>
 #include "ScreenReader/ScreenReader.h"
+#include "joystick_wrapper.h"
 
 namespace ygo {
+
+	static void MouseClick(const irr::SEvent& event, bool rightClick) {
+		auto cursor = mainGame->device->getCursorControl();
+		auto pos = cursor->getRelativePosition();
+
+		auto& jevent = event.JoystickEvent;
+		static irr::u32 buttonstates = 0;
+		buttonstates |= irr::E_MOUSE_BUTTON_STATE_MASK::EMBSM_LEFT;
+		irr::SEvent simulated{};
+		simulated.EventType = irr::EET_MOUSE_INPUT_EVENT;
+		simulated.MouseInput.ButtonStates = buttonstates;
+		simulated.MouseInput.Control = false;
+		simulated.MouseInput.Shift = false;
+		simulated.MouseInput.X = irr::core::round32(pos.X * mainGame->window_size.Width);
+		simulated.MouseInput.Y = irr::core::round32(pos.Y * mainGame->window_size.Height);
+
+		buttonstates |= (simulated.MouseInput.Control) ? 1 << 30 : 0;
+		buttonstates |= (simulated.MouseInput.Shift) ? 1 << 29 : 0;
+
+		auto& changed = jevent.POV;
+
+		auto CheckAndPost = [device = mainGame->device, &simulated, &changed, &states = jevent.ButtonStates](int button, irr::EMOUSE_INPUT_EVENT type) {
+			simulated.MouseInput.Event = (states & button) ? type : (irr::EMOUSE_INPUT_EVENT)(type + 3);
+			device->postEventFromUser(simulated);
+		};
+
+		CheckAndPost(JWrapper::Buttons::A, rightClick ? irr::EMIE_RMOUSE_PRESSED_DOWN : irr::EMIE_LMOUSE_PRESSED_DOWN);
+	}
 	static void UpdateDeck() {
 		gGameConfig->lastdeck = mainGame->cbDeckSelect->getItem(mainGame->cbDeckSelect->getSelected());
 		const auto& deck = mainGame->deckBuilder.GetCurrentDeck();
@@ -1337,35 +1368,39 @@ namespace ygo {
 			}
 			case irr::KEY_RIGHT: {
 				if (!event.KeyInput.PressedDown) {
-					CheckMenu();
-					typing = false;
-					mainGame->env->removeFocus(mainGame->env->getFocus());
-					if (menu.empty())
-						menu = menuMain;
-					menuSelectCounter++;
-					if (menuSelectCounter >= menu.size())
-						menuSelectCounter = 0;
-					currentMenu = menu.at(menuSelectCounter);
-					ScreenReader::getReader()->readScreen(menu.at(menuSelectCounter).c_str());
-					if (menu.at(menuSelectCounter) == L"Rooms")
-						ScreenReader::getReader()->textToSpeech(fmt::format(L"{} games", mainGame->roomListTable->getRowCount()));
+					if (!scrollSelected) {
+						CheckMenu();
+						typing = false;
+						mainGame->env->removeFocus(mainGame->env->getFocus());
+						if (menu.empty())
+							menu = menuMain;
+						menuSelectCounter++;
+						if (menuSelectCounter >= menu.size())
+							menuSelectCounter = 0;
+						currentMenu = menu.at(menuSelectCounter);
+						ScreenReader::getReader()->readScreen(menu.at(menuSelectCounter).c_str());
+						if (menu.at(menuSelectCounter) == L"Rooms")
+							ScreenReader::getReader()->textToSpeech(fmt::format(L"{} games", mainGame->roomListTable->getRowCount()));
+					}
 				}
 				break;
 			}
 			case irr::KEY_LEFT: {
 				if (!event.KeyInput.PressedDown) {
-					CheckMenu();		
-					typing = false;
-					mainGame->env->removeFocus(mainGame->env->getFocus());
-					if (menu.empty())
-						menu = menuMain;
-					menuSelectCounter--;
-					if (menuSelectCounter < 0)
-						menuSelectCounter = menu.size() - 1;
-					currentMenu = menu.at(menuSelectCounter);
-					ScreenReader::getReader()->readScreen(menu.at(menuSelectCounter).c_str());
-					if (menu.at(menuSelectCounter) == L"Rooms")
-						ScreenReader::getReader()->textToSpeech(fmt::format(L"{} games", mainGame->roomListTable->getRowCount()));
+					if (!scrollSelected) {
+						CheckMenu();		
+						typing = false;
+						mainGame->env->removeFocus(mainGame->env->getFocus());
+						if (menu.empty())
+							menu = menuMain;
+						menuSelectCounter--;
+						if (menuSelectCounter < 0)
+							menuSelectCounter = menu.size() - 1;
+						currentMenu = menu.at(menuSelectCounter);
+						ScreenReader::getReader()->readScreen(menu.at(menuSelectCounter).c_str());
+						if (menu.at(menuSelectCounter) == L"Rooms")
+							ScreenReader::getReader()->textToSpeech(fmt::format(L"{} games", mainGame->roomListTable->getRowCount()));
+					}
 				}
 				break;
 			}
@@ -1401,6 +1436,10 @@ namespace ygo {
 					else if (menu.at(0) == L"Change Password") {
 						PasswordMenu();
 					}
+					//else if (selectedMenu == MainMenu::ONLINE) {
+					else if (menu.at(0) == L"Enable Sound Effects") {
+						GameOptions();
+					}
 				}
 				break;
 			}
@@ -1410,21 +1449,18 @@ namespace ygo {
 					onlineMatchCounter = 0;
 					if (mainGame->btnRPNo->isTrulyVisible())
 						ClickButton(mainGame->btnRPNo);
-					else if (mainGame->btnHostPrepCancel->isTrulyVisible()) {
+					else if (mainGame->btnHostPrepCancel->isTrulyVisible())
 						ClickButton(mainGame->btnHostPrepCancel);
-					}
-					else if (mainGame->btnHostCancel->isTrulyVisible()) {
+					else if (mainGame->btnHostCancel->isTrulyVisible())
 						ClickButton(mainGame->btnHostCancel);
-					}
-					else if (mainGame->btnJoinCancel->isTrulyVisible()) {
+					else if (mainGame->btnJoinCancel->isTrulyVisible())
 						ClickButton(mainGame->btnJoinCancel);
-					}
-					else if (mainGame->btnJoinCancel2->isTrulyVisible()) {
+					else if (mainGame->btnJoinCancel2->isTrulyVisible())
 						ClickButton(mainGame->btnJoinCancel2);
-					}
-					else if (mainGame->btnModeExit->isTrulyVisible()) {
+					else if (mainGame->gSettings.window->isTrulyVisible())
+						mainGame->HideElement(mainGame->gSettings.window);
+					else if (mainGame->btnModeExit->isTrulyVisible())
 						ClickButton(mainGame->btnModeExit);
-					}
 					currentMenu = menu.at(menuSelectCounter);
 				}
 
@@ -1494,7 +1530,10 @@ namespace ygo {
 
 
 	void MenuHandler::CheckMenu(){
-		if (mainGame->btnOnlineMode->isEnabled() && mainGame->btnOnlineMode->isTrulyVisible())
+
+		if (mainGame->gSettings.window->isTrulyVisible())
+			menu = menuGameOptions;
+		else if (mainGame->btnOnlineMode->isEnabled() && mainGame->btnOnlineMode->isTrulyVisible())
 			menu = menuMain;
 		else if (mainGame->ebRPName->isEnabled() && mainGame->ebRPName->isTrulyVisible())
 			menu = menuPassword;
@@ -1521,6 +1560,10 @@ namespace ygo {
 		}
 		else if (menuSelectCounter == MenuType::MainMenu::MM_DECK_EDITOR && mainGame->btnDeckEdit->isEnabled()) {
 			ClickButton(mainGame->btnDeckEdit);
+		}
+		else if (menuSelectCounter == MenuType::MainMenu::MM_GAME_OPTIONS && mainGame->wBtnSettings->isEnabled()) {
+			ClickButton(mainGame->btnSettings);
+			menu = menuGameOptions;
 		}
 		else if (menuSelectCounter == MenuType::MainMenu::MM_ACCESSILITY_KEYS) {
 			ScreenReader::getReader()->readScreen(StringBuilder::getBuiltMessage());
@@ -1781,6 +1824,42 @@ namespace ygo {
 		}
 		else if (menuSelectCounter == MenuType::OnlineMenu::STARTED_ROOMS && mainGame->chkShowActiveRooms->isTrulyVisible()) {
 			CheckBox(mainGame->chkShowActiveRooms);
+		}
+	}
+
+	void MenuHandler::GameOptions() {
+		menu = menuGameOptions;
+		if (menuSelectCounter == MenuType::GameOptionsMenu::GAMEOP_ENABLE_SOUND_EFFECTS && mainGame->gSettings.chkEnableSound->isTrulyVisible()) {
+			CheckBox(mainGame->gSettings.chkEnableSound);
+		}
+		else if (menuSelectCounter == MenuType::GameOptionsMenu::GAMEOP_SOUND_EFFECTS_VOLUME && mainGame->gSettings.scrSoundVolume->isTrulyVisible()) {
+			if (!scrollSelected) {
+				ScreenReader::getReader()->readScreen(gDataManager->GetAccessibilityTipsString(11).data());
+				ScreenReader::getReader()->readScreen(gDataManager->GetAccessibilityTipsString(12).data());
+				mainGame->env->setFocus(mainGame->gSettings.scrSoundVolume);
+				scrollSelected = true;
+			}
+			else {
+				ScreenReader::getReader()->readScreen(fmt::format(L"Volume set to {}", gGameConfig->soundVolume));
+				scrollSelected = false;
+				mainGame->env->removeFocus(mainGame->env->getFocus());
+			}
+		}
+		else if (menuSelectCounter == MenuType::GameOptionsMenu::GAMEOP_ENABLE_MUSIC && mainGame->gSettings.chkEnableMusic->isTrulyVisible()) {
+			CheckBox(mainGame->gSettings.chkEnableMusic);
+		}
+		else if (menuSelectCounter == MenuType::GameOptionsMenu::GAMEOP_MUSIC_VOLUME && mainGame->gSettings.scrMusicVolume->isTrulyVisible()) {
+			if (!scrollSelected) {
+				ScreenReader::getReader()->readScreen(gDataManager->GetAccessibilityTipsString(11).data());
+				ScreenReader::getReader()->readScreen(gDataManager->GetAccessibilityTipsString(12).data());
+				mainGame->env->setFocus(mainGame->gSettings.scrMusicVolume);
+				scrollSelected = true;
+			}
+			else {
+				ScreenReader::getReader()->readScreen(fmt::format(L"Volume set to {}", gGameConfig->musicVolume));
+				scrollSelected = false;
+				mainGame->env->removeFocus(mainGame->env->getFocus());
+			}
 		}
 	}
 }

@@ -799,6 +799,7 @@ namespace ygo {
 		btnSettings->setDrawBorder(false);
 		btnSettings->setImageSize(dimBtnSettings.getSize());
 		btnSettings->setImage(imageManager.tSettings);
+		btnSettings->setIsPushButton(true);
 		//log
 		tabRepositories = wInfos->addTab(gDataManager->GetSysString(2045).data());
 		defaultStrings.emplace_back(tabRepositories, 2045);

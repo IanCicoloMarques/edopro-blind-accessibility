@@ -161,6 +161,7 @@ public:
 	void ScrollCardList();
 	void DisplayCards(const std::vector<ClientCard*>& field, const std::wstring & = L"");
 	void DisplayCards(const std::vector<ChainInfo>& field, const std::wstring & = L"");
+	void SetSelectableCards();
 	bool UseCard(const AccessibilityFieldFocus::UseType& useType, irr::SEvent event);
 	bool CheckIfCanViewCards(irr::SEvent event);
 	void SelectFieldSlot(int slot, const AccessibilityFieldFocus::DisplayedField& player = AccessibilityFieldFocus::DisplayedField::PLAYER, const AccessibilityFieldFocus::CardType& cardType = AccessibilityFieldFocus::CardType::NO_CARD_TYPE);

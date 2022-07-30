@@ -1925,7 +1925,9 @@ namespace ygo  {
 			case irr::KEY_KEY_Z: {
 				if (!event.KeyInput.PressedDown) {
 					bool canViewCards = CheckIfCanViewCards(event);
-					if (canViewCards) {
+					if(mainGame->scrCardList->isTrulyVisible())
+						SetSelectableCards();
+					else if (canViewCards) {
 						cardType = AccessibilityFieldFocus::CardType::MONSTER;
 						lookupFieldLocId = AccessibilityFieldFocus::FieldLookerLocId::SELECTABLE_CARDS;
 						if (mainGame->wCardSelect->isTrulyVisible()) {
@@ -1933,8 +1935,6 @@ namespace ygo  {
 							ScreenReader::getReader()->readScreen(fmt::format(L"Selectable Cards {} cards", display_cards.size()).data(), false);
 							mainGame->env->setFocus(mainGame->wCardSelect);
 						}
-						else
-							DisplayCards(selectable_cards, fmt::format(L"Selectable Cards"));
 					}
 					else
 						CloseDialog();
@@ -2068,9 +2068,10 @@ namespace ygo  {
 						std::wstring fieldSlot = fmt::format(L"Zone {}", SearchFieldSlot(displayedField, selectedCard));
 						std::wstring linkMarks = GetLinkMarks(selectedCard);
 						std::wstring overlayedCards = GetOverlayedCards(selectedCard);
-
+						std::wstring location = fmt::format(L"{}[{}]", gDataManager->FormatLocation(selectedCard->location, selectedCard->sequence), selectedCard->sequence + 1);
 						ScreenReader::getReader()->readScreen(cardName.c_str(), false);
-						if (fieldSlot.compare(L"Slot 0") != 0)
+						ScreenReader::getReader()->readScreen(location.c_str(), false);
+						if (fieldSlot.compare(L"Zone 0") != 0)
 							ScreenReader::getReader()->readScreen(fieldSlot.c_str(), false);
 						if (selectedCard->position != 10)
 							ScreenReader::getReader()->readScreen(position.c_str(), false);
@@ -2514,6 +2515,7 @@ namespace ygo  {
 
 	bool ClientField::UseCard(const AccessibilityFieldFocus::UseType& useType, irr::SEvent event) {
 		bool canUse = false;
+		std::wstring command;
 		SetLookUpField();
 		if (mainGame->wCardDisplay->isVisible())
 			TriggerEvent(mainGame->btnDisplayOK, irr::gui::EGET_BUTTON_CLICKED);
@@ -2522,26 +2524,44 @@ namespace ygo  {
 			switch (useType)
 			{
 			case AccessibilityFieldFocus::UseType::NORMAL_SUMMON: {
-				if (mainGame->btnSummon->isVisible())
+				if (mainGame->btnSummon->isVisible()) {
 					TriggerEvent(mainGame->btnSummon, irr::gui::EGET_BUTTON_CLICKED);
+					canUse = true;
+				}
+				else
+					command = CommandMessages::NORMAL_SUMMON;
 				break;
 			}
 			case AccessibilityFieldFocus::UseType::SET_CARD: {
-				if (mainGame->btnMSet->isVisible())
+				if (mainGame->btnMSet->isVisible()) {
 					TriggerEvent(mainGame->btnMSet, irr::gui::EGET_BUTTON_CLICKED);
-				else if (mainGame->btnSSet->isVisible())
+					canUse = true;
+				}
+				else if (mainGame->btnSSet->isVisible()) {
 					TriggerEvent(mainGame->btnSSet, irr::gui::EGET_BUTTON_CLICKED);
+					canUse = true;
+				}
+				else
+					command = CommandMessages::SET_CARD;
 				break;
 			}
 			case AccessibilityFieldFocus::UseType::SPECIAL_SUMMON: {
-				if (mainGame->btnSPSummon->isVisible())
+				if (mainGame->btnSPSummon->isVisible()) {
 					TriggerEvent(mainGame->btnSPSummon, irr::gui::EGET_BUTTON_CLICKED);
+					canUse = true;
+				}
+				else
+					command = CommandMessages::SPECIAL_SUMMON;
 				break;
 			}
 			case AccessibilityFieldFocus::UseType::ACTIVATE: {
 				lookupFieldLocId = AccessibilityFieldFocus::FieldLookerLocId::SELECTABLE_CARDS;
-				if (mainGame->btnActivate->isVisible())
+				if (mainGame->btnActivate->isTrulyVisible()) {
 					TriggerEvent(mainGame->btnActivate, irr::gui::EGET_BUTTON_CLICKED);
+					canUse = true;
+				}
+				else
+					command = CommandMessages::ACTIVATE;
 				break;
 			}
 			case AccessibilityFieldFocus::UseType::MONSTER_ATTACK: {
@@ -2555,28 +2575,40 @@ namespace ygo  {
 				}
 				else {
 					ShowMenu(64, 500, 500);
-					if (mainGame->btnAttack->isVisible())
+					if (mainGame->btnAttack->isVisible()) {
 						TriggerEvent(mainGame->btnAttack, irr::gui::EGET_BUTTON_CLICKED);
+						canUse = true;
+					}
+					else
+						command = CommandMessages::ATTACK;
 				}
 				break;
 			}
 			case AccessibilityFieldFocus::UseType::CHANGE_MODE: {
-				if (mainGame->btnRepos->isVisible()) 
+				if (mainGame->btnRepos->isVisible()) {
 					TriggerEvent(mainGame->btnRepos, irr::gui::EGET_BUTTON_CLICKED);
+					canUse = true;
+				}
+				else
+					command = CommandMessages::CHANGE_MODE;
 				break;
 			}
 			case AccessibilityFieldFocus::UseType::SELECT_CARD: {
 				SelectFieldSlotNoPlayer(SearchFieldSlot(displayedField));
 				MouseClick(event);
+				canUse = true;
 				break;
 			}
 			default:
+				canUse = true;
 				if (indexLookedUpCard < display_cards.size() && mainGame->btnCardSelect[indexLookedUpCard]->isTrulyVisible()) {
 					TriggerEvent(mainGame->btnCardSelect[indexLookedUpCard], irr::gui::EGET_BUTTON_CLICKED);
 				}
 				break;
 			}
 		}
+		if(!canUse)
+			ScreenReader::getReader()->readScreen(AccessibilityMessages::getCommandNotAvaliableMessage(command));
 		return canUse;
 	}
 
@@ -2642,6 +2674,24 @@ namespace ygo  {
 			mainGame->wCardDisplay->setText(fmt::format(L"{}({})", gDataManager->GetSysString(lookupFieldLocId), display_cards.size()).data());
 			ShowLocationCard();
 			mainGame->ShowCardInfo(display_cards[0]->code);
+		}
+	}
+
+	void ClientField::SetSelectableCards() {
+		indexLookedUpCard = 0;
+		if (selectable_cards.size()) {
+			display_cards.clear();
+			for (int i = 0; i < 5; ++i) {
+				if (selectable_cards.size() > i)
+					display_cards.push_back(selectable_cards[i]);
+			}
+			mainGame->ShowCardInfo(display_cards[indexLookedUpCard]->code);
+		}
+		else
+		{
+			std::wstring nvdaString = fmt::format(L"There are no cards to display");
+			ScreenReader::getReader()->readScreen(nvdaString.c_str(), false);
+			CloseDialog();
 		}
 	}
 
@@ -2947,11 +2997,11 @@ namespace ygo  {
 		switch (position)
 		{
 		case ygo::AccessibilityFieldFocus::Scroll::RIGHT: {
-			posX = 0.94;
+			posX = 0.94f;
 			break;
 		}
 		case ygo::AccessibilityFieldFocus::Scroll::LEFT: {
-			posX = 0.36;
+			posX = 0.36f;
 			break;
 		}
 		default:

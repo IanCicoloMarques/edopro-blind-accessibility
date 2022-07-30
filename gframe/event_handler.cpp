@@ -1793,7 +1793,12 @@ namespace ygo  {
 		case irr::EET_KEY_INPUT_EVENT: {
 			switch (event.KeyInput.Key) {
 			case irr::KEY_KEY_Q: {
-				if (!event.KeyInput.PressedDown) {
+				if (event.KeyInput.Control && !event.KeyInput.PressedDown) {
+					StringBuilder::cleanBuiltMessage();
+					StringBuilder::AddLine(gDataManager->GetAccessibilityString(13).data());
+					ScreenReader::getReader()->readScreen(StringBuilder::getBuiltMessage(), false);
+				}
+				else if (!event.KeyInput.PressedDown) {
 					bool canViewCards = CheckIfCanViewCards(event);
 					if (canViewCards) {
 						lookupFieldLocId = AccessibilityFieldFocus::FieldLookerLocId::PLAYER_HAND;
@@ -1806,7 +1811,12 @@ namespace ygo  {
 				break;
 			}
 			case irr::KEY_KEY_W: {
-				if (!event.KeyInput.PressedDown) {
+				if (event.KeyInput.Control && !event.KeyInput.PressedDown) {
+					StringBuilder::cleanBuiltMessage();
+					StringBuilder::AddLine(gDataManager->GetAccessibilityString(14).data());
+					ScreenReader::getReader()->readScreen(StringBuilder::getBuiltMessage(), false);
+				}
+				else if (!event.KeyInput.PressedDown) {
 					bool canViewCards = CheckIfCanViewCards(event);
 					if (canViewCards) {
 						lookupFieldLocId = AccessibilityFieldFocus::FieldLookerLocId::PLAYER_MONSTERS;
@@ -1819,7 +1829,12 @@ namespace ygo  {
 				break;
 			}
 			case irr::KEY_KEY_E: {
-				if (!event.KeyInput.PressedDown) {
+				if (event.KeyInput.Control && !event.KeyInput.PressedDown) {
+					StringBuilder::cleanBuiltMessage();
+					StringBuilder::AddLine(gDataManager->GetAccessibilityString(15).data());
+					ScreenReader::getReader()->readScreen(StringBuilder::getBuiltMessage(), false);
+				}
+				else if (!event.KeyInput.PressedDown) {
 					bool canViewCards = CheckIfCanViewCards(event);
 					if (canViewCards) {
 						lookupFieldLocId = AccessibilityFieldFocus::FieldLookerLocId::PLAYER_SPELLS;
@@ -1832,7 +1847,12 @@ namespace ygo  {
 				break;
 			}
 			case irr::KEY_KEY_R: {
-				if (!event.KeyInput.PressedDown) {
+				if (event.KeyInput.Control && !event.KeyInput.PressedDown) {
+					StringBuilder::cleanBuiltMessage();
+					StringBuilder::AddLine(gDataManager->GetAccessibilityString(16).data());
+					ScreenReader::getReader()->readScreen(StringBuilder::getBuiltMessage(), false);
+				}
+				else if (!event.KeyInput.PressedDown) {
 					bool canViewCards = CheckIfCanViewCards(event);
 					if (canViewCards) {
 						lookupFieldLocId = AccessibilityFieldFocus::FieldLookerLocId::PLAYER_EXTRA_DECK;
@@ -1845,7 +1865,12 @@ namespace ygo  {
 				break;
 			}
 			case irr::KEY_KEY_T: {
-				if (!event.KeyInput.PressedDown) {
+				if (event.KeyInput.Control && !event.KeyInput.PressedDown) {
+					StringBuilder::cleanBuiltMessage();
+					StringBuilder::AddLine(gDataManager->GetAccessibilityString(17).data());
+					ScreenReader::getReader()->readScreen(StringBuilder::getBuiltMessage(), false);
+				}
+				else if (!event.KeyInput.PressedDown) {
 					bool canViewCards = CheckIfCanViewCards(event);
 					if (canViewCards) {
 						lookupFieldLocId = AccessibilityFieldFocus::FieldLookerLocId::PLAYER_GRAVEYARD;
@@ -1858,7 +1883,12 @@ namespace ygo  {
 				break;
 			}
 			case irr::KEY_KEY_Y: {
-				if (!event.KeyInput.PressedDown) {
+				if (event.KeyInput.Control && !event.KeyInput.PressedDown) {
+					StringBuilder::cleanBuiltMessage();
+					StringBuilder::AddLine(gDataManager->GetAccessibilityString(18).data());
+					ScreenReader::getReader()->readScreen(StringBuilder::getBuiltMessage(), false);
+				}
+				else if (!event.KeyInput.PressedDown) {
 					bool canViewCards = CheckIfCanViewCards(event);
 					if (canViewCards) {
 						cardType = AccessibilityFieldFocus::CardType::MONSTER;
@@ -1871,7 +1901,12 @@ namespace ygo  {
 				break;
 			}
 			case irr::KEY_KEY_U: {
-				if (!event.KeyInput.PressedDown) {
+				if (event.KeyInput.Control && !event.KeyInput.PressedDown) {
+					StringBuilder::cleanBuiltMessage();
+					StringBuilder::AddLine(gDataManager->GetAccessibilityString(19).data());
+					ScreenReader::getReader()->readScreen(StringBuilder::getBuiltMessage(), false);
+				}
+				else if (!event.KeyInput.PressedDown) {
 					bool canViewCards = CheckIfCanViewCards(event);
 					if (canViewCards) {
 						cardType = AccessibilityFieldFocus::CardType::MONSTER;
@@ -1884,7 +1919,15 @@ namespace ygo  {
 				break;
 			}
 			case irr::KEY_KEY_A: {
-				if (!event.KeyInput.PressedDown) {
+				if (event.KeyInput.Control && !event.KeyInput.PressedDown) {
+					StringBuilder::cleanBuiltMessage();
+					StringBuilder::AddLine(gDataManager->GetAccessibilityString(20).data());
+					StringBuilder::AddLine(gDataManager->GetAccessibilityString(43).data());
+					StringBuilder::AddLine(gDataManager->GetAccessibilityTipsString(0).data());
+					StringBuilder::AddLine(gDataManager->GetAccessibilityTipsString(4).data());
+					ScreenReader::getReader()->readScreen(StringBuilder::getBuiltMessage(), false);
+				}
+				else if (!event.KeyInput.PressedDown) {
 					if (battlePhase == AccessibilityFieldFocus::BattleStep::BP)
 						UseCard(AccessibilityFieldFocus::UseType::MONSTER_ATTACK, event);
 					else
@@ -1893,14 +1936,26 @@ namespace ygo  {
 				break;
 			}
 			case irr::KEY_KEY_S: {
-				if (!event.KeyInput.PressedDown) {
+				if (event.KeyInput.Control && !event.KeyInput.PressedDown) {
+					StringBuilder::cleanBuiltMessage();
+					StringBuilder::AddLine(gDataManager->GetAccessibilityString(21).data());
+					StringBuilder::AddLine(gDataManager->GetAccessibilityTipsString(3).data());
+					ScreenReader::getReader()->readScreen(StringBuilder::getBuiltMessage(), false);
+				}
+				else if (!event.KeyInput.PressedDown) {
 					ChangeFieldByCard();
 					UseCard(AccessibilityFieldFocus::UseType::SET_CARD, event);
 				}
 				break;
 			}
 			case irr::KEY_KEY_D: {
-				if (!event.KeyInput.PressedDown) {
+				if (event.KeyInput.Control && !event.KeyInput.PressedDown) {
+					StringBuilder::cleanBuiltMessage();
+					StringBuilder::AddLine(gDataManager->GetAccessibilityString(22).data());
+					StringBuilder::AddLine(gDataManager->GetAccessibilityTipsString(2).data());
+					ScreenReader::getReader()->readScreen(StringBuilder::getBuiltMessage(), false);
+				}
+				else if (!event.KeyInput.PressedDown) {
 					lookupFieldLocId = AccessibilityFieldFocus::PLAYER_MONSTERS;
 					cardType = AccessibilityFieldFocus::CardType::MONSTER;
 					UseCard(AccessibilityFieldFocus::UseType::SPECIAL_SUMMON, event);
@@ -1908,7 +1963,13 @@ namespace ygo  {
 				break;
 			}
 			case irr::KEY_KEY_F: {
-				if (!event.KeyInput.PressedDown) {
+				if (event.KeyInput.Control && !event.KeyInput.PressedDown) {
+					StringBuilder::cleanBuiltMessage();
+					StringBuilder::AddLine(gDataManager->GetAccessibilityString(23).data());
+					StringBuilder::AddLine(gDataManager->GetAccessibilityTipsString(5).data());
+					ScreenReader::getReader()->readScreen(StringBuilder::getBuiltMessage(), false);
+				}
+				else if (!event.KeyInput.PressedDown) {
 					ChangeFieldByCard();
 					UseCard(AccessibilityFieldFocus::UseType::ACTIVATE, event);
 				}
@@ -1916,14 +1977,25 @@ namespace ygo  {
 				break;
 			}
 			case irr::KEY_KEY_G: {
-				if (!event.KeyInput.PressedDown) {
+				if (event.KeyInput.Control && !event.KeyInput.PressedDown) {
+					StringBuilder::cleanBuiltMessage();
+					StringBuilder::AddLine(gDataManager->GetAccessibilityString(24).data());
+					StringBuilder::AddLine(gDataManager->GetAccessibilityTipsString(6).data());
+					ScreenReader::getReader()->readScreen(StringBuilder::getBuiltMessage(), false);
+				}
+				else if (!event.KeyInput.PressedDown) {
 					cardType = AccessibilityFieldFocus::CardType::MONSTER;
 					UseCard(AccessibilityFieldFocus::UseType::CHANGE_MODE, event);
 				}
 				break;
 			}
 			case irr::KEY_KEY_Z: {
-				if (!event.KeyInput.PressedDown) {
+				if (event.KeyInput.Control && !event.KeyInput.PressedDown) {
+					StringBuilder::cleanBuiltMessage();
+					StringBuilder::AddLine(gDataManager->GetAccessibilityString(34).data());
+					ScreenReader::getReader()->readScreen(StringBuilder::getBuiltMessage(), false);
+				}
+				else if (!event.KeyInput.PressedDown) {
 					bool canViewCards = CheckIfCanViewCards(event);
 					if(mainGame->scrCardList->isTrulyVisible())
 						SetSelectableCards();
@@ -1935,6 +2007,9 @@ namespace ygo  {
 							ScreenReader::getReader()->readScreen(fmt::format(L"Selectable Cards {} cards", display_cards.size()).data(), false);
 							mainGame->env->setFocus(mainGame->wCardSelect);
 						}
+						else if(selectable_cards.size() != 0){
+							DisplayCards(selectable_cards, fmt::format(L"Selectable Cards"));
+						}
 					}
 					else
 						CloseDialog();
@@ -1942,7 +2017,12 @@ namespace ygo  {
 				break;
 			}
 			case irr::KEY_KEY_X: {
-				if (!event.KeyInput.PressedDown) {
+				if (event.KeyInput.Control && !event.KeyInput.PressedDown) {
+					StringBuilder::cleanBuiltMessage();
+					StringBuilder::AddLine(gDataManager->GetAccessibilityString(35).data());
+					ScreenReader::getReader()->readScreen(StringBuilder::getBuiltMessage(), false);
+				}
+				else if (!event.KeyInput.PressedDown) {
 					bool canViewCards = CheckIfCanViewCards(event);
 					if (canViewCards) {
 						cardType = AccessibilityFieldFocus::CardType::MONSTER;
@@ -1961,7 +2041,12 @@ namespace ygo  {
 				break;
 			}
 			case irr::KEY_KEY_C: {
-				if (!event.KeyInput.PressedDown) {
+				if (event.KeyInput.Control && !event.KeyInput.PressedDown) {
+					StringBuilder::cleanBuiltMessage();
+					StringBuilder::AddLine(gDataManager->GetAccessibilityString(36).data());
+					ScreenReader::getReader()->readScreen(StringBuilder::getBuiltMessage(), false);
+				}
+				else if (!event.KeyInput.PressedDown) {
 					bool canViewCards = CheckIfCanViewCards(event);
 					if (canViewCards) {
 						cardType = AccessibilityFieldFocus::CardType::MONSTER;
@@ -1974,7 +2059,13 @@ namespace ygo  {
 				break;
 			}
 			case irr::KEY_KEY_V: {
-				if (!event.KeyInput.PressedDown) {
+				if (event.KeyInput.Control && !event.KeyInput.PressedDown) {
+					StringBuilder::cleanBuiltMessage();
+					StringBuilder::AddLine(gDataManager->GetAccessibilityString(37).data());
+					StringBuilder::AddLine(gDataManager->GetAccessibilityTipsString(7).data());
+					ScreenReader::getReader()->readScreen(StringBuilder::getBuiltMessage(), false);
+				}
+				else if (!event.KeyInput.PressedDown) {
 					if (cardType == AccessibilityFieldFocus::CardType::LINK ||
 						cardType == AccessibilityFieldFocus::CardType::NO_CARD_TYPE ||
 						cardType == AccessibilityFieldFocus::CardType::GRAVEYARD) {
@@ -1990,7 +2081,15 @@ namespace ygo  {
 				break;
 			}
 			case irr::KEY_COMMA: {
-				if (!event.KeyInput.PressedDown) {
+				if (event.KeyInput.Control && !event.KeyInput.PressedDown) {
+					StringBuilder::cleanBuiltMessage();
+					StringBuilder::AddLine(gDataManager->GetAccessibilityString(5).data());
+					StringBuilder::AddLine(gDataManager->GetAccessibilityString(6).data());
+					StringBuilder::AddLine(gDataManager->GetAccessibilityString(7).data());
+					StringBuilder::AddLine(gDataManager->GetAccessibilityString(8).data());
+					ScreenReader::getReader()->readScreen(StringBuilder::getBuiltMessage(), false);
+				}
+				else if (!event.KeyInput.PressedDown) {
 					if (mainGame->btnYes->isTrulyVisible()) {
 						TriggerEvent(mainGame->btnYes, irr::gui::EGET_BUTTON_CLICKED);
 						std::wstring nvdaString = fmt::format(L"Yes");
@@ -2018,7 +2117,14 @@ namespace ygo  {
 				break;
 			}
 			case irr::KEY_PERIOD: {
-				if (!event.KeyInput.PressedDown) {
+				if (event.KeyInput.Control && !event.KeyInput.PressedDown) {
+					StringBuilder::cleanBuiltMessage();
+					StringBuilder::AddLine(gDataManager->GetAccessibilityString(9).data());
+					StringBuilder::AddLine(gDataManager->GetAccessibilityString(10).data());
+					StringBuilder::AddLine(gDataManager->GetAccessibilityString(11).data());
+					ScreenReader::getReader()->readScreen(StringBuilder::getBuiltMessage(), false);
+				}
+				else if (!event.KeyInput.PressedDown) {
 					if (mainGame->btnFileSaveNo->isTrulyVisible()) {
 						TriggerEvent(mainGame->btnFileSaveNo, irr::gui::EGET_BUTTON_CLICKED);
 						std::wstring nvdaString = fmt::format(L"No");
@@ -2048,7 +2154,12 @@ namespace ygo  {
 				break;
 			}
 			case irr::KEY_KEY_I: {
-				if (!event.KeyInput.PressedDown) {
+				if (event.KeyInput.Control && !event.KeyInput.PressedDown) {
+					StringBuilder::cleanBuiltMessage();
+					StringBuilder::AddLine(gDataManager->GetAccessibilityString(25).data());
+					ScreenReader::getReader()->readScreen(StringBuilder::getBuiltMessage(), false);
+				}
+				else if (!event.KeyInput.PressedDown) {
 					if (!display_cards.empty() && indexLookedUpCard <= display_cards.size() && display_cards[indexLookedUpCard]->code != 0) {
 						//Talvez fosse melhor montar um objeto e mandar para uma função de leitura. Posso até fazer usando o messageBuilder
 						auto selectedCard = display_cards[indexLookedUpCard];
@@ -2099,20 +2210,35 @@ namespace ygo  {
 				break;
 			}
 			case irr::KEY_KEY_L: {
-				if (!event.KeyInput.PressedDown) {
+				if (event.KeyInput.Control && !event.KeyInput.PressedDown) {
+					StringBuilder::cleanBuiltMessage();
+					StringBuilder::AddLine(gDataManager->GetAccessibilityString(26).data());
+					ScreenReader::getReader()->readScreen(StringBuilder::getBuiltMessage(), false);
+				}
+				else if (!event.KeyInput.PressedDown) {
 					ScreenReader::getReader()->readScreen(fmt::format(L"Player: {} LP", mainGame->dInfo.lp[AccessibilityFieldFocus::DisplayedField::PLAYER]).c_str(), false);
 					ScreenReader::getReader()->readScreen(fmt::format(L"Enemy: {} LP", mainGame->dInfo.lp[AccessibilityFieldFocus::DisplayedField::ENEMY_PLAYER]).c_str(), false);
 				}
 				break;
 			}
 			case irr::KEY_KEY_H: {
-				if (!event.KeyInput.PressedDown) {
+				if (event.KeyInput.Control && !event.KeyInput.PressedDown) {
+					StringBuilder::cleanBuiltMessage();
+					StringBuilder::AddLine(gDataManager->GetAccessibilityString(32).data());
+					ScreenReader::getReader()->readScreen(StringBuilder::getBuiltMessage(), false);
+				}
+				else if (!event.KeyInput.PressedDown) {
 					ScreenReader::getReader()->readScreen(ScreenReader::getReader()->getBuiltMessage(), false);
 				}
 				break;
 			}
 			case irr::KEY_KEY_J: {
-				if (!event.KeyInput.PressedDown) {
+				if (event.KeyInput.Control && !event.KeyInput.PressedDown) {
+					StringBuilder::cleanBuiltMessage();
+					StringBuilder::AddLine(gDataManager->GetAccessibilityString(33).data());
+					ScreenReader::getReader()->readScreen(StringBuilder::getBuiltMessage(), false);
+				}
+				else if (!event.KeyInput.PressedDown) {
 					if (mainGame->btnEP->isVisible() && mainGame->btnEP->isEnabled() && mainGame->dInfo.selfnames.size() > 0)
 						ScreenReader::getReader()->readScreen(fmt::format(L"Your turn", mainGame->dInfo.selfnames.at(0)), false);
 					else if(mainGame->dInfo.opponames.size() > 0)
@@ -2121,14 +2247,25 @@ namespace ygo  {
 				break;
 			}
 			case irr::KEY_KEY_P: {
-				if (!event.KeyInput.PressedDown) {
+				if (event.KeyInput.Control && !event.KeyInput.PressedDown) {
+					StringBuilder::cleanBuiltMessage();
+					StringBuilder::AddLine(gDataManager->GetAccessibilityString(28).data());
+					ScreenReader::getReader()->readScreen(StringBuilder::getBuiltMessage(), false);
+				}
+				else if (!event.KeyInput.PressedDown) {
 					ChangeFieldByCard();
 					MouseClick(event);
 				}
 				break;
 			}
 			case irr::KEY_KEY_N: {
-				if (!event.KeyInput.PressedDown) {
+				if (event.KeyInput.Control && !event.KeyInput.PressedDown) {
+					StringBuilder::cleanBuiltMessage();
+					StringBuilder::AddLine(gDataManager->GetAccessibilityString(30).data());
+					StringBuilder::AddLine(gDataManager->GetAccessibilityTipsString(8).data());
+					ScreenReader::getReader()->readScreen(StringBuilder::getBuiltMessage(), false);
+				}
+				else if (!event.KeyInput.PressedDown) {
 					bool canViewCards = CheckIfCanViewCards(event);
 					if (canViewCards) {
 						cardType = AccessibilityFieldFocus::CardType::CHAIN;
@@ -2141,19 +2278,34 @@ namespace ygo  {
 				break;
 			}
 			case irr::KEY_KEY_M: {
-				if (!event.KeyInput.PressedDown) {
+				if (event.KeyInput.Control && !event.KeyInput.PressedDown) {
+					StringBuilder::cleanBuiltMessage();
+					StringBuilder::AddLine(gDataManager->GetAccessibilityString(31).data());
+					ScreenReader::getReader()->readScreen(StringBuilder::getBuiltMessage(), false);
+				}
+				else if (!event.KeyInput.PressedDown) {
 					MouseClick(event, true);
 				}
 				break;
 			}
 			case irr::KEY_KEY_B: {
-				if (!event.KeyInput.PressedDown) {
+				if (event.KeyInput.Control && !event.KeyInput.PressedDown) {
+					StringBuilder::cleanBuiltMessage();
+					StringBuilder::AddLine(gDataManager->GetAccessibilityString(29).data());
+					ScreenReader::getReader()->readScreen(StringBuilder::getBuiltMessage(), false);
+				}
+				else if (!event.KeyInput.PressedDown) {
 					ScreenReader::getReader()->readLastMessage();
 				}
 				break;
 			}
 			case irr::KEY_RETURN: {
-				if (!event.KeyInput.PressedDown) {
+				if (event.KeyInput.Control && !event.KeyInput.PressedDown) {
+					StringBuilder::cleanBuiltMessage();
+					StringBuilder::AddLine(gDataManager->GetAccessibilityString(27).data());
+					ScreenReader::getReader()->readScreen(StringBuilder::getBuiltMessage(), false);
+				}
+				else if (!event.KeyInput.PressedDown) {
 					if (mainGame->btnBP->isEnabled() && battlePhase != AccessibilityFieldFocus::BattleStep::MP1)
 						battlePhase = AccessibilityFieldFocus::BattleStep::MP1;
 					//Criar função de trigger ok vai quebrar algo?
@@ -2177,7 +2329,13 @@ namespace ygo  {
 				break;
 			}
 			case irr::KEY_SPACE: {
-				if (!event.KeyInput.PressedDown) {
+				if (event.KeyInput.Control && !event.KeyInput.PressedDown) {
+					StringBuilder::cleanBuiltMessage();
+					StringBuilder::AddLine(gDataManager->GetAccessibilityString(38).data());
+					StringBuilder::AddLine(gDataManager->GetAccessibilityTipsString(9).data());
+					ScreenReader::getReader()->readScreen(StringBuilder::getBuiltMessage(), false);
+				}
+				else if (!event.KeyInput.PressedDown) {
 					if (mainGame->cbANNumber->isTrulyVisible()) {
 						if (!mainGame->env->hasFocus(mainGame->cbANNumber))
 							mainGame->env->setFocus(mainGame->cbANNumber);
@@ -2234,7 +2392,12 @@ namespace ygo  {
 				break;
 			}
 			case irr::KEY_UP: {
-				if (!event.KeyInput.PressedDown) {
+				if (event.KeyInput.Control && !event.KeyInput.PressedDown) {
+					StringBuilder::cleanBuiltMessage();
+					StringBuilder::AddLine(gDataManager->GetAccessibilityString(39).data());
+					ScreenReader::getReader()->readScreen(StringBuilder::getBuiltMessage(), false);
+				}
+				else if (!event.KeyInput.PressedDown) {
 					if (displayedField != AccessibilityFieldFocus::DisplayedField::ENEMY_PLAYER) {
 						displayedField = AccessibilityFieldFocus::DisplayedField::ENEMY_PLAYER;
 						std::wstring nvdaString = fmt::format(L"Enemy Player Field");
@@ -2255,7 +2418,12 @@ namespace ygo  {
 				break;
 			}
 			case irr::KEY_DOWN: {
-				if (!event.KeyInput.PressedDown) {
+				if (event.KeyInput.Control && !event.KeyInput.PressedDown) {
+					StringBuilder::cleanBuiltMessage();
+					StringBuilder::AddLine(gDataManager->GetAccessibilityString(40).data());
+					ScreenReader::getReader()->readScreen(StringBuilder::getBuiltMessage(), false);
+				}
+				else if (!event.KeyInput.PressedDown) {
 					if (displayedField != AccessibilityFieldFocus::DisplayedField::PLAYER) {
 						displayedField = AccessibilityFieldFocus::DisplayedField::PLAYER;
 						std::wstring nvdaString = fmt::format(L"Player Field");
@@ -2277,7 +2445,14 @@ namespace ygo  {
 				break;
 			}
 			case irr::KEY_KEY_1: {
-				if (!event.KeyInput.PressedDown) {
+				if (event.KeyInput.Control && !event.KeyInput.PressedDown) {
+					StringBuilder::cleanBuiltMessage();
+					StringBuilder::AddLine(gDataManager->GetAccessibilityString(1).data());
+					StringBuilder::AddLine(gDataManager->GetAccessibilityString(2).data());
+					StringBuilder::AddLine(gDataManager->GetAccessibilityString(41).data());
+					ScreenReader::getReader()->readScreen(StringBuilder::getBuiltMessage(), false);
+				}
+				else if (!event.KeyInput.PressedDown) {
 					if (mainGame->btnDisplayOK->isTrulyVisible())
 						TriggerEvent(mainGame->btnDisplayOK, irr::gui::EGET_BUTTON_CLICKED);
 					if (mainGame->btnHand[0]->isTrulyVisible()) {
@@ -2298,7 +2473,14 @@ namespace ygo  {
 				break;
 			}
 			case irr::KEY_KEY_2: {
-				if (!event.KeyInput.PressedDown) {
+				if (event.KeyInput.Control && !event.KeyInput.PressedDown) {
+					StringBuilder::cleanBuiltMessage();
+					StringBuilder::AddLine(gDataManager->GetAccessibilityString(1).data());
+					StringBuilder::AddLine(gDataManager->GetAccessibilityString(3).data());
+					StringBuilder::AddLine(gDataManager->GetAccessibilityString(41).data());
+					ScreenReader::getReader()->readScreen(StringBuilder::getBuiltMessage(), false);
+				}
+				else if (!event.KeyInput.PressedDown) {
 					if (mainGame->btnHand[1]->isTrulyVisible()) {
 						TriggerEvent(mainGame->btnHand[1], irr::gui::EGET_BUTTON_CLICKED);
 						std::wstring nvdaString = fmt::format(L"ROCK");
@@ -2319,7 +2501,14 @@ namespace ygo  {
 				break;
 			}
 			case irr::KEY_KEY_3: {
-				if (!event.KeyInput.PressedDown) {
+				if (event.KeyInput.Control && !event.KeyInput.PressedDown) {
+					StringBuilder::cleanBuiltMessage();
+					StringBuilder::AddLine(gDataManager->GetAccessibilityString(1).data());
+					StringBuilder::AddLine(gDataManager->GetAccessibilityString(4).data());
+					StringBuilder::AddLine(gDataManager->GetAccessibilityString(41).data());
+					ScreenReader::getReader()->readScreen(StringBuilder::getBuiltMessage(), false);
+				}
+				else if (!event.KeyInput.PressedDown) {
 					if (mainGame->btnHand[2]->isTrulyVisible()) {
 						TriggerEvent(mainGame->btnHand[2], irr::gui::EGET_BUTTON_CLICKED);
 						std::wstring nvdaString = fmt::format(L"Paper");
@@ -2340,7 +2529,12 @@ namespace ygo  {
 				break;
 			}
 			case irr::KEY_KEY_4: {
-				if (!event.KeyInput.PressedDown) {
+				if (event.KeyInput.Control && !event.KeyInput.PressedDown) {
+					StringBuilder::cleanBuiltMessage();
+					StringBuilder::AddLine(gDataManager->GetAccessibilityString(41).data());
+					ScreenReader::getReader()->readScreen(StringBuilder::getBuiltMessage(), false);
+				}
+				else if (!event.KeyInput.PressedDown) {
 					if (mainGame->btnOption[3]->isTrulyVisible()) {
 						selected_option = 3;
 						SetResponseSelectedOption();
@@ -2355,7 +2549,12 @@ namespace ygo  {
 				break;
 			}
 			case irr::KEY_KEY_5: {
-				if (!event.KeyInput.PressedDown) {
+				if (event.KeyInput.Control && !event.KeyInput.PressedDown) {
+					StringBuilder::cleanBuiltMessage();
+					StringBuilder::AddLine(gDataManager->GetAccessibilityString(41).data());
+					ScreenReader::getReader()->readScreen(StringBuilder::getBuiltMessage(), false);
+				}
+				else if (!event.KeyInput.PressedDown) {
 					if (mainGame->btnOption[4]->isTrulyVisible()) {
 						selected_option = 4;
 						SetResponseSelectedOption();
@@ -2370,7 +2569,12 @@ namespace ygo  {
 				break;
 			}
 			case irr::KEY_KEY_6: {
-				if (!event.KeyInput.PressedDown) {
+				if (event.KeyInput.Control && !event.KeyInput.PressedDown) {
+					StringBuilder::cleanBuiltMessage();
+					StringBuilder::AddLine(gDataManager->GetAccessibilityString(41).data());
+					ScreenReader::getReader()->readScreen(StringBuilder::getBuiltMessage(), false);
+				}
+				else if (!event.KeyInput.PressedDown) {
 					if (mainGame->btnDisplayOK->isTrulyVisible())
 						TriggerEvent(mainGame->btnDisplayOK, irr::gui::EGET_BUTTON_CLICKED);
 					SelectFieldSlot(6, displayedField);
@@ -2379,7 +2583,12 @@ namespace ygo  {
 				break;
 			}
 			case irr::KEY_KEY_7: {
-				if (!event.KeyInput.PressedDown) {
+				if (event.KeyInput.Control && !event.KeyInput.PressedDown) {
+					StringBuilder::cleanBuiltMessage();
+					StringBuilder::AddLine(gDataManager->GetAccessibilityString(41).data());
+					ScreenReader::getReader()->readScreen(StringBuilder::getBuiltMessage(), false);
+				}
+				else if (!event.KeyInput.PressedDown) {
 					if (mainGame->btnDisplayOK->isTrulyVisible())
 						TriggerEvent(mainGame->btnDisplayOK, irr::gui::EGET_BUTTON_CLICKED);
 					SelectFieldSlot(7, displayedField);
@@ -2388,7 +2597,12 @@ namespace ygo  {
 				break;
 			}
 			case irr::KEY_KEY_0: {
-				if (!event.KeyInput.PressedDown) {
+				if (event.KeyInput.Control && !event.KeyInput.PressedDown) {
+					StringBuilder::cleanBuiltMessage();
+					StringBuilder::AddLine(gDataManager->GetAccessibilityString(44).data());
+					ScreenReader::getReader()->readScreen(StringBuilder::getBuiltMessage(), false);
+				}
+				else if (!event.KeyInput.PressedDown) {
 					if (mainGame->btnLeaveGame->isTrulyVisible()) {
 						TriggerEvent(mainGame->btnLeaveGame, irr::gui::EGET_BUTTON_CLICKED);
 						std::wstring nvdaString = fmt::format(L"Surrender");
@@ -2398,7 +2612,13 @@ namespace ygo  {
 				break;
 			}
 			case irr::KEY_BACK: {
-				if (!event.KeyInput.PressedDown) {
+				if (event.KeyInput.Control && !event.KeyInput.PressedDown) {
+					StringBuilder::cleanBuiltMessage();
+					StringBuilder::AddLine(gDataManager->GetAccessibilityString(45).data());
+					StringBuilder::AddLine(gDataManager->GetAccessibilityTipsString(10).data());
+					ScreenReader::getReader()->readScreen(StringBuilder::getBuiltMessage(), false);
+				}
+				else if (!event.KeyInput.PressedDown) {
 					if (mainGame->btnBP->isVisible() && mainGame->btnBP->isEnabled()) {
 						TriggerEvent(mainGame->btnBP, irr::gui::EGET_BUTTON_CLICKED);
 						battlePhase = AccessibilityFieldFocus::BattleStep::BP;

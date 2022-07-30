@@ -5,6 +5,7 @@
 #include "IScreenReader.h"
 #include "NVDA.h"
 #include "TolkController.h"
+#include "AccessibilityMessages.h"
 
 class ScreenReader
 {

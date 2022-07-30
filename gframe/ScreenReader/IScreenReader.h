@@ -1,4 +1,3 @@
-
 #ifndef ISCREENREADER_H
 #define ISCREENREADER_H
 

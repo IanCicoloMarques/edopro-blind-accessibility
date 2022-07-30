@@ -201,6 +201,8 @@
     <ClInclude Include="..\gframe\RNG\mt19937.h" />
     <ClInclude Include="..\gframe\RNG\SplitMix64.hpp" />
     <ClInclude Include="..\gframe\RNG\Xoshiro256.hpp" />
+    <ClInclude Include="..\gframe\ScreenReader\AccessibilityMessages.h" />
+    <ClInclude Include="..\gframe\ScreenReader\CommandMessages.h" />
     <ClInclude Include="..\gframe\ScreenReader\IScreenReader.h" />
     <ClInclude Include="..\gframe\ScreenReader\NVDA.h" />
     <ClInclude Include="..\gframe\ScreenReader\ScreenReader.h" />
@@ -269,6 +271,8 @@
     <ClCompile Include="..\gframe\replay.cpp" />
     <ClCompile Include="..\gframe\replay_mode.cpp" />
     <ClCompile Include="..\gframe\repo_manager.cpp" />
+    <ClCompile Include="..\gframe\ScreenReader\AccessibilityMessages.cpp" />
+    <ClCompile Include="..\gframe\ScreenReader\CommandMessages.cpp" />
     <ClCompile Include="..\gframe\ScreenReader\NVDA.cpp" />
     <ClCompile Include="..\gframe\ScreenReader\ScreenReader.cpp" />
     <ClCompile Include="..\gframe\ScreenReader\StringBuilder.cpp" />

@@ -107,6 +107,12 @@
     <ClCompile Include="..\gframe\ScreenReader\ScreenReader.cpp">
       <Filter>ScreenReader</Filter>
     </ClCompile>
+    <ClCompile Include="..\gframe\ScreenReader\AccessibilityMessages.cpp">
+      <Filter>ScreenReader</Filter>
+    </ClCompile>
+    <ClCompile Include="..\gframe\ScreenReader\CommandMessages.cpp">
+      <Filter>ScreenReader</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\gframe\Base64.h" />
@@ -288,6 +294,12 @@
     </ClInclude>
     <ClInclude Include="MenuType.h">
       <Filter>Accessibility</Filter>
+    </ClInclude>
+    <ClInclude Include="..\gframe\ScreenReader\AccessibilityMessages.h">
+      <Filter>ScreenReader</Filter>
+    </ClInclude>
+    <ClInclude Include="..\gframe\ScreenReader\CommandMessages.h">
+      <Filter>ScreenReader</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -2444,6 +2444,7 @@ namespace ygo  {
 				}
 				break;
 			}
+			case irr::KEY_NUMPAD1:
 			case irr::KEY_KEY_1: {
 				if (event.KeyInput.Control && !event.KeyInput.PressedDown) {
 					StringBuilder::cleanBuiltMessage();
@@ -2472,6 +2473,7 @@ namespace ygo  {
 				}
 				break;
 			}
+			case irr::KEY_NUMPAD2:
 			case irr::KEY_KEY_2: {
 				if (event.KeyInput.Control && !event.KeyInput.PressedDown) {
 					StringBuilder::cleanBuiltMessage();
@@ -2500,6 +2502,7 @@ namespace ygo  {
 				}
 				break;
 			}
+			case irr::KEY_NUMPAD3:
 			case irr::KEY_KEY_3: {
 				if (event.KeyInput.Control && !event.KeyInput.PressedDown) {
 					StringBuilder::cleanBuiltMessage();
@@ -2528,6 +2531,7 @@ namespace ygo  {
 				}
 				break;
 			}
+			case irr::KEY_NUMPAD4:
 			case irr::KEY_KEY_4: {
 				if (event.KeyInput.Control && !event.KeyInput.PressedDown) {
 					StringBuilder::cleanBuiltMessage();
@@ -2548,6 +2552,7 @@ namespace ygo  {
 				}
 				break;
 			}
+			case irr::KEY_NUMPAD5:
 			case irr::KEY_KEY_5: {
 				if (event.KeyInput.Control && !event.KeyInput.PressedDown) {
 					StringBuilder::cleanBuiltMessage();
@@ -2568,6 +2573,7 @@ namespace ygo  {
 				}
 				break;
 			}
+			case irr::KEY_NUMPAD6:
 			case irr::KEY_KEY_6: {
 				if (event.KeyInput.Control && !event.KeyInput.PressedDown) {
 					StringBuilder::cleanBuiltMessage();
@@ -2582,6 +2588,7 @@ namespace ygo  {
 				}
 				break;
 			}
+			case irr::KEY_NUMPAD7:
 			case irr::KEY_KEY_7: {
 				if (event.KeyInput.Control && !event.KeyInput.PressedDown) {
 					StringBuilder::cleanBuiltMessage();
@@ -2596,6 +2603,7 @@ namespace ygo  {
 				}
 				break;
 			}
+			case irr::KEY_NUMPAD0:
 			case irr::KEY_KEY_0: {
 				if (event.KeyInput.Control && !event.KeyInput.PressedDown) {
 					StringBuilder::cleanBuiltMessage();

@@ -157,7 +157,8 @@ void ImageDownloader::DownloadPic() {
 				}
 				continue;
 			}
-			SetPayloadAndUrl(fmt::format(src.url, code), fp);
+			auto url = fmt::format(src.url, code);
+			SetPayloadAndUrl(url, fp);
 			res = curl_easy_perform(curl);
 			fclose(fp);
 			if(res == CURLE_OK) {

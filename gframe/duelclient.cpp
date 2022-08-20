@@ -1693,6 +1693,11 @@ catch(...) { what = def; }
 			mainGame->dField.Initial(mainGame->LocalPlayer(1), deckc, extrac);
 			mainGame->dInfo.turn = 0;
 			mainGame->dInfo.is_shuffling = false;
+			if(mainGame->dInfo.isFirst)
+				ScreenReader::getReader()->readScreen(L"You play first", false);
+			else
+				ScreenReader::getReader()->readScreen(L"Enemy plays first", false);
+
 			return true;
 		}
 		case MSG_UPDATE_DATA: {

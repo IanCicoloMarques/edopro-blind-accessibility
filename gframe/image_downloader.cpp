@@ -4,6 +4,8 @@
 #include <fmt/format.h>
 #include <cerrno>
 #include <array>
+#include <chrono>
+#include <thread>
 #include "logging.h"
 #include "utils.h"
 #include "game_config.h"
@@ -40,6 +42,7 @@ void ImageDownloader::AddDownloadResource(PicSource src) {
 
 static constexpr std::array<uint8_t, 8> pngheader{ 0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a };
 static constexpr std::array<uint8_t, 3> jpgheader{ 0xff, 0xd8, 0xff };
+static int numberImagesDownloaded = 0;
 
 enum headerType : uint8_t {
 	UNK_FILE,
@@ -150,13 +153,18 @@ void ImageDownloader::DownloadPic() {
 			if(src.type != type)
 				continue;
 			auto fp = fileopen(name.data(), "wb");
-			if(fp == nullptr) {
-				if(gGameConfig->logDownloadErrors) {
+			if (fp == nullptr) {
+				if (gGameConfig->logDownloadErrors) {
 					ygo::ErrorLog("Failed opening {} for write.", Utils::ToUTF8IfNeeded(name));
 					ygo::ErrorLog("Error: {}.", strerror(errno));
 				}
 				continue;
 			}
+			if(numberImagesDownloaded >= 10){
+				std::this_thread::sleep_until(std::chrono::system_clock::now() + std::chrono::seconds(1));
+				--numberImagesDownloaded;
+			}
+			numberImagesDownloaded++;
 			auto url = fmt::format(src.url, code);
 			SetPayloadAndUrl(url, fp);
 			res = curl_easy_perform(curl);

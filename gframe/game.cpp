@@ -38,7 +38,8 @@
 #include "utils_gui.h"
 #include "custom_skin_enum.h"
 #include "joystick_wrapper.h"
-#include "ScreenReader/StringBuilder.h"
+#include "../Accessibility/ScreenReader/StringBuilder.h"
+#include "../Accessibility/ScreenReader/ScreenReader.h"
 #if defined(__MINGW32__) && defined(UNICODE)
 #include <fcntl.h>
 #include <ext/stdio_filebuf.h>
@@ -2536,6 +2537,7 @@ namespace ygo {
 		chatMsg[0] = fmt::format(L"{}: {}", sender, msg);
 		lstChat->addItem(chatMsg[0].data());
 	}
+
 	void Game::AddChatMsg(epro::wstringview name, epro::wstringview msg, int type) {
 		for (int i = 7; i > 0; --i) {
 			chatMsg[i].swap(chatMsg[i - 1]);
@@ -2564,6 +2566,7 @@ namespace ygo {
 			chatMsg[0] = fmt::format(L"System: {}", msg);
 		lstChat->addItem(chatMsg[0].data());
 		gSoundManager->PlaySoundEffect(SoundManager::SFX::CHAT);
+		ScreenReader::getReader()->readScreen(fmt::format(L"Chat: {}", chatMsg[0].data()), false);
 	}
 	void Game::AddLog(epro::wstringview msg, int param) {
 		logParam.push_back(param);

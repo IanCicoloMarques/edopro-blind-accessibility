@@ -30,7 +30,7 @@
 #ifdef __ANDROID__
 #include "Android/porting_android.h"
 #endif
-#include "ScreenReader/ScreenReader.h"
+#include "../Accessibility/ScreenReader/ScreenReader.h"
 
 #define DEFAULT_DUEL_RULE 5
 namespace ygo {
@@ -41,7 +41,7 @@ namespace ygo {
 	bool DuelClient::is_host = false;
 	bool DuelClient::is_local_host = false;
 	std::atomic<bool> DuelClient::answered{ false };
-	bool DuelClient::waitingForOponent{false};
+	bool DuelClient::waitingForOponent{ false };
 	event_base* DuelClient::client_base = nullptr;
 	bufferevent* DuelClient::client_bev = nullptr;
 	bool DuelClient::is_closing = false;
@@ -1317,7 +1317,7 @@ catch(...) { what = def; }
 					waitingForOponent = false;
 				}
 			}
-			else if(waitingForOponent == false) {
+			else if (waitingForOponent == false) {
 				Play(SoundManager::SFX::COUNTER_REMOVE);
 				waitingForOponent = true;
 			}
@@ -1693,6 +1693,11 @@ catch(...) { what = def; }
 			mainGame->dField.Initial(mainGame->LocalPlayer(1), deckc, extrac);
 			mainGame->dInfo.turn = 0;
 			mainGame->dInfo.is_shuffling = false;
+			if (mainGame->dInfo.isFirst)
+				ScreenReader::getReader()->readScreen(L"You play first", false);
+			else
+				ScreenReader::getReader()->readScreen(L"Enemy plays first", false);
+
 			return true;
 		}
 		case MSG_UPDATE_DATA: {
@@ -2061,9 +2066,12 @@ catch(...) { what = def; }
 			std::sort(mainGame->dField.selectable_cards.begin(), mainGame->dField.selectable_cards.end(), ClientCard::client_card_sort);
 			std::wstring text = fmt::format(L"{}({}-{})", gDataManager->GetDesc(select_hint ? select_hint : 560, mainGame->dInfo.compat_mode),
 				mainGame->dField.select_min, mainGame->dField.select_max);
-			ScreenReader::getReader()->readScreen(fmt::format(L"{}", gDataManager->GetDesc(select_hint ? select_hint : 560, mainGame->dInfo.compat_mode)));
+			ScreenReader::getReader()->readScreen(text);
+			ScreenReader::getReader()->readScreen(gDataManager->GetAccessibilityTipsString(14).data());
 			ScreenReader::getReader()->cleanBuiltMessage();
 			ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
+			ScreenReader::getReader()->buildMessage(gDataManager->GetAccessibilityTipsString(14).data());
+			ScreenReader::getReader()->buildMessage(gDataManager->GetAccessibilityTipsString(13).data());
 			std::lock_guard<std::mutex> lock(mainGame->gMutex);
 			select_hint = 0;
 			if (panelmode) {
@@ -2084,9 +2092,6 @@ catch(...) { what = def; }
 				mainGame->dField.ShowCancelOrFinishButton(0);
 			}
 			mainGame->ShowCardInfo(mainGame->dField.display_cards[mainGame->dField.indexLookedUpCard]->code);
-			ScreenReader::getReader()->readScreen(fmt::format(L"{}", gDataManager->GetName(mainGame->dField.display_cards[mainGame->dField.indexLookedUpCard]->code)));
-			ScreenReader::getReader()->cleanBuiltMessage();
-			ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
 			return false;
 		}
 		case MSG_SELECT_UNSELECT_CARD: {
@@ -2630,18 +2635,10 @@ catch(...) { what = def; }
 				DuelClient::SendResponse();
 				return true;
 			}
-			if (mainGame->dInfo.curMsg == MSG_SORT_CHAIN) {
+			if (mainGame->dInfo.curMsg == MSG_SORT_CHAIN)
 				mainGame->wCardSelect->setText(gDataManager->GetSysString(206).data());
-				ScreenReader::getReader()->readScreen(L"Select chain order");
-				ScreenReader::getReader()->cleanBuiltMessage();
-				ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
-			}
-			else {
+			else
 				mainGame->wCardSelect->setText(gDataManager->GetSysString(205).data());
-				ScreenReader::getReader()->readScreen(L"Select from top to bottom");
-				ScreenReader::getReader()->cleanBuiltMessage();
-				ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
-			}
 			mainGame->dField.select_min = 0;
 			mainGame->dField.select_max = count;
 			mainGame->dField.ShowSelectCard();
@@ -3161,13 +3158,6 @@ catch(...) { what = def; }
 				break;
 			case PHASE_STANDBY:
 				event_string = gDataManager->GetSysString(21).data();
-				mainGame->btnSP->setVisible(true);
-				mainGame->btnSP->setSubElement(true);
-				mainGame->showcardcode = 5;
-				ScreenReader::getReader()->readScreen(L"Standby Phase.");
-				ScreenReader::getReader()->cleanBuiltMessage();
-				ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
-
 				break;
 			case PHASE_MAIN1:
 				event_string = gDataManager->GetSysString(22).data();
@@ -3416,6 +3406,11 @@ catch(...) { what = def; }
 							mainGame->WaitFrameSignal(5, lock);
 							mainGame->dField.MoveCard(pcard, 5);
 							mainGame->WaitFrameSignal(5, lock);
+							mainGame->dField.display_cards.clear();
+							mainGame->dField.display_cards.push_back(pcard);
+							mainGame->dField.indexLookedUpCard = 0;
+							ScreenReader::getReader()->readScreen(fmt::format(L"Card {} revealed", gDataManager->GetName(pcard->code)));
+
 						}
 						else {
 							if (current.location == LOCATION_MZONE && pcard->overlayed.size() > 0) {

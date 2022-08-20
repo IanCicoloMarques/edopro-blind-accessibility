@@ -3,7 +3,7 @@
 
 #pragma once
 #include "IScreenReader.h"
-#include "nvdaController.h"
+#include "../Readers/nvda-lib/nvdaController.h"
 
 class NVDA : public IScreenReader
 {

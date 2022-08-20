@@ -1,7 +1,7 @@
 #ifndef TOLKCONTROLLER_H
 #define TOLKCONTROLLER_H
 
-#include "../ScreenReader/src/Tolk.h"
+#include "../Readers/tolk/Tolk.h"
 #include "IScreenReader.h"
 
 class TolkController : public IScreenReader

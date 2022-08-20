@@ -1,0 +1,52 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="ScreenReader">
+      <UniqueIdentifier>{2e58369e-6827-407f-aae5-112e61f50922}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Menu">
+      <UniqueIdentifier>{9cbf152e-ad91-4b03-a910-38fb2d8901e1}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="ScreenReader\AccessibilityMessages.h">
+      <Filter>ScreenReader</Filter>
+    </ClInclude>
+    <ClInclude Include="ScreenReader\CommandMessages.h">
+      <Filter>ScreenReader</Filter>
+    </ClInclude>
+    <ClInclude Include="ScreenReader\IScreenReader.h">
+      <Filter>ScreenReader</Filter>
+    </ClInclude>
+    <ClInclude Include="ScreenReader\ScreenReader.h">
+      <Filter>ScreenReader</Filter>
+    </ClInclude>
+    <ClInclude Include="ScreenReader\StringBuilder.h">
+      <Filter>ScreenReader</Filter>
+    </ClInclude>
+    <ClInclude Include="ScreenReader\TolkController.h">
+      <Filter>ScreenReader</Filter>
+    </ClInclude>
+    <ClInclude Include="Menus\MenuType.h">
+      <Filter>Menu</Filter>
+    </ClInclude>
+    <ClInclude Include="FieldFocus\AccessibilityFieldFocus.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="ScreenReader\AccessibilityMessages.cpp">
+      <Filter>ScreenReader</Filter>
+    </ClCompile>
+    <ClCompile Include="ScreenReader\CommandMessages.cpp">
+      <Filter>ScreenReader</Filter>
+    </ClCompile>
+    <ClCompile Include="ScreenReader\ScreenReader.cpp">
+      <Filter>ScreenReader</Filter>
+    </ClCompile>
+    <ClCompile Include="ScreenReader\StringBuilder.cpp">
+      <Filter>ScreenReader</Filter>
+    </ClCompile>
+    <ClCompile Include="ScreenReader\TolkController.cpp">
+      <Filter>ScreenReader</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

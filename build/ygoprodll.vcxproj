@@ -25,7 +25,7 @@
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>Unicode</CharacterSet>
     <PlatformToolset>v142</PlatformToolset>
@@ -136,6 +136,7 @@
     <ClInclude Include="..\gframe\CGUISkinSystem\clipRects.h" />
     <ClInclude Include="..\gframe\CGUITTFont\CGUITTFont.h" />
     <ClInclude Include="..\gframe\CGUITTFont\irrUString.h" />
+    <ClInclude Include="..\gframe\CGUIWindowedTabControl\CGUIWindowedTabControl.h" />
     <ClInclude Include="..\gframe\CProgressBar\CProgressBar.h" />
     <ClInclude Include="..\gframe\CXMLRegistry\CXMLNode.h" />
     <ClInclude Include="..\gframe\CXMLRegistry\CXMLRegistry.h" />
@@ -222,6 +223,7 @@
     <ClCompile Include="..\gframe\CGUISkinSystem\CGUISkinSystem.cpp" />
     <ClCompile Include="..\gframe\CGUISkinSystem\CImageGUISkin.cpp" />
     <ClCompile Include="..\gframe\CGUITTFont\CGUITTFont.cpp" />
+    <ClCompile Include="..\gframe\CGUIWindowedTabControl\CGUIWindowedTabControl.cpp" />
     <ClCompile Include="..\gframe\CProgressBar\CProgressBar.cpp" />
     <ClCompile Include="..\gframe\CXMLRegistry\CXMLNode.cpp" />
     <ClCompile Include="..\gframe\CXMLRegistry\CXMLRegistry.cpp" />

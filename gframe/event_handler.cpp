@@ -331,6 +331,7 @@ namespace ygo  {
 					if (selected_option == 0)
 						mainGame->btnOptionp->setVisible(false);
 					mainGame->stOptions->setText(gDataManager->GetDesc(select_options[selected_option], mainGame->dInfo.compat_mode).data());
+					ScreenReader::getReader()->readScreen(gDataManager->GetDesc(select_options[selected_option], mainGame->dInfo.compat_mode).data(), false);
 					break;
 				}
 				case BUTTON_OPTION_NEXT: {
@@ -339,6 +340,7 @@ namespace ygo  {
 					if (selected_option == select_options.size() - 1)
 						mainGame->btnOptionn->setVisible(false);
 					mainGame->stOptions->setText(gDataManager->GetDesc(select_options[selected_option], mainGame->dInfo.compat_mode).data());
+					ScreenReader::getReader()->readScreen(gDataManager->GetDesc(select_options[selected_option], mainGame->dInfo.compat_mode).data(), false);
 					break;
 				}
 				case BUTTON_OPTION_0:
@@ -1479,10 +1481,14 @@ namespace ygo  {
 						clicked_card->is_selected = false;
 						auto it = std::find(selected_cards.begin(), selected_cards.end(), clicked_card);
 						selected_cards.erase(it);
+						ScreenReader::getReader()->readScreen(fmt::format(L"{} uncofirmed", gDataManager->GetName(clicked_card->code)));
+						gSoundManager->PlaySoundEffect(SoundManager::SFX::UNCONFIRM);
 					}
 					else {
 						clicked_card->is_selected = true;
 						selected_cards.push_back(clicked_card);
+						ScreenReader::getReader()->readScreen(fmt::format(L"{} confirmed", gDataManager->GetName(clicked_card->code)));
+						gSoundManager->PlaySoundEffect(SoundManager::SFX::CONFIRM);
 					}
 					uint32_t min = selected_cards.size(), max = 0;
 					if (mainGame->dInfo.curMsg == MSG_SELECT_CARD) {
@@ -1522,7 +1528,7 @@ namespace ygo  {
 						break;
 					if (clicked_card->is_selected) {
 						if (!mainGame->dInfo.isCatchingUp) {
-							ScreenReader::getReader()->readScreen(fmt::format(L"{} unselected", gDataManager->GetName(clicked_card->code)));
+							ScreenReader::getReader()->readScreen(fmt::format(L"{} uncofirmed", gDataManager->GetName(clicked_card->code)));
 							gSoundManager->PlaySoundEffect(SoundManager::SFX::UNCONFIRM);
 						}
 
@@ -2247,9 +2253,9 @@ namespace ygo  {
 				}
 				else if (!event.KeyInput.PressedDown && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
 					if (mainGame->btnEP->isVisible() && mainGame->btnEP->isEnabled() && mainGame->dInfo.selfnames.size() > 0)
-						ScreenReader::getReader()->readScreen(fmt::format(L"Your turn", mainGame->dInfo.selfnames.at(0)), false);
+						ScreenReader::getReader()->readScreen(fmt::format(L"Your turn {}", mainGame->dInfo.selfnames.at(0)), false);
 					else if(mainGame->dInfo.opponames.size() > 0)
-						ScreenReader::getReader()->readScreen(fmt::format(L"Opponent turn", mainGame->dInfo.opponames.at(0)), false);
+						ScreenReader::getReader()->readScreen(fmt::format(L"Opponent turn {}", mainGame->dInfo.opponames.at(0)), false);
 				}
 				break;
 			}
@@ -2408,21 +2414,21 @@ namespace ygo  {
 					ScreenReader::getReader()->readScreen(StringBuilder::getBuiltMessage(), false);
 				}
 				else if (!event.KeyInput.PressedDown  && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
-					if (displayedField != AccessibilityFieldFocus::DisplayedField::ENEMY_PLAYER) {
+					if (mainGame->cbANNumber->isTrulyVisible()) {
+						if (!mainGame->env->hasFocus(mainGame->cbANNumber))
+							mainGame->env->setFocus(mainGame->cbANNumber);
+						std::wstring nvdaString = fmt::format(L"{}", mainGame->cbANNumber->getItem(mainGame->cbANNumber->getSelected()));
+						ScreenReader::getReader()->readScreen(nvdaString.c_str(), false);
+					}
+					else if (mainGame->btnOptionn->isTrulyVisible())
+						TriggerEvent(mainGame->btnOptionn, irr::gui::EGET_BUTTON_CLICKED);
+					else if (displayedField != AccessibilityFieldFocus::DisplayedField::ENEMY_PLAYER) {
 						displayedField = AccessibilityFieldFocus::DisplayedField::ENEMY_PLAYER;
 						std::wstring nvdaString = fmt::format(L"Enemy Player Field");
 						ScreenReader::getReader()->readScreen(nvdaString.c_str());
 						CloseDialog();
 						MouseClick(event, true);
 						ChangeFieldAndLook();
-					}
-					else {
-						if (mainGame->cbANNumber->isTrulyVisible()) {
-							if (!mainGame->env->hasFocus(mainGame->cbANNumber))
-								mainGame->env->setFocus(mainGame->cbANNumber);
-							std::wstring nvdaString = fmt::format(L"{}", mainGame->cbANNumber->getItem(mainGame->cbANNumber->getSelected()));
-							ScreenReader::getReader()->readScreen(nvdaString.c_str(), false);
-						}
 					}
 				}
 				break;
@@ -2434,22 +2440,21 @@ namespace ygo  {
 					ScreenReader::getReader()->readScreen(StringBuilder::getBuiltMessage(), false);
 				}
 				else if (!event.KeyInput.PressedDown  && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
-					if (displayedField != AccessibilityFieldFocus::DisplayedField::PLAYER) {
+					if (mainGame->cbANNumber->isTrulyVisible()) {
+						if (!mainGame->env->hasFocus(mainGame->cbANNumber))
+							mainGame->env->setFocus(mainGame->cbANNumber);
+						std::wstring nvdaString = fmt::format(L"{}", mainGame->cbANNumber->getItem(mainGame->cbANNumber->getSelected()));
+						ScreenReader::getReader()->readScreen(nvdaString.c_str(), false);
+					}
+					else if (mainGame->btnOptionp->isTrulyVisible())
+						TriggerEvent(mainGame->btnOptionp, irr::gui::EGET_BUTTON_CLICKED);
+					else if (displayedField != AccessibilityFieldFocus::DisplayedField::PLAYER) {
 						displayedField = AccessibilityFieldFocus::DisplayedField::PLAYER;
 						std::wstring nvdaString = fmt::format(L"Player Field");
 						ScreenReader::getReader()->readScreen(nvdaString.c_str());
 						CloseDialog();
 						MouseClick(event, true);
 						ChangeFieldAndLook();
-					}
-					else {
-						if (mainGame->cbANNumber->isTrulyVisible()) {
-							if (!mainGame->env->hasFocus(mainGame->cbANNumber))
-								mainGame->env->setFocus(mainGame->cbANNumber);
-							std::wstring nvdaString = fmt::format(L"{}", mainGame->cbANNumber->getItem(mainGame->cbANNumber->getSelected()));
-							ScreenReader::getReader()->readScreen(nvdaString.c_str(), false);
-						}
-
 					}
 				}
 				break;

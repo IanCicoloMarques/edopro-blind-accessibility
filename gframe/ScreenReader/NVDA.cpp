@@ -34,7 +34,7 @@ void NVDA::readHelpMessage()
 void NVDA::buildMessage(std::wstring string)
 {
 	builtMessage += string;
-	builtMessage += L"\n";
+	builtMessage += L",\n";
 }
 
 void NVDA::cleanBuiltMessage()

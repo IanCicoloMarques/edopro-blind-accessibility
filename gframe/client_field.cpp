@@ -625,9 +625,11 @@ namespace ygo {
 				break;
 			}
 		}
-		ScreenReader::getReader()->readScreen(L"Select a option");
-		ScreenReader::getReader()->cleanBuiltMessage();
-		ScreenReader::getReader()->buildMessage(L"Use the number keys to select an option");
+		if (count > 1) {
+			ScreenReader::getReader()->readScreen(L"Use the arrow keys to select an option");
+			ScreenReader::getReader()->cleanBuiltMessage();
+			ScreenReader::getReader()->buildMessage(L"Use the arrow keys to select an option");
+		}
 		for (int i = 0; (i < count) && (i < 5) && quickmode; i++) {
 			mainGame->btnOption[i]->setText(gDataManager->GetDesc(select_options[i], mainGame->dInfo.compat_mode).data());
 			ScreenReader::getReader()->readScreen(fmt::format(L"{} - {}", i + 1, gDataManager->GetDesc(select_options[i], mainGame->dInfo.compat_mode).data()));
@@ -667,6 +669,7 @@ namespace ygo {
 			mainGame->wOptions->setRelativePosition(pos);
 		}
 		mainGame->wOptions->setText(gDataManager->GetDesc(select_hint ? select_hint : 555, mainGame->dInfo.compat_mode).data());
+		ScreenReader::getReader()->readScreen(gDataManager->GetDesc(select_options[0], mainGame->dInfo.compat_mode).data(), false);
 		mainGame->PopupElement(mainGame->wOptions);
 	}
 	void ClientField::ReplaySwap() {

@@ -2069,6 +2069,7 @@ catch(...) { what = def; }
 			ScreenReader::getReader()->readScreen(fmt::format(L"{}", gDataManager->GetDesc(select_hint ? select_hint : 560, mainGame->dInfo.compat_mode)));
 			ScreenReader::getReader()->cleanBuiltMessage();
 			ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
+			ScreenReader::getReader()->buildMessage(gDataManager->GetAccessibilityTipsString(13).data());
 			std::lock_guard<std::mutex> lock(mainGame->gMutex);
 			select_hint = 0;
 			if (panelmode) {
@@ -2089,9 +2090,6 @@ catch(...) { what = def; }
 				mainGame->dField.ShowCancelOrFinishButton(0);
 			}
 			mainGame->ShowCardInfo(mainGame->dField.display_cards[mainGame->dField.indexLookedUpCard]->code);
-			ScreenReader::getReader()->readScreen(fmt::format(L"{}", gDataManager->GetName(mainGame->dField.display_cards[mainGame->dField.indexLookedUpCard]->code)));
-			ScreenReader::getReader()->cleanBuiltMessage();
-			ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
 			return false;
 		}
 		case MSG_SELECT_UNSELECT_CARD: {

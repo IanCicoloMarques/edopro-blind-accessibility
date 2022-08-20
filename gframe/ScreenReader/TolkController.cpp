@@ -34,7 +34,7 @@ void TolkController::setHelpMessage(std::wstring string)
 void TolkController::buildMessage(std::wstring string)
 {
 	builtMessage += string;
-	builtMessage += L"\n";
+	builtMessage += L",\n";
 }
 
 void TolkController::cleanBuiltMessage()

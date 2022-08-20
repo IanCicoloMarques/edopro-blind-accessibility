@@ -2331,6 +2331,9 @@ namespace ygo  {
 						TriggerEvent(mainGame->btnOptionOK, irr::gui::EGET_BUTTON_CLICKED);
 					if(mainGame->btnANNumberOK->isTrulyVisible())
 						TriggerEvent(mainGame->btnANNumberOK, irr::gui::EGET_BUTTON_CLICKED);
+					if (mainGame->btnOption[0]->isTrulyVisible()) {
+						SetResponseSelectedOption();
+					}
 					else if (!display_cards.empty() && indexLookedUpCard <= display_cards.size()) {
 						clicked_card = display_cards[indexLookedUpCard];
 						std::wstring cardName = fmt::format(L"Selected {}", gDataManager->GetName(clicked_card->code));
@@ -2422,6 +2425,10 @@ namespace ygo  {
 					}
 					else if (mainGame->btnOptionn->isTrulyVisible())
 						TriggerEvent(mainGame->btnOptionn, irr::gui::EGET_BUTTON_CLICKED);
+					else if (mainGame->btnOption[0]->isTrulyVisible() && selected_option - 1 >= 0 && selected_option - 1 < select_options.size()) {
+						selected_option--;
+						ScreenReader::getReader()->readScreen(gDataManager->GetDesc(select_options[selected_option], mainGame->dInfo.compat_mode).data(), false);
+					}
 					else if (displayedField != AccessibilityFieldFocus::DisplayedField::ENEMY_PLAYER) {
 						displayedField = AccessibilityFieldFocus::DisplayedField::ENEMY_PLAYER;
 						std::wstring nvdaString = fmt::format(L"Enemy Player Field");
@@ -2448,6 +2455,10 @@ namespace ygo  {
 					}
 					else if (mainGame->btnOptionp->isTrulyVisible())
 						TriggerEvent(mainGame->btnOptionp, irr::gui::EGET_BUTTON_CLICKED);
+					else if (mainGame->btnOption[0]->isTrulyVisible() && selected_option + 1 < select_options.size()) {
+						selected_option++;
+						ScreenReader::getReader()->readScreen(gDataManager->GetDesc(select_options[selected_option], mainGame->dInfo.compat_mode).data(), false);
+					}
 					else if (displayedField != AccessibilityFieldFocus::DisplayedField::PLAYER) {
 						displayedField = AccessibilityFieldFocus::DisplayedField::PLAYER;
 						std::wstring nvdaString = fmt::format(L"Player Field");
@@ -2475,10 +2486,6 @@ namespace ygo  {
 						TriggerEvent(mainGame->btnHand[0], irr::gui::EGET_BUTTON_CLICKED);
 						std::wstring nvdaString = fmt::format(L"SCISSORS");
 						ScreenReader::getReader()->readScreen(nvdaString.c_str(), false);
-					}
-					else if (mainGame->btnOption[0]->isTrulyVisible()) {
-						selected_option = 0;
-						SetResponseSelectedOption();
 					}
 					else
 					{
@@ -2789,7 +2796,7 @@ namespace ygo  {
 				break;
 			}
 			case AccessibilityFieldFocus::UseType::SPECIAL_SUMMON: {
-				if (mainGame->btnSPSummon->isVisible()) {
+				if (mainGame->btnSPSummon->isTrulyVisible()) {
 					TriggerEvent(mainGame->btnSPSummon, irr::gui::EGET_BUTTON_CLICKED);
 					canUse = true;
 				}
@@ -3165,7 +3172,9 @@ namespace ygo  {
 					fieldSlot = i + 1;
 				else if (i < 5)
 					fieldSlot = 5 - i;
-				else {
+				else if(szone[displayedField][i] == selectedCard)
+					fieldSlot = i + 1;
+				else{
 					lookupFieldLocId = AccessibilityFieldFocus::FieldLookerLocId::LINK_ZONE;
 					if (displayedField == AccessibilityFieldFocus::DisplayedField::PLAYER)
 						fieldSlot = i - 4;
@@ -3176,6 +3185,7 @@ namespace ygo  {
 							fieldSlot = 1;
 					}
 				}
+				
 				break;
 			}
 		}

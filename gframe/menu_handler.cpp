@@ -1334,8 +1334,15 @@ namespace ygo {
 				}
 				break;
 			}
+			case irr::KEY_KEY_M: {
+				if (!event.KeyInput.PressedDown && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
+					ScreenReader::getReader()->readScreen(fmt::format(L"Chat active"), false);
+					mainGame->env->setFocus(mainGame->ebChatInput);
+				}
+				break;
+			}
 			case irr::KEY_DOWN: {
-				if (!event.KeyInput.PressedDown) {
+				if (!event.KeyInput.PressedDown && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
 					if (mainGame->roomListTable->isTrulyVisible() && currentMenu == L"Rooms") {
 						if (onlineMatchCounter < mainGame->roomListTable->getRowCount() - 1)
 							onlineMatchCounter++;
@@ -1351,7 +1358,7 @@ namespace ygo {
 				break;
 			}
 			case irr::KEY_UP: {
-				if (!event.KeyInput.PressedDown) {
+				if (!event.KeyInput.PressedDown && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
 					if (mainGame->roomListTable->isTrulyVisible() && currentMenu == L"Rooms") {
 						if (onlineMatchCounter > 0)
 							onlineMatchCounter--;
@@ -1367,7 +1374,7 @@ namespace ygo {
 				break;
 			}
 			case irr::KEY_RIGHT: {
-				if (!event.KeyInput.PressedDown) {
+				if (!event.KeyInput.PressedDown && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
 					if (!scrollSelected) {
 						CheckMenu();
 						typing = false;
@@ -1386,7 +1393,7 @@ namespace ygo {
 				break;
 			}
 			case irr::KEY_LEFT: {
-				if (!event.KeyInput.PressedDown) {
+				if (!event.KeyInput.PressedDown && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
 					if (!scrollSelected) {
 						CheckMenu();		
 						typing = false;
@@ -1406,7 +1413,7 @@ namespace ygo {
 			}
 			//Colocar nome do jogador na partida
 			case irr::KEY_RETURN: {
-				if (!event.KeyInput.PressedDown) {
+				if (!event.KeyInput.PressedDown && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
 					if (menu.empty())
 						menu = menuMain;
 					if (menu.at(0) == L"Online Duel") {

@@ -3891,4 +3891,13 @@ void Game::ApplyLocale(size_t index, bool forced) {
 	ReloadElementsStrings();
 }
 
+#pragma region Accessibility
+void Game::PlaySoundEffect(SoundManager::SFX sound)
+{
+	if (!mainGame->dInfo.isCatchingUp)
+		gSoundManager->PlaySoundEffect(sound);
+}
+#pragma endregion
+
+
 }

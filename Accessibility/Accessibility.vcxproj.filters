@@ -13,6 +13,9 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="ScreenReader">
+      <UniqueIdentifier>{2e58369e-6827-407f-aae5-112e61f50922}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
@@ -24,6 +27,27 @@
     <ClInclude Include="FieldFocus\AccessibilityFieldFocus.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ScreenReader\AccessibilityMessages.h">
+      <Filter>ScreenReader</Filter>
+    </ClInclude>
+    <ClInclude Include="ScreenReader\CommandMessages.h">
+      <Filter>ScreenReader</Filter>
+    </ClInclude>
+    <ClInclude Include="ScreenReader\IScreenReader.h">
+      <Filter>ScreenReader</Filter>
+    </ClInclude>
+    <ClInclude Include="ScreenReader\NVDA.h">
+      <Filter>ScreenReader</Filter>
+    </ClInclude>
+    <ClInclude Include="ScreenReader\ScreenReader.h">
+      <Filter>ScreenReader</Filter>
+    </ClInclude>
+    <ClInclude Include="ScreenReader\StringBuilder.h">
+      <Filter>ScreenReader</Filter>
+    </ClInclude>
+    <ClInclude Include="ScreenReader\TolkController.h">
+      <Filter>ScreenReader</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Accessibility.cpp">
@@ -31,6 +55,24 @@
     </ClCompile>
     <ClCompile Include="pch.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ScreenReader\AccessibilityMessages.cpp">
+      <Filter>ScreenReader</Filter>
+    </ClCompile>
+    <ClCompile Include="ScreenReader\CommandMessages.cpp">
+      <Filter>ScreenReader</Filter>
+    </ClCompile>
+    <ClCompile Include="ScreenReader\NVDA.cpp">
+      <Filter>ScreenReader</Filter>
+    </ClCompile>
+    <ClCompile Include="ScreenReader\ScreenReader.cpp">
+      <Filter>ScreenReader</Filter>
+    </ClCompile>
+    <ClCompile Include="ScreenReader\StringBuilder.cpp">
+      <Filter>ScreenReader</Filter>
+    </ClCompile>
+    <ClCompile Include="ScreenReader\TolkController.cpp">
+      <Filter>ScreenReader</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

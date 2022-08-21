@@ -154,6 +154,13 @@
     <ClInclude Include="FieldFocus\AccessibilityFieldFocus.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="pch.h" />
+    <ClInclude Include="ScreenReader\AccessibilityMessages.h" />
+    <ClInclude Include="ScreenReader\CommandMessages.h" />
+    <ClInclude Include="ScreenReader\IScreenReader.h" />
+    <ClInclude Include="ScreenReader\NVDA.h" />
+    <ClInclude Include="ScreenReader\ScreenReader.h" />
+    <ClInclude Include="ScreenReader\StringBuilder.h" />
+    <ClInclude Include="ScreenReader\TolkController.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Accessibility.cpp" />
@@ -163,6 +170,12 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="ScreenReader\AccessibilityMessages.cpp" />
+    <ClCompile Include="ScreenReader\CommandMessages.cpp" />
+    <ClCompile Include="ScreenReader\NVDA.cpp" />
+    <ClCompile Include="ScreenReader\ScreenReader.cpp" />
+    <ClCompile Include="ScreenReader\StringBuilder.cpp" />
+    <ClCompile Include="ScreenReader\TolkController.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

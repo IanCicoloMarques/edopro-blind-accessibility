@@ -882,6 +882,34 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 		}
+		else if (event.KeyInput.PressedDown) {
+			switch (event.KeyInput.Key) {
+			case irr::KEY_KEY_S: {
+				if (event.KeyInput.Control) {
+					TriggerEvent(mainGame->btnSaveDeckAs, irr::gui::EGET_BUTTON_CLICKED);
+				}
+				break;
+			}
+			case irr::KEY_KEY_F: {
+				if (event.KeyInput.Control) {
+					epro::wstringview dname(mainGame->ebDeckname->getText());
+					if (dname.empty()) {
+						ScreenReader::getReader()->readScreen(L"No name");
+						break;
+					}
+					ScreenReader::getReader()->readScreen(fmt::format(L"Deck {}", dname.data()));
+				}
+				break;
+			}
+			case irr::KEY_KEY_0: {
+				if (mainGame->btnLeaveGame->isTrulyVisible())
+					TriggerEvent(mainGame->btnLeaveGame, irr::gui::EGET_BUTTON_CLICKED);
+				break;
+			}
+			default:
+				break;
+			}
+		}
 		break;
 	}
 #ifndef __ANDROID__

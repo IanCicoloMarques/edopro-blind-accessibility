@@ -7,7 +7,7 @@
 #include <IEventReceiver.h>
 #include <vector3d.h>
 #include <vector2d.h>
-#include "FieldFocus/AccessibilityFieldFocus.h"
+#include "../Accessibility/FieldFocus/AccessibilityFieldFocus.h"
 
 namespace ygo {
 

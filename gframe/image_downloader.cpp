@@ -1,20 +1,12 @@
 #include "image_downloader.h"
-#include <fstream>
 #include <curl/curl.h>
 #include <fmt/format.h>
 #include <cerrno>
 #include <array>
-#include <chrono>
-#include <thread>
 #include "logging.h"
 #include "utils.h"
 #include "game_config.h"
-
-#ifdef UNICODE
-#define fileopen(file, mode) _wfopen(file, L##mode)
-#else
-#define fileopen(file, mode) fopen(file, mode)
-#endif
+#include "file_stream.h"
 
 namespace ygo {
 
@@ -25,14 +17,16 @@ struct curl_payload {
 };
 
 ImageDownloader::ImageDownloader() : stop_threads(false) {
-	for(auto& thread : download_threads)
-		thread = std::thread(&ImageDownloader::DownloadPic, this);
+	download_threads.reserve(gGameConfig->imageDownloadThreads);
+	for(int i = 0; i < gGameConfig->imageLoadThreads; ++i)
+		download_threads.emplace_back(&ImageDownloader::DownloadPic, this);
 }
 ImageDownloader::~ImageDownloader() {
-	std::unique_lock<std::mutex> lck(pic_download);
-	stop_threads = true;
-	cv.notify_all();
-	lck.unlock();
+	{
+		std::lock_guard<std::mutex> lck(pic_download);
+		stop_threads = true;
+		cv.notify_all();
+	}
 	for(auto& thread : download_threads)
 		thread.join();
 }
@@ -42,7 +36,6 @@ void ImageDownloader::AddDownloadResource(PicSource src) {
 
 static constexpr std::array<uint8_t, 8> pngheader{ 0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a };
 static constexpr std::array<uint8_t, 3> jpgheader{ 0xff, 0xd8, 0xff };
-static int numberImagesDownloaded = 0;
 
 enum headerType : uint8_t {
 	UNK_FILE,
@@ -153,20 +146,14 @@ void ImageDownloader::DownloadPic() {
 			if(src.type != type)
 				continue;
 			auto fp = fileopen(name.data(), "wb");
-			if (fp == nullptr) {
-				if (gGameConfig->logDownloadErrors) {
+			if(fp == nullptr) {
+				if(gGameConfig->logDownloadErrors) {
 					ygo::ErrorLog("Failed opening {} for write.", Utils::ToUTF8IfNeeded(name));
 					ygo::ErrorLog("Error: {}.", strerror(errno));
 				}
 				continue;
 			}
-			if(numberImagesDownloaded >= 10){
-				std::this_thread::sleep_until(std::chrono::system_clock::now() + std::chrono::seconds(1));
-				--numberImagesDownloaded;
-			}
-			numberImagesDownloaded++;
-			auto url = fmt::format(src.url, code);
-			SetPayloadAndUrl(url, fp);
+			SetPayloadAndUrl(fmt::format(src.url, code), fp);
 			res = curl_easy_perform(curl);
 			fclose(fp);
 			if(res == CURLE_OK) {

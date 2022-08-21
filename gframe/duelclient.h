@@ -51,7 +51,6 @@ public:
 	static bool try_needed;
 	static bool is_local_host;
 	static std::atomic<bool> answered;
-	static bool waitingForOponent;
 
 	static std::pair<uint32_t, uint16_t> ResolveServer(epro::stringview address, uint16_t port);
 	static inline std::pair<uint32_t, uint16_t> ResolveServer(epro::wstringview address, epro::wstringview port) {
@@ -122,6 +121,7 @@ public:
 	static int RefreshThread(event_base* broadev);
 	static void BroadcastReply(evutil_socket_t fd, short events, void* arg);
 };
+
 }
 
 #endif //DUELCLIENT_H

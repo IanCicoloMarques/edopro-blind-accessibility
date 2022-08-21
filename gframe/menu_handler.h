@@ -303,8 +303,6 @@ public:
 
 	//Todo - Mandar isso pro arquivo de menu no projeto separado
 #pragma region Accessibility
-	int prev_operation;
-	int prev_sel;
 	int menuSelectCounter = 0;
 	int subMenuSelectCounter = 0;
 	int onlineMatchCounter = 0;

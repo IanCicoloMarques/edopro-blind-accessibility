@@ -47,4 +47,5 @@ premake5.exe
 /irrlicht/include/*
 /irrlicht/src/*
 /build/enc_temp_folder/*
-
+/build/debug/*
+/Accessibility/Debug/*

@@ -21,6 +21,7 @@
 #include "CGUIImageButton/CGUIImageButton.h"
 #include "CGUITTFont/CGUITTFont.h"
 #include "custom_skin_enum.h"
+#include "../Accessibility/ScreenReader/ScreenReader.h"
 
 namespace ygo {
 
@@ -462,6 +463,12 @@ void ClientField::ShowSelectCard(bool buttonok, bool chain) {
 		mainGame->scrCardList->setMax((selectable_cards.size() - 5) * 10 + 9);
 		mainGame->scrCardList->setPos(0);
 	}
+	display_cards.clear();
+	for (int i = 0; i < 5; ++i) {
+		if (selectable_cards.size() > i)
+			display_cards.push_back(selectable_cards[i]);
+	}
+	mainGame->dField.indexLookedUpCard = 0;
 	mainGame->btnSelectOK->setVisible(buttonok);
 	mainGame->PopupElement(mainGame->wCardSelect);
 }
@@ -601,6 +608,11 @@ void ClientField::ShowSelectOption(uint64_t select_hint, bool should_lock) {
 			break;
 		}
 	}
+	if (count > 1) {
+		ScreenReader::getReader()->readScreen(L"Use the arrow keys to select an option");
+		ScreenReader::getReader()->cleanBuiltMessage();
+		ScreenReader::getReader()->buildMessage(L"Use the arrow keys to select an option");
+	}
 	for(int i = 0; (i < count) && (i < 5) && quickmode; i++)
 		mainGame->btnOption[i]->setText(gDataManager->GetDesc(select_options[i], mainGame->dInfo.compat_mode).data());
 	irr::core::recti pos = mainGame->wOptions->getRelativePosition();
@@ -636,6 +648,7 @@ void ClientField::ShowSelectOption(uint64_t select_hint, bool should_lock) {
 		mainGame->wOptions->setRelativePosition(pos);
 	}
 	mainGame->wOptions->setText(gDataManager->GetDesc(select_hint ? select_hint : 555, mainGame->dInfo.compat_mode).data());
+	ScreenReader::getReader()->readScreen(gDataManager->GetDesc(select_options[0], mainGame->dInfo.compat_mode).data(), false);
 	mainGame->PopupElement(mainGame->wOptions);
 }
 void ClientField::ReplaySwap() {

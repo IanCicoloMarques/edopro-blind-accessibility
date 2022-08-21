@@ -12,7 +12,7 @@
 #include "image_manager.h"
 
 namespace ygo {
-void Game::DrawSelectionLine(const Materials::QuadVertex vec, bool strip, int width, irr::video::SColor color) {
+void Game::DrawSelectionLine(irr::video::S3DVertex vec[4], bool strip, int width, irr::video::SColor color) {
 	driver->setMaterial(matManager.mOutLine);
 	if(strip && !gGameConfig->dotted_lines) {
 		int pattern = linePatternD3D - 14;
@@ -39,57 +39,64 @@ void Game::DrawSelectionLine(const Materials::QuadVertex vec, bool strip, int wi
 void Game::DrawBackGround() {
 	static float selFieldAlpha = 255;
 	static float selFieldDAlpha = -10;
+	//draw field
 	//draw field spell card
 	driver->setTransform(irr::video::ETS_WORLD, irr::core::IdentityMatrix);
-	auto tfield = [dfield = dInfo.duel_field] {
-		switch(dfield) {
+	bool drawField = false;
+	int field = (dInfo.duel_field == 3 || dInfo.duel_field == 5) ? 0 : 1;
+	int tfield = 3;
+	switch (dInfo.duel_field) {
 		case 1:
-		case 2:
-			return 2;
-		case 3:
-			return 0;
-		case 4:
-			return 1;
-		default:
-			return 3;
+		case 2: {
+			tfield = 2;
+			break;
 		}
-	}();
-	auto DrawTextureRect = [this](Materials::QuadVertex vertices, irr::video::ITexture* texture) {
-		matManager.mTexture.setTexture(0, texture);
-		driver->setMaterial(matManager.mTexture);
-		driver->drawVertexPrimitiveList(vertices, 4, matManager.iRectangle, 2);
-	};
+		case 3: {
+			tfield = 0;
+			break;
+		}
+		case 4: {
+			tfield = 1;
+			break;
+		}
+	}
 	int speed = (dInfo.duel_params & DUEL_3_COLUMNS_FIELD) ? 1 : 0;
-	auto DrawFieldSpell = [&]() -> bool {
-		if(!gGameConfig->draw_field_spell)
-			return false;
-		uint32_t fieldcode1 = 0;
+	if(gGameConfig->draw_field_spell) {
+		int fieldcode1 = -1;
+		int fieldcode2 = -1;
 		if(dField.szone[0][5] && dField.szone[0][5]->position & POS_FACEUP)
 			fieldcode1 = dField.szone[0][5]->code;
-		uint32_t fieldcode2 = 0;
 		if(dField.szone[1][5] && dField.szone[1][5]->position & POS_FACEUP)
 			fieldcode2 = dField.szone[1][5]->code;
-		auto both = fieldcode1 | fieldcode2;
-		if(both == 0)
-			return false;
-		if(both != fieldcode1) {
-			auto* texture1 = imageManager.GetTextureField(fieldcode1);
-			if(texture1)
-				DrawTextureRect(matManager.vFieldSpell1[speed], texture1);
-			auto texture2 = imageManager.GetTextureField(fieldcode2);
-			if(texture2)
-				DrawTextureRect(matManager.vFieldSpell2[speed], texture2);
-			return texture1 || texture2;
+		int fieldcode = (fieldcode1 > 0) ? fieldcode1 : fieldcode2;
+		if(fieldcode1 > 0 && fieldcode2 > 0 && fieldcode1 != fieldcode2) {
+			irr::video::ITexture* texture = imageManager.GetTextureField(fieldcode1);
+			if(texture) {
+				drawField = true;
+				matManager.mTexture.setTexture(0, texture);
+				driver->setMaterial(matManager.mTexture);
+				driver->drawVertexPrimitiveList(matManager.vFieldSpell1[speed], 4, matManager.iRectangle, 2);
+			}
+			texture = imageManager.GetTextureField(fieldcode2);
+			if(texture) {
+				drawField = true;
+				matManager.mTexture.setTexture(0, texture);
+				driver->setMaterial(matManager.mTexture);
+				driver->drawVertexPrimitiveList(matManager.vFieldSpell2[speed], 4, matManager.iRectangle, 2);
+			}
+		} else if(fieldcode > 0) {
+			irr::video::ITexture* texture = imageManager.GetTextureField(fieldcode);
+			if(texture) {
+				drawField = true;
+				matManager.mTexture.setTexture(0, texture);
+				driver->setMaterial(matManager.mTexture);
+				driver->drawVertexPrimitiveList(matManager.vFieldSpell[speed], 4, matManager.iRectangle, 2);
+			}
 		}
-		auto* texture = imageManager.GetTextureField(both);
-		if(texture)
-			DrawTextureRect(matManager.vFieldSpell[speed], texture);
-		return texture;
-	};
-
-	//draw field
-	DrawTextureRect(matManager.vField, DrawFieldSpell() ? imageManager.tFieldTransparent[speed][tfield] : imageManager.tField[speed][tfield]);
-
+	}
+	matManager.mTexture.setTexture(0, drawField ? imageManager.tFieldTransparent[speed][tfield] : imageManager.tField[speed][tfield]);
+	driver->setMaterial(matManager.mTexture);
+	driver->drawVertexPrimitiveList(matManager.vField, 4, matManager.iRectangle, 2);
 	driver->setMaterial(matManager.mBackLine);
 	//select field
 	if((dInfo.curMsg == MSG_SELECT_PLACE || dInfo.curMsg == MSG_SELECT_DISFIELD || dInfo.curMsg == MSG_HINT) && dField.selectable_field) {
@@ -102,7 +109,7 @@ void Game::DrawBackGround() {
 		filter = 0x100;
 		for (int i = 0; i < 8; ++i, filter <<= 1) {
 			if (dField.selectable_field & filter)
-				DrawSelectionLine(matManager.getSzone()[0][i], !(dField.selected_field & filter), 2, outline_color);
+				DrawSelectionLine(matManager.vFieldSzone[0][i][field][speed], !(dField.selected_field & filter), 2, outline_color);
 		}
 		filter = 0x10000;
 		for (int i = 0; i < 7; ++i, filter <<= 1) {
@@ -112,7 +119,7 @@ void Game::DrawBackGround() {
 		filter = 0x1000000;
 		for (int i = 0; i < 8; ++i, filter <<= 1) {
 			if (dField.selectable_field & filter)
-				DrawSelectionLine(matManager.getSzone()[1][i], !(dField.selected_field & filter), 2, outline_color);
+				DrawSelectionLine(matManager.vFieldSzone[1][i][field][speed], !(dField.selected_field & filter), 2, outline_color);
 		}
 	}
 	//disabled field
@@ -128,8 +135,8 @@ void Game::DrawBackGround() {
 		filter = 0x100;
 		for (int i = 0; i < 8; ++i, filter <<= 1) {
 			if (dField.disabled_field & filter) {
-				driver->draw3DLine(matManager.getSzone()[0][i][0].Pos, matManager.getSzone()[0][i][3].Pos, disabled_color);
-				driver->draw3DLine(matManager.getSzone()[0][i][1].Pos, matManager.getSzone()[0][i][2].Pos, disabled_color);
+				driver->draw3DLine(matManager.vFieldSzone[0][i][field][speed][0].Pos, matManager.vFieldSzone[0][i][field][speed][3].Pos, disabled_color);
+				driver->draw3DLine(matManager.vFieldSzone[0][i][field][speed][1].Pos, matManager.vFieldSzone[0][i][field][speed][2].Pos, disabled_color);
 			}
 		}
 		filter = 0x10000;
@@ -142,8 +149,8 @@ void Game::DrawBackGround() {
 		filter = 0x1000000;
 		for (int i = 0; i < 8; ++i, filter <<= 1) {
 			if (dField.disabled_field & filter) {
-				driver->draw3DLine(matManager.getSzone()[1][i][0].Pos, matManager.getSzone()[1][i][3].Pos, disabled_color);
-				driver->draw3DLine(matManager.getSzone()[1][i][1].Pos, matManager.getSzone()[1][i][2].Pos, disabled_color);
+				driver->draw3DLine(matManager.vFieldSzone[1][i][field][speed][0].Pos, matManager.vFieldSzone[1][i][field][speed][3].Pos, disabled_color);
+				driver->draw3DLine(matManager.vFieldSzone[1][i][field][speed][1].Pos, matManager.vFieldSzone[1][i][field][speed][2].Pos, disabled_color);
 			}
 		}
 	}
@@ -168,9 +175,9 @@ void Game::DrawBackGround() {
 			selFieldDAlpha = -10;
 		}
 		setAlpha(matManager.mSelField, skin::DUELFIELD_HOVERED_VAL);
-		const irr::video::S3DVertex *vertex = nullptr;
+		irr::video::S3DVertex *vertex = nullptr;
 		if (dField.hovered_location == LOCATION_DECK)
-			vertex = matManager.getDeck()[dField.hovered_controler];
+			vertex = matManager.vFieldDeck[dField.hovered_controler][speed];
 		else if (dField.hovered_location == LOCATION_MZONE) {
 			vertex = matManager.vFieldMzone[dField.hovered_controler][dField.hovered_sequence];
 			ClientCard* pcard = dField.mzone[dField.hovered_controler][dField.hovered_sequence];
@@ -178,17 +185,17 @@ void Game::DrawBackGround() {
 				DrawLinkedZones(pcard);
 			}
 		} else if(dField.hovered_location == LOCATION_SZONE) {
-			vertex = matManager.getSzone()[dField.hovered_controler][dField.hovered_sequence];
+			vertex = matManager.vFieldSzone[dField.hovered_controler][dField.hovered_sequence][field][speed];
 			ClientCard* pcard = dField.szone[dField.hovered_controler][dField.hovered_sequence];
 			if(pcard && (pcard->type & TYPE_LINK) && (pcard->position & POS_FACEUP))
 				DrawLinkedZones(pcard);
 		}
 		else if (dField.hovered_location == LOCATION_GRAVE)
-			vertex = matManager.getGrave()[dField.hovered_controler];
+			vertex = matManager.vFieldGrave[dField.hovered_controler][field][speed];
 		else if (dField.hovered_location == LOCATION_REMOVED)
-			vertex = matManager.getRemove()[dField.hovered_controler];
+			vertex = matManager.vFieldRemove[dField.hovered_controler][field][speed];
 		else if (dField.hovered_location == LOCATION_EXTRA)
-			vertex = matManager.getExtra()[dField.hovered_controler];
+			vertex = matManager.vFieldExtra[dField.hovered_controler][speed];
 		if(!vertex)
 			return;
 		driver->setMaterial(matManager.mSelField);
@@ -208,6 +215,7 @@ void Game::DrawLinkedZones(ClientCard* pcard) {
 	ClientCard* pcard2;
 	const uint32_t speed = (dInfo.duel_params & DUEL_3_COLUMNS_FIELD) ? 1 : 0;
 	if(dField.hovered_location == LOCATION_SZONE) {
+		int field = (dInfo.duel_field == 3 || dInfo.duel_field == 5) ? 0 : 1;
 		if(dField.hovered_sequence > 4)
 			return;
 		if(mark & LINK_MARKER_TOP_LEFT && dField.hovered_sequence > (0 + speed)) {
@@ -228,12 +236,12 @@ void Game::DrawLinkedZones(ClientCard* pcard) {
 		if(mark & LINK_MARKER_LEFT && dField.hovered_sequence >(0 + speed)) {
 			pcard2 = dField.szone[dField.hovered_controler][dField.hovered_sequence - 1];
 			CheckMutual(pcard2, LINK_MARKER_RIGHT);
-			driver->drawVertexPrimitiveList(&matManager.getSzone()[dField.hovered_controler][dField.hovered_sequence - 1], 4, matManager.iRectangle, 2);
+			driver->drawVertexPrimitiveList(&matManager.vFieldSzone[dField.hovered_controler][dField.hovered_sequence - 1][field][speed], 4, matManager.iRectangle, 2);
 		}
 		if(mark & LINK_MARKER_RIGHT && dField.hovered_sequence < (4 - speed)) {
 			pcard2 = dField.szone[dField.hovered_controler][dField.hovered_sequence + 1];
 			CheckMutual(pcard2, LINK_MARKER_LEFT);
-			driver->drawVertexPrimitiveList(&matManager.getSzone()[dField.hovered_controler][dField.hovered_sequence + 1], 4, matManager.iRectangle, 2);
+			driver->drawVertexPrimitiveList(&matManager.vFieldSzone[dField.hovered_controler][dField.hovered_sequence + 1][field][speed], 4, matManager.iRectangle, 2);
 		}
 		return;
 	}
@@ -251,17 +259,17 @@ void Game::DrawLinkedZones(ClientCard* pcard) {
 		if(mark & LINK_MARKER_BOTTOM_LEFT && dField.hovered_sequence > (0 + speed)) {
 			pcard2 = dField.szone[dField.hovered_controler][dField.hovered_sequence - 1];
 			if(CheckMutual(pcard2, LINK_MARKER_TOP_RIGHT))
-				driver->drawVertexPrimitiveList(&matManager.getSzone()[dField.hovered_controler][dField.hovered_sequence - 1], 4, matManager.iRectangle, 2);
+				driver->drawVertexPrimitiveList(&matManager.vFieldSzone[dField.hovered_controler][dField.hovered_sequence - 1], 4, matManager.iRectangle, 2);
 		}
 		if(mark & LINK_MARKER_BOTTOM_RIGHT && dField.hovered_sequence < (4 - speed)) {
 			pcard2 = dField.szone[dField.hovered_controler][dField.hovered_sequence + 1];
 			if(CheckMutual(pcard2, LINK_MARKER_TOP_LEFT))
-				driver->drawVertexPrimitiveList(&matManager.getSzone()[dField.hovered_controler][dField.hovered_sequence + 1], 4, matManager.iRectangle, 2);
+				driver->drawVertexPrimitiveList(&matManager.vFieldSzone[dField.hovered_controler][dField.hovered_sequence + 1], 4, matManager.iRectangle, 2);
 		}
 		if(mark & LINK_MARKER_BOTTOM) {
 			pcard2 = dField.szone[dField.hovered_controler][dField.hovered_sequence];
 			if(CheckMutual(pcard2, LINK_MARKER_TOP))
-				driver->drawVertexPrimitiveList(&matManager.getSzone()[dField.hovered_controler][dField.hovered_sequence], 4, matManager.iRectangle, 2);
+				driver->drawVertexPrimitiveList(&matManager.vFieldSzone[dField.hovered_controler][dField.hovered_sequence], 4, matManager.iRectangle, 2);
 		}
 		if (dInfo.duel_field >= 4) {
 			if ((mark & LINK_MARKER_TOP_LEFT && dField.hovered_sequence == 2)
@@ -460,6 +468,7 @@ void Game::DrawMisc() {
 		mat[1] = _sin;
 		mat[4] = -_sin;
 	};
+	const int field = (dInfo.duel_field == 3 || dInfo.duel_field == 5) ? 0 : 1;
 	const int speed = (dInfo.duel_params & DUEL_3_COLUMNS_FIELD) ? 1 : 0;
 	irr::core::matrix4 im, ic, it;
 	act_rot += (1.2f / 1000.0f) * delta_time;
@@ -474,7 +483,7 @@ void Game::DrawMisc() {
 	matManager.mTexture.setTexture(0, imageManager.tAct);
 	driver->setMaterial(matManager.mTexture);
 
-	auto drawact = [this, &im](const Materials::QuadVertex vertex, float zval) {
+	auto drawact = [this, &im](irr::video::S3DVertex vertex[4], float zval) {
 		im.setTranslation(irr::core::vector3df((vertex[0].Pos.X + vertex[1].Pos.X) / 2,
 			(vertex[0].Pos.Y + vertex[2].Pos.Y) / 2, zval));
 		driver->setTransform(irr::video::ETS_WORLD, im);
@@ -484,15 +493,15 @@ void Game::DrawMisc() {
 	int pzseq = dInfo.duel_field == 4 ? (speed) ? 1 : 0 : 6;
 	for(int p = 0; p < 2; p++) {
 		if(dField.deck_act[p])
-			drawact(matManager.getDeck()[p], dField.deck[p].size() * 0.01f + 0.02f);
+			drawact(matManager.vFieldDeck[p][speed], dField.deck[p].size() * 0.01f + 0.02f);
 		if(dField.grave_act[p])
-			drawact(matManager.getGrave()[p], dField.grave[p].size() * 0.01f + 0.02f);
+			drawact(matManager.vFieldGrave[p][field][speed], dField.grave[p].size() * 0.01f + 0.02f);
 		if(dField.remove_act[p])
-			drawact(matManager.getRemove()[p], dField.remove[p].size() * 0.01f + 0.02f);
+			drawact(matManager.vFieldRemove[p][field][speed], dField.remove[p].size() * 0.01f + 0.02f);
 		if(dField.extra_act[p])
-			drawact(matManager.getExtra()[p], dField.extra[p].size() * 0.01f + 0.02f);
+			drawact(matManager.vFieldExtra[p][speed], dField.extra[p].size() * 0.01f + 0.02f);
 		if(dField.pzone_act[p])
-			drawact(matManager.getSzone()[p][pzseq], 0.03f);
+			drawact(matManager.vFieldSzone[p][pzseq][field][speed], 0.03f);
 	}
 
 	if(dField.conti_act) {
@@ -637,14 +646,14 @@ void Game::DrawMisc() {
 		}
 		if (dField.extra[p].size()) {
 			const auto str = (dField.extra_p_count[p]) ? fmt::format(L"{}({})", dField.extra[p].size(), dField.extra_p_count[p]) : fmt::format(L"{}", dField.extra[p].size());
-			DrawStackIndicator(str, matManager.getExtra()[p], (p == 1));
+			DrawStackIndicator(str, matManager.vFieldExtra[p][speed], (p == 1));
 		}
 		if (dField.deck[p].size())
-			DrawStackIndicator(gDataManager->GetNumString(dField.deck[p].size()), matManager.getDeck()[p], (p == 1));
+			DrawStackIndicator(gDataManager->GetNumString(dField.deck[p].size()), matManager.vFieldDeck[p][speed], (p == 1));
 		if (dField.grave[p].size())
-			DrawStackIndicator(gDataManager->GetNumString(dField.grave[p].size()), matManager.getGrave()[p], (p == 1));
+			DrawStackIndicator(gDataManager->GetNumString(dField.grave[p].size()), matManager.vFieldGrave[p][field][speed], (p == 1));
 		if (dField.remove[p].size())
-			DrawStackIndicator(gDataManager->GetNumString(dField.remove[p].size()), matManager.getRemove()[p], (p == 1));
+			DrawStackIndicator(gDataManager->GetNumString(dField.remove[p].size()), matManager.vFieldRemove[p][field][speed], (p == 1));
 	}
 }
 /*
@@ -752,7 +761,7 @@ void Game::DrawPendScale(ClientCard* pcard) {
 /*
 Draws the text in the middle of the bottom side of the zone
 */
-void Game::DrawStackIndicator(epro::wstringview text, const Materials::QuadVertex v, bool opponent) {
+void Game::DrawStackIndicator(epro::wstringview text, irr::video::S3DVertex* v, bool opponent) {
 	const irr::core::ustring utext(text);
 	const auto dim = textFont->getDimensionustring(utext) / 2;
 	//int width = dim.Width / 2, height = dim.Height / 2;
@@ -809,6 +818,10 @@ void Game::DrawGUI() {
 							for(int i = 0; i < 5; ++i)
 								btnCardDisplay[i]->setDrawImage(true);
 						}
+						const auto prevfocused = env->getFocus();
+						env->setFocus(fu.guiFading);
+						if(prevfocused && (prevfocused->getType() == irr::gui::EGUIET_EDIT_BOX))
+							env->setFocus(prevfocused);
 					} else
 						fu.guiFading->setRelativePosition(irr::core::recti(fu.fadingUL, fu.fadingLR));
 				}
@@ -858,12 +871,6 @@ void Game::DrawGUI() {
 				HideElement(fu.guiFading);
 		} else {
 			fu.guiFading->setEnabled(fu.wasEnabled);
-			if(fu.wasEnabled){
-				const auto prevfocused = env->getFocus();
-				env->setFocus(fu.guiFading);
-				if(prevfocused && (prevfocused->getType() == irr::gui::EGUIET_EDIT_BOX))
-					env->setFocus(prevfocused);
-			}
 			fu.guiFading->setRelativePosition(fu.fadingSize);
 			fit = fadingList.erase(fthis);
 		}
@@ -1009,8 +1016,6 @@ void Game::DrawSpec() {
 		matk.setTranslation(atk_t);
 		matk.setRotationRadians(atk_r);
 		driver->setTransform(irr::video::ETS_WORLD, matk);
-		matManager.mATK.AmbientColor = skin::DUELFIELD_ATTACK_ARROW_VAL;
-		matManager.mATK.DiffuseColor = (skin::DUELFIELD_ATTACK_ARROW_VAL.getAlpha() << 24) | 0xffffff;
 		driver->setMaterial(matManager.mATK);
 		driver->drawVertexPrimitiveList(&matManager.vArrow[std::min(static_cast<int>(attack_sv) * 4, 28)], 12, matManager.iArrow, 10, irr::video::EVT_STANDARD, irr::scene::EPT_TRIANGLE_STRIP);
 		attack_sv += (60.0f / 1000.0f) * delta_time;

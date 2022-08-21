@@ -72,9 +72,13 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
+    <OutDir>..\bin\debug\</OutDir>
+    <IntDir>..\obj\Debug\accessibility\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
+    <OutDir>..\bin\release\</OutDir>
+    <IntDir>..\obj\Release\accessibility\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
@@ -90,7 +94,8 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>..\Readers\src;..\Readers\nvda-lib</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\Readers\src</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>
@@ -99,6 +104,12 @@
       <AdditionalDependencies>tolk.lib;nvdaControllerClient32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>..\Accessibility\Readers\libs\nvda-lib;..\Accessibility\Readers\libs\x64;..\Accessibility\Readers\libs\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
+    <Lib>
+      <AdditionalDependencies>tolk.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Lib>
+    <Lib>
+      <AdditionalLibraryDirectories>..\Accessibility\Readers\libs\x64;..\Accessibility\Readers\libs\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -108,9 +119,10 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>..\Readers\src;..\Readers\nvda-lib</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\Readers\src</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>
@@ -160,7 +172,6 @@
     <ClInclude Include="ScreenReader\AccessibilityMessages.h" />
     <ClInclude Include="ScreenReader\CommandMessages.h" />
     <ClInclude Include="ScreenReader\IScreenReader.h" />
-    <ClInclude Include="ScreenReader\NVDA.h" />
     <ClInclude Include="ScreenReader\ScreenReader.h" />
     <ClInclude Include="ScreenReader\StringBuilder.h" />
     <ClInclude Include="ScreenReader\TolkController.h" />
@@ -168,7 +179,6 @@
   <ItemGroup>
     <ClCompile Include="ScreenReader\AccessibilityMessages.cpp" />
     <ClCompile Include="ScreenReader\CommandMessages.cpp" />
-    <ClCompile Include="ScreenReader\NVDA.cpp" />
     <ClCompile Include="ScreenReader\ScreenReader.cpp" />
     <ClCompile Include="ScreenReader\StringBuilder.cpp" />
     <ClCompile Include="ScreenReader\TolkController.cpp" />

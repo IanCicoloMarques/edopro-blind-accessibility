@@ -214,6 +214,7 @@
     <ClInclude Include="..\gframe\windbot.h" />
     <ClInclude Include="..\gframe\windbot_panel.h" />
     <ClInclude Include="..\gframe\CGUIWindowedTabControl\CGUIWindowedTabControl.h" />
+    <ClInclude Include="..\gframe\sound_sfml.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\gframe\CGUICustomCheckBox\CGUICustomCheckBox.cpp">
@@ -310,6 +311,7 @@
     <ClCompile Include="..\gframe\windbot.cpp" />
     <ClCompile Include="..\gframe\windbot_panel.cpp" />
     <ClCompile Include="..\gframe\CGUIWindowedTabControl\CGUIWindowedTabControl.cpp" />
+    <ClCompile Include="..\gframe\sound_sfml.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\gframe\dpiawarescaling.manifest" />

@@ -49,3 +49,6 @@ premake5.exe
 /build/enc_temp_folder/*
 /build/debug/*
 /Accessibility/Debug/*
+/Accessibility/Release/*
+ocgcore
+*.aps

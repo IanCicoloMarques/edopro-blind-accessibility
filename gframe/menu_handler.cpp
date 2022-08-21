@@ -28,11 +28,24 @@
 #include <IGUIWindow.h>
 #pragma region Accessiblity
 #include "CGUIImageButton/CGUIImageButton.h"
-#include "ScreenReader/ScreenReader.h"
+#include "../Accessibility/ScreenReader/ScreenReader.h"
 #include "joystick_wrapper.h"
 #pragma endregion
 
 namespace ygo {
+	template<typename T>
+	static void Synchronize(const T& range, irr::gui::IGUICheckBox* elem) {
+		auto checked = elem->isChecked();
+		for (auto i = range.first; i != range.second; ++i)
+			static_cast<irr::gui::IGUICheckBox*>(i->second)->setChecked(checked);
+	}
+	template<typename T>
+	static void Synchronize(const T& range, irr::gui::IGUIScrollBar* elem) {
+		auto position = elem->getPos();
+		for (auto i = range.first; i != range.second; ++i)
+			static_cast<irr::gui::IGUIScrollBar*>(i->second)->setPos(position);
+	}
+
 #pragma region Accessiblity
 	static void MouseClick(const irr::SEvent& event, bool rightClick) {
 		auto cursor = mainGame->device->getCursorControl();
@@ -61,11 +74,6 @@ namespace ygo {
 
 		CheckAndPost(JWrapper::Buttons::A, rightClick ? irr::EMIE_RMOUSE_PRESSED_DOWN : irr::EMIE_LMOUSE_PRESSED_DOWN);
 	}
-
-	static inline void ClickButton(irr::gui::IGUIElement* btn) {
-		TriggerEvent(btn, irr::gui::EGET_BUTTON_CLICKED);
-	}
-
 	static inline void CheckBox(irr::gui::IGUICheckBox* chkbox) {
 		if (chkbox->isTrulyVisible()) {
 			if (chkbox->isChecked())
@@ -90,6 +98,11 @@ namespace ygo {
 		event.GUIEvent.Caller = target;
 		ygo::mainGame->device->postEventFromUser(event);
 	}
+
+	static inline void ClickButton(irr::gui::IGUIElement* btn) {
+		TriggerEvent(btn, irr::gui::EGET_BUTTON_CLICKED);
+	}
+
 #pragma endregion
 
 	static void UpdateDeck() {
@@ -460,12 +473,12 @@ namespace ygo {
 					}
 					break;
 				}
-				case BUTTON_HP_DUELIST: { {
-						ScreenReader::getReader()->readScreen(L"Duel mode");
-						mainGame->cbDeckSelect->setEnabled(true);
-						DuelClient::SendPacketToServer(CTOS_HS_TODUELIST);
-						break;
-					}
+				case BUTTON_HP_DUELIST: { 
+					ScreenReader::getReader()->readScreen(L"Duel mode");
+					mainGame->cbDeckSelect->setEnabled(true);
+					DuelClient::SendPacketToServer(CTOS_HS_TODUELIST);
+					break;
+				}
 				case BUTTON_HP_OBSERVER: {
 					ScreenReader::getReader()->readScreen(L"Spectator mode");
 					DuelClient::SendPacketToServer(CTOS_HS_TOOBSERVER);
@@ -825,9 +838,8 @@ namespace ygo {
 					ServerLobby::FillOnlineRooms();
 					break;
 				}
-				}
-									  break;
-				}
+				break;
+			}
 			case irr::gui::EGET_LISTBOX_CHANGED: {
 				switch (id) {
 				case LISTBOX_LAN_HOST: {
@@ -1205,13 +1217,14 @@ namespace ygo {
 					}
 					break;
 				}
-				}
-				break;
 			}
+			break;
+		}
 			default: break;
 			}
-											  break;
+			break;
 			}
+		}
 		case irr::EET_KEY_INPUT_EVENT: {
 			switch (event.KeyInput.Key) {
 			case irr::KEY_KEY_B: {
@@ -1373,7 +1386,7 @@ namespace ygo {
 				}
 				break;
 			}
-							  //Colocar nome do jogador na partida
+			//Colocar nome do jogador na partida
 			case irr::KEY_RETURN: {
 				if (!event.KeyInput.PressedDown && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
 					if (menu.empty())
@@ -1497,8 +1510,7 @@ namespace ygo {
 #endif
 		default: break;
 		}
-							   return false;
-		}
+		return false;
 	}
 
 	void MenuHandler::SynchronizeElement(irr::gui::IGUIElement* elem) const {
@@ -1518,7 +1530,6 @@ namespace ygo {
 #pragma region Accessibility
 
 	void MenuHandler::CheckMenu() {
-
 		if (mainGame->gSettings.window->isTrulyVisible())
 			menu = menuGameOptions;
 		else if (mainGame->btnOnlineMode->isEnabled() && mainGame->btnOnlineMode->isTrulyVisible())
@@ -1536,7 +1547,6 @@ namespace ygo {
 		else if ((mainGame->btnHostPrepDuelist->isEnabled() && mainGame->btnHostPrepDuelist->isTrulyVisible()) ||
 			mainGame->btnHostPrepOB->isEnabled() && mainGame->btnHostPrepOB->isTrulyVisible())
 			menu = menuRulesOkOnline;
-
 	}
 
 	void MenuHandler::MainMenu() {
@@ -1850,17 +1860,5 @@ namespace ygo {
 	}
 
 #pragma endregion
-}
-	template<typename T>
-	static void Synchronize(const T& range, irr::gui::IGUICheckBox* elem) {
-		auto checked = elem->isChecked();
-		for (auto i = range.first; i != range.second; ++i)
-			static_cast<irr::gui::IGUICheckBox*>(i->second)->setChecked(checked);
-	}
-	template<typename T>
-	static void Synchronize(const T& range, irr::gui::IGUIScrollBar* elem) {
-		auto position = elem->getPos();
-		for (auto i = range.first; i != range.second; ++i)
-			static_cast<irr::gui::IGUIScrollBar*>(i->second)->setPos(position);
-	}
 
+}

@@ -14,7 +14,7 @@
 #include "duelclient.h"
 #include "single_mode.h"
 #include "client_card.h"
-#include "ScreenReader/ScreenReader.h"
+#include "../Accessibility/ScreenReader/ScreenReader.h"
 
 namespace ygo {
 	//TODO - COLOCAR ISSO EM UM ARQUIVO SEPARADO PARA CHAMAR NAS CLASSES EM VEZ DE POR INLINE

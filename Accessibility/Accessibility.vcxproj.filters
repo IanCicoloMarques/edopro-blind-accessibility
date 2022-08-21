@@ -18,9 +18,6 @@
     <ClInclude Include="ScreenReader\IScreenReader.h">
       <Filter>ScreenReader</Filter>
     </ClInclude>
-    <ClInclude Include="ScreenReader\NVDA.h">
-      <Filter>ScreenReader</Filter>
-    </ClInclude>
     <ClInclude Include="ScreenReader\ScreenReader.h">
       <Filter>ScreenReader</Filter>
     </ClInclude>
@@ -40,9 +37,6 @@
       <Filter>ScreenReader</Filter>
     </ClCompile>
     <ClCompile Include="ScreenReader\CommandMessages.cpp">
-      <Filter>ScreenReader</Filter>
-    </ClCompile>
-    <ClCompile Include="ScreenReader\NVDA.cpp">
       <Filter>ScreenReader</Filter>
     </ClCompile>
     <ClCompile Include="ScreenReader\ScreenReader.cpp">

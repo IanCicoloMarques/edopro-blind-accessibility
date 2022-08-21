@@ -14,9 +14,17 @@
 #include "duelclient.h"
 #include "single_mode.h"
 #include "client_card.h"
+#include "ScreenReader/ScreenReader.h"
 
 namespace ygo {
-
+	//TODO - COLOCAR ISSO EM UM ARQUIVO SEPARADO PARA CHAMAR NAS CLASSES EM VEZ DE POR INLINE
+static inline void TriggerEvent(irr::gui::IGUIElement* target, irr::gui::EGUI_EVENT_TYPE type) {
+	irr::SEvent event;
+	event.EventType = irr::EET_GUI_EVENT;
+	event.GUIEvent.EventType = type;
+	event.GUIEvent.Caller = target;
+	ygo::mainGame->device->postEventFromUser(event);
+}
 static int parse_filter(const wchar_t* pstr, uint32_t& type) {
 	if(*pstr == L'=') {
 		type = 1;
@@ -108,6 +116,7 @@ void DeckBuilder::Initialize(bool refresh) {
 	prev_operation = 0;
 	mainGame->SetMessageWindow();
 	mainGame->device->setEventReceiver(this);
+	mainGame->env->removeFocus(mainGame->env->getFocus());
 }
 void DeckBuilder::Terminate(bool showmenu) {
 	mainGame->is_building = false;
@@ -144,11 +153,17 @@ void DeckBuilder::Terminate(bool showmenu) {
 }
 void DeckBuilder::ImportDeck() {
 	const wchar_t* deck_string = Utils::OSOperator->getTextFromClipboard();
-	if(deck_string) {
-		if(wcsncmp(L"ydke://", deck_string, sizeof(L"ydke://") / sizeof(wchar_t) - 1) == 0)
+	std::wstring wstringDeckString = std::wstring(deck_string);
+	std::size_t startPosition = wstringDeckString.find(L"ydke://");
+	if (deck_string) {
+		if (wcsncmp(L"ydke://", deck_string, sizeof(L"ydke://") / sizeof(wchar_t) - 1) == 0)
 			DeckManager::ImportDeckBase64(current_deck, deck_string);
+		else if (startPosition != 0 && startPosition != std::string::npos) {
+			DeckManager::ImportDeckBase64(current_deck, (wstringDeckString.substr(startPosition)).c_str());
+		}
 		else
 			(void)DeckManager::ImportDeckBase64Omega(current_deck, deck_string);
+		ScreenReader::getReader()->readScreen(L"Deck Imported");
 		RefreshLimitationStatus();
 	}
 }
@@ -252,6 +267,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				current_deck.main.clear();
 				current_deck.extra.clear();
 				current_deck.side.clear();
+				ScreenReader::getReader()->readScreen(L"New deck");
 #endif
 				break;
 			}
@@ -279,8 +295,11 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 			}
 			case BUTTON_SAVE_DECK_AS: {
 				epro::wstringview dname(mainGame->ebDeckname->getText());
-				if(dname.empty())
+				if (dname.empty()) {
+					ScreenReader::getReader()->readScreen(L"Cannot save deck without a name");
 					break;
+				}
+				ScreenReader::getReader()->readScreen(fmt::format(L"Deck {} saved", dname.data()));
 				int sel = -1;
 				{
 					const auto upper = Utils::ToUpperNoAccents<std::wstring>({ dname.data(), dname.size() });
@@ -338,6 +357,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case BUTTON_LEAVE_GAME: {
+				ScreenReader::getReader()->readScreen(L"Leaving deck editor");
 				Terminate();
 				break;
 			}
@@ -811,9 +831,51 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 					ExportDeckToClipboard(event.KeyInput.Shift);
 				break;
 			}
+			case irr::KEY_KEY_F: {
+				if (event.KeyInput.Control) {
+					epro::wstringview dname(mainGame->ebDeckname->getText());
+					if (dname.empty()) {
+						ScreenReader::getReader()->readScreen(L"No name");
+						break;
+					}
+					ScreenReader::getReader()->readScreen(fmt::format(L"Deck {}", dname.data()));
+				}
+				break;
+			}
+			case irr::KEY_KEY_G: {
+				if (event.KeyInput.Control) {
+					mainGame->env->setFocus(mainGame->btnClearDeck);
+					TriggerEvent(mainGame->btnClearDeck, irr::gui::EGET_BUTTON_CLICKED);
+				}
+				break;
+			}
+			case irr::KEY_KEY_R: {
+				if (event.KeyInput.Control) {
+					mainGame->env->setFocus(mainGame->ebDeckname);
+					ScreenReader::getReader()->readScreen(L"Set deck's name");
+				}
+				break;
+			}
+			case irr::KEY_KEY_S: {
+				if (event.KeyInput.Control) {
+					mainGame->env->setFocus(mainGame->btnSaveDeckAs);
+					TriggerEvent(mainGame->btnSaveDeckAs, irr::gui::EGET_BUTTON_CLICKED);
+				}
+				break;
+			}
 			case irr::KEY_KEY_V: {
 				if(event.KeyInput.Control && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX))
 					ImportDeck();
+				break;
+			}
+			case irr::KEY_KEY_0: {
+				if (mainGame->btnLeaveGame->isTrulyVisible())
+					TriggerEvent(mainGame->btnLeaveGame, irr::gui::EGET_BUTTON_CLICKED);
+				break;
+			}
+			case irr::KEY_RETURN: {
+				if (mainGame->btnSideOK->isTrulyVisible())
+					TriggerEvent(mainGame->btnSideOK, irr::gui::EGET_BUTTON_CLICKED);
 				break;
 			}
 			default:

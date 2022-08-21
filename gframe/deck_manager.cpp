@@ -542,6 +542,8 @@ static cardlist_type BufferToCardlist(const std::vector<uint8_t>& input) {
 	return vect;
 }
 void DeckManager::ImportDeckBase64(Deck& deck, const wchar_t* buffer) {
+	std::wstring newBuffer = std::wstring(buffer) + L"!";
+	buffer = newBuffer.c_str();
 	buffer += (sizeof(L"ydke://") / sizeof(wchar_t)) - 1;
 	size_t delimiters[3];
 	int delim = 0;

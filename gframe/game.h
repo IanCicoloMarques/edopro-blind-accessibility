@@ -20,6 +20,7 @@
 #include "discord_wrapper.h"
 #include "windbot_panel.h"
 #include "ocgapi_types.h"
+#include "sound_manager.h"
 
 struct unzip_payload;
 class CGUISkinSystem;
@@ -383,10 +384,13 @@ public:
 	irr::gui::IGUIContextMenu* mTopMenu;
 	irr::gui::IGUIContextMenu* mRepositoriesInfo;
 	irr::gui::IGUIContextMenu* mAbout;
+	irr::gui::IGUIContextMenu* mAccessibility;
 	irr::gui::IGUIWindow* wAbout;
 	irr::gui::IGUIStaticText* stAbout;
 	irr::gui::IGUIContextMenu* mVersion;
 	irr::gui::IGUIWindow* wVersion;
+	irr::gui::IGUIWindow* wAccessibility;
+	irr::gui::IGUIStaticText* stAccessibility;
 	irr::gui::IGUIStaticText* stVersion;
 	irr::gui::IGUIStaticText* stCoreVersion;
 	irr::gui::IGUIStaticText* stExpectedCoreVersion;

@@ -40,6 +40,8 @@
 #include "joystick_wrapper.h"
 #include "CGUIWindowedTabControl/CGUIWindowedTabControl.h"
 #include "file_stream.h"
+#include "ScreenReader/StringBuilder.h"
+#include "ScreenReader/ScreenReader.h"
 
 #if defined(__ANDROID__) || defined(EDOPRO_IOS)
 #include "CGUICustomComboBox/CGUICustomComboBox.h"
@@ -234,6 +236,21 @@ void Game::Initialize() {
 	wVersion->setDraggable(false);
 	wVersion->setDrawTitlebar(false);
 	wVersion->setDrawBackground(false);
+	StringBuilder::cleanBuiltMessage();
+	mAccessibility = mTopMenu->getSubMenu(mTopMenu->addItem(L"Accessibility", 2, true, true));
+	wAccessibility = env->addWindow(Scale(0, 0, 450, 700), false, L"", mAccessibility);
+	wAccessibility->getCloseButton()->setVisible(false);
+	wAccessibility->setDraggable(false);
+	wAccessibility->setDrawTitlebar(false);
+	wAccessibility->setDrawBackground(false);
+	for (int i = 0; i < gDataManager->GetAccessibilityStringSize(); i++) {
+		StringBuilder::AddLine(gDataManager->GetAccessibilityString(i).data());
+	}
+	stAccessibility = irr::gui::CGUICustomText::addCustomText(StringBuilder::getBuiltMessage().c_str(), false, env, wAccessibility, -1, Scale(10, 10, 440, 690));
+	((irr::gui::CGUICustomText*)stAccessibility)->enableScrollBar();
+	((irr::gui::CGUICustomText*)stAccessibility)->setWordWrap(true);
+	((irr::gui::CGUICustomContextMenu*)mAccessibility)->addItem(wAccessibility, -1);
+	wAccessibility->setRelativePosition(irr::core::recti(0, 0, std::min(Scale(450), stAccessibility->getTextWidth() + Scale(20)), std::min(stAccessibility->getTextHeight() + Scale(20), Scale(700))));
 	stVersion = env->addStaticText(EDOPRO_VERSION_STRING, Scale(10, 10, 290, 35), false, false, wVersion);
 	int titleWidth = stVersion->getTextWidth();
 	stVersion->setRelativePosition(irr::core::recti(Scale(10), Scale(10), titleWidth + Scale(10), Scale(35)));
@@ -440,11 +457,11 @@ void Game::Initialize() {
 	ebDrawCount->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
 	tmpptr = env->addStaticText(gDataManager->GetSysString(1234).data(), Scale(10, 330, 220, 350), false, false, wCreateHost);
 	defaultStrings.emplace_back(tmpptr, 1234);
-	ebServerName = env->addEditBox(gGameConfig->gamename.data(), Scale(110, 325, 250, 350), true, wCreateHost);
+	ebServerName = env->addEditBox(gGameConfig->gamename.data(), Scale(110, 325, 250, 350), true, wCreateHost, EDITBOX_TEXT);
 	ebServerName->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
  	tmpptr = env->addStaticText(gDataManager->GetSysString(1235).data(), Scale(10, 360, 220, 380), false, false, wCreateHost);
 	defaultStrings.emplace_back(tmpptr, 1235);
-	ebServerPass = env->addEditBox(L"", Scale(110, 355, 250, 380), true, wCreateHost);
+	ebServerPass = env->addEditBox(L"", Scale(110, 355, 250, 380), true, wCreateHost, EDITBOX_TEXT);
 	ebServerPass->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
 	btnHostConfirm = env->addButton(Scale(260, 355, 370, 380), wCreateHost, BUTTON_HOST_CONFIRM, gDataManager->GetSysString(1211).data());
 	defaultStrings.emplace_back(btnHostConfirm, 1211);
@@ -515,7 +532,7 @@ void Game::Initialize() {
 	stHostPrepRule->setWordWrap(true);
 	stDeckSelect = env->addStaticText(gDataManager->GetSysString(1254).data(), Scale(10, 235, 110, 255), false, false, wHostPrepare);
 	defaultStrings.emplace_back(stDeckSelect, 1254);
-	cbDeckSelect = AddComboBox(env, Scale(120, 230, 270, 255), wHostPrepare);
+	cbDeckSelect = AddComboBox(env, Scale(120, 230, 270, 255), wHostPrepare, COMBOBOX_PLAYER_DECK);
 	cbDeckSelect->setMaxSelectionRows(10);
 	cbDeckSelect2 = AddComboBox(env, Scale(280, 230, 430, 255), wHostPrepare);
 	cbDeckSelect2->setMaxSelectionRows(10);
@@ -571,6 +588,7 @@ void Game::Initialize() {
 	btnSettings->setDrawBorder(false);
 	btnSettings->setImageSize(dimBtnSettings.getSize());
 	btnSettings->setImage(imageManager.tSettings);
+	btnSettings->setIsPushButton(true);
 	//
 	wHand = env->addWindow(Scale(500, 450, 825, 605), false, L"");
 	wHand->getCloseButton()->setVisible(false);
@@ -2362,6 +2380,8 @@ bool Game::ApplySkin(const epro::path_string& skinname, bool reload, bool firstr
 		reapply_colors();
 	if(wAbout)
 		wAbout->setRelativePosition(irr::core::recti(0, 0, std::min(Scale(450), stAbout->getTextWidth() + Scale(20)), std::min(stAbout->getTextHeight() + Scale(40), Scale(700))));
+	if (wAccessibility)
+		wAccessibility->setRelativePosition(irr::core::recti(0, 0, std::min(Scale(450), stAccessibility->getTextWidth() + Scale(20)), std::min(stAccessibility->getTextHeight() + Scale(40), Scale(700))));
 	if(dpi_scale > 1.5f) {
 		auto* sprite_texture = imageManager.GetCheckboxScaledTexture(dpi_scale);
 		if(sprite_texture) {

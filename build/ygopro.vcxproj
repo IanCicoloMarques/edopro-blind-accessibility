@@ -279,6 +279,9 @@
     <ResourceCompile Include="..\gframe\ygopro.rc" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Accessibility\Accessibility.vcxproj">
+      <Project>{37cedcf7-dc1c-45b5-aec1-64d2382ea357}</Project>
+    </ProjectReference>
     <ProjectReference Include="freetype.vcxproj">
       <Project>{89895bd8-7556-b6e3-9e6f-a48b8a9beb71}</Project>
     </ProjectReference>
@@ -290,6 +293,9 @@
     </ProjectReference>
     <ProjectReference Include="Irrlicht.vcxproj">
       <Project>{06C1B133-F28D-0C3F-1BA7-FAE607D341CD}</Project>
+    </ProjectReference>
+    <ProjectReference Include="sfAudio.vcxproj">
+      <Project>{b030f18a-1c10-7026-2528-fbfc9186d687}</Project>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -138,6 +138,15 @@ public:
 	inline epro::wstringview GetSetName(uint32_t code)  const {
 		return _setnameStrings.GetLocale(code, L"");
 	}
+	inline epro::wstringview GetAccessibilityString(uint32_t code)  const {
+		return _accessibilityStrings.GetLocale(code);
+	}
+	inline int GetAccessibilityStringSize()  const {
+		return _accessibilityStrings.map.size();
+	}
+	inline epro::wstringview GetAccessibilityTipsString(uint32_t code)  const {
+		return _accessibilityTipsStrings.GetLocale(code);
+	}
 	std::vector<uint16_t> GetSetCode(const std::vector<std::wstring>& setname) const;
 	std::wstring GetNumString(int num, bool bracket = false) const;
 	epro::wstringview FormatLocation(uint32_t location, int sequence) const;
@@ -192,6 +201,8 @@ private:
 	LocaleStringHelper _victoryStrings;
 	LocaleStringHelper _setnameStrings;
 	LocaleStringHelper _sysStrings;
+	LocaleStringHelper _accessibilityStrings;
+	LocaleStringHelper _accessibilityTipsStrings;
 	std::string cur_database;
 	std::map<uint32_t, uint32_t> mapped_ids;
 };

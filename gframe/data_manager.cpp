@@ -241,7 +241,14 @@ bool DataManager::LoadStrings(const epro::path_string& file) {
 		try {
 			if(type == "system") {
 				_sysStrings.SetMain(std::stoi(value), BufferIO::DecodeUTF8(str));
-			} else {
+			}
+			else if (type == "accessibility") {
+				_accessibilityStrings.SetMain(std::stoi(value), BufferIO::DecodeUTF8(str));
+			}
+			else if (type == "accessibilitytips") {
+				_accessibilityTipsStrings.SetMain(std::stoi(value), BufferIO::DecodeUTF8(str));
+			}
+			else {
 				LocaleStringHelper* obj;
 				if(type == "victory")
 					obj = &_victoryStrings;
@@ -326,6 +333,8 @@ void DataManager::ClearLocaleStrings() {
 	_victoryStrings.ClearLocales();
 	_counterStrings.ClearLocales();
 	_setnameStrings.ClearLocales();
+	_accessibilityStrings.ClearLocales();
+	_accessibilityTipsStrings.ClearLocales();
 }
 bool DataManager::Error(sqlite3* pDB, sqlite3_stmt* pStmt) const {
 	ErrorLog("Error when loading database ({}): {}", cur_database, sqlite3_errmsg(pDB));

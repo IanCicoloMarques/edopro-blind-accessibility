@@ -42,8 +42,8 @@
 #include <IGUITabControl.h>
 #include <IGUIScrollBar.h>
 #include "joystick_wrapper.h"
-#include "FieldFocus/AccessibilityFieldFocus.h"
-#include "ScreenReader/ScreenReader.h"
+#include "../Accessibility/FieldFocus/AccessibilityFieldFocus.h"
+#include "../Accessibility/ScreenReader/ScreenReader.h"
 
 namespace ygo {
 	std::string showing_repo = "";

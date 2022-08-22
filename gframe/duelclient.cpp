@@ -30,7 +30,7 @@
 #ifdef __ANDROID__
 #include "Android/porting_android.h"
 #endif
-#include "ScreenReader/ScreenReader.h"
+#include "../Accessibility/ScreenReader/ScreenReader.h"
 
 #define DEFAULT_DUEL_RULE 5
 namespace ygo {

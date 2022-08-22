@@ -38,8 +38,8 @@
 #include "utils_gui.h"
 #include "custom_skin_enum.h"
 #include "joystick_wrapper.h"
-#include "ScreenReader/StringBuilder.h"
-#include "ScreenReader/ScreenReader.h"
+#include "../Accessibility/ScreenReader/StringBuilder.h"
+#include "../Accessibility/ScreenReader/ScreenReader.h"
 #if defined(__MINGW32__) && defined(UNICODE)
 #include <fcntl.h>
 #include <ext/stdio_filebuf.h>

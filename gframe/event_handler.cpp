@@ -3362,7 +3362,14 @@ namespace ygo {
 #endif
 		switch (event.EventType) {
 		case irr::EET_GUI_EVENT: {
-			irr::s32 id = event.GUIEvent.Caller->getID();
+			irr::s32 id;
+			try {
+				id = event.GUIEvent.Caller->getID();
+			}
+			catch(irr::s32 id)
+			{
+				break;
+			}
 			switch (event.GUIEvent.EventType) {
 			case irr::gui::EGET_ELEMENT_HOVERED: {
 				// Set cursor to an I-Beam if hovering over an edit box

@@ -1273,10 +1273,9 @@ namespace ygo {
 				break;
 			}
 			case irr::KEY_KEY_G: {
-				if (!event.KeyInput.PressedDown && mainGame->btnDeckEdit->isTrulyVisible() && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
+				if (!event.KeyInput.PressedDown && mainGame->btnDeckEdit->isTrulyVisible()) {
 					ClickButton(mainGame->btnDeckEdit);
 				}
-
 				break;
 			}
 			case irr::KEY_KEY_I: {
@@ -1298,11 +1297,6 @@ namespace ygo {
 				}
 				break;
 			}
-			case irr::KEY_KEY_R: {
-				if (!event.KeyInput.PressedDown && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX))
-					mainGame->textFont->setTransparency(true);
-				break;
-			}
 			case irr::KEY_KEY_V: {
 				if (!event.KeyInput.PressedDown && mainGame->gBot.cbBotDeck->isTrulyVisible() && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
 					mainGame->env->setFocus(mainGame->gBot.cbBotDeck);
@@ -1317,7 +1311,7 @@ namespace ygo {
 				break;
 			}
 			case irr::KEY_DOWN: {
-				if (!event.KeyInput.PressedDown && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
+				if (!event.KeyInput.PressedDown) {
 					if (mainGame->roomListTable->isTrulyVisible() && currentMenu == L"Rooms") {
 						if (onlineMatchCounter < mainGame->roomListTable->getRowCount() - 1)
 							onlineMatchCounter++;
@@ -1333,7 +1327,7 @@ namespace ygo {
 				break;
 			}
 			case irr::KEY_UP: {
-				if (!event.KeyInput.PressedDown && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
+				if (!event.KeyInput.PressedDown) {
 					if (mainGame->roomListTable->isTrulyVisible() && currentMenu == L"Rooms") {
 						if (onlineMatchCounter > 0)
 							onlineMatchCounter--;
@@ -1388,7 +1382,7 @@ namespace ygo {
 			}
 			//Colocar nome do jogador na partida
 			case irr::KEY_RETURN: {
-				if (!event.KeyInput.PressedDown && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
+				if (!event.KeyInput.PressedDown) {
 					if (menu.empty())
 						menu = menuMain;
 					if (menu.at(0) == L"Online Duel") {

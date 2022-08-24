@@ -1291,7 +1291,7 @@ namespace ygo {
 				break;
 			}
 			case irr::KEY_KEY_M: {
-				if (!event.KeyInput.PressedDown && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
+				if (!event.KeyInput.PressedDown && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX) && mainGame->wChat->isTrulyVisible()) {
 					ScreenReader::getReader()->readScreen(fmt::format(L"Chat active"), false);
 					mainGame->env->setFocus(mainGame->ebChatInput);
 				}
@@ -1383,6 +1383,7 @@ namespace ygo {
 			//Colocar nome do jogador na partida
 			case irr::KEY_RETURN: {
 				if (!event.KeyInput.PressedDown) {
+					mainGame->env->removeFocus(mainGame->env->getFocus());
 					if (menu.empty())
 						menu = menuMain;
 					if (menu.at(0) == L"Online Duel") {

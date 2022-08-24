@@ -2066,9 +2066,11 @@ catch(...) { what = def; }
 			std::sort(mainGame->dField.selectable_cards.begin(), mainGame->dField.selectable_cards.end(), ClientCard::client_card_sort);
 			std::wstring text = fmt::format(L"{}({}-{})", gDataManager->GetDesc(select_hint ? select_hint : 560, mainGame->dInfo.compat_mode),
 				mainGame->dField.select_min, mainGame->dField.select_max);
-			ScreenReader::getReader()->readScreen(fmt::format(L"{}", gDataManager->GetDesc(select_hint ? select_hint : 560, mainGame->dInfo.compat_mode)));
+			ScreenReader::getReader()->readScreen(text);
+			ScreenReader::getReader()->readScreen(gDataManager->GetAccessibilityTipsString(14).data());
 			ScreenReader::getReader()->cleanBuiltMessage();
 			ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
+			ScreenReader::getReader()->buildMessage(gDataManager->GetAccessibilityTipsString(14).data());
 			ScreenReader::getReader()->buildMessage(gDataManager->GetAccessibilityTipsString(13).data());
 			std::lock_guard<std::mutex> lock(mainGame->gMutex);
 			select_hint = 0;
@@ -3404,6 +3406,11 @@ catch(...) { what = def; }
 							mainGame->WaitFrameSignal(5, lock);
 							mainGame->dField.MoveCard(pcard, 5);
 							mainGame->WaitFrameSignal(5, lock);
+							mainGame->dField.display_cards.clear();
+							mainGame->dField.display_cards.push_back(pcard);
+							mainGame->dField.indexLookedUpCard = 0;
+							ScreenReader::getReader()->readScreen(fmt::format(L"Card {} revealed", gDataManager->GetName(pcard->code)));
+
 						}
 						else {
 							if (current.location == LOCATION_MZONE && pcard->overlayed.size() > 0) {

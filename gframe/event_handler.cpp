@@ -3133,8 +3133,8 @@ namespace ygo {
 		}
 		else {
 			if (display_cards[indexLookedUpCard]->code != 0)
-				nvdaString = fmt::format(L"{} slot {}", gDataManager->GetName(display_cards[indexLookedUpCard]->code), indexLookedUpCard);
-			else
+				nvdaString = fmt::format(L"{} {} attack {} defense zone {}", gDataManager->GetName(display_cards[indexLookedUpCard]->code), display_cards[indexLookedUpCard]->attack, display_cards[indexLookedUpCard]->defense, indexLookedUpCard);
+				else
 				nvdaString = fmt::format(L"Face-down slot {}", indexLookedUpCard);
 		}
 		ScreenReader::getReader()->readScreen(nvdaString.c_str());

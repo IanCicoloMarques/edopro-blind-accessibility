@@ -132,6 +132,7 @@
     <ClInclude Include="..\gframe\CGUICustomTabControl\CGUICustomTabControl.h" />
     <ClInclude Include="..\gframe\CGUICustomTable\CGUICustomTable.h" />
     <ClInclude Include="..\gframe\CGUICustomText\CGUICustomText.h" />
+    <ClInclude Include="..\gframe\CGUIEnvironmentLinker.h" />
     <ClInclude Include="..\gframe\CGUIFileSelectListBox\CGUIFileSelectListBox.h" />
     <ClInclude Include="..\gframe\CGUIImageButton\CGUIImageButton.h" />
     <ClInclude Include="..\gframe\CGUISkinSystem\CConfigMap.h" />

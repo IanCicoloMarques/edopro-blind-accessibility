@@ -22,8 +22,6 @@ using CCursorControl = irr::CCursorControl;
 #elif defined(EDOPRO_MACOS)
 #import <CoreFoundation/CoreFoundation.h>
 #include "osx_menu.h"
-#elif defined(EDOPRO_IOS)
-#include "iOS/porting_ios.h"
 #elif defined(__linux__)
 #if !(IRRLICHT_VERSION_MAJOR==1 && IRRLICHT_VERSION_MINOR==9)
 #include <X11/Xlib.h>
@@ -67,8 +65,6 @@ static inline irr::video::E_DRIVER_TYPE getDefaultDriver(irr::E_DEVICE_TYPE devi
 	(void)device_type;
 #if defined(__ANDROID__)
 	return irr::video::EDT_OGLES2;
-#elif defined(EDOPRO_IOS)
-	return irr::video::EDT_OGLES1;
 #elif defined(__linux__) && (IRRLICHT_VERSION_MAJOR==1 && IRRLICHT_VERSION_MINOR==9)
 	if(device_type == irr::E_DEVICE_TYPE::EIDT_WAYLAND)
 		return irr::video::EDT_OGLES2;
@@ -139,15 +135,13 @@ irr::IrrlichtDevice* GUIUtils::CreateDevice(GameConfig* configs) {
 			break;
 		}
 	}
-#endif
-#if defined(EDOPRO_IOS) || defined(__ANDROID__)
 	device->getGUIEnvironment()->setOSOperator(Utils::OSOperator);
 	if(!driver->queryFeature(irr::video::EVDF_TEXTURE_NPOT))
 		driver->setTextureCreationFlag(irr::video::ETCF_ALLOW_NON_POWER_2, true);
 #endif
 	driver->setTextureCreationFlag(irr::video::ETCF_CREATE_MIP_MAPS, false);
 	driver->setTextureCreationFlag(irr::video::ETCF_OPTIMIZED_FOR_QUALITY, true);
-	device->setWindowCaption(L"Accessibility Yugioh Project - Forked from Project Ignis: EDOPro");
+	device->setWindowCaption(L"EDOPro - Accessibility Project Version");
 #if !(IRRLICHT_VERSION_MAJOR==1 && IRRLICHT_VERSION_MINOR==9)
 	device->setResizable(true);
 #endif
@@ -176,7 +170,7 @@ irr::IrrlichtDevice* GUIUtils::CreateDevice(GameConfig* configs) {
 }
 
 void GUIUtils::ChangeCursor(irr::IrrlichtDevice* device, /*irr::gui::ECURSOR_ICON*/ int _icon) {
-#if !defined(__ANDROID__) && !defined(EDOPRO_IOS)
+#ifndef __ANDROID__
 	auto icon = static_cast<irr::gui::ECURSOR_ICON>(_icon);
 	auto cursor = device->getCursorControl();
 	if (cursor->getActiveIcon() != icon) {
@@ -191,7 +185,7 @@ bool GUIUtils::TakeScreenshot(irr::IrrlichtDevice* device) {
 	if(!image)
 		return false;
 	const auto now = std::time(nullptr);
-	const auto filename = fmt::format(EPRO_TEXT("screenshots/YGO {:%Y-%m-%d %H-%M-%S}.png"), *std::localtime(&now));
+	const auto filename = fmt::format(EPRO_TEXT("screenshots/EDOPro {:%Y-%m-%d %H-%M-%S}.png"), *std::localtime(&now));
 	auto written = driver->writeImageToFile(image, { filename.data(), static_cast<irr::u32>(filename.size()) });
 	if(!written)
 		device->getLogger()->log(L"Failed to take screenshot.", irr::ELL_WARNING);
@@ -355,8 +349,6 @@ void GUIUtils::ShowErrorWindow(epro::stringview context, epro::stringview messag
 	CFRelease(message_ref);
 #elif defined(__ANDROID__)
 	porting::showErrorDialog(context, message);
-#elif defined(EDOPRO_IOS)
-	EPRO_IOS_ShowErrorDialog(context.data(), message.data());
 #elif defined(__linux__)
 	auto pid = vfork();
 	if(pid == 0) {

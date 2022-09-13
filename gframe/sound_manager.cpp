@@ -102,7 +102,7 @@ void SoundManager::RefreshSoundsList() {
 		{CHAT, EPRO_TEXT("./sound/chatmessage.{}"_sv)},
 		{NP, EPRO_TEXT("./sound/np.{}"_sv)},
 		{CONFIRM, EPRO_TEXT("./sound/confirm.{}"_sv)},
-		{UNCONFIRM, EPRO_TEXT("./sound/unconfirm.{}"_sv)}
+		{UNCONFIRM, EPRO_TEXT("./sound/unconfirm.{}"_sv)},
 	};
 	const auto extensions = mixer->GetSupportedSoundExtensions();
 	for(const auto& sound : fx) {

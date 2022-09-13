@@ -1,12 +1,20 @@
 #include "image_downloader.h"
+#include <fstream>
 #include <curl/curl.h>
 #include <fmt/format.h>
 #include <cerrno>
 #include <array>
+#include <chrono>
+#include <thread>
 #include "logging.h"
 #include "utils.h"
 #include "game_config.h"
-#include "file_stream.h"
+
+#ifdef UNICODE
+#define fileopen(file, mode) _wfopen(file, L##mode)
+#else
+#define fileopen(file, mode) fopen(file, mode)
+#endif
 
 namespace ygo {
 
@@ -17,15 +25,14 @@ struct curl_payload {
 };
 
 ImageDownloader::ImageDownloader() : stop_threads(false) {
-	for (auto& thread : download_threads)
+	for(auto& thread : download_threads)
 		thread = std::thread(&ImageDownloader::DownloadPic, this);
 }
 ImageDownloader::~ImageDownloader() {
-	{
-		std::lock_guard<std::mutex> lck(pic_download);
-		stop_threads = true;
-		cv.notify_all();
-	}
+	std::unique_lock<std::mutex> lck(pic_download);
+	stop_threads = true;
+	cv.notify_all();
+	lck.unlock();
 	for(auto& thread : download_threads)
 		thread.join();
 }
@@ -146,19 +153,20 @@ void ImageDownloader::DownloadPic() {
 			if(src.type != type)
 				continue;
 			auto fp = fileopen(name.data(), "wb");
-			if(fp == nullptr) {
-				if(gGameConfig->logDownloadErrors) {
+			if (fp == nullptr) {
+				if (gGameConfig->logDownloadErrors) {
 					ygo::ErrorLog("Failed opening {} for write.", Utils::ToUTF8IfNeeded(name));
 					ygo::ErrorLog("Error: {}.", strerror(errno));
 				}
 				continue;
 			}
-			if (numberImagesDownloaded >= 10) {
+			if(numberImagesDownloaded >= 10){
 				std::this_thread::sleep_until(std::chrono::system_clock::now() + std::chrono::seconds(1));
 				--numberImagesDownloaded;
 			}
 			numberImagesDownloaded++;
-			SetPayloadAndUrl(fmt::format(src.url, code), fp);
+			auto url = fmt::format(src.url, code);
+			SetPayloadAndUrl(url, fp);
 			res = curl_easy_perform(curl);
 			fclose(fp);
 			if(res == CURLE_OK) {

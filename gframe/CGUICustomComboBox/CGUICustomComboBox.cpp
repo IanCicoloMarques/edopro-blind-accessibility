@@ -1,8 +1,7 @@
 // Copyright (C) 2002-2012 Nikolaus Gebhardt
 // This file is part of the "Irrlicht Engine".
 // For conditions of distribution and use, see copyright notice in irrlicht.h
-#include "../config.h"
-#if defined(__ANDROID__) || defined(EDOPRO_IOS)
+#ifdef __ANDROID__
 #include "CGUICustomComboBox.h"
 #ifdef _IRR_COMPILE_WITH_GUI_
 
@@ -15,13 +14,9 @@
 #include <IGUIFont.h>
 #include <IGUIButton.h>
 #include "../IrrlichtCommonIncludes1.9/CGUIListBox.h"
-#include "../IrrlichtCommonIncludes1.9/os.h"
 #include <IGUIStaticText.h>
-#ifdef __ANDROID__
+#include "../IrrlichtCommonIncludes1.9/os.h"
 #include "../Android/porting_android.h"
-#else
-#include "../iOS/porting_ios.h"
-#endif
 #include "../bufferio.h"
 #include "../game_config.h"
 
@@ -195,46 +190,54 @@ bool CGUICustomComboBox::OnEvent(const SEvent& event) {
 		case EET_KEY_INPUT_EVENT:
 			if(ListBox && event.KeyInput.PressedDown && event.KeyInput.Key == KEY_ESCAPE) {
 				// hide list box
-				//openCloseMenu();
+				openCloseMenu();
 				return true;
 			} else
-				if (event.KeyInput.PressedDown) {
-					s32 oldSelected = Selected;
-					bool absorb = true;
-					switch (event.KeyInput.Key) {
-					case KEY_DOWN:
-						setSelected(Selected + 1);
-						break;
-					case KEY_UP:
-						setSelected(Selected - 1);
-						break;
-					case KEY_HOME:
-					case KEY_PRIOR:
-						setSelected(0);
-						break;
-					case KEY_END:
-					case KEY_NEXT:
-						setSelected((s32)Items.size() - 1);
-						break;
-					default:
-						absorb = false;
+				if(event.KeyInput.Key == KEY_RETURN || event.KeyInput.Key == KEY_SPACE) {
+					if(!event.KeyInput.PressedDown) {
+						openCloseMenu();
 					}
 
-					if (Selected < 0)
-						setSelected(0);
+					ListButton->setPressed(ListBox == 0);
 
-					if (Selected >= (s32)Items.size())
-						setSelected((s32)Items.size() - 1);
+					return true;
+				} else
+					if(event.KeyInput.PressedDown) {
+						s32 oldSelected = Selected;
+						bool absorb = true;
+						switch(event.KeyInput.Key) {
+						case KEY_DOWN:
+							setSelected(Selected + 1);
+							break;
+						case KEY_UP:
+							setSelected(Selected - 1);
+							break;
+						case KEY_HOME:
+						case KEY_PRIOR:
+							setSelected(0);
+							break;
+						case KEY_END:
+						case KEY_NEXT:
+							setSelected((s32)Items.size() - 1);
+							break;
+						default:
+							absorb = false;
+						}
 
-					if (Selected != oldSelected) {
-						sendSelectionChangedEvent();
-						return true;
+						if(Selected < 0)
+							setSelected(0);
+
+						if(Selected >= (s32)Items.size())
+							setSelected((s32)Items.size() - 1);
+
+						if(Selected != oldSelected) {
+							sendSelectionChangedEvent();
+							return true;
+						}
+
+						if(absorb)
+							return true;
 					}
-
-					if (absorb)
-						return true;
-				}
-					
 				break;
 
 		case EET_GUI_EVENT:
@@ -253,7 +256,7 @@ bool CGUICustomComboBox::OnEvent(const SEvent& event) {
 				if(event.GUIEvent.Caller == ListButton) {
 					if(!ygo::gGameConfig->native_mouse)
 						Environment->setFocus(this);
-					//openCloseMenu();
+					openCloseMenu();
 					return true;
 				}
 				break;
@@ -411,11 +414,7 @@ void CGUICustomComboBox::openCloseMenu() {
 		for(int i = 0; i < Items.size(); i++) {
 			parameters.push_back(BufferIO::EncodeUTF8({ Items[i].Name.data(), Items[i].Name.size() }));
 		}
-#ifdef __ANDROID__
 		porting::showComboBox(parameters);
-#else
-		EPRO_IOS_ShowPicker(parameters, Selected);
-#endif
 		return;
 	}
 	if(ListBox) {
@@ -504,11 +503,6 @@ void CGUICustomComboBox::deserializeAttributes(io::IAttributes* in, io::SAttribu
 
 	setSelected(in->getAttributeAsInt("Selected"));
 }
-
-void CGUICustomComboBox::close() {
-	openCloseMenu();
-}
-
 
 } // end namespace gui
 } // end namespace irr

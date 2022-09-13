@@ -1,4 +1,5 @@
 #include "data_handler.h"
+#include <fstream>
 #include <curl/curl.h>
 #include <irrlicht.h>
 #include "utils_gui.h"
@@ -15,10 +16,6 @@
 #ifdef __ANDROID__
 #include "Android/COSAndroidOperator.h"
 #include "Android/porting_android.h"
-#endif
-#ifdef EDOPRO_IOS
-#include "iOS/COSiOSOperator.h"
-#include "iOS/porting_ios.h"
 #endif
 
 namespace ygo {
@@ -104,16 +101,7 @@ DataHandler::DataHandler() {
 	configs = std::unique_ptr<GameConfig>(new GameConfig());
 	gGameConfig = configs.get();
 	tmp_device = nullptr;
-#if defined(EDOPRO_IOS)
-	tmp_device = GUIUtils::CreateDevice(configs.get());
-	if(tmp_device->getVideoDriver())
-		ios_exposed_data = &tmp_device->getVideoDriver()->getExposedVideoData();
-	Utils::OSOperator = new irr::COSiOSOperator();
-	configs->ssl_certificate_path = fmt::format("{}/cacert.pem", Utils::GetExeFolder());
-#elif defined(__ANDROID__)
-	Utils::OSOperator = new irr::COSAndroidOperator();
-	configs->ssl_certificate_path = fmt::format("{}/cacert.pem", porting::internal_storage);
-#else
+#ifndef __ANDROID__
 	tmp_device = GUIUtils::CreateDevice(configs.get());
 	Utils::OSOperator = tmp_device->getGUIEnvironment()->getOSOperator();
 	Utils::OSOperator->grab();
@@ -122,6 +110,9 @@ DataHandler::DataHandler() {
 			configs->ssl_certificate_path = configs->override_ssl_certificate_path;
 	} else
 		configs->ssl_certificate_path = fmt::format("{}/cacert.pem", Utils::ToUTF8IfNeeded(Utils::GetWorkingDirectory()));
+#else
+	Utils::OSOperator = new irr::COSAndroidOperator();
+	configs->ssl_certificate_path = fmt::format("{}/cacert.pem", porting::internal_storage);
 #endif
 	filesystem = new irr::io::CFileSystem();
 	dataManager = std::unique_ptr<DataManager>(new DataManager());

@@ -215,6 +215,7 @@
     <ClInclude Include="..\gframe\windbot_panel.h" />
     <ClInclude Include="..\gframe\CGUIWindowedTabControl\CGUIWindowedTabControl.h" />
     <ClInclude Include="..\gframe\sound_sfml.h" />
+    <ClInclude Include="..\gframe\CGUIEnvironmentLinker.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\gframe\CGUICustomCheckBox\CGUICustomCheckBox.cpp">

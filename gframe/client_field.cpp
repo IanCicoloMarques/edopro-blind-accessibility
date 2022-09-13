@@ -21,7 +21,7 @@
 #include "CGUIImageButton/CGUIImageButton.h"
 #include "CGUITTFont/CGUITTFont.h"
 #include "custom_skin_enum.h"
-#include "../Accessibility/ScreenReader/ScreenReader.h"
+#include "ScreenReader/ScreenReader.h"
 
 namespace ygo {
 	ClientField::ClientField() {

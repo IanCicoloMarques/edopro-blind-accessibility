@@ -147,6 +147,7 @@ public:
 	inline epro::wstringview GetAccessibilityTipsString(uint32_t code)  const {
 		return _accessibilityTipsStrings.GetLocale(code);
 	}
+
 	std::vector<uint16_t> GetSetCode(const std::vector<std::wstring>& setname) const;
 	std::wstring GetNumString(int num, bool bracket = false) const;
 	epro::wstringview FormatLocation(uint32_t location, int sequence) const;

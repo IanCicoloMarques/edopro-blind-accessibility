@@ -1,4 +1,5 @@
 #include "data_manager.h"
+#include <fstream>
 #include <fmt/format.h>
 #include <IReadFile.h>
 #include <sqlite3.h>
@@ -8,7 +9,10 @@
 #include "logging.h"
 #include "utils.h"
 #include "common.h"
-#include "file_stream.h"
+#if defined(__MINGW32__) && defined(UNICODE)
+#include <fcntl.h>
+#include <ext/stdio_filebuf.h>
+#endif
 
 namespace ygo {
 
@@ -220,8 +224,17 @@ bool DataManager::ParseLocaleDB(sqlite3* pDB) {
 	sqlite3_close(pDB);
 	return true;
 }
+
 bool DataManager::LoadStrings(const epro::path_string& file) {
-	FileStream string_file{ file, FileStream::in };
+#if defined(__MINGW32__) && defined(UNICODE)
+	auto fd = _wopen(file.data(), _O_RDONLY);
+	if(fd == -1)
+		return false;
+	__gnu_cxx::stdio_filebuf<char> b(fd, std::ios::in);
+	std::istream string_file(&b);
+#else
+	std::ifstream string_file(file);
+#endif
 	if(string_file.fail())
 		return false;
 	std::string str;
@@ -266,7 +279,15 @@ bool DataManager::LoadStrings(const epro::path_string& file) {
 	return true;
 }
 bool DataManager::LoadLocaleStrings(const epro::path_string& file) {
-	FileStream string_file{ file, FileStream::in };
+#if defined(__MINGW32__) && defined(UNICODE)
+	auto fd = _wopen(file.data(), _O_RDONLY);
+	if(fd == -1)
+		return false;
+	__gnu_cxx::stdio_filebuf<char> b(fd, std::ios::in);
+	std::istream string_file(&b);
+#else
+	std::ifstream string_file(file);
+#endif
 	if(string_file.fail())
 		return false;
 	std::string str;
@@ -304,7 +325,15 @@ bool DataManager::LoadLocaleStrings(const epro::path_string& file) {
 	return true;
 }
 bool DataManager::LoadIdsMapping(const epro::path_string& file) {
-	FileStream mappings_file{ file, FileStream::in };
+#if defined(__MINGW32__) && defined(UNICODE)
+	auto fd = _wopen(file.data(), _O_RDONLY);
+	if(fd == -1)
+		return false;
+	__gnu_cxx::stdio_filebuf<char> b(fd, std::ios::in);
+	std::istream mappings_file(&b);
+#else
+	std::ifstream mappings_file(file);
+#endif
 	if(mappings_file.fail())
 		return false;
 	nlohmann::json mappings;
@@ -333,8 +362,6 @@ void DataManager::ClearLocaleStrings() {
 	_victoryStrings.ClearLocales();
 	_counterStrings.ClearLocales();
 	_setnameStrings.ClearLocales();
-	_accessibilityStrings.ClearLocales();
-	_accessibilityTipsStrings.ClearLocales();
 }
 bool DataManager::Error(sqlite3* pDB, sqlite3_stmt* pStmt) const {
 	ErrorLog("Error when loading database ({}): {}", cur_database, sqlite3_errmsg(pDB));

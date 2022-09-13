@@ -13,40 +13,25 @@
 #include "server_lobby.h"
 #include "utils_gui.h"
 #include "CGUIFileSelectListBox/CGUIFileSelectListBox.h"
+#include "CGUIImageButton/CGUIImageButton.h"
 #include "CGUITTFont/CGUITTFont.h"
 #include <IrrlichtDevice.h>
 #include <IGUIEnvironment.h>
 #include <IGUIButton.h>
 #include <IGUICheckBox.h>
 #include <IGUIComboBox.h>
+#include <IGUIScrollBar.h>
 #include <IGUIContextMenu.h>
 #include <IGUIEditBox.h>
-#include <IGUIScrollBar.h>
 #include <IGUIStaticText.h>
 #include <IGUITabControl.h>
 #include <IGUITable.h>
 #include <IGUIWindow.h>
-#pragma region Accessiblity
-#include "CGUIImageButton/CGUIImageButton.h"
-#include "../Accessibility/ScreenReader/ScreenReader.h"
+#include "ScreenReader/ScreenReader.h"
 #include "joystick_wrapper.h"
-#pragma endregion
 
 namespace ygo {
-	template<typename T>
-	static void Synchronize(const T& range, irr::gui::IGUICheckBox* elem) {
-		auto checked = elem->isChecked();
-		for (auto i = range.first; i != range.second; ++i)
-			static_cast<irr::gui::IGUICheckBox*>(i->second)->setChecked(checked);
-	}
-	template<typename T>
-	static void Synchronize(const T& range, irr::gui::IGUIScrollBar* elem) {
-		auto position = elem->getPos();
-		for (auto i = range.first; i != range.second; ++i)
-			static_cast<irr::gui::IGUIScrollBar*>(i->second)->setPos(position);
-	}
 
-#pragma region Accessiblity
 	static void MouseClick(const irr::SEvent& event, bool rightClick) {
 		auto cursor = mainGame->device->getCursorControl();
 		auto pos = cursor->getRelativePosition();
@@ -74,37 +59,6 @@ namespace ygo {
 
 		CheckAndPost(JWrapper::Buttons::A, rightClick ? irr::EMIE_RMOUSE_PRESSED_DOWN : irr::EMIE_LMOUSE_PRESSED_DOWN);
 	}
-	static inline void CheckBox(irr::gui::IGUICheckBox* chkbox) {
-		if (chkbox->isTrulyVisible()) {
-			if (chkbox->isChecked())
-				mainGame->PlaySoundEffect(SoundManager::SFX::UNCONFIRM);
-			else
-				mainGame->PlaySoundEffect(SoundManager::SFX::CONFIRM);
-			chkbox->setChecked(!chkbox->isChecked());
-		}
-	}
-
-	static inline void FocusTextBox(irr::gui::IGUIEditBox* editBox) {
-		if (editBox->isTrulyVisible()) {
-			editBox->setText(L"");
-			mainGame->env->setFocus(editBox);
-		}
-	}
-
-	static inline void TriggerEvent(irr::gui::IGUIElement* target, irr::gui::EGUI_EVENT_TYPE type) {
-		irr::SEvent event;
-		event.EventType = irr::EET_GUI_EVENT;
-		event.GUIEvent.EventType = type;
-		event.GUIEvent.Caller = target;
-		ygo::mainGame->device->postEventFromUser(event);
-	}
-
-	static inline void ClickButton(irr::gui::IGUIElement* btn) {
-		TriggerEvent(btn, irr::gui::EGET_BUTTON_CLICKED);
-	}
-
-#pragma endregion
-
 	static void UpdateDeck() {
 		gGameConfig->lastdeck = mainGame->cbDeckSelect->getItem(mainGame->cbDeckSelect->getSelected());
 		const auto& deck = mainGame->deckBuilder.GetCurrentDeck();
@@ -164,6 +118,34 @@ namespace ygo {
 		if (start_turn == 1)
 			start_turn = 0;
 		ReplayMode::StartReplay(start_turn, (mainGame->chkYrp->isChecked() || replay.pheader.id == REPLAY_YRP1));
+	}
+	static inline void TriggerEvent(irr::gui::IGUIElement* target, irr::gui::EGUI_EVENT_TYPE type) {
+		irr::SEvent event;
+		event.EventType = irr::EET_GUI_EVENT;
+		event.GUIEvent.EventType = type;
+		event.GUIEvent.Caller = target;
+		ygo::mainGame->device->postEventFromUser(event);
+	}
+
+	static inline void ClickButton(irr::gui::IGUIElement* btn) {
+		TriggerEvent(btn, irr::gui::EGET_BUTTON_CLICKED);
+	}
+
+	static inline void CheckBox(irr::gui::IGUICheckBox* chkbox) {
+		if (chkbox->isTrulyVisible()) {
+			if (chkbox->isChecked())
+				mainGame->PlaySoundEffect(SoundManager::SFX::UNCONFIRM);
+			else
+				mainGame->PlaySoundEffect(SoundManager::SFX::CONFIRM);
+			chkbox->setChecked(!chkbox->isChecked());
+		}
+	}
+
+	static inline void FocusTextBox(irr::gui::IGUIEditBox* editBox) {
+		if (editBox->isTrulyVisible()) {
+			editBox->setText(L"");
+			mainGame->env->setFocus(editBox);
+		}
 	}
 
 	bool MenuHandler::OnEvent(const irr::SEvent& event) {
@@ -245,7 +227,7 @@ namespace ygo {
 							menuSelectCounter = 0;
 							currentMenu = menu.at(menuSelectCounter);
 						}
-						else {
+						else{
 							menu = menuRulesOkOnline;
 							menuSelectCounter = 0;
 							currentMenu = menu.at(menuSelectCounter);
@@ -266,7 +248,7 @@ namespace ygo {
 					if (mainGame->cbDeckSelect->isTrulyVisible()) {
 						menu = menuRulesOkOnline;
 					}
-					else {
+					else{
 						menu = menuOnline;
 					}
 					break;
@@ -447,10 +429,10 @@ namespace ygo {
 						mainGame->btnHostCancel->setEnabled(false);
 						mainGame->gBot.Refresh(gGameConfig->filterBot * (mainGame->cbDuelRule->getSelected() + 1), gGameConfig->lastBot);
 						menu = menuRulesOk;
-
-						menuSelectCounter = 0;
-						currentMenu = menu.at(menuSelectCounter);ScreenReader::getReader()->readScreen(L"Rules ok.");
+						ScreenReader::getReader()->readScreen(L"Rules ok.");
 					}
+					menuSelectCounter = 0;
+					currentMenu = menu.at(menuSelectCounter);
 					break;
 				}
 				case BUTTON_HOST_CANCEL: {
@@ -473,7 +455,7 @@ namespace ygo {
 					}
 					break;
 				}
-				case BUTTON_HP_DUELIST: { 
+				case BUTTON_HP_DUELIST: {
 					ScreenReader::getReader()->readScreen(L"Duel mode");
 					mainGame->cbDeckSelect->setEnabled(true);
 					DuelClient::SendPacketToServer(CTOS_HS_TODUELIST);
@@ -748,6 +730,9 @@ namespace ygo {
 					}
 					mainGame->HideElement(mainGame->wMainMenu);
 					mainGame->deckBuilder.Initialize();
+					//menu = menuDeckEditor;
+					//menuSelectCounter = 0;
+					//currentMenu = menu.at(menuSelectCounter);
 					break;
 				}
 				case BUTTON_MSG_OK: {
@@ -837,6 +822,7 @@ namespace ygo {
 				case BUTTON_FILTER_RELAY: {
 					ServerLobby::FillOnlineRooms();
 					break;
+				}
 				}
 				break;
 			}
@@ -1099,6 +1085,33 @@ namespace ygo {
 					target->setText(elem->getText());
 					break;
 				}
+				/*case EDITBOX_NUMERIC: {
+					auto elem = static_cast<irr::gui::IGUIEditBox*>(event.GUIEvent.Caller);
+					std::wstring screenReaderString;
+					if (elem == mainGame->ebStartLP)
+						screenReaderString = fmt::format(L"Starting lifepoints set as {}", elem->getText());
+					else if (elem == mainGame->ebStartHand)
+						screenReaderString = fmt::format(L"Starting cards on hand set as {}", elem->getText());
+					else if (elem == mainGame->ebDrawCount)
+						screenReaderString = fmt::format(L"Draw count set as {}", elem->getText());
+					else if (elem == mainGame->ebServerName)
+						screenReaderString = fmt::format(L"Room name set as {}", elem->getText());
+					else if (elem == mainGame->ebServerPass)
+						screenReaderString = fmt::format(L"Room password set as {}", elem->getText());
+					ScreenReader::getReader()->readScreen(screenReaderString);
+					break;
+				}
+				case EDITBOX_TEXT: {
+					auto elem = static_cast<irr::gui::IGUIEditBox*>(event.GUIEvent.Caller);
+					std::wstring screenReaderString;
+					if (elem == mainGame->ebServerName)
+						screenReaderString = fmt::format(L"Room name set as {}", elem->getText());
+					else if (elem == mainGame->ebServerPass)
+						screenReaderString = fmt::format(L"Room password set as {}", elem->getText());
+					ScreenReader::getReader()->readScreen(screenReaderString);
+
+					break;
+				}*/
 				}
 				if (caller->getParent() == mainGame->wRoomListPlaceholder)
 					ServerLobby::FillOnlineRooms();
@@ -1106,6 +1119,12 @@ namespace ygo {
 			}
 			case irr::gui::EGET_COMBO_BOX_CHANGED: {
 				switch (id) {
+				case COMBOBOX_HOST_LFLIST: {
+					int selected = mainGame->cbHostLFList->getSelected();
+					if (selected < 0) break;
+					LFList* lflist = gdeckManager->GetLFList(mainGame->cbHostLFList->getItemData(selected));
+					break;
+				}
 				case COMBOBOX_DUEL_RULE: {
 					mainGame->chkTcgRulings->setChecked(false);
 					auto combobox = static_cast<irr::gui::IGUIComboBox*>(event.GUIEvent.Caller);
@@ -1217,27 +1236,29 @@ namespace ygo {
 					}
 					break;
 				}
-			}
-			break;
-		}
-			default: break;
-			}
-			break;
-			}
-		}
-		case irr::EET_KEY_INPUT_EVENT: {
-			switch (event.KeyInput.Key) {
-			case irr::KEY_KEY_B: {
-				if (!event.KeyInput.PressedDown && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
-					ScreenReader::getReader()->readLastMessage();
 				}
 				break;
 			}
-			case irr::KEY_KEY_C: {
-				if (!event.KeyInput.PressedDown && mainGame->cbDeckSelect->isTrulyVisible() && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
-					mainGame->env->setFocus(mainGame->cbDeckSelect);
-					std::wstring nvdaString = fmt::format(L"Deck {}", mainGame->cbDeckSelect->getItem(mainGame->cbDeckSelect->getSelected()));
-					ScreenReader::getReader()->readScreen(nvdaString.c_str());
+			default: break;
+			}
+			break;
+		}
+		case irr::EET_KEY_INPUT_EVENT: {
+			switch (event.KeyInput.Key) {
+			case irr::KEY_KEY_R: {
+				if (!event.KeyInput.PressedDown && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX))
+					mainGame->textFont->setTransparency(true);
+				break;
+			}
+			case irr::KEY_ESCAPE: {
+				if (!mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX))
+					mainGame->device->minimizeWindow();
+				break;
+			}
+			case irr::KEY_F5: {
+				if (!event.KeyInput.PressedDown && mainGame->wRoomListPlaceholder->isVisible()) {
+					onlineMatchCounter = 0;
+					ServerLobby::RefreshRooms();
 				}
 				break;
 			}
@@ -1267,15 +1288,11 @@ namespace ygo {
 				}
 				break;
 			}
-			case irr::KEY_KEY_F: {
-				if (!event.KeyInput.PressedDown && mainGame->btnHostPrepNotReady->isEnabled() && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX))
-					ClickButton(mainGame->btnHostPrepNotReady);
-				break;
-			}
 			case irr::KEY_KEY_G: {
-				if (!event.KeyInput.PressedDown && mainGame->btnDeckEdit->isTrulyVisible()) {
+				if (!event.KeyInput.PressedDown && mainGame->btnDeckEdit->isTrulyVisible() && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
 					ClickButton(mainGame->btnDeckEdit);
 				}
+
 				break;
 			}
 			case irr::KEY_KEY_I: {
@@ -1290,10 +1307,16 @@ namespace ygo {
 				}
 				break;
 			}
-			case irr::KEY_KEY_M: {
-				if (!event.KeyInput.PressedDown && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX) && mainGame->wChat->isTrulyVisible()) {
-					ScreenReader::getReader()->readScreen(fmt::format(L"Chat active"), false);
-					mainGame->env->setFocus(mainGame->ebChatInput);
+			case irr::KEY_KEY_F: {
+				if (!event.KeyInput.PressedDown && mainGame->btnHostPrepNotReady->isEnabled() && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX))
+					ClickButton(mainGame->btnHostPrepNotReady);
+				break;
+			}
+			case irr::KEY_KEY_C: {
+				if (!event.KeyInput.PressedDown && mainGame->cbDeckSelect->isTrulyVisible() && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
+					mainGame->env->setFocus(mainGame->cbDeckSelect);
+					std::wstring nvdaString = fmt::format(L"Deck {}", mainGame->cbDeckSelect->getItem(mainGame->cbDeckSelect->getSelected()));
+					ScreenReader::getReader()->readScreen(nvdaString.c_str());
 				}
 				break;
 			}
@@ -1305,13 +1328,21 @@ namespace ygo {
 				}
 				break;
 			}
-			case irr::KEY_ESCAPE: {
-				if (!mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX))
-					mainGame->device->minimizeWindow();
+			case irr::KEY_KEY_B: {
+				if (!event.KeyInput.PressedDown && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
+					ScreenReader::getReader()->readLastMessage();
+				}
+				break;
+			}
+			case irr::KEY_KEY_M: {
+				if (!event.KeyInput.PressedDown && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
+					ScreenReader::getReader()->readScreen(fmt::format(L"Chat active"), false);
+					mainGame->env->setFocus(mainGame->ebChatInput);
+				}
 				break;
 			}
 			case irr::KEY_DOWN: {
-				if (!event.KeyInput.PressedDown) {
+				if (!event.KeyInput.PressedDown && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
 					if (mainGame->roomListTable->isTrulyVisible() && currentMenu == L"Rooms") {
 						if (onlineMatchCounter < mainGame->roomListTable->getRowCount() - 1)
 							onlineMatchCounter++;
@@ -1327,7 +1358,7 @@ namespace ygo {
 				break;
 			}
 			case irr::KEY_UP: {
-				if (!event.KeyInput.PressedDown) {
+				if (!event.KeyInput.PressedDown && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
 					if (mainGame->roomListTable->isTrulyVisible() && currentMenu == L"Rooms") {
 						if (onlineMatchCounter > 0)
 							onlineMatchCounter--;
@@ -1364,7 +1395,7 @@ namespace ygo {
 			case irr::KEY_LEFT: {
 				if (!event.KeyInput.PressedDown && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
 					if (!scrollSelected) {
-						CheckMenu();
+						CheckMenu();		
 						typing = false;
 						mainGame->env->removeFocus(mainGame->env->getFocus());
 						if (menu.empty())
@@ -1382,8 +1413,7 @@ namespace ygo {
 			}
 			//Colocar nome do jogador na partida
 			case irr::KEY_RETURN: {
-				if (!event.KeyInput.PressedDown) {
-					mainGame->env->removeFocus(mainGame->env->getFocus());
+				if (!event.KeyInput.PressedDown && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
 					if (menu.empty())
 						menu = menuMain;
 					if (menu.at(0) == L"Online Duel") {
@@ -1440,10 +1470,7 @@ namespace ygo {
 						ClickButton(mainGame->btnModeExit);
 					currentMenu = menu.at(menuSelectCounter);
 				}
-			}
-			case irr::KEY_F5: {
-				if (!event.KeyInput.PressedDown && mainGame->wRoomListPlaceholder->isVisible())
-					ServerLobby::RefreshRooms();
+
 				break;
 			}
 			default: break;
@@ -1508,23 +1535,9 @@ namespace ygo {
 		return false;
 	}
 
-	void MenuHandler::SynchronizeElement(irr::gui::IGUIElement* elem) const {
-		const auto range = synchronized_elements.equal_range(elem->getID());
-		if (range.first == range.second)
-			return;
-		switch (elem->getType()) {
-		case irr::gui::EGUIET_CHECK_BOX:
-			return Synchronize(range, static_cast<irr::gui::IGUICheckBox*>(elem));
-		case irr::gui::EGUIET_SCROLL_BAR:
-			return Synchronize(range, static_cast<irr::gui::IGUIScrollBar*>(elem));
-		default:
-			return;
-		}
-	}
 
-#pragma region Accessibility
+	void MenuHandler::CheckMenu(){
 
-	void MenuHandler::CheckMenu() {
 		if (mainGame->gSettings.window->isTrulyVisible())
 			menu = menuGameOptions;
 		else if (mainGame->btnOnlineMode->isEnabled() && mainGame->btnOnlineMode->isTrulyVisible())
@@ -1540,8 +1553,9 @@ namespace ygo {
 		else if (mainGame->btnCreateHost2->isEnabled() && mainGame->btnCreateHost2->isTrulyVisible())
 			menu = menuOnline;
 		else if ((mainGame->btnHostPrepDuelist->isEnabled() && mainGame->btnHostPrepDuelist->isTrulyVisible()) ||
-			mainGame->btnHostPrepOB->isEnabled() && mainGame->btnHostPrepOB->isTrulyVisible())
+				  mainGame->btnHostPrepOB->isEnabled() && mainGame->btnHostPrepOB->isTrulyVisible())
 			menu = menuRulesOkOnline;
+		
 	}
 
 	void MenuHandler::MainMenu() {
@@ -1775,6 +1789,7 @@ namespace ygo {
 			}
 		}
 	}
+
 	void MenuHandler::OnlineDuel() {
 		menu = menuOnline;
 		if (menuSelectCounter == MenuType::OnlineMenu::HOST && mainGame->btnCreateHost2->isEnabled()) {
@@ -1818,6 +1833,7 @@ namespace ygo {
 			CheckBox(mainGame->chkShowActiveRooms);
 		}
 	}
+
 	void MenuHandler::GameOptions() {
 		menu = menuGameOptions;
 		if (menuSelectCounter == MenuType::GameOptionsMenu::GAMEOP_ENABLE_SOUND_EFFECTS && mainGame->gSettings.chkEnableSound->isTrulyVisible()) {
@@ -1853,7 +1869,4 @@ namespace ygo {
 			}
 		}
 	}
-
-#pragma endregion
-
 }

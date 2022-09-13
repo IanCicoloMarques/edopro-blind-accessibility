@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 
 set -euxo pipefail
-ARCH=${ARCH:-"x64"}
 
 ./travis/install-local-dependencies.sh
 if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then
@@ -13,7 +12,7 @@ if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
 #   ./ocgcore/travis/install-lua.sh
 fi
 if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
-	if [[ "$ARCH" == "x64" ]]; then
+	if [[ -z "${ARM64:-""}" ]]; then
 		./travis/get-osx-sdk.sh $MACOSX_DEPLOYMENT_TARGET
 	fi
     ./travis/get-osx-vcpkg-cache.sh

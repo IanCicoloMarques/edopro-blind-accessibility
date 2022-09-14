@@ -29,6 +29,8 @@
 #include "progressivebuffer.h"
 #include "utils.h"
 #include "porting.h"
+#include "../accessibility/ScreenReader/ScreenReader.h"
+#include "../accessibility/Control/EventHandler.h"
 
 #define DEFAULT_DUEL_RULE 5
 namespace ygo {
@@ -68,6 +70,9 @@ uint32_t DuelClient::temp_ip = 0;
 uint16_t DuelClient::temp_port = 0;
 uint16_t DuelClient::temp_ver = 0;
 bool DuelClient::try_needed = false;
+
+IScreenReader* screenReader = ScreenReader::getReader();
+IEventHandler* eventHandler = EventHandler::getEventHandler();
 
 std::pair<uint32_t, uint16_t> DuelClient::ResolveServer(epro::stringview address, uint16_t port) {
 	uint32_t remote_addr = inet_addr(address.data());

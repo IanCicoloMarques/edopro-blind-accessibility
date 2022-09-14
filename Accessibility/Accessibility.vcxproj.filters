@@ -7,6 +7,9 @@
     <Filter Include="ScreenReader">
       <UniqueIdentifier>{040d198c-aaf8-4700-bc60-47967844078c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Configuration">
+      <UniqueIdentifier>{6b54b070-ba59-4508-9a3d-e37f387fe0f3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Menus\MenuType.h">
@@ -32,6 +35,9 @@
     </ClInclude>
     <ClInclude Include="FieldFocus\AccessibilityFieldFocus.h" />
     <ClInclude Include="Control\IEventHandler.h" />
+    <ClInclude Include="Configuration\AccessibilityConfiguration.h">
+      <Filter>Configuration</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ScreenReader\AccessibilityMessages.cpp">
@@ -48,6 +54,9 @@
     </ClCompile>
     <ClCompile Include="ScreenReader\TolkController.cpp">
       <Filter>ScreenReader</Filter>
+    </ClCompile>
+    <ClCompile Include="Configuration\AccessibilityConfiguration.cpp">
+      <Filter>Configuration</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

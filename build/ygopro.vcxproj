@@ -121,7 +121,6 @@
     </Manifest>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="..\accessibility\Control\CardsDTO.h" />
     <ClInclude Include="..\accessibility\Control\EventHandler.h" />
     <ClInclude Include="..\gframe\Base64.h" />
     <ClInclude Include="..\gframe\CGUICustomCheckBox\CGUICustomCheckBox.h" />
@@ -219,7 +218,6 @@
     <ClInclude Include="..\gframe\windbot_panel.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\accessibility\Control\CardsDTO.cpp" />
     <ClCompile Include="..\accessibility\Control\EventHandler.cpp" />
     <ClCompile Include="..\gframe\CGUICustomCheckBox\CGUICustomCheckBox.cpp" />
     <ClCompile Include="..\gframe\CGUICustomComboBox\CGUICustomComboBox.cpp" />

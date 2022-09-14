@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Configuration\AccessibilityConfiguration.h" />
     <ClInclude Include="Control\IEventHandler.h" />
     <ClInclude Include="FieldFocus\AccessibilityFieldFocus.h" />
     <ClInclude Include="Menus\MenuType.h" />
@@ -30,6 +31,7 @@
     <ClInclude Include="ScreenReader\TolkController.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Configuration\AccessibilityConfiguration.cpp" />
     <ClCompile Include="ScreenReader\AccessibilityMessages.cpp" />
     <ClCompile Include="ScreenReader\CommandMessages.cpp" />
     <ClCompile Include="ScreenReader\ScreenReader.cpp" />

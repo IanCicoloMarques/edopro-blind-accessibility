@@ -40,8 +40,6 @@
 #include <IGUIScrollBar.h>
 #include "joystick_wrapper.h"
 #include "porting.h"
-#include "../accessibility/Control/CardsDTO.h"
-//#include "../accessibility/Control/IEventHandler.h"
 #include "../accessibility/Control/EventHandler.h"
 
 namespace {
@@ -77,9 +75,6 @@ namespace ygo {
 std::string showing_repo = "";
 
 bool ClientField::OnEvent(const irr::SEvent& event) {
-	if (!CardsDTO::loaded) {
-		CardsDTO::SetupCards(deck, hand, mzone);
-	}
 	bool stopPropagation = false;
 	if(OnCommonEvent(event, stopPropagation))
 		return stopPropagation;
@@ -1731,12 +1726,10 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 		break;
 	}
 	case irr::EET_KEY_INPUT_EVENT: {
+		//if accessibility true
+		EventHandler::getEventHandler()->PushKey(event);
+		//else
 		switch(event.KeyInput.Key) {
-		case irr::KEY_KEY_Q: {
-			IEventHandler* eventHandler = new EventHandler();
-			eventHandler->PushKey(event);
-			break;
-		}
 		case irr::KEY_KEY_A: {
 			if(!mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
 				mainGame->always_chain = event.KeyInput.PressedDown;

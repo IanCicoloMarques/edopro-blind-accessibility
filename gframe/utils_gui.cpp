@@ -7,6 +7,7 @@
 #include "utils.h"
 #include "game_config.h"
 #include "text_types.h"
+#include "porting.h"
 #ifdef _WIN32
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
@@ -17,14 +18,10 @@
 #include "IrrlichtCommonIncludes/CCursorControl.h"
 using CCursorControl = irr::CCursorControl;
 #endif
-#elif defined(__ANDROID__)
-#include "Android/porting_android.h"
 #elif defined(EDOPRO_MACOS)
 #import <CoreFoundation/CoreFoundation.h>
 #include "osx_menu.h"
-#elif defined(EDOPRO_IOS)
-#include "iOS/porting_ios.h"
-#elif defined(__linux__)
+#elif defined(__linux__) && !defined(__ANDROID__)
 #if !(IRRLICHT_VERSION_MAJOR==1 && IRRLICHT_VERSION_MINOR==9)
 #include <X11/Xlib.h>
 #include <X11/Xatom.h>
@@ -147,7 +144,7 @@ irr::IrrlichtDevice* GUIUtils::CreateDevice(GameConfig* configs) {
 #endif
 	driver->setTextureCreationFlag(irr::video::ETCF_CREATE_MIP_MAPS, false);
 	driver->setTextureCreationFlag(irr::video::ETCF_OPTIMIZED_FOR_QUALITY, true);
-	device->setWindowCaption(L"Accessibility Yugioh Project - Forked from Project Ignis: EDOPro");
+	device->setWindowCaption(L"Project Ignis: EDOPro");
 #if !(IRRLICHT_VERSION_MAJOR==1 && IRRLICHT_VERSION_MINOR==9)
 	device->setResizable(true);
 #endif
@@ -191,7 +188,7 @@ bool GUIUtils::TakeScreenshot(irr::IrrlichtDevice* device) {
 	if(!image)
 		return false;
 	const auto now = std::time(nullptr);
-	const auto filename = fmt::format(EPRO_TEXT("screenshots/YGO {:%Y-%m-%d %H-%M-%S}.png"), *std::localtime(&now));
+	const auto filename = fmt::format(EPRO_TEXT("screenshots/EDOPro {:%Y-%m-%d %H-%M-%S}.png"), *std::localtime(&now));
 	auto written = driver->writeImageToFile(image, { filename.data(), static_cast<irr::u32>(filename.size()) });
 	if(!written)
 		device->getLogger()->log(L"Failed to take screenshot.", irr::ELL_WARNING);
@@ -353,10 +350,8 @@ void GUIUtils::ShowErrorWindow(epro::stringview context, epro::stringview messag
 	//Clean up the strings
 	CFRelease(header_ref);
 	CFRelease(message_ref);
-#elif defined(__ANDROID__)
+#elif defined(__ANDROID__) || defined(EDOPRO_IOS)
 	porting::showErrorDialog(context, message);
-#elif defined(EDOPRO_IOS)
-	EPRO_IOS_ShowErrorDialog(context.data(), message.data());
 #elif defined(__linux__)
 	auto pid = vfork();
 	if(pid == 0) {

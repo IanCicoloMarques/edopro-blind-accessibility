@@ -3,12 +3,13 @@
 #import <UIKit/UIKit.h>
 #import <CoreFoundation/CoreFoundation.h>
 #include <irrlicht.h>
+#include <SExposedVideoData.h>
 #include <mutex>
+#include <array>
+#include <string>
 #include "../bufferio.h"
 #include "../game.h"
 #include "porting_ios.h"
-
-const irr::video::SExposedVideoData* ios_exposed_data = nullptr;
 
 static std::mutex* queued_messages_mutex;
 static std::deque<std::function<void()>>* events;
@@ -91,22 +92,26 @@ static std::deque<std::function<void()>>* events;
 
 @end
 
-void EPRO_IOS_ShowErrorDialog(const char* context, const char* message){
-	NSString *nscontext = [NSString stringWithUTF8String:context];
-	NSString *nsmessage = [NSString stringWithUTF8String:message];
+namespace porting {
+
+const irr::video::SExposedVideoData* exposed_data = nullptr;
+
+void showErrorDialog(epro::stringview context, epro::stringview message){
+	NSString *nscontext = [NSString stringWithUTF8String:context.data()];
+	NSString *nsmessage = [NSString stringWithUTF8String:message.data()];
 	UIAlertController *alert = [UIAlertController alertControllerWithTitle:nscontext message:nsmessage preferredStyle:UIAlertControllerStyleAlert];
 	UIAlertAction *ok = [UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
 		exit(0);
 	}];
 	[alert addAction:ok];
-	UIViewController* controller = (__bridge UIViewController*)ios_exposed_data->OpenGLiOS.ViewController;
+	UIViewController* controller = (__bridge UIViewController*)exposed_data->OpenGLiOS.ViewController;
 	[controller presentViewController:alert animated:YES completion:nil];
 }
 
-void EPRO_IOS_ShowPicker(const std::vector<std::string>& parameters, int selected) {
+void showComboBox(const std::vector<std::string>& parameters, int selected) {
 	NSMutableArray* objc_parameters = [NSMutableArray new];
-	for(size_t i = 0; i < parameters.size(); i++)
-		[objc_parameters addObject: [NSString stringWithUTF8String:parameters[i].data()]];
+	for(const auto& param : parameters)
+		[objc_parameters addObject: [NSString stringWithUTF8String:param.data()]];
 	UiPickerDelegate* delegate = [[UiPickerDelegate alloc] init];
 	[delegate setElements:objc_parameters elements_size:parameters.size()];
 	UIPickerView * picker = [UIPickerView new];
@@ -123,7 +128,7 @@ void EPRO_IOS_ShowPicker(const std::vector<std::string>& parameters, int selecte
 			return;
 		queued_messages_mutex->lock();
 		events->emplace_back([index](){
-		auto device = ygo::mainGame->device;
+			auto device = ygo::mainGame->device;
 			auto irrenv = device->getGUIEnvironment();
 			auto element = irrenv->getFocus();
 			if(element && element->getType() == irr::gui::EGUIET_COMBO_BOX) {
@@ -140,11 +145,11 @@ void EPRO_IOS_ShowPicker(const std::vector<std::string>& parameters, int selecte
 		queued_messages_mutex->unlock();
 	}]];
 	[picker selectRow:selected inComponent:0 animated:true];
-	UIViewController* controller = (__bridge UIViewController*)ios_exposed_data->OpenGLiOS.ViewController;
+	UIViewController* controller = (__bridge UIViewController*)exposed_data->OpenGLiOS.ViewController;
 	[controller presentViewController:alert animated:YES completion:nil];
 }
 
-static void EPRO_IOS_ShowTextInputWindow(epro::stringview curtext) {
+void showTextInputWindow(epro::stringview curtext) {
 	UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Text input" message:@"" preferredStyle:UIAlertControllerStyleAlert];
 	[alert addAction:[UIAlertAction actionWithTitle:@"Done" style:UIAlertActionStyleDefault handler:nil]];
 	[alert addTextFieldWithConfigurationHandler:^(UITextField *textField) {
@@ -152,17 +157,17 @@ static void EPRO_IOS_ShowTextInputWindow(epro::stringview curtext) {
 		textField.text = [NSString stringWithUTF8String:curtext.data()];
 		textField.delegate = [[ActionCallbackDelegate alloc] init];
 	}];
-	UIViewController* controller = (__bridge UIViewController*)ios_exposed_data->OpenGLiOS.ViewController;
+	UIViewController* controller = (__bridge UIViewController*)exposed_data->OpenGLiOS.ViewController;
 	[controller presentViewController:alert animated:YES completion:nil];
 }
 
-epro::path_string EPRO_IOS_GetWorkDir() {
+epro::path_string getWorkDir() {
 	NSFileManager *filemgr;
 	NSArray *dirPaths;
 	NSString *docsDir;
 	BOOL isDir;
 	
-	filemgr =[NSFileManager defaultManager];
+	filemgr = [NSFileManager defaultManager];
 	
 	dirPaths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
 	
@@ -181,16 +186,12 @@ epro::path_string EPRO_IOS_GetWorkDir() {
 	return res;
 }
 
-int EPRO_IOS_ChangeWorkDir(const char* newdir) {
+int changeWorkDir(const char* newdir) {
 	return [[NSFileManager defaultManager] changeCurrentDirectoryPath:[NSString stringWithUTF8String:newdir]] == true;
 }
 
-
-int EPRO_IOS_transformEvent(const void* sevent, int* stopPropagation, void* irrdevice) {
-	static irr::core::position2di m_pointer = irr::core::position2di(0, 0);
-	const irr::SEvent& event = *(const irr::SEvent*)sevent;
-	auto* device = (irr::IrrlichtDevice*)irrdevice;
-	
+int transformEvent(const irr::SEvent& event, bool& stopPropagation) {
+	auto device = ygo::mainGame->device;
 	switch(event.EventType) {
 		case irr::EET_MOUSE_INPUT_EVENT: {
 			if(event.MouseInput.Event == irr::EMIE_LMOUSE_PRESSED_DOWN) {
@@ -200,8 +201,8 @@ int EPRO_IOS_transformEvent(const void* sevent, int* stopPropagation, void* irrd
 						bool retval = hovered->OnEvent(event);
 						if(retval)
 							ygo::mainGame->env->setFocus(hovered);
-						EPRO_IOS_ShowTextInputWindow(BufferIO::EncodeUTF8(((irr::gui::IGUIEditBox *)hovered)->getText()));
-						*stopPropagation = retval;
+						showTextInputWindow(BufferIO::EncodeUTF8(((irr::gui::IGUIEditBox *)hovered)->getText()));
+						stopPropagation = retval;
 						return retval;
 					}
 				}
@@ -209,7 +210,7 @@ int EPRO_IOS_transformEvent(const void* sevent, int* stopPropagation, void* irrd
 			break;
 		}
 		case irr::EET_SYSTEM_EVENT: {
-			*stopPropagation = 0;
+			stopPropagation = false;
 			switch(event.ApplicationEvent.EventType) {
 				case irr::EAET_WILL_PAUSE: {
 					ygo::mainGame->SaveConfig();
@@ -219,95 +220,12 @@ int EPRO_IOS_transformEvent(const void* sevent, int* stopPropagation, void* irrd
 			}
 			return true;
 		}
-		case irr::EET_TOUCH_INPUT_EVENT: {
-			//printf("Got touch input\n");
-			irr::SEvent translated;
-			memset(&translated, 0, sizeof(irr::SEvent));
-			translated.EventType = irr::EET_MOUSE_INPUT_EVENT;
-			
-			translated.MouseInput.X = event.TouchInput.X;
-			translated.MouseInput.Y = event.TouchInput.Y;
-			translated.MouseInput.Control = false;
-			
-			switch(event.TouchInput.touchedCount) {
-				case 1: {
-					/*printf("event type is: %d\n", event.TouchInput.Event);
-					printf("event.TouchInput.X is: %d\n", event.TouchInput.X);
-					printf("event.TouchInput.Y is: %d\n", event.TouchInput.Y);*/
-					switch(event.TouchInput.Event) {
-						case irr::ETIE_PRESSED_DOWN:
-							m_pointer = irr::core::position2di(event.TouchInput.X, event.TouchInput.Y);
-							translated.MouseInput.Event = irr::EMIE_LMOUSE_PRESSED_DOWN;
-							translated.MouseInput.ButtonStates = irr::EMBSM_LEFT;
-							irr::SEvent hoverEvent;
-							hoverEvent.EventType = irr::EET_MOUSE_INPUT_EVENT;
-							hoverEvent.MouseInput.Event = irr::EMIE_MOUSE_MOVED;
-							hoverEvent.MouseInput.X = event.TouchInput.X;
-							hoverEvent.MouseInput.Y = event.TouchInput.Y;
-							device->postEventFromUser(hoverEvent);
-							break;
-						case irr::ETIE_MOVED:
-							m_pointer = irr::core::position2di(event.TouchInput.X, event.TouchInput.Y);
-							translated.MouseInput.Event = irr::EMIE_MOUSE_MOVED;
-							translated.MouseInput.ButtonStates = irr::EMBSM_LEFT;
-							break;
-						case irr::ETIE_LEFT_UP:
-							translated.MouseInput.Event = irr::EMIE_LMOUSE_LEFT_UP;
-							translated.MouseInput.ButtonStates = 0;
-							// we don't have a valid pointer element use last
-							// known pointer pos
-							translated.MouseInput.X = m_pointer.X;
-							translated.MouseInput.Y = m_pointer.Y;
-							break;
-						default:
-							*stopPropagation = 1;
-							return true;
-					}
-					break;
-				}
-				case 2: {
-					if(event.TouchInput.Event == irr::ETIE_PRESSED_DOWN) {
-						translated.MouseInput.Event = irr::EMIE_RMOUSE_PRESSED_DOWN;
-						translated.MouseInput.ButtonStates = irr::EMBSM_LEFT | irr::EMBSM_RIGHT;
-						translated.MouseInput.X = m_pointer.X;
-						translated.MouseInput.Y = m_pointer.Y;
-						device->postEventFromUser(translated);
-						
-						translated.MouseInput.Event = irr::EMIE_RMOUSE_LEFT_UP;
-						translated.MouseInput.ButtonStates = irr::EMBSM_LEFT;
-						
-						device->postEventFromUser(translated);
-					}
-					return true;
-				}
-				case 3: {
-					if(event.TouchInput.Event == irr::ETIE_PRESSED_DOWN) {
-						translated.EventType = irr::EET_KEY_INPUT_EVENT;
-						translated.KeyInput.Control = true;
-						translated.KeyInput.PressedDown = false;
-						translated.KeyInput.Key = irr::KEY_KEY_O;
-						device->postEventFromUser(translated);
-					}
-					return true;
-				}
-				default:
-					return true;
-			}
-			
-			bool retval = device->postEventFromUser(translated);
-			
-			if(event.TouchInput.Event == irr::ETIE_LEFT_UP) {
-				m_pointer = irr::core::position2di(0, 0);
-			}
-			*stopPropagation = retval;
-			return true;
-		}
 		default: break;
 	}
 	return false;
 }
 
-void EPRO_IOS_dispatchQueuedMessages() {
+void dispatchQueuedMessages() {
 	auto& _events = *events;
 	std::unique_lock<std::mutex> lock(*queued_messages_mutex);
 	while(!_events.empty()) {
@@ -319,14 +237,20 @@ void EPRO_IOS_dispatchQueuedMessages() {
 	}
 }
 
-extern int epro_ios_main(int argc, char *argv[]);
+}
+
+extern int epro_ios_main(int argc, char* argv[]);
 
 void irrlicht_main(){
 	std::mutex _queued_messages_mutex;
 	queued_messages_mutex = &_queued_messages_mutex;
 	std::deque<std::function<void()>> _events;
-	events=&_events;
-	char* a[]={};
-	if(epro_ios_main(0,a) == EXIT_SUCCESS)
+	events = &_events;
+
+	const auto workdir = porting::getWorkDir() + "/";
+
+	std::array<const char*, 3> args{ {"", "-C", workdir.data()} };
+
+	if(epro_ios_main(args.size(), (char**)args.data()) == EXIT_SUCCESS)
 		exit(0);
 }

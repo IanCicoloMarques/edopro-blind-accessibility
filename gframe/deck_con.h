@@ -29,6 +29,7 @@ public:
 		LIMITATION_FILTER_PRERELEASE,
 		LIMITATION_FILTER_SPEED,
 		LIMITATION_FILTER_RUSH,
+		LIMITATION_FILTER_LEGEND,
 		LIMITATION_FILTER_ANIME,
 		LIMITATION_FILTER_ILLEGAL,
 		LIMITATION_FILTER_VIDEOGAME,
@@ -46,6 +47,7 @@ public:
 	const Deck& GetCurrentDeck() const {
 		return current_deck;
 	}
+	bool SetCurrentDeckFromFile(epro::path_stringview file, bool separated = false);
 	void SetCurrentDeck(Deck new_deck) {
 		current_deck = std::move(new_deck);
 		RefreshLimitationStatus();
@@ -61,6 +63,7 @@ private:
 	void ClearSearch();
 	void SortList();
 
+	void ClearDeck();
 	void RefreshLimitationStatus();
 	enum DeckType {
 		MAIN,
@@ -86,7 +89,7 @@ private:
 	DECLARE_WITH_CACHE(uint32_t, filter_type)
 	DECLARE_WITH_CACHE(uint32_t, filter_type2)
 	DECLARE_WITH_CACHE(uint32_t, filter_attrib)
-	DECLARE_WITH_CACHE(uint32_t, filter_race)
+	DECLARE_WITH_CACHE(uint64_t, filter_race)
 	DECLARE_WITH_CACHE(uint32_t, filter_atktype)
 	DECLARE_WITH_CACHE(int32_t, filter_atk)
 	DECLARE_WITH_CACHE(uint32_t, filter_deftype)

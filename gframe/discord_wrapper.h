@@ -33,11 +33,11 @@ public:
 	bool IsConnected() const { return connected; }
 	void UpdatePresence(PresenceType type);
 	void Check();
-	bool connected{ false };
 private:
 	int previous_gameid{ 0 };
 	bool running{ false };
 	bool initialized{ false };
+	bool connected{ false };
 	char secret_buf[128];
 	PresenceType presence{ CLEAR };
 	static void Connect();

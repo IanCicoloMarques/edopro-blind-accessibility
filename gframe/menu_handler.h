@@ -5,7 +5,6 @@
 #include <IEventReceiver.h>
 #include <IGUIElement.h>
 #include <map>
-#include "../Accessibility/Menus/MenuType.h"
 
 namespace ygo {
 
@@ -35,6 +34,7 @@ enum GUI {
 	CHECKBOX_HP_READY,
 	BUTTON_HP_READY,
 	BUTTON_HP_NOTREADY,
+	TAB_CONTROL_CREATE_HOST,
 	COMBOBOX_HOST_LFLIST,
 	COMBOBOX_DUEL_RULE,
 	BUTTON_CUSTOM_RULE_OK,
@@ -47,12 +47,10 @@ enum GUI {
 	BUTTON_SHARE_REPLAY,
 	EDITBOX_TEAM_COUNT,
 	EDITBOX_NUMERIC,
-	EDITBOX_TEXT,
 	BUTTON_HP_AI_TOGGLE,
 	BUTTON_BOT_ADD,
 	EDITBOX_CHAT,
 	EDITBOX_PORT_BOX,
-	COMBOBOX_PLAYER_DECK,
 	COMBOBOX_BOT_DECK,
 	COMBOBOX_BOT_ENGINE,
 	EDITBOX_NICKNAME,
@@ -188,6 +186,7 @@ enum GUI {
 	CHECKBOX_FULLSCREEN,
 	CHECKBOX_SCALE_BACKGROUND,
 	CHECKBOX_ACCURATE_BACKGROUND_RESIZE,
+	CHECKBOX_CONFIRM_DECK_CLEAR,
 	CHECKBOX_HIDE_ARCHETYPES,
 	CHECKBOX_HIDE_PASSCODE_SCOPE,
 	CHECKBOX_DRAW_FIELD_SPELLS,
@@ -282,6 +281,9 @@ enum GUI {
 	SCROLL_SOUND_VOLUME,
 	CHECKBOX_KEEP_FIELD_ASPECT_RATIO,
 	CHECKBOX_TOPDOWN,
+	DONT_CHECK_DECK_CONTENT,
+	DONT_CHECK_DECK_SIZE,
+	DONT_SHUFFLE_DECK,
 };
 
 class MenuHandler : public irr::IEventReceiver {
@@ -299,42 +301,6 @@ public:
 	static constexpr bool IsSynchronizedElement(int id) {
 		return (id & 0x4fff0000) == SYNCHRONIZED_ELEMENT;
 	}
-
-
-	//Todo - Mandar isso pro arquivo de menu no projeto separado
-#pragma region Accessibility
-	int menuSelectCounter = 0;
-	int subMenuSelectCounter = 0;
-	int onlineMatchCounter = 0;
-	bool typing = false;
-	bool scrollSelected = false;
-	std::vector<std::wstring> menu;
-	std::vector<std::wstring> menuMain = { L"Online Duel", L"Duel", L"Deck Editor", L"Game Options", L"Accessibility" };
-	std::vector<std::wstring> menuSinglePlayer = { L"Host Duel", L"Player Name" };
-	std::vector<std::wstring> menuHostDuel = { L"Rules ok", L"Num Players Team 1", L"Num Players Team 2", L"Best of", L"Time Limit", L"Starting LP", L"Starting Hand", L"Cards per Draw", L"Don't check deck", L"Don't shuffle deck", L"Room Name", L"Room Password" };
-	std::vector<std::wstring> menuRulesOk = { L"Start Duel", L"Select Deck", L"Player Ready", L"Select AI" };
-	std::vector<std::wstring> menuRulesOkOnline = { L"Start Duel", L"Select Deck", L"Player Ready", L"Enter Duel mode", L"Enter Spectate mode" };
-	std::vector<std::wstring> menuSelectAI = { L"AI Ok", L"Select Deck", L"Always throw Rock" };
-	std::vector<std::wstring> menuOnline = { L"Host", L"Refresh", L"Rooms", L"Server", L"Player Name", L"Allowed Cards", L"Forbidden List", L"Show Locked Rooms", L"Show Started Rooms" };
-	std::vector<std::wstring> menuPassword = { L"Change Password", L"OK", L"Cancel" };
-	std::vector<std::wstring> menuDeckEditor = { L"OK", L"Cancel" };
-	std::vector<std::wstring> menuGameOptions = { L"Enable Sound Effects", L"Sound Effects Volume", L"Enable Music", L"Music Volume" };
-	std::wstring currentMenu = L"Online Duel";
-	std::wstring oldMenu = L"Online Duel";
-	MenuType::MenuList selectedMenu = MenuType::MenuList::MAIN_MENU;
-	int currentSelectedSubMenu = 0;
-	int oldSelectedSubMenu = 0;
-	void CheckMenu();
-	void MainMenu();
-	void HostDuel();
-	void DuelMenu();
-	void SPDuel();
-	void AIConfigMenu();
-	void OnlineDuel();
-	void PasswordMenu();
-	void GameOptions();
-#pragma endregion
-
 
 };
 

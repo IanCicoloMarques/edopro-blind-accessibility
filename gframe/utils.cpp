@@ -15,9 +15,8 @@
 #include <unistd.h>
 #include <pthread.h>
 using Stat = struct stat;
-#ifdef __ANDROID__
-#include "Android/porting_android.h"
-#else
+#include "porting.h"
+#ifndef __ANDROID__
 #include <sys/wait.h>
 #endif //__ANDROID__
 #if defined(__linux__)
@@ -28,8 +27,6 @@ using Stat = struct stat;
 #import <CoreFoundation/CoreFoundation.h>
 #include <mach-o/dyld.h>
 #include <CoreServices/CoreServices.h>
-#else
-#include "iOS/porting_ios.h"
 #endif //EDOPRO_MACOS
 #include <copyfile.h>
 #endif //__linux__
@@ -154,15 +151,21 @@ namespace ygo {
 		return SetLastErrorStringIfFailed(mkdir(path.data(), 0777) == 0 || errno == EEXIST);
 #endif
 	}
-#ifdef __linux__
 	bool Utils::FileCopyFD(int source, int destination) {
+#if defined(__linux__)
 		off_t bytesCopied = 0;
-		Stat fileinfo = { 0 };
+		Stat fileinfo{};
 		fstat(source, &fileinfo);
 		int result = sendfile(destination, source, &bytesCopied, fileinfo.st_size);
 		return SetLastErrorStringIfFailed(result != -1);
-	}
+#elif defined(__APPLE__)
+		return SetLastErrorStringIfFailed(fcopyfile(source, destination, 0, COPYFILE_ALL) == 0);
+#else
+		(void)source;
+		(void)destination;
+		return false;
 #endif
+	}
 	bool Utils::FileCopy(epro::path_stringview source, epro::path_stringview destination) {
 		if(source == destination)
 			return false;
@@ -174,7 +177,9 @@ namespace ygo {
 			SetLastError();
 			return false;
 		}
-		if((output = creat(destination.data(), 0660)) == -1) {
+		Stat fileinfo{};
+		fstat(input, &fileinfo);
+		if((output = creat(destination.data(), fileinfo.st_mode)) == -1) {
 			SetLastError();
 			close(input);
 			return false;
@@ -219,7 +224,7 @@ namespace ygo {
 #ifdef _WIN32
 		bool res = SetLastErrorStringIfFailed(SetCurrentDirectory(newpath.data()));
 #elif defined(EDOPRO_IOS)
-		bool res = EPRO_IOS_ChangeWorkDir(newpath.data()) == 1;
+		bool res = porting::changeWorkDir(newpath.data()) == 1;
 #else
 		bool res = SetLastErrorStringIfFailed(chdir(newpath.data()) == 0);
 #endif
@@ -448,8 +453,6 @@ namespace ygo {
 		CFRelease(path);
 		CFRelease(bundle_path);
 		return res;
-#elif defined(EDOPRO_IOS)
-		return EPRO_IOS_GetWorkDir() + "/";
 #else
 		return EPRO_TEXT("");
 #endif

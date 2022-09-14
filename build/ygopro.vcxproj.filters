@@ -31,6 +31,9 @@
     <Filter Include="CGUITTFont">
       <UniqueIdentifier>{6CDC35C2-5894-770F-C19B-506BAD721200}</UniqueIdentifier>
     </Filter>
+    <Filter Include="CGUIWindowedTabControl">
+      <UniqueIdentifier>{46873246-3281-5B98-1BEE-F1A80787C104}</UniqueIdentifier>
+    </Filter>
     <Filter Include="CProgressBar">
       <UniqueIdentifier>{926CDC6D-7ECF-6B12-2755-A4C813973795}</UniqueIdentifier>
     </Filter>
@@ -49,8 +52,14 @@
     <Filter Include="ResizeablePanel">
       <UniqueIdentifier>{5BFE9C27-C789-0AEC-D09A-8DE03CA566EC}</UniqueIdentifier>
     </Filter>
+    <Filter Include="iOS">
+      <UniqueIdentifier>{107C880B-7C85-887C-0501-9F7C7109947C}</UniqueIdentifier>
+    </Filter>
     <Filter Include="nonstd">
       <UniqueIdentifier>{1B648D10-0706-B8E6-F0C0-CB3ADC013F37}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Accessibility">
+      <UniqueIdentifier>{a55535a2-bf0c-42fb-a4cc-1543eb94e772}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -76,6 +85,7 @@
     <ClInclude Include="..\gframe\CGUICustomText\CGUICustomText.h">
       <Filter>CGUICustomText</Filter>
     </ClInclude>
+    <ClInclude Include="..\gframe\CGUIEnvironmentLinker.h" />
     <ClInclude Include="..\gframe\CGUIFileSelectListBox\CGUIFileSelectListBox.h">
       <Filter>CGUIFileSelectListBox</Filter>
     </ClInclude>
@@ -102,6 +112,9 @@
     </ClInclude>
     <ClInclude Include="..\gframe\CGUITTFont\irrUString.h">
       <Filter>CGUITTFont</Filter>
+    </ClInclude>
+    <ClInclude Include="..\gframe\CGUIWindowedTabControl\CGUIWindowedTabControl.h">
+      <Filter>CGUIWindowedTabControl</Filter>
     </ClInclude>
     <ClInclude Include="..\gframe\CProgressBar\CProgressBar.h">
       <Filter>CProgressBar</Filter>
@@ -178,9 +191,16 @@
     <ClInclude Include="..\gframe\discord_wrapper.h" />
     <ClInclude Include="..\gframe\dllinterface.h" />
     <ClInclude Include="..\gframe\duelclient.h" />
+    <ClInclude Include="..\gframe\file_stream.h" />
     <ClInclude Include="..\gframe\game.h" />
     <ClInclude Include="..\gframe\game_config.h" />
     <ClInclude Include="..\gframe\generic_duel.h" />
+    <ClInclude Include="..\gframe\iOS\COSiOSOperator.h">
+      <Filter>iOS</Filter>
+    </ClInclude>
+    <ClInclude Include="..\gframe\iOS\porting_ios.h">
+      <Filter>iOS</Filter>
+    </ClInclude>
     <ClInclude Include="..\gframe\image_downloader.h" />
     <ClInclude Include="..\gframe\image_manager.h" />
     <ClInclude Include="..\gframe\ireadfile_sqlite.h" />
@@ -198,6 +218,7 @@
     </ClInclude>
     <ClInclude Include="..\gframe\ocgapi_types.h" />
     <ClInclude Include="..\gframe\osx_menu.h" />
+    <ClInclude Include="..\gframe\porting.h" />
     <ClInclude Include="..\gframe\progressivebuffer.h" />
     <ClInclude Include="..\gframe\replay.h" />
     <ClInclude Include="..\gframe\replay_mode.h" />
@@ -207,14 +228,19 @@
     <ClInclude Include="..\gframe\single_mode.h" />
     <ClInclude Include="..\gframe\sound_backend.h" />
     <ClInclude Include="..\gframe\sound_manager.h" />
+    <ClInclude Include="..\gframe\sound_sfml.h" />
     <ClInclude Include="..\gframe\sound_threaded_backend.h" />
     <ClInclude Include="..\gframe\text_types.h" />
     <ClInclude Include="..\gframe\utils.h" />
     <ClInclude Include="..\gframe\utils_gui.h" />
     <ClInclude Include="..\gframe\windbot.h" />
     <ClInclude Include="..\gframe\windbot_panel.h" />
-    <ClInclude Include="..\gframe\CGUIWindowedTabControl\CGUIWindowedTabControl.h" />
-    <ClInclude Include="..\gframe\sound_sfml.h" />
+    <ClInclude Include="..\accessibility\Control\EventHandler.h">
+      <Filter>Accessibility</Filter>
+    </ClInclude>
+    <ClInclude Include="..\accessibility\Control\CardsDTO.h">
+      <Filter>Accessibility</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\gframe\CGUICustomCheckBox\CGUICustomCheckBox.cpp">
@@ -258,6 +284,9 @@
     </ClCompile>
     <ClCompile Include="..\gframe\CGUITTFont\CGUITTFont.cpp">
       <Filter>CGUITTFont</Filter>
+    </ClCompile>
+    <ClCompile Include="..\gframe\CGUIWindowedTabControl\CGUIWindowedTabControl.cpp">
+      <Filter>CGUIWindowedTabControl</Filter>
     </ClCompile>
     <ClCompile Include="..\gframe\CProgressBar\CProgressBar.cpp">
       <Filter>CProgressBar</Filter>
@@ -305,16 +334,21 @@
     <ClCompile Include="..\gframe\settings_window.cpp" />
     <ClCompile Include="..\gframe\single_mode.cpp" />
     <ClCompile Include="..\gframe\sound_manager.cpp" />
+    <ClCompile Include="..\gframe\sound_sfml.cpp" />
     <ClCompile Include="..\gframe\sound_threaded_backend.cpp" />
     <ClCompile Include="..\gframe\utils.cpp" />
     <ClCompile Include="..\gframe\utils_gui.cpp" />
     <ClCompile Include="..\gframe\windbot.cpp" />
     <ClCompile Include="..\gframe\windbot_panel.cpp" />
-    <ClCompile Include="..\gframe\CGUIWindowedTabControl\CGUIWindowedTabControl.cpp" />
-    <ClCompile Include="..\gframe\sound_sfml.cpp" />
+    <ClCompile Include="..\accessibility\Control\EventHandler.cpp">
+      <Filter>Accessibility</Filter>
+    </ClCompile>
+    <ClCompile Include="..\accessibility\Control\CardsDTO.cpp">
+      <Filter>Accessibility</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\gframe\dpiawarescaling.manifest" />
+    <None Include="..\gframe\ygopro.exe.manifest" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="..\gframe\ygopro.rc" />

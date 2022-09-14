@@ -18,37 +18,55 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Control\IEventHandler.h" />
+    <ClInclude Include="FieldFocus\AccessibilityFieldFocus.h" />
+    <ClInclude Include="Menus\MenuType.h" />
+    <ClInclude Include="ScreenReader\AccessibilityMessages.h" />
+    <ClInclude Include="ScreenReader\CommandMessages.h" />
+    <ClInclude Include="ScreenReader\IScreenReader.h" />
+    <ClInclude Include="ScreenReader\ScreenReader.h" />
+    <ClInclude Include="ScreenReader\StringBuilder.h" />
+    <ClInclude Include="ScreenReader\TolkController.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="ScreenReader\AccessibilityMessages.cpp" />
+    <ClCompile Include="ScreenReader\CommandMessages.cpp" />
+    <ClCompile Include="ScreenReader\ScreenReader.cpp" />
+    <ClCompile Include="ScreenReader\StringBuilder.cpp" />
+    <ClCompile Include="ScreenReader\TolkController.cpp" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{37cedcf7-dc1c-45b5-aec1-64d2382ea357}</ProjectGuid>
-    <RootNamespace>Accessibility</RootNamespace>
+    <ProjectGuid>{89541d4f-647d-4e19-8bcd-dd305f3fb95a}</ProjectGuid>
+    <RootNamespace>accessibility</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
@@ -71,20 +89,8 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <LinkIncremental>true</LinkIncremental>
     <OutDir>..\bin\debug\</OutDir>
     <IntDir>..\obj\Debug\accessibility\</IntDir>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <LinkIncremental>false</LinkIncremental>
-    <OutDir>..\bin\release\</OutDir>
-    <IntDir>..\obj\Release\accessibility\</IntDir>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <LinkIncremental>true</LinkIncremental>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -93,7 +99,6 @@
       <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <AdditionalIncludeDirectories>..\Readers\src</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
@@ -101,14 +106,12 @@
       <SubSystem>
       </SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>tolk.lib;nvdaControllerClient32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>..\Accessibility\Readers\libs\nvda-lib;..\Accessibility\Readers\libs\x64;..\Accessibility\Readers\libs\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <Lib>
-      <AdditionalDependencies>tolk.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Tolk.lib</AdditionalDependencies>
     </Lib>
     <Lib>
-      <AdditionalLibraryDirectories>..\Accessibility\Readers\libs\x64;..\Accessibility\Readers\libs\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\accessibility\Readers\tolk;..\accessibility\Readers\libs\x64;..\accessibility\Readers\libs\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -119,10 +122,8 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>..\Readers\src</AdditionalIncludeDirectories>
-      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>
@@ -166,23 +167,6 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
   </ItemDefinitionGroup>
-  <ItemGroup>
-    <ClInclude Include="FieldFocus\AccessibilityFieldFocus.h" />
-    <ClInclude Include="Menus\MenuType.h" />
-    <ClInclude Include="ScreenReader\AccessibilityMessages.h" />
-    <ClInclude Include="ScreenReader\CommandMessages.h" />
-    <ClInclude Include="ScreenReader\IScreenReader.h" />
-    <ClInclude Include="ScreenReader\ScreenReader.h" />
-    <ClInclude Include="ScreenReader\StringBuilder.h" />
-    <ClInclude Include="ScreenReader\TolkController.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="ScreenReader\AccessibilityMessages.cpp" />
-    <ClCompile Include="ScreenReader\CommandMessages.cpp" />
-    <ClCompile Include="ScreenReader\ScreenReader.cpp" />
-    <ClCompile Include="ScreenReader\StringBuilder.cpp" />
-    <ClCompile Include="ScreenReader\TolkController.cpp" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

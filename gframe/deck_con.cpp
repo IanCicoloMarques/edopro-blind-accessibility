@@ -14,17 +14,9 @@
 #include "duelclient.h"
 #include "single_mode.h"
 #include "client_card.h"
-#include "../Accessibility/ScreenReader/ScreenReader.h"
 
 namespace ygo {
-	//TODO - COLOCAR ISSO EM UM ARQUIVO SEPARADO PARA CHAMAR NAS CLASSES EM VEZ DE POR INLINE
-static inline void TriggerEvent(irr::gui::IGUIElement* target, irr::gui::EGUI_EVENT_TYPE type) {
-	irr::SEvent event;
-	event.EventType = irr::EET_GUI_EVENT;
-	event.GUIEvent.EventType = type;
-	event.GUIEvent.Caller = target;
-	ygo::mainGame->device->postEventFromUser(event);
-}
+
 static int parse_filter(const wchar_t* pstr, uint32_t& type) {
 	if(*pstr == L'=') {
 		type = 1;
@@ -116,7 +108,6 @@ void DeckBuilder::Initialize(bool refresh) {
 	prev_operation = 0;
 	mainGame->SetMessageWindow();
 	mainGame->device->setEventReceiver(this);
-	mainGame->env->removeFocus(mainGame->env->getFocus());
 }
 void DeckBuilder::Terminate(bool showmenu) {
 	mainGame->is_building = false;
@@ -151,19 +142,20 @@ void DeckBuilder::Terminate(bool showmenu) {
 		gGameConfig->lastdeck = mainGame->cbDBDecks->getItem(sel);
 	gGameConfig->lastlflist = gdeckManager->_lfList[mainGame->cbDBLFList->getSelected()].hash;
 }
+bool DeckBuilder::SetCurrentDeckFromFile(epro::path_stringview file, bool separated) {
+	Deck tmp;
+	if(!DeckManager::LoadDeckFromFile(file, tmp, separated))
+		return false;
+	SetCurrentDeck(std::move(tmp));
+	return true;
+}
 void DeckBuilder::ImportDeck() {
 	const wchar_t* deck_string = Utils::OSOperator->getTextFromClipboard();
-	std::wstring wstringDeckString = std::wstring(deck_string);
-	std::size_t startPosition = wstringDeckString.find(L"ydke://");
-	if (deck_string) {
-		if (wcsncmp(L"ydke://", deck_string, sizeof(L"ydke://") / sizeof(wchar_t) - 1) == 0)
+	if(deck_string) {
+		if(wcsncmp(L"ydke://", deck_string, sizeof(L"ydke://") / sizeof(wchar_t) - 1) == 0)
 			DeckManager::ImportDeckBase64(current_deck, deck_string);
-		else if (startPosition != 0 && startPosition != std::string::npos) {
-			DeckManager::ImportDeckBase64(current_deck, (wstringDeckString.substr(startPosition)).c_str());
-		}
 		else
 			(void)DeckManager::ImportDeckBase64Omega(current_deck, deck_string);
-		ScreenReader::getReader()->readScreen(L"Deck Imported");
 		RefreshLimitationStatus();
 	}
 }
@@ -258,17 +250,14 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case BUTTON_CLEAR_DECK: {
-#ifdef __ANDROID__
-				std::lock_guard<std::mutex> lock(mainGame->gMutex);
-				mainGame->stQMessage->setText(fmt::format(L"{}", gDataManager->GetSysString(2004)).data());
-				mainGame->PopupElement(mainGame->wQuery);
-				prev_operation = id;
-#else
-				current_deck.main.clear();
-				current_deck.extra.clear();
-				current_deck.side.clear();
-				ScreenReader::getReader()->readScreen(L"New deck");
-#endif
+				if(gGameConfig->confirm_clear_deck) {
+					std::lock_guard<std::mutex> lock(mainGame->gMutex);
+					mainGame->stQMessage->setText(fmt::format(L"{}", gDataManager->GetSysString(2004)).data());
+					mainGame->PopupElement(mainGame->wQuery);
+					prev_operation = id;
+					break;
+				}
+				ClearDeck();
 				break;
 			}
 			case BUTTON_SORT_DECK: {
@@ -287,7 +276,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 			}
 			case BUTTON_SAVE_DECK: {
 				int sel = mainGame->cbDBDecks->getSelected();
-				if(sel >= 0 && gdeckManager->SaveDeck(current_deck, Utils::ToPathString(mainGame->cbDBDecks->getItem(sel)))) {
+				if(sel >= 0 && DeckManager::SaveDeck(Utils::ToPathString(mainGame->cbDBDecks->getItem(sel)), current_deck)) {
 					mainGame->stACMessage->setText(gDataManager->GetSysString(1335).data());
 					mainGame->PopupElement(mainGame->wACMessage, 20);
 				}
@@ -295,11 +284,8 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 			}
 			case BUTTON_SAVE_DECK_AS: {
 				epro::wstringview dname(mainGame->ebDeckname->getText());
-				if (dname.empty()) {
-					ScreenReader::getReader()->readScreen(L"Cannot save deck without a name");
+				if(dname.empty())
 					break;
-				}
-				ScreenReader::getReader()->readScreen(fmt::format(L"Deck {} saved", dname.data()));
 				int sel = -1;
 				{
 					const auto upper = Utils::ToUpperNoAccents<std::wstring>({ dname.data(), dname.size() });
@@ -318,7 +304,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 					mainGame->cbDBDecks->addItem(dname.data());
 					mainGame->cbDBDecks->setSelected(mainGame->cbDBDecks->getItemCount() - 1);
 				}
-				if(gdeckManager->SaveDeck(current_deck, Utils::ToPathString(dname))) {
+				if(DeckManager::SaveDeck(Utils::ToPathString(dname), current_deck)) {
 					mainGame->stACMessage->setText(gDataManager->GetSysString(1335).data());
 					mainGame->PopupElement(mainGame->wACMessage, 20);
 				}
@@ -357,7 +343,6 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case BUTTON_LEAVE_GAME: {
-				ScreenReader::getReader()->readScreen(L"Leaving deck editor");
 				Terminate();
 				break;
 			}
@@ -436,7 +421,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 							sel = count - 1;
 						mainGame->cbDBDecks->setSelected(sel);
 						if(sel != -1)
-							gdeckManager->LoadDeck(Utils::ToPathString(mainGame->cbDBDecks->getItem(sel)), nullptr, true);
+							mainGame->deckBuilder.SetCurrentDeckFromFile(Utils::ToPathString(mainGame->cbDBDecks->getItem(sel)), true);
 						mainGame->stACMessage->setText(gDataManager->GetSysString(1338).data());
 						mainGame->PopupElement(mainGame->wACMessage, 20);
 						prev_deck = sel;
@@ -449,13 +434,13 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				}
 				case COMBOBOX_DBDECKS: {
 					int sel = mainGame->cbDBDecks->getSelected();
-					gdeckManager->LoadDeck(Utils::ToPathString(mainGame->cbDBDecks->getItem(sel)), nullptr, true);
+					mainGame->deckBuilder.SetCurrentDeckFromFile(Utils::ToPathString(mainGame->cbDBDecks->getItem(sel)), true);
 					prev_deck = sel;
+					break;
 				}
 				case BUTTON_CLEAR_DECK: {
-					current_deck.main.clear();
-					current_deck.extra.clear();
-					current_deck.side.clear();
+					ClearDeck();
+					break;
 				}
 				}
 				prev_operation = 0;
@@ -548,7 +533,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 			case COMBOBOX_DBDECKS: {
 				int sel = mainGame->cbDBDecks->getSelected();
 				if(sel >= 0)
-					gdeckManager->LoadDeck(Utils::ToPathString(mainGame->cbDBDecks->getItem(sel)), nullptr, true);
+					mainGame->deckBuilder.SetCurrentDeckFromFile(Utils::ToPathString(mainGame->cbDBDecks->getItem(sel)), true);
 				prev_deck = sel;
 				break;
 			}
@@ -831,79 +816,9 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 					ExportDeckToClipboard(event.KeyInput.Shift);
 				break;
 			}
-			case irr::KEY_KEY_F: {
-				if (event.KeyInput.Control) {
-					epro::wstringview dname(mainGame->ebDeckname->getText());
-					if (dname.empty()) {
-						ScreenReader::getReader()->readScreen(L"No name");
-						break;
-					}
-					ScreenReader::getReader()->readScreen(fmt::format(L"Deck {}", dname.data()));
-				}
-				break;
-			}
-			case irr::KEY_KEY_G: {
-				if (event.KeyInput.Control) {
-					mainGame->env->setFocus(mainGame->btnClearDeck);
-					TriggerEvent(mainGame->btnClearDeck, irr::gui::EGET_BUTTON_CLICKED);
-				}
-				break;
-			}
-			case irr::KEY_KEY_R: {
-				if (event.KeyInput.Control) {
-					mainGame->env->setFocus(mainGame->ebDeckname);
-					ScreenReader::getReader()->readScreen(L"Set deck's name");
-				}
-				break;
-			}
-			case irr::KEY_KEY_S: {
-				if (event.KeyInput.Control) {
-					mainGame->env->setFocus(mainGame->btnSaveDeckAs);
-					TriggerEvent(mainGame->btnSaveDeckAs, irr::gui::EGET_BUTTON_CLICKED);
-				}
-				break;
-			}
 			case irr::KEY_KEY_V: {
 				if(event.KeyInput.Control && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX))
 					ImportDeck();
-				break;
-			}
-			case irr::KEY_KEY_0: {
-				if (mainGame->btnLeaveGame->isTrulyVisible())
-					TriggerEvent(mainGame->btnLeaveGame, irr::gui::EGET_BUTTON_CLICKED);
-				break;
-			}
-			case irr::KEY_RETURN: {
-				if (mainGame->btnSideOK->isTrulyVisible())
-					TriggerEvent(mainGame->btnSideOK, irr::gui::EGET_BUTTON_CLICKED);
-				break;
-			}
-			default:
-				break;
-			}
-		}
-		else if (event.KeyInput.PressedDown) {
-			switch (event.KeyInput.Key) {
-			case irr::KEY_KEY_S: {
-				if (event.KeyInput.Control) {
-					TriggerEvent(mainGame->btnSaveDeckAs, irr::gui::EGET_BUTTON_CLICKED);
-				}
-				break;
-			}
-			case irr::KEY_KEY_F: {
-				if (event.KeyInput.Control) {
-					epro::wstringview dname(mainGame->ebDeckname->getText());
-					if (dname.empty()) {
-						ScreenReader::getReader()->readScreen(L"No name");
-						break;
-					}
-					ScreenReader::getReader()->readScreen(fmt::format(L"Deck {}", dname.data()));
-				}
-				break;
-			}
-			case irr::KEY_KEY_0: {
-				if (mainGame->btnLeaveGame->isTrulyVisible())
-					TriggerEvent(mainGame->btnLeaveGame, irr::gui::EGET_BUTTON_CLICKED);
 				break;
 			}
 			default:
@@ -912,7 +827,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 		}
 		break;
 	}
-#ifndef __ANDROID__
+#if !defined(__ANDROID__) && !defined(EDOPRO_IOS)
 	case irr::EET_DROP_EVENT: {
 		static std::wstring to_open_file;
 		switch(event.DropEvent.DropType) {
@@ -983,7 +898,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 			case irr::DROP_END:	{
 				if(to_open_file.size()) {
 					auto extension = Utils::GetFileExtension(to_open_file);
-					if(!mainGame->is_siding && extension == L"ydk" && gdeckManager->LoadDeck(Utils::ToPathString(to_open_file), nullptr, true)) {
+					if(!mainGame->is_siding && extension == L"ydk" && mainGame->deckBuilder.SetCurrentDeckFromFile(Utils::ToPathString(to_open_file), true)) {
 						auto name = Utils::GetFileName(to_open_file);
 						mainGame->ebDeckname->setText(name.data());
 						mainGame->cbDBDecks->setSelected(-1);
@@ -1310,6 +1225,10 @@ bool DeckBuilder::CheckCard(CardDataM* data, SEARCH_MODIFIER modifier, const std
 				if(!(data->_data.ot & SCOPE_RUSH))
 					return false;
 				break;
+			case LIMITATION_FILTER_LEGEND:
+				if(!(data->_data.ot & SCOPE_LEGEND))
+					return false;
+				break;
 			case LIMITATION_FILTER_ANIME:
 				if(data->_data.ot != SCOPE_ANIME)
 					return false;
@@ -1408,6 +1327,26 @@ void DeckBuilder::SortList() {
 		std::sort(left, results.end(), DataManager::deck_sort_name);
 		break;
 	}
+}
+void DeckBuilder::ClearDeck() {
+	current_deck.main.clear();
+	current_deck.extra.clear();
+	current_deck.side.clear();
+
+	main_and_extra_legend_count = 0;
+	main_skill_count = 0;
+	main_monster_count = 0;
+	main_spell_count = 0;
+	main_trap_count = 0;
+
+	extra_fusion_count = 0;
+	extra_xyz_count = 0;
+	extra_synchro_count = 0;
+	extra_link_count = 0;
+
+	side_monster_count = 0;
+	side_spell_count = 0;
+	side_trap_count = 0;
 }
 void DeckBuilder::RefreshLimitationStatus() {
 	main_and_extra_legend_count = DeckManager::OTCount(current_deck.main, SCOPE_LEGEND) + DeckManager::OTCount(current_deck.extra, SCOPE_LEGEND);
@@ -1610,7 +1549,7 @@ bool DeckBuilder::check_limit(const CardDataC* pointer) {
 	return true;
 }
 void DeckBuilder::RefreshCurrentDeck() {
-	gdeckManager->RefreshDeck(current_deck);
+	DeckManager::RefreshDeck(current_deck);
 	RefreshLimitationStatus();
 }
 }

@@ -28,13 +28,14 @@
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>Unicode</CharacterSet>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <CharacterSet>Unicode</CharacterSet>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -48,6 +49,7 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>false</LinkIncremental>
+    <IgnoreImportLibrary>true</IgnoreImportLibrary>
     <OutDir>..\bin\debug\</OutDir>
     <IntDir>..\obj\Debug\ocgcoreshared\</IntDir>
     <TargetName>ocgcore</TargetName>
@@ -55,6 +57,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
+    <IgnoreImportLibrary>true</IgnoreImportLibrary>
     <OutDir>..\bin\release\</OutDir>
     <IntDir>..\obj\Release\ocgcoreshared\</IntDir>
     <TargetName>ocgcore</TargetName>
@@ -110,10 +113,12 @@
   <ItemGroup>
     <ClInclude Include="..\ocgcore\card.h" />
     <ClInclude Include="..\ocgcore\common.h" />
+    <ClInclude Include="..\ocgcore\containers_fwd.h" />
     <ClInclude Include="..\ocgcore\duel.h" />
     <ClInclude Include="..\ocgcore\effect.h" />
     <ClInclude Include="..\ocgcore\effectset.h" />
     <ClInclude Include="..\ocgcore\field.h" />
+    <ClInclude Include="..\ocgcore\function_array_helper.h" />
     <ClInclude Include="..\ocgcore\group.h" />
     <ClInclude Include="..\ocgcore\interpreter.h" />
     <ClInclude Include="..\ocgcore\lua_obj.h" />

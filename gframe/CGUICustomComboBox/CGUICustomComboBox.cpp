@@ -17,11 +17,7 @@
 #include "../IrrlichtCommonIncludes1.9/CGUIListBox.h"
 #include "../IrrlichtCommonIncludes1.9/os.h"
 #include <IGUIStaticText.h>
-#ifdef __ANDROID__
-#include "../Android/porting_android.h"
-#else
-#include "../iOS/porting_ios.h"
-#endif
+#include "../porting.h"
 #include "../bufferio.h"
 #include "../game_config.h"
 
@@ -195,13 +191,12 @@ bool CGUICustomComboBox::OnEvent(const SEvent& event) {
 		case EET_KEY_INPUT_EVENT:
 			if(ListBox && event.KeyInput.PressedDown && event.KeyInput.Key == KEY_ESCAPE) {
 				// hide list box
-				//openCloseMenu();
 				return true;
 			} else
-				if (event.KeyInput.PressedDown) {
+				if(event.KeyInput.PressedDown) {
 					s32 oldSelected = Selected;
 					bool absorb = true;
-					switch (event.KeyInput.Key) {
+					switch(event.KeyInput.Key) {
 					case KEY_DOWN:
 						setSelected(Selected + 1);
 						break;
@@ -220,21 +215,20 @@ bool CGUICustomComboBox::OnEvent(const SEvent& event) {
 						absorb = false;
 					}
 
-					if (Selected < 0)
+					if(Selected < 0)
 						setSelected(0);
 
-					if (Selected >= (s32)Items.size())
+					if(Selected >= (s32)Items.size())
 						setSelected((s32)Items.size() - 1);
 
-					if (Selected != oldSelected) {
+					if(Selected != oldSelected) {
 						sendSelectionChangedEvent();
 						return true;
 					}
 
-					if (absorb)
+					if(absorb)
 						return true;
 				}
-					
 				break;
 
 		case EET_GUI_EVENT:
@@ -251,9 +245,10 @@ bool CGUICustomComboBox::OnEvent(const SEvent& event) {
 				break;
 			case EGET_BUTTON_CLICKED:
 				if(event.GUIEvent.Caller == ListButton) {
+#ifdef __ANDROID__
 					if(!ygo::gGameConfig->native_mouse)
+#endif
 						Environment->setFocus(this);
-					//openCloseMenu();
 					return true;
 				}
 				break;
@@ -293,7 +288,9 @@ bool CGUICustomComboBox::OnEvent(const SEvent& event) {
 				if(!(ListBox &&
 					 ListBox->getAbsolutePosition().isPointInside(p) &&
 					 ListBox->OnEvent(event))) {
+#ifdef __ANDROID__
 					if(!ygo::gGameConfig->native_mouse)
+#endif
 						Environment->setFocus(this);
 					openCloseMenu();
 				}
@@ -406,16 +403,15 @@ void CGUICustomComboBox::draw() {
 
 
 void CGUICustomComboBox::openCloseMenu() {
-	if(!ygo::gGameConfig->native_mouse) {
+#ifdef __ANDROID__
+	if(!ygo::gGameConfig->native_mouse)
+#endif
+	{
 		std::vector<std::string> parameters;
 		for(int i = 0; i < Items.size(); i++) {
 			parameters.push_back(BufferIO::EncodeUTF8({ Items[i].Name.data(), Items[i].Name.size() }));
 		}
-#ifdef __ANDROID__
-		porting::showComboBox(parameters);
-#else
-		EPRO_IOS_ShowPicker(parameters, Selected);
-#endif
+		porting::showComboBox(parameters, Selected);
 		return;
 	}
 	if(ListBox) {
@@ -508,7 +504,6 @@ void CGUICustomComboBox::deserializeAttributes(io::IAttributes* in, io::SAttribu
 void CGUICustomComboBox::close() {
 	openCloseMenu();
 }
-
 
 } // end namespace gui
 } // end namespace irr

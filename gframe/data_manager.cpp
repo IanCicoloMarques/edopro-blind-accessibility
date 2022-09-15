@@ -333,6 +333,8 @@ void DataManager::ClearLocaleStrings() {
 	_victoryStrings.ClearLocales();
 	_counterStrings.ClearLocales();
 	_setnameStrings.ClearLocales();
+	_accessibilityStrings.ClearLocales();
+	_accessibilityTipsStrings.ClearLocales();
 }
 bool DataManager::Error(sqlite3* pDB, sqlite3_stmt* pStmt) const {
 	ErrorLog("Error when loading database ({}): {}", cur_database, sqlite3_errmsg(pDB));

@@ -41,6 +41,8 @@
 #include "joystick_wrapper.h"
 #include "porting.h"
 #include "../accessibility/Control/EventHandler.h"
+#include <Configuration/AccessibilityConfiguration.h>
+#include <ScreenReader/ScreenReader.h>
 
 namespace {
 
@@ -330,6 +332,8 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				if(selected_option == 0)
 					mainGame->btnOptionp->setVisible(false);
 				mainGame->stOptions->setText(gDataManager->GetDesc(select_options[selected_option], mainGame->dInfo.compat_mode).data());
+				ScreenReader::getReader()->readScreen(gDataManager->GetDesc(select_options[selected_option], mainGame->dInfo.compat_mode).data(), false);
+
 				break;
 			}
 			case BUTTON_OPTION_NEXT: {
@@ -338,6 +342,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				if(selected_option == select_options.size() - 1)
 					mainGame->btnOptionn->setVisible(false);
 				mainGame->stOptions->setText(gDataManager->GetDesc(select_options[selected_option], mainGame->dInfo.compat_mode).data());
+				ScreenReader::getReader()->readScreen(gDataManager->GetDesc(select_options[selected_option], mainGame->dInfo.compat_mode).data(), false);
 				break;
 			}
 			case BUTTON_OPTION_0:
@@ -356,6 +361,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 			}
 			case BUTTON_ANNUMBER_OK: {
 				DuelClient::SetResponseI(mainGame->cbANNumber->getSelected());
+				ScreenReader::getReader()->textToSpeech(fmt::format(L"Selected {}", mainGame->cbANNumber->getText()));
 				mainGame->HideElement(mainGame->wANNumber, true);
 				break;
 			}
@@ -445,9 +451,11 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					}
 					if(!conti_selecting) {
 						mainGame->wCardSelect->setText(gDataManager->GetSysString(566).data());
+						ScreenReader::getReader()->readScreen(gDataManager->GetSysString(566).data());
 						list_command = COMMAND_ACTIVATE;
 					} else {
 						mainGame->wCardSelect->setText(gDataManager->GetSysString(568).data());
+						ScreenReader::getReader()->readScreen(gDataManager->GetSysString(568).data());
 						list_command = COMMAND_OPERATION;
 					}
 					std::sort(selectable_cards.begin(), selectable_cards.end(), ClientCard::client_card_sort);
@@ -1110,6 +1118,9 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 		default:
 			break;
 		}
+		if (AccessibilityConfiguration::accessibilityShortcuts) {
+			EventHandler::getEventHandler()->GuiEvent(event);
+		}
 		break;
 	}
 	case irr::EET_MOUSE_INPUT_EVENT: {
@@ -1424,6 +1435,10 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 						}
 					}
 				}
+				else {
+					if (!mainGame->dInfo.isCatchingUp)
+						gSoundManager->PlaySoundEffect(SoundManager::SFX::NP);
+				}
 				break;
 			}
 			case MSG_SELECT_CARD:
@@ -1434,9 +1449,13 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					clicked_card->is_selected = false;
 					auto it = std::find(selected_cards.begin(), selected_cards.end(), clicked_card);
 					selected_cards.erase(it);
+					ScreenReader::getReader()->readScreen(fmt::format(L"{} uncofirmed", gDataManager->GetName(clicked_card->code)));
+					gSoundManager->PlaySoundEffect(SoundManager::SFX::UNCONFIRM);
 				} else {
 					clicked_card->is_selected = true;
 					selected_cards.push_back(clicked_card);
+					ScreenReader::getReader()->readScreen(fmt::format(L"{} confirmed", gDataManager->GetName(clicked_card->code)));
+					gSoundManager->PlaySoundEffect(SoundManager::SFX::CONFIRM);
 				}
 				uint32_t min = selected_cards.size(), max = 0;
 				if (mainGame->dInfo.curMsg == MSG_SELECT_CARD) {
@@ -1471,8 +1490,16 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				if (!(hovered_location & 0xe) || !clicked_card || !clicked_card->is_selectable)
 					break;
 				if (clicked_card->is_selected) {
+					if (!mainGame->dInfo.isCatchingUp) {
+						ScreenReader::getReader()->readScreen(fmt::format(L"{} uncofirmed", gDataManager->GetName(clicked_card->code)));
+						gSoundManager->PlaySoundEffect(SoundManager::SFX::UNCONFIRM);
+					}
 					clicked_card->is_selected = false;
 				} else {
+					if (!mainGame->dInfo.isCatchingUp) {
+						ScreenReader::getReader()->readScreen(fmt::format(L"{} selected", gDataManager->GetName(clicked_card->code)));
+						gSoundManager->PlaySoundEffect(SoundManager::SFX::CONFIRM);
+					}
 					clicked_card->is_selected = true;
 				}
 				selected_cards.push_back(clicked_card);
@@ -1726,9 +1753,10 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 		break;
 	}
 	case irr::EET_KEY_INPUT_EVENT: {
-		//if accessibility true
-		EventHandler::getEventHandler()->PushKey(event);
-		//else
+		if (AccessibilityConfiguration::accessibilityShortcuts) {
+			EventHandler::getEventHandler()->KeyInputEvent(event);
+			break;
+		}
 		switch(event.KeyInput.Key) {
 		case irr::KEY_KEY_A: {
 			if(!mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {

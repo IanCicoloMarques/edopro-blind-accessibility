@@ -1,6 +1,7 @@
 #ifndef EVENTHANDLER_H
 #define EVENTHANDLER_H
 
+#include "../accessibility/Configuration/AccessibilityConfiguration.h"
 #include "../accessibility/Control/IEventHandler.h"
 #include "../accessibility/FieldFocus/AccessibilityFieldFocus.h"
 #include "../gframe/duelclient.h"
@@ -9,19 +10,25 @@
 #include "../gframe/CGUIImageButton/CGUIImageButton.h"
 #include "../gframe/custom_skin_enum.h"
 #include "../gframe/joystick_wrapper.h"
+#include "../gframe/sound_manager.h"
 #include <vector>
 #include <string>
-//#include "../accessibility/Control/CardsDTO.h"
+#include <IGUIEditBox.h>
+#include <IGUIWindow.h>
+#include <IrrlichtDevice.h>
+#include <IGUIStaticText.h>
+#include <IGUIScrollBar.h>
+#include <IGUIComboBox.h>
 
 namespace ygo {
 	class EventHandler : public IEventHandler
 	{
 	public:
 		static IEventHandler* getEventHandler();
-		virtual void PushKey(const irr::SEvent& event) override;
+		void KeyInputEvent(const irr::SEvent& event) override;
+		void GuiEvent(const irr::SEvent& event) override;
 	private:
 		static IEventHandler* eventHandler;
-		bool accessibilityFocus = true; //TODO- FAZER UMA CONFIGURAÇÃO NO MENU PRA ISSO
 		bool selectZone = false;
 		int cardSelectPosition = 0;
 		int indexLookedUpCard = 0;

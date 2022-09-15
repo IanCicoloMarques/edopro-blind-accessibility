@@ -6,7 +6,8 @@
 class IEventHandler
 {
 	public:
-		virtual void PushKey(const irr::SEvent& event) = 0;
+		virtual void KeyInputEvent(const irr::SEvent& event) = 0;
+		virtual void GuiEvent(const irr::SEvent& event) = 0;
 };
 
 #endif

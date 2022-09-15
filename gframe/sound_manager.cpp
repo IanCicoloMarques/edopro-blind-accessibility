@@ -99,7 +99,10 @@ void SoundManager::RefreshSoundsList() {
 		{NEXT_TURN, EPRO_TEXT("./sound/nextturn.{}"_sv)},
 		{PHASE, EPRO_TEXT("./sound/phase.{}"_sv)},
 		{PLAYER_ENTER, EPRO_TEXT("./sound/playerenter.{}"_sv)},
-		{CHAT, EPRO_TEXT("./sound/chatmessage.{}"_sv)}
+		{CHAT, EPRO_TEXT("./sound/chatmessage.{}"_sv)},
+		{NP, EPRO_TEXT("./sound/np.{}"_sv)},
+		{CONFIRM, EPRO_TEXT("./sound/confirm.{}"_sv)},
+		{UNCONFIRM, EPRO_TEXT("./sound/unconfirm.{}"_sv)},
 	};
 	const auto extensions = mixer->GetSupportedSoundExtensions();
 	for(const auto& sound : fx) {

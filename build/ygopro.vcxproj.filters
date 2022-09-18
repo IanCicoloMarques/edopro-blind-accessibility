@@ -238,6 +238,9 @@
     <ClInclude Include="..\accessibility\Control\EventHandler.h">
       <Filter>Accessibility</Filter>
     </ClInclude>
+    <ClInclude Include="..\accessibility\Menus\AccessibilityMenu.h">
+      <Filter>Accessibility</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\gframe\CGUICustomCheckBox\CGUICustomCheckBox.cpp">
@@ -338,6 +341,9 @@
     <ClCompile Include="..\gframe\windbot.cpp" />
     <ClCompile Include="..\gframe\windbot_panel.cpp" />
     <ClCompile Include="..\accessibility\Control\EventHandler.cpp">
+      <Filter>Accessibility</Filter>
+    </ClCompile>
+    <ClCompile Include="..\accessibility\Menus\AccessibilityMenu.cpp">
       <Filter>Accessibility</Filter>
     </ClCompile>
   </ItemGroup>

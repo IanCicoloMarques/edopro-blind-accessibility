@@ -27,11 +27,11 @@ namespace ygo {
 		static IEventHandler* getEventHandler();
 		void KeyInputEvent(const irr::SEvent& event) override;
 		void GuiEvent(const irr::SEvent& event) override;
-	private:
 		static IEventHandler* eventHandler;
+		static int indexLookedUpCard;
+	private:
 		bool selectZone = false;
 		int cardSelectPosition = 0;
-		int indexLookedUpCard = 0;
 		AccessibilityFieldFocus::DisplayedField displayedField = AccessibilityFieldFocus::DisplayedField::PLAYER;
 		int displayedCards = AccessibilityFieldFocus::DisplayedCards::NO_DISPLAY;
 		int battlePhase = AccessibilityFieldFocus::BattleStep::MP1;

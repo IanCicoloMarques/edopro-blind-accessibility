@@ -26,6 +26,8 @@
 #include <IGUITabControl.h>
 #include <IGUITable.h>
 #include <IGUIWindow.h>
+#include "../accessibility/Menus/AccessibilityMenu.h"
+#include <Configuration/AccessibilityConfiguration.h>
 
 namespace ygo {
 
@@ -124,6 +126,10 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 		if(mainGame->wFileSave->isVisible() && id != BUTTON_FILE_SAVE && id != BUTTON_FILE_CANCEL) {
 			mainGame->wFileSave->getParent()->bringToFront(mainGame->wFileSave);
 			break;
+		}
+
+		if (AccessibilityConfiguration::accessibilityShortcuts) {
+			MenuEventHandler::getMenuHandler()->GuiEvent(event);
 		}
 		switch(event.GUIEvent.EventType) {
 		case irr::gui::EGET_ELEMENT_HOVERED: {
@@ -443,8 +449,10 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 			case BUTTON_BOT_ADD: {
 				try {
 					int port = std::stoi(gGameConfig->serverport);
-					if(mainGame->gBot.LaunchSelected(port, mainGame->dInfo.secret.pass))
+					if(mainGame->gBot.LaunchSelected(port, mainGame->dInfo.secret.pass)) {
+						mainGame->HideElement(mainGame->gBot.window);
 						break;
+					}
 				} catch(...) {}
 				mainGame->PopupMessage(L"Failed to launch windbot");
 				break;
@@ -1052,6 +1060,9 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 		break;
 	}
 	case irr::EET_KEY_INPUT_EVENT: {
+		if (AccessibilityConfiguration::accessibilityShortcuts) {
+			MenuEventHandler::getMenuHandler()->KeyInputEvent(event);
+		}
 		switch(event.KeyInput.Key) {
 		case irr::KEY_KEY_R: {
 			if(!event.KeyInput.PressedDown && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX))

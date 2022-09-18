@@ -7,6 +7,7 @@
 
 namespace ygo {
 	IEventHandler* EventHandler::eventHandler = nullptr;
+	int EventHandler::indexLookedUpCard = 0;
 	static AccessibilityFieldFocus::FieldLookerLocId lookupFieldLocId;
 
 	static inline void TriggerEvent(irr::gui::IGUIElement* target, irr::gui::EGUI_EVENT_TYPE type) {

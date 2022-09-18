@@ -122,6 +122,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\accessibility\Control\EventHandler.h" />
+    <ClInclude Include="..\accessibility\Menus\AccessibilityMenu.h" />
     <ClInclude Include="..\gframe\Base64.h" />
     <ClInclude Include="..\gframe\CGUICustomCheckBox\CGUICustomCheckBox.h" />
     <ClInclude Include="..\gframe\CGUICustomComboBox\CGUICustomComboBox.h" />
@@ -219,6 +220,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\accessibility\Control\EventHandler.cpp" />
+    <ClCompile Include="..\accessibility\Menus\AccessibilityMenu.cpp" />
     <ClCompile Include="..\gframe\CGUICustomCheckBox\CGUICustomCheckBox.cpp" />
     <ClCompile Include="..\gframe\CGUICustomComboBox\CGUICustomComboBox.cpp" />
     <ClCompile Include="..\gframe\CGUICustomContextMenu\CGUICustomContextMenu.cpp" />

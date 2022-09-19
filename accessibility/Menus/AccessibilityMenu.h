@@ -20,6 +20,7 @@
 #include <IGUITable.h>
 #include <IGUIScrollBar.h>
 #include <IrrlichtDevice.h>
+#include <IGUITabControl.h>
 
 namespace ygo {
 	class MenuEventHandler : public IEventHandler {

@@ -22,6 +22,7 @@
 #include "CGUITTFont/CGUITTFont.h"
 #include "custom_skin_enum.h"
 #include <ScreenReader/ScreenReader.h>
+#include "../accessibility/Control/EventHandler.h"
 
 namespace ygo {
 
@@ -463,6 +464,12 @@ void ClientField::ShowSelectCard(bool buttonok, bool chain) {
 		mainGame->scrCardList->setMax((selectable_cards.size() - 5) * 10 + 9);
 		mainGame->scrCardList->setPos(0);
 	}
+	display_cards.clear();
+	for (int i = 0; i < 5; ++i) {
+		if (selectable_cards.size() > i)
+			display_cards.push_back(selectable_cards[i]);
+	}
+	EventHandler::indexLookedUpCard = 0;
 	mainGame->btnSelectOK->setVisible(buttonok);
 	mainGame->PopupElement(mainGame->wCardSelect);
 }

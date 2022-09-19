@@ -17,6 +17,7 @@
 #include "utils_gui.h"
 #include "custom_skin_enum.h"
 #include "game_config.h"
+#include "../accessibility/ScreenReader/ScreenReader.h"
 
 namespace ygo {
 
@@ -300,7 +301,10 @@ void ServerLobby::JoinServer(bool host) {
 			return;
 		if(room->locked) {
 			if(!mainGame->wRoomPassword->isVisible()) {
+				ScreenReader::getReader()->readScreen(L"Use the arrow keys to set the password");
+				mainGame->ebRPName->setText(L"");
 				mainGame->wRoomPassword->setVisible(true);
+				mainGame->env->setFocus(mainGame->ebRPName);
 				return;
 			}
 			auto text = mainGame->ebRPName->getText();

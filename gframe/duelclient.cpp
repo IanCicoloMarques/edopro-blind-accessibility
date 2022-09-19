@@ -2021,6 +2021,15 @@ int DuelClient::ClientAnalyze(const uint8_t* msg, uint32_t len) {
 			if (info.location & 0xf1)
 				panelmode = true;
 		}
+		mainGame->dField.display_cards.clear();
+		for (int i = 0; i < 5; i++)
+		{
+			if (i < mainGame->dField.selectable_cards.size())
+				mainGame->dField.display_cards.push_back(mainGame->dField.selectable_cards[i]);
+			else
+				break;
+		}
+		EventHandler::indexLookedUpCard = 0;
 		std::sort(mainGame->dField.selectable_cards.begin(), mainGame->dField.selectable_cards.end(), ClientCard::client_card_sort);
 		std::wstring text = fmt::format(L"{}({}-{})", gDataManager->GetDesc(select_hint ? select_hint : 560, mainGame->dInfo.compat_mode),
 			mainGame->dField.select_min, mainGame->dField.select_max);
@@ -2105,6 +2114,15 @@ int DuelClient::ClientAnalyze(const uint8_t* msg, uint32_t len) {
 			if (info.location & 0xf1)
 				panelmode = true;
 		}
+		mainGame->dField.display_cards.clear();// = mainGame->dField.selectable_cards;
+		for (int i = 0; i < 5; i++)
+		{
+			if (i < mainGame->dField.selectable_cards.size())
+				mainGame->dField.display_cards.push_back(mainGame->dField.selectable_cards[i]);
+			else
+				break;
+		}
+		EventHandler::indexLookedUpCard = 0;
 		std::sort(mainGame->dField.selectable_cards.begin(), mainGame->dField.selectable_cards.end(), ClientCard::client_card_sort);
 		std::wstring text = fmt::format(L"{}({}-{})", gDataManager->GetDesc(select_hint ? select_hint : 560, mainGame->dInfo.compat_mode),
 			mainGame->dField.select_min, mainGame->dField.select_max);
@@ -2611,9 +2629,6 @@ int DuelClient::ClientAnalyze(const uint8_t* msg, uint32_t len) {
 		ClientCard* pcard;
 		mainGame->dField.selectable_cards.clear();
 		const auto backit = mainGame->dField.extra[player].rbegin() + mainGame->dField.extra_p_count[player];
-		ScreenReader::getReader()->readScreen(fmt::format(L"{}", gDataManager->GetName(pcard->code)));
-		ScreenReader::getReader()->cleanBuiltMessage();
-		ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
 		for(uint32_t i = 0; i < count; ++i) {
 			code = BufferIO::Read<uint32_t>(pbuf);
 			pbuf += (mainGame->dInfo.compat_mode) ? 3 : 6;
@@ -2627,6 +2642,9 @@ int DuelClient::ClientAnalyze(const uint8_t* msg, uint32_t len) {
 		for(uint32_t i = 0; i < count; ++i) {
 			pcard = *(backit + i);
 			std::unique_lock<std::mutex> lock(mainGame->gMutex);
+			ScreenReader::getReader()->readScreen(fmt::format(L"{}", gDataManager->GetName(pcard->code)));
+			ScreenReader::getReader()->cleanBuiltMessage();
+			ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
 			mainGame->AddLog(fmt::format(L"*[{}]", gDataManager->GetName(pcard->code)), pcard->code);
 			constexpr float milliseconds = 5.0f * 1000.0f / 60.0f;
 			if (player == 0)

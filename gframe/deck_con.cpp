@@ -15,6 +15,8 @@
 #include "single_mode.h"
 #include "client_card.h"
 #include "../accessibility/ScreenReader/ScreenReader.h"
+#include "../accessibility/Control/DeckHandler.h"
+#include "../accessibility/Configuration/AccessibilityConfiguration.h"
 
 namespace ygo {
 static inline void TriggerEvent(irr::gui::IGUIElement* target, irr::gui::EGUI_EVENT_TYPE type) {
@@ -826,45 +828,11 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 		break;
 	}
 	case irr::EET_KEY_INPUT_EVENT: {
+		if (AccessibilityConfiguration::accessibilityShortcuts) {
+			DeckHandler::getDeckHandler()->KeyInputEvent(event);
+		}
 		if(event.KeyInput.PressedDown && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
 			switch(event.KeyInput.Key) {
-				case irr::KEY_KEY_G: {
-					if (event.KeyInput.Control) {
-						mainGame->env->setFocus(mainGame->btnClearDeck);
-						TriggerEvent(mainGame->btnClearDeck, irr::gui::EGET_BUTTON_CLICKED);
-					}
-					break;
-				}
-				case irr::KEY_KEY_R: {
-					if (event.KeyInput.Control) {
-						mainGame->env->setFocus(mainGame->ebDeckname);
-						ScreenReader::getReader()->readScreen(L"Set deck's name");
-					}
-					break;
-				}
-				case irr::KEY_KEY_S: {
-					if (event.KeyInput.Control) {
-						mainGame->env->setFocus(mainGame->btnSaveDeckAs);
-						TriggerEvent(mainGame->btnSaveDeckAs, irr::gui::EGET_BUTTON_CLICKED);
-					}
-					break;
-				}
-				case irr::KEY_KEY_F: {
-					if (event.KeyInput.Control) {
-						epro::wstringview dname(mainGame->ebDeckname->getText());
-						if (dname.empty()) {
-							ScreenReader::getReader()->readScreen(L"No name");
-							break;
-						}
-						ScreenReader::getReader()->readScreen(fmt::format(L"Deck {}", dname.data()));
-					}
-					break;
-				}
-				case irr::KEY_KEY_0: {
-					if (mainGame->btnLeaveGame->isTrulyVisible())
-						TriggerEvent(mainGame->btnLeaveGame, irr::gui::EGET_BUTTON_CLICKED);
-					break;
-				}
 				case irr::KEY_KEY_C: {
 					if (event.KeyInput.Control)
 						ExportDeckToClipboard(event.KeyInput.Shift);
@@ -889,17 +857,6 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				case irr::KEY_KEY_S: {
 					if (event.KeyInput.Control) {
 						TriggerEvent(mainGame->btnSaveDeckAs, irr::gui::EGET_BUTTON_CLICKED);
-					}
-					break;
-				}
-				case irr::KEY_KEY_F: {
-					if (event.KeyInput.Control) {
-						epro::wstringview dname(mainGame->ebDeckname->getText());
-						if (dname.empty()) {
-							ScreenReader::getReader()->readScreen(L"No name");
-							break;
-						}
-						ScreenReader::getReader()->readScreen(fmt::format(L"Deck {}", dname.data()));
 					}
 					break;
 				}
@@ -1375,7 +1332,7 @@ void DeckBuilder::ClearSearch() {
 	results.clear();
 	result_string = L"0";
 	scroll_pos = 0;
-	mainGame->env->setFocus(mainGame->ebCardName);
+	//mainGame->env->setFocus(mainGame->ebCardName);
 }
 void DeckBuilder::ClearFilter() {
 	mainGame->cbAttribute->setSelected(0);

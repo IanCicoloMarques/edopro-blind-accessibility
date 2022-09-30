@@ -21,7 +21,7 @@
 #include "CGUIImageButton/CGUIImageButton.h"
 #include "CGUITTFont/CGUITTFont.h"
 #include "custom_skin_enum.h"
-#include <ScreenReader/ScreenReader.h>
+#include "../accessibility/ScreenReader/ScreenReader.h"
 #include "../accessibility/Control/EventHandler.h"
 
 namespace ygo {

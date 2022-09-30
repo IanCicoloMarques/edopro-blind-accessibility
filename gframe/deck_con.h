@@ -54,6 +54,14 @@ public:
 	}
 	void StartFilter(bool force_refresh = false);
 	void RefreshCurrentDeck();
+
+	bool push_main(const CardDataC* pointer, int seq = -1, bool forced = false);
+	bool push_extra(const CardDataC* pointer, int seq = -1, bool forced = false);
+	bool push_side(const CardDataC* pointer, int seq = -1, bool forced = false);
+	void pop_main(int seq);
+	void pop_extra(int seq);
+	void pop_side(int seq);
+	bool check_limit(const CardDataC* pointer);
 private:
 	void GetHoveredCard();
 	bool FiltersChanged();
@@ -75,14 +83,6 @@ private:
 
 	void ImportDeck();
 	void ExportDeckToClipboard(bool plain_text);
-
-	bool push_main(const CardDataC* pointer, int seq = -1, bool forced = false);
-	bool push_extra(const CardDataC* pointer, int seq = -1, bool forced = false);
-	bool push_side(const CardDataC* pointer, int seq = -1, bool forced = false);
-	void pop_main(int seq);
-	void pop_extra(int seq);
-	void pop_side(int seq);
-	bool check_limit(const CardDataC* pointer);
 #define DECLARE_WITH_CACHE(type, name) type name;\
 										type prev_##name;
 	DECLARE_WITH_CACHE(uint64_t, filter_effect)

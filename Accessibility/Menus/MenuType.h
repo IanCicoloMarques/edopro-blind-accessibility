@@ -7,20 +7,6 @@
 namespace ygo {
 	class MenuType {
 	public:
-		//static std::vector<std::wstring> menu;
-		//static std::vector<std::wstring> menuMain;// = { L"Online Duel", L"Duel", L"Deck Editor" };
-		//static std::vector<std::wstring> menuSinglePlayer;// = { L"Host Duel", L"Player Name" };
-		//	static std::vector<std::wstring> menuHostDuel;// = { L"Rules ok", L"Best of", L"Time Limit", L"Starting LP", L"Starting Hand", L"Cards per Draw", L"Don't check deck", L"Don't shuffle deck", L"Room Name", L"Room Password" };
-		//	static std::vector<std::wstring> menuRulesOk;// = { L"Start Duel", L"Select Deck", L"Player Ready", L"Select AI" };
-		//	static std::vector<std::wstring> menuRulesOkOnline;// = { L"Start Duel", L"Select Deck", L"Player Ready", L"Enter Duel mode", L"Enter Spectate mode" };
-		//static std::vector<std::wstring> menuSelectAI;// = { L"AI Ok", L"Select Deck", L"Always throw Rock" };
-		//static std::vector<std::wstring> menuOnline;// = { L"Host", L"Refresh", L"Rooms", L"Server", L"Player Name", L"Allowed Cards", L"Forbidden List", L"Show Locked Rooms", L"Show Started Rooms" };
-		//static std::vector<std::wstring> menuPassword;// = { L"OK", L"Cancel" };
-		//static std::wstring currentMenu;// = L"Online Duel";
-		//static std::wstring oldMenu;// = L"Online Duel";
-		//static int menuSelectCounter;// = 0;
-		//static int subMenuSelectCounter;// = 0;
-		//static int onlineMatchCounter;// = 0;
 
 		enum MenuList {
 			MAIN_MENU,
@@ -111,20 +97,24 @@ namespace ygo {
 			GAMEOP_ENABLE_MUSIC,
 			GAMEOP_MUSIC_VOLUME
 		};
+
+		enum DeckOptionsMenu {
+			DECKOP_SELECT_DECK,
+			DECKOP_SEARCH,
+			DECKOP_CATEGORY,
+			DECKOP_SUB_CATEGORY,
+			DECKOP_ATTRIBUTE,
+			DECKOP_TYPE,
+			DECKOP_LEVEL,
+			DECKOP_SCALE,
+			DECKOP_LIMIT,
+			DECKOP_ATTACK,
+			DECKOP_DEFENSE,
+			DECKOP_LINK_MARKER,
+			DECKOP_EFFECT,
+			DECKOP_CLEAR_SEARCH
+		};
 	};
 }
-//static std::vector<std::wstring> menuMain = { L"Online Duel", L"Duel", L"Deck Editor" };
-//static std::vector<std::wstring> menuSinglePlayer = { L"Host Duel", L"Player Name" };
-//static std::vector<std::wstring> menuHostDuel = { L"Rules ok", L"Best of", L"Time Limit", L"Starting LP", L"Starting Hand", L"Cards per Draw", L"Don't check deck", L"Don't shuffle deck", L"Room Name", L"Room Password" };
-//static std::vector<std::wstring> menuRulesOk = { L"Start Duel", L"Select Deck", L"Player Ready", L"Select AI" };
-//static std::vector<std::wstring> menuRulesOkOnline = { L"Start Duel", L"Select Deck", L"Player Ready", L"Enter Duel mode", L"Enter Spectate mode" };
-//static std::vector<std::wstring> menuSelectAI = { L"AI Ok", L"Select Deck", L"Always throw Rock" };
-//static std::vector<std::wstring> menuOnline = { L"Host", L"Refresh", L"Rooms", L"Server", L"Player Name", L"Allowed Cards", L"Forbidden List", L"Show Locked Rooms", L"Show Started Rooms" };
-//static std::vector<std::wstring> menuPassword = { L"OK", L"Cancel" };
-//static std::wstring currentMenu = L"Online Duel";
-//static std::wstring oldMenu = L"Online Duel";
-//static int menuSelectCounter = 0;
-//static int subMenuSelectCounter = 0;
-//static int onlineMatchCounter = 0;
 
 #endif //MENU_TYPE_H

@@ -123,7 +123,11 @@ namespace ygo {
 			}
 			case irr::KEY_DOWN: {
 				if (!event.KeyInput.PressedDown && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
-					if (mainGame->roomListTable->isTrulyVisible() && currentMenu == L"Rooms") {
+					if (!event.KeyInput.PressedDown && mainGame->cbDeckSelect->isTrulyVisible() && menuSelectCounter == MenuType::PlayerDuel::PD_SELECT_DECK && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
+						std::wstring nvdaString = fmt::format(L"Deck {}", mainGame->cbDeckSelect->getItem(mainGame->cbDeckSelect->getSelected()));
+						ScreenReader::getReader()->readScreen(nvdaString.c_str());
+					}
+					else if (mainGame->roomListTable->isTrulyVisible() && currentMenu == L"Rooms") {
 						if (onlineMatchCounter < mainGame->roomListTable->getRowCount() - 1)
 							onlineMatchCounter++;
 						mainGame->roomListTable->setSelected(onlineMatchCounter);
@@ -196,6 +200,8 @@ namespace ygo {
 				break;
 			}
 			case irr::KEY_RETURN: {
+				if (!event.KeyInput.PressedDown && mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX))
+					mainGame->env->removeFocus(mainGame->env->getFocus());
 				if (!event.KeyInput.PressedDown) {
 					if (menu.empty())
 						menu = menuMain;
@@ -251,7 +257,10 @@ namespace ygo {
 						mainGame->HideElement(mainGame->gSettings.window);
 					else if (mainGame->btnModeExit->isTrulyVisible())
 						ClickButton(mainGame->btnModeExit);
-					currentMenu = menu.at(menuSelectCounter);
+					if (menu.empty())
+						menu = menuMain;
+					else
+						currentMenu = menu.at(menuSelectCounter);
 				}
 
 				break;

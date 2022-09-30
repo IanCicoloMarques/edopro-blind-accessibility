@@ -27,7 +27,7 @@
 #include <IGUITable.h>
 #include <IGUIWindow.h>
 #include "../accessibility/Menus/AccessibilityMenu.h"
-#include <Configuration/AccessibilityConfiguration.h>
+#include "../accessibility/Configuration/AccessibilityConfiguration.h"
 
 namespace ygo {
 

@@ -38,6 +38,7 @@
     <ClInclude Include="Configuration\AccessibilityConfiguration.h">
       <Filter>Configuration</Filter>
     </ClInclude>
+    <ClInclude Include="FieldFocus\AccessibilityDeckFocus.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ScreenReader\AccessibilityMessages.cpp">

@@ -3108,6 +3108,9 @@ int DuelClient::ClientAnalyze(const uint8_t* msg, uint32_t len) {
 			mainGame->btnBP->setPressed(true);
 			mainGame->btnBP->setEnabled(false);
 			mainGame->showcardcode = 7;
+			ScreenReader::getReader()->readScreen(L"Battle Phase");
+			ScreenReader::getReader()->cleanBuiltMessage();
+			ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
 			break;
 		case PHASE_MAIN2:
 			event_string = gDataManager->GetSysString(22).data();

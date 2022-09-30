@@ -241,6 +241,9 @@
     <ClInclude Include="..\accessibility\Menus\AccessibilityMenu.h">
       <Filter>Accessibility</Filter>
     </ClInclude>
+    <ClInclude Include="..\accessibility\Control\DeckHandler.h">
+      <Filter>Accessibility</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\gframe\CGUICustomCheckBox\CGUICustomCheckBox.cpp">
@@ -344,6 +347,9 @@
       <Filter>Accessibility</Filter>
     </ClCompile>
     <ClCompile Include="..\accessibility\Menus\AccessibilityMenu.cpp">
+      <Filter>Accessibility</Filter>
+    </ClCompile>
+    <ClCompile Include="..\accessibility\Control\DeckHandler.cpp">
       <Filter>Accessibility</Filter>
     </ClCompile>
   </ItemGroup>

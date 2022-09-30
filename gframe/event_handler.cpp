@@ -41,8 +41,8 @@
 #include "joystick_wrapper.h"
 #include "porting.h"
 #include "../accessibility/Control/EventHandler.h"
-#include <Configuration/AccessibilityConfiguration.h>
-#include <ScreenReader/ScreenReader.h>
+#include "../accessibility/ScreenReader/ScreenReader.h"
+#include "../accessibility/Configuration/AccessibilityConfiguration.h"
 
 namespace {
 
@@ -1173,7 +1173,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 			GetHoverField(mousepos);
 			if(hovered_location & 0xe)
 				clicked_card = GetCard(hovered_controler, hovered_location, hovered_sequence);
-			else clicked_card = 0;
+			//else clicked_card = 0;
 			if(mainGame->dInfo.isReplay) {
 				if(mainGame->wCardSelect->isVisible())
 					break;
@@ -2211,6 +2211,9 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event, bool& stopPropagation)
 		break;
 	}
 	case irr::EET_KEY_INPUT_EVENT: {
+		if (AccessibilityConfiguration::accessibilityShortcuts) {
+			return false;
+		}
 		switch(event.KeyInput.Key) {
 		case irr::KEY_KEY_C: {
 			if(event.KeyInput.Control && mainGame->HasFocus(irr::gui::EGUIET_LIST_BOX)) {

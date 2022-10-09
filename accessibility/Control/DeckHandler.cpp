@@ -264,48 +264,16 @@ namespace ygo {
 			case irr::KEY_RIGHT: {
 				if (!event.KeyInput.PressedDown && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
 					if (deckLooker == AccessibilityDeckFocus::DeckLookerLocId::MAIN_DECK) {
-						if (!mainGame->deckBuilder.GetCurrentDeck().main.empty() && mainGame->deckBuilder.GetCurrentDeck().main.size() == 1)
-							indexLookedUpCard = 0;
-						else if (!mainGame->deckBuilder.GetCurrentDeck().main.empty() && indexLookedUpCard < mainGame->deckBuilder.GetCurrentDeck().main.size() - 1)
-							indexLookedUpCard++;
-
-						if (!mainGame->deckBuilder.GetCurrentDeck().main.empty() && indexLookedUpCard < mainGame->deckBuilder.GetCurrentDeck().main.size() - 1) {
-							mainGame->ShowCardInfo(mainGame->deckBuilder.GetCurrentDeck().main[indexLookedUpCard]->code);
-							ReadCardName();
-						}
+						RightKeyLookCard(mainGame->deckBuilder.GetCurrentDeck().main);
 					}
 					else if (deckLooker == AccessibilityDeckFocus::DeckLookerLocId::EXTRA_DECK) {
-						if (!mainGame->deckBuilder.GetCurrentDeck().extra.empty() && mainGame->deckBuilder.GetCurrentDeck().extra.size() == 1)
-							indexLookedUpCard = 0;
-						else if (!mainGame->deckBuilder.GetCurrentDeck().extra.empty() && indexLookedUpCard < mainGame->deckBuilder.GetCurrentDeck().extra.size() - 1)
-							indexLookedUpCard++;
-
-						if (!mainGame->deckBuilder.GetCurrentDeck().extra.empty() && indexLookedUpCard < mainGame->deckBuilder.GetCurrentDeck().extra.size() - 1) {
-							mainGame->ShowCardInfo(mainGame->deckBuilder.GetCurrentDeck().extra[indexLookedUpCard]->code);
-							ReadCardName();
-						}
+						RightKeyLookCard(mainGame->deckBuilder.GetCurrentDeck().extra);
 					}
 					else if (deckLooker == AccessibilityDeckFocus::DeckLookerLocId::SIDE_DECK) {
-						if (!mainGame->deckBuilder.GetCurrentDeck().side.empty() && mainGame->deckBuilder.GetCurrentDeck().side.size() == 1)
-							indexLookedUpCard = 0;
-						else if (!mainGame->deckBuilder.GetCurrentDeck().side.empty() && indexLookedUpCard < mainGame->deckBuilder.GetCurrentDeck().side.size() - 1)
-							indexLookedUpCard++;
-
-						if (!mainGame->deckBuilder.GetCurrentDeck().side.empty() && indexLookedUpCard < mainGame->deckBuilder.GetCurrentDeck().side.size() - 1) {
-							mainGame->ShowCardInfo(mainGame->deckBuilder.GetCurrentDeck().side[indexLookedUpCard]->code);
-							ReadCardName();
-						}
+						RightKeyLookCard(mainGame->deckBuilder.GetCurrentDeck().side);
 					}
 					else if (deckLooker == AccessibilityDeckFocus::DeckLookerLocId::SEARCH) {
-						if (!mainGame->deckBuilder.results.empty() && mainGame->deckBuilder.results.size() == 1)
-							indexLookedUpCard = 0;
-						else if (!mainGame->deckBuilder.results.empty() && indexLookedUpCard < mainGame->deckBuilder.results.size() - 1)
-							indexLookedUpCard++;
-					
-						if (!mainGame->deckBuilder.results.empty() && indexLookedUpCard < mainGame->deckBuilder.results.size() - 1) {
-							mainGame->ShowCardInfo(mainGame->deckBuilder.results[indexLookedUpCard]->code);
-							ReadCardName();
-						}
+						RightKeyLookCard(mainGame->deckBuilder.results);
 					}
 					else if (deckLooker == AccessibilityDeckFocus::DeckLookerLocId::MENU) {
 						if (!scrollSelected) {
@@ -323,44 +291,17 @@ namespace ygo {
 			case irr::KEY_LEFT: {
 				if (!event.KeyInput.PressedDown && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
 					if (deckLooker == AccessibilityDeckFocus::DeckLookerLocId::MAIN_DECK) {
-						if (!mainGame->deckBuilder.GetCurrentDeck().main.empty() && mainGame->deckBuilder.GetCurrentDeck().main.size() == 1)
-							indexLookedUpCard = 0;
-						else if (mainGame->deckBuilder.GetCurrentDeck().main.size() && indexLookedUpCard <= mainGame->deckBuilder.GetCurrentDeck().main.size() && indexLookedUpCard > 0)
-							indexLookedUpCard--;
-						if (!mainGame->deckBuilder.GetCurrentDeck().main.empty() && indexLookedUpCard <= mainGame->deckBuilder.GetCurrentDeck().main.size()) {
-							mainGame->ShowCardInfo(mainGame->deckBuilder.GetCurrentDeck().main[indexLookedUpCard]->code);
-							ReadCardName();
-						}
+						LeftKeyLookCard(mainGame->deckBuilder.GetCurrentDeck().main);
 					}
 					else if (deckLooker == AccessibilityDeckFocus::DeckLookerLocId::EXTRA_DECK) {
-						if (!mainGame->deckBuilder.GetCurrentDeck().extra.empty() && mainGame->deckBuilder.GetCurrentDeck().extra.size() == 1)
-							indexLookedUpCard = 0;
-						else if (mainGame->deckBuilder.GetCurrentDeck().extra.size() && indexLookedUpCard <= mainGame->deckBuilder.GetCurrentDeck().extra.size() && indexLookedUpCard > 0)
-							indexLookedUpCard--;
-						if (!mainGame->deckBuilder.GetCurrentDeck().extra.empty() && indexLookedUpCard <= mainGame->deckBuilder.GetCurrentDeck().extra.size()) {
-							mainGame->ShowCardInfo(mainGame->deckBuilder.GetCurrentDeck().extra[indexLookedUpCard]->code);
-							ReadCardName();
-						}
+						LeftKeyLookCard(mainGame->deckBuilder.GetCurrentDeck().extra);
+
 					}
 					else if (deckLooker == AccessibilityDeckFocus::DeckLookerLocId::SIDE_DECK) {
-						if (!mainGame->deckBuilder.GetCurrentDeck().side.empty() && mainGame->deckBuilder.GetCurrentDeck().side.size() == 1)
-							indexLookedUpCard = 0;
-						else if (mainGame->deckBuilder.GetCurrentDeck().side.size() && indexLookedUpCard <= mainGame->deckBuilder.GetCurrentDeck().side.size() && indexLookedUpCard > 0)
-							indexLookedUpCard--;
-						if (!mainGame->deckBuilder.GetCurrentDeck().side.empty() && indexLookedUpCard <= mainGame->deckBuilder.GetCurrentDeck().side.size()) {
-							mainGame->ShowCardInfo(mainGame->deckBuilder.GetCurrentDeck().side[indexLookedUpCard]->code);
-							ReadCardName();
-						}
+						LeftKeyLookCard(mainGame->deckBuilder.GetCurrentDeck().side);
 					}
 					else if (deckLooker == AccessibilityDeckFocus::DeckLookerLocId::SEARCH) {
-						if (!mainGame->deckBuilder.results.empty() && mainGame->deckBuilder.results.size() == 1)
-							indexLookedUpCard = 0;
-						else if (mainGame->deckBuilder.results.size() && indexLookedUpCard <= mainGame->deckBuilder.results.size() && indexLookedUpCard > 0)
-							indexLookedUpCard--;
-						if (!mainGame->deckBuilder.results.empty() && indexLookedUpCard <= mainGame->deckBuilder.results.size()) {
-							mainGame->ShowCardInfo(mainGame->deckBuilder.results[indexLookedUpCard]->code);
-							ReadCardName();
-						}
+						LeftKeyLookCard(mainGame->deckBuilder.results);
 					}
 					else if (deckLooker == AccessibilityDeckFocus::DeckLookerLocId::MENU) {
 						if (!scrollSelected) {
@@ -407,17 +348,33 @@ namespace ygo {
 		return;
 	}
 
-	void DeckHandler::ReadCardName() {
+	void DeckHandler::RightKeyLookCard(const std::vector<const CardDataC*>& deck) {
+		if (!deck.empty() && deck.size() == 1)
+			indexLookedUpCard = 0;
+		else if (!deck.empty() && indexLookedUpCard < deck.size() - 1)
+			indexLookedUpCard++;
+
+		if (!deck.empty() && indexLookedUpCard < deck.size()) {
+			mainGame->ShowCardInfo(deck[indexLookedUpCard]->code);
+			ReadCardName(deck);
+		}
+	}
+
+	void DeckHandler::LeftKeyLookCard(const std::vector<const CardDataC*>& deck) {
+		if (!deck.empty() && deck.size() == 1)
+			indexLookedUpCard = 0;
+		else if (deck.size() && indexLookedUpCard <= deck.size() && indexLookedUpCard > 0)
+			indexLookedUpCard--;
+		if (!deck.empty() && indexLookedUpCard <= deck.size()) {
+			mainGame->ShowCardInfo(deck[indexLookedUpCard]->code);
+			ReadCardName(deck);
+		}
+	}
+
+	void DeckHandler::ReadCardName(const std::vector<const CardDataC*> &deck) {
 		std::wstring nvdaString;
-		if (deckLooker == AccessibilityDeckFocus::DeckLookerLocId::MAIN_DECK) {
-			if (mainGame->deckBuilder.GetCurrentDeck().main.size() > indexLookedUpCard && mainGame->deckBuilder.GetCurrentDeck().main[indexLookedUpCard]->code != 0)
-				nvdaString = fmt::format(L"{} {} attack {} defense", gDataManager->GetName(mainGame->deckBuilder.GetCurrentDeck().main[indexLookedUpCard]->code), mainGame->deckBuilder.GetCurrentDeck().main[indexLookedUpCard]->attack, mainGame->deckBuilder.GetCurrentDeck().main[indexLookedUpCard]->defense);
-		}
-		else if (deckLooker == AccessibilityDeckFocus::DeckLookerLocId::SEARCH) {
-			if (mainGame->deckBuilder.results.size() > indexLookedUpCard && mainGame->deckBuilder.results[indexLookedUpCard]->code != 0)
-				nvdaString = fmt::format(L"{} {} attack {} defense", gDataManager->GetName(mainGame->deckBuilder.results[indexLookedUpCard]->code), mainGame->deckBuilder.results[indexLookedUpCard]->attack, mainGame->deckBuilder.results[indexLookedUpCard]->defense);
-		}
-		
+		if (deck.size() > indexLookedUpCard && deck[indexLookedUpCard]->code != 0)
+			nvdaString = fmt::format(L"{} {} attack {} defense", gDataManager->GetName(deck[indexLookedUpCard]->code), deck[indexLookedUpCard]->attack, deck[indexLookedUpCard]->defense);
 		ScreenReader::getReader()->readScreen(nvdaString.c_str());
 	}
 

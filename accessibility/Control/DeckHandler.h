@@ -37,7 +37,9 @@ namespace ygo {
 		std::vector<std::wstring> menu = { L"Deck", L"Search", L"Category", L"Sub Category", L"Attribute", L"Type", L"Level", L"Scale", L"Limit", L"Attack", L"Defense", L"Link Marker", L"Effect", L"Clear Search" };
 		AccessibilityDeckFocus::DeckLookerLocId deckLooker = AccessibilityDeckFocus::DeckLookerLocId::MAIN_DECK;
 
-		void ReadCardName();
+		void ReadCardName(const std::vector<const CardDataC*> &deck);
+		void RightKeyLookCard(const std::vector<const CardDataC*> &deck);
+		void LeftKeyLookCard(const std::vector<const CardDataC*> &deck);
 
 		void DeckOptionsMenu();
 	};

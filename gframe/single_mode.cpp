@@ -13,6 +13,7 @@
 #include <IGUIButton.h>
 #include <IGUIContextMenu.h>
 #include <IGUITabControl.h>
+#include <ScreenReader/ScreenReader.h>
 
 namespace ygo {
 
@@ -404,6 +405,7 @@ bool SingleMode::SinglePlayAnalyze(CoreUtils::Packet& packet) {
 			} else {
 				std::unique_lock<std::mutex> lock(mainGame->gMutex);
 				mainGame->stMessage->setText(BufferIO::DecodeUTF8({ reinterpret_cast<char*>(pbuf), len }).data());
+				ScreenReader::getReader()->readScreen(BufferIO::DecodeUTF8({ reinterpret_cast<char*>(pbuf), len }).data());
 				mainGame->PopupElement(mainGame->wMessage);
 				mainGame->actionSignal.Wait(lock);
 			}

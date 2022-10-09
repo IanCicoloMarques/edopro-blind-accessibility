@@ -463,10 +463,6 @@ namespace ygo {
 						else if (mainGame->dField.selectable_cards.size() != 0) {
 							DisplayCards(mainGame->dField.selectable_cards, fmt::format(L"Selectable Cards"));
 						}
-						else if (mainGame->ebANCard->isTrulyVisible()) {
-							ScreenReader::getReader()->readScreen(L"Declare Card Name", false);
-							mainGame->env->setFocus(mainGame->ebANCard);
-						}
 					}
 					else
 						CloseDialog();
@@ -589,6 +585,12 @@ namespace ygo {
 						std::wstring nvdaString = fmt::format(L"{}", mainGame->cbANNumber->getItem(mainGame->cbANNumber->getSelected()));
 						ScreenReader::getReader()->readScreen(nvdaString.c_str(), false);
 					}
+					//Fazer função de focus
+					else if (mainGame->ebANCard->isTrulyVisible()) {
+						if (!mainGame->env->hasFocus(mainGame->ebANCard))
+							mainGame->env->setFocus(mainGame->ebANCard);
+						ScreenReader::getReader()->readScreen(L"Type Card Name", false);
+					}
 				}
 				break;
 			}
@@ -669,17 +671,12 @@ namespace ygo {
 					ScreenReader::getReader()->readScreen(StringBuilder::getBuiltMessage(), false);
 				}
 				else if (!event.KeyInput.PressedDown && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
+					//Criar funções menores pra dividir
 					if (mainGame->cbANNumber->isTrulyVisible()) {
 						if (!mainGame->env->hasFocus(mainGame->cbANNumber))
 							mainGame->env->setFocus(mainGame->cbANNumber);
 						std::wstring nvdaString = fmt::format(L"{}", mainGame->cbANNumber->getItem(mainGame->cbANNumber->getSelected()));
 						ScreenReader::getReader()->readScreen(nvdaString.c_str(), false);
-					}
-					else if (mainGame->btnOptionn->isTrulyVisible())
-						TriggerEvent(mainGame->btnOptionn, irr::gui::EGET_BUTTON_CLICKED);
-					else if (mainGame->btnOption[0]->isTrulyVisible() && mainGame->dField.selected_option - 1 >= 0 && mainGame->dField.selected_option - 1 < mainGame->dField.select_options.size()) {
-						mainGame->dField.selected_option--;
-						ScreenReader::getReader()->readScreen(gDataManager->GetDesc(mainGame->dField.select_options[mainGame->dField.selected_option], mainGame->dInfo.compat_mode).data(), false);
 					}
 					else if (mainGame->lstANCard->isTrulyVisible()) {
 						if (!mainGame->env->hasFocus(mainGame->lstANCard))
@@ -688,6 +685,12 @@ namespace ygo {
 							std::wstring nvdaString = fmt::format(L"{}", mainGame->lstANCard->getListItem(mainGame->lstANCard->getSelected()));
 							ScreenReader::getReader()->readScreen(nvdaString.c_str(), false);
 						}
+					}
+					else if (mainGame->btnOptionn->isTrulyVisible())
+						TriggerEvent(mainGame->btnOptionn, irr::gui::EGET_BUTTON_CLICKED);
+					else if (mainGame->btnOption[0]->isTrulyVisible() && mainGame->dField.selected_option - 1 >= 0 && mainGame->dField.selected_option - 1 < mainGame->dField.select_options.size()) {
+						mainGame->dField.selected_option--;
+						ScreenReader::getReader()->readScreen(gDataManager->GetDesc(mainGame->dField.select_options[mainGame->dField.selected_option], mainGame->dInfo.compat_mode).data(), false);
 					}
 					else if (displayedField != AccessibilityFieldFocus::DisplayedField::ENEMY_PLAYER) {
 						displayedField = AccessibilityFieldFocus::DisplayedField::ENEMY_PLAYER;

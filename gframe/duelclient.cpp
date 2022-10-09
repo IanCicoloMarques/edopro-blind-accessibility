@@ -4246,7 +4246,7 @@ int DuelClient::ClientAnalyze(const uint8_t* msg, uint32_t len) {
 		mainGame->ebANCard->setText(L"");
 		mainGame->wANCard->setText(gDataManager->GetDesc(select_hint ? select_hint : 564, mainGame->dInfo.compat_mode).data());
 		ScreenReader::getReader()->readScreen(fmt::format(gDataManager->GetDesc(select_hint ? select_hint : 564, mainGame->dInfo.compat_mode)));
-		ScreenReader::getReader()->readScreen(L"Press the key Z to type the cards name. After that, press the key enter to confirm and use the arrow keys Up and Down to search the card.");
+		ScreenReader::getReader()->readScreen(L"Press the key Space to type the cards name. After that, press the key enter to confirm and use the arrow keys Up and Down to search the card.");
 		ScreenReader::getReader()->cleanBuiltMessage();
 		ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
 		mainGame->dField.UpdateDeclarableList();

@@ -278,26 +278,24 @@ namespace ygo {
 						if (mainGame->roomListTable->getSelected() >= 0) {
 							if (mainGame->ebRPName->isTrulyVisible()) {
 								menu = menuPassword;
-								menuSelectCounter = 0;
-								currentMenu = menu.at(menuSelectCounter);
 							}
 							else {
 								menu = menuRulesOkOnline;
-								menuSelectCounter = 0;
-								currentMenu = menu.at(menuSelectCounter);
 							}
+							menuSelectCounter = 0;
+							currentMenu = menu.at(menuSelectCounter);
 						}
 						break;
 					}
 					case BUTTON_ROOMPASSWORD_OK: {
-						menuSelectCounter = 0;
-						currentMenu = menu.at(menuSelectCounter);
 						if (mainGame->cbDeckSelect->isTrulyVisible()) {
 							menu = menuRulesOkOnline;
 						}
 						else {
 							menu = menuOnline;
 						}
+						menuSelectCounter = 0;
+						currentMenu = menu.at(menuSelectCounter);
 						break;
 					}
 					case BUTTON_ROOMPASSWORD_CANCEL: {

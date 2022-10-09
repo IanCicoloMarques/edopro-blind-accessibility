@@ -1104,10 +1104,13 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				}
 				if(id >= BUTTON_DISPLAY_0 && id <= BUTTON_DISPLAY_4) {
 					int pos = mainGame->scrDisplayList->getPos() / 10;
-					ClientCard* mcard = display_cards[id - BUTTON_DISPLAY_0 + pos];
-					if(mcard)
-						SetShowMark(mcard, false);
-					mainGame->stCardListTip->setVisible(false);
+					int display_cards_pos = id - BUTTON_DISPLAY_0 + pos;
+					if (display_cards.size() > display_cards_pos) {
+						ClientCard* mcard = display_cards[id - BUTTON_DISPLAY_0 + pos];
+						if(mcard)
+							SetShowMark(mcard, false);
+						mainGame->stCardListTip->setVisible(false);
+					}
 				}
 			}
 			if(id == TEXT_CARD_LIST_TIP) {

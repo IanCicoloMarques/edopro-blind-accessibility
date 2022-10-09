@@ -39,7 +39,4 @@ CMakeLists.txt.user
 /deploy/
 premake5
 premake5.exe
-/freetype/*
-/irrlicht/*
-!/irrlicht/premake5.lua
-!/irrlicht/defines.lua
+

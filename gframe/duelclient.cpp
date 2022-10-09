@@ -1947,6 +1947,9 @@ int DuelClient::ClientAnalyze(const uint8_t* msg, uint32_t len) {
 			ScreenReader::getReader()->buildMessage(gDataManager->GetAccessibilityString(63).data());
 		} else {
 			text = fmt::sprintf(gDataManager->GetDesc(desc, mainGame->dInfo.compat_mode), gDataManager->GetName(code));
+			ScreenReader::getReader()->readScreen(text.c_str());
+			ScreenReader::getReader()->cleanBuiltMessage();
+			ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
 		}
 		std::lock_guard<std::mutex> lock(mainGame->gMutex);
 		ClientCard* pcard = mainGame->dField.GetCard(info.controler, info.location, info.sequence);
@@ -2760,6 +2763,9 @@ int DuelClient::ClientAnalyze(const uint8_t* msg, uint32_t len) {
 			std::unique_lock<std::mutex> lock(mainGame->gMutex);
 			mainGame->dField.selectable_cards = panel_confirm;
 			mainGame->wCardSelect->setText(fmt::sprintf(gDataManager->GetSysString(208), panel_confirm.size()).data());
+			ScreenReader::getReader()->readScreen(fmt::sprintf(gDataManager->GetSysString(208), panel_confirm.size()).data());
+			ScreenReader::getReader()->cleanBuiltMessage();
+			ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
 			mainGame->dField.ShowSelectCard(true);
 			mainGame->actionSignal.Wait(lock);
 		}
@@ -3097,6 +3103,7 @@ int DuelClient::ClientAnalyze(const uint8_t* msg, uint32_t len) {
 			mainGame->btnM1->setVisible(true);
 			mainGame->btnM1->setSubElement(true);
 			mainGame->showcardcode = 6;
+			EventHandler::battlePhase = AccessibilityFieldFocus::BattleStep::MP1;
 			ScreenReader::getReader()->readScreen(L"Main Phase One");
 			ScreenReader::getReader()->cleanBuiltMessage();
 			ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
@@ -3108,6 +3115,7 @@ int DuelClient::ClientAnalyze(const uint8_t* msg, uint32_t len) {
 			mainGame->btnBP->setPressed(true);
 			mainGame->btnBP->setEnabled(false);
 			mainGame->showcardcode = 7;
+			EventHandler::battlePhase = AccessibilityFieldFocus::BattleStep::BP;
 			ScreenReader::getReader()->readScreen(L"Battle Phase");
 			ScreenReader::getReader()->cleanBuiltMessage();
 			ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
@@ -3119,6 +3127,7 @@ int DuelClient::ClientAnalyze(const uint8_t* msg, uint32_t len) {
 			mainGame->btnM2->setPressed(true);
 			mainGame->btnM2->setEnabled(false);
 			mainGame->showcardcode = 8;
+			EventHandler::battlePhase = AccessibilityFieldFocus::BattleStep::MP2;
 			ScreenReader::getReader()->readScreen(L"Main Phase Two");
 			ScreenReader::getReader()->cleanBuiltMessage();
 			ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());

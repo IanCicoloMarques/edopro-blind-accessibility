@@ -20,6 +20,7 @@
 #include <IGUIScrollBar.h>
 #include <IGUIComboBox.h>
 #include <IGUIListBox.h>
+#include <IGUICheckBox.h>
 
 namespace ygo {
 	class EventHandler : public IEventHandler
@@ -35,6 +36,7 @@ namespace ygo {
 	private:
 		bool selectZone = false;
 		int cardSelectPosition = 0;
+		int selectAttribute = 0;
 		AccessibilityFieldFocus::DisplayedField displayedField = AccessibilityFieldFocus::DisplayedField::PLAYER;
 		int displayedCards = AccessibilityFieldFocus::DisplayedCards::NO_DISPLAY;
 		int cardType = AccessibilityFieldFocus::CardType::MONSTER;

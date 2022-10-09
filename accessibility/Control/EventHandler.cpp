@@ -579,17 +579,27 @@ namespace ygo {
 					ScreenReader::getReader()->readScreen(StringBuilder::getBuiltMessage(), false);
 				}
 				else if (!event.KeyInput.PressedDown && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
+					//Fazer função de focus
 					if (mainGame->cbANNumber->isTrulyVisible()) {
 						if (!mainGame->env->hasFocus(mainGame->cbANNumber))
 							mainGame->env->setFocus(mainGame->cbANNumber);
 						std::wstring nvdaString = fmt::format(L"{}", mainGame->cbANNumber->getItem(mainGame->cbANNumber->getSelected()));
 						ScreenReader::getReader()->readScreen(nvdaString.c_str(), false);
 					}
-					//Fazer função de focus
 					else if (mainGame->ebANCard->isTrulyVisible()) {
 						if (!mainGame->env->hasFocus(mainGame->ebANCard))
 							mainGame->env->setFocus(mainGame->ebANCard);
 						ScreenReader::getReader()->readScreen(L"Type Card Name", false);
+					}
+					else if (mainGame->wANRace->isTrulyVisible()) {
+						if (!mainGame->env->hasFocus(mainGame->wANRace))
+							mainGame->env->setFocus(mainGame->wANRace);
+						ScreenReader::getReader()->readScreen(L"Select Race", false);
+					}
+					else if (mainGame->wANAttribute->isTrulyVisible()) {
+						if (!mainGame->env->hasFocus(mainGame->wANAttribute))
+							mainGame->env->setFocus(mainGame->wANAttribute);
+						ScreenReader::getReader()->readScreen(L"Select Attribute", false);
 					}
 				}
 				break;
@@ -686,6 +696,18 @@ namespace ygo {
 							ScreenReader::getReader()->readScreen(nvdaString.c_str(), false);
 						}
 					}
+					else if (selectAttribute < 7 && mainGame->chkAttribute[selectAttribute]->isTrulyVisible()) {
+						for (int i = selectAttribute+1; i < 7; i++) {
+							if (mainGame->chkAttribute[i]->isVisible()) {
+								if (!mainGame->env->hasFocus(mainGame->chkAttribute[i]))
+									mainGame->env->setFocus(mainGame->chkAttribute[i]);
+								std::wstring nvdaString = fmt::format(L"{}", mainGame->chkAttribute[i]->getText());
+								ScreenReader::getReader()->readScreen(nvdaString.c_str(), false);
+								selectAttribute = i;
+								break;
+							}
+						}
+					}
 					else if (mainGame->btnOptionn->isTrulyVisible())
 						TriggerEvent(mainGame->btnOptionn, irr::gui::EGET_BUTTON_CLICKED);
 					else if (mainGame->btnOption[0]->isTrulyVisible() && mainGame->dField.selected_option - 1 >= 0 && mainGame->dField.selected_option - 1 < mainGame->dField.select_options.size()) {
@@ -715,6 +737,18 @@ namespace ygo {
 							mainGame->env->setFocus(mainGame->cbANNumber);
 						std::wstring nvdaString = fmt::format(L"{}", mainGame->cbANNumber->getItem(mainGame->cbANNumber->getSelected()));
 						ScreenReader::getReader()->readScreen(nvdaString.c_str(), false);
+					}
+					else if (selectAttribute > 0 && mainGame->chkAttribute[selectAttribute]->isTrulyVisible()) {
+						for (int i = selectAttribute - 1; i >= 0; i--) {
+							if (mainGame->chkAttribute[i]->isVisible()) {
+								if (!mainGame->env->hasFocus(mainGame->chkAttribute[i]))
+									mainGame->env->setFocus(mainGame->chkAttribute[i]);
+								std::wstring nvdaString = fmt::format(L"{}", mainGame->chkAttribute[i]->getText());
+								ScreenReader::getReader()->readScreen(nvdaString.c_str(), false);
+								selectAttribute = i;
+								break;
+							}
+						}
 					}
 					else if (mainGame->btnOptionp->isTrulyVisible())
 						TriggerEvent(mainGame->btnOptionp, irr::gui::EGET_BUTTON_CLICKED);
@@ -986,6 +1020,10 @@ namespace ygo {
 			TriggerEvent(mainGame->btnCategoryOK, irr::gui::EGET_BUTTON_CLICKED);
 		if (mainGame->btnMarksOK->isTrulyVisible())
 			TriggerEvent(mainGame->btnMarksOK, irr::gui::EGET_BUTTON_CLICKED);
+		if (mainGame->chkAttribute[selectAttribute]->isTrulyVisible()) {
+			mainGame->chkAttribute[selectAttribute]->setChecked(!mainGame->chkAttribute[selectAttribute]->isChecked());
+			TriggerEvent(mainGame->chkAttribute[selectAttribute], irr::gui::EGET_CHECKBOX_CHANGED);
+		}
 	}
 
 	void EventHandler::EffectResolver(irr::SEvent event) {
@@ -1806,7 +1844,6 @@ namespace ygo {
 			case irr::gui::EGET_BUTTON_CLICKED: {
 				switch (id) {
 					case BUTTON_ANCARD_OK: {
-						//This changes the cards to the enemy field when attacking a monster, so the player doesn't have to do this manually
 						if (AccessibilityConfiguration::accessibilityShortcuts) {
 							if (mainGame->lstANCard->getSelected() != -1) {
 								std::wstring nvdaString = fmt::format(L"{} card name selected", mainGame->lstANCard->getListItem(mainGame->lstANCard->getSelected()));
@@ -1838,7 +1875,20 @@ namespace ygo {
 						}
 						break;
 					}
-				 break;
+					break;
+				}
+			}
+			case irr::gui::EGET_CHECKBOX_CHANGED: {
+				switch (id) {
+					case CHECK_ATTRIBUTE: {
+						if (AccessibilityConfiguration::accessibilityShortcuts) {
+							std::wstring nvdaString = fmt::format(L"Element {} selected", mainGame->chkAttribute[selectAttribute]->getText());
+							ScreenReader::getReader()->readScreen(nvdaString.c_str(), false);
+							selectAttribute = 0;
+						}
+						break;
+					}
+					break;
 				}
 			}
 		}

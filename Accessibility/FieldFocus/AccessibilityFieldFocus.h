@@ -70,7 +70,8 @@ namespace ygo {
 			GRAVEYARD = 6,
 			BANNED = 7,
 			DECK = 8,
-			CHAIN = 9
+			CHAIN = 9,
+			EXTRA_DECK = 10
 		};
 
 		enum BattleStep

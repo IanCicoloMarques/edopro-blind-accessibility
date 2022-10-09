@@ -8,6 +8,8 @@
 namespace ygo {
 	IEventHandler* EventHandler::eventHandler = nullptr;
 	int EventHandler::indexLookedUpCard = 0;
+	int EventHandler::battlePhase = AccessibilityFieldFocus::BattleStep::MP1;
+	bool EventHandler::effectResolver = false;
 	static AccessibilityFieldFocus::FieldLookerLocId lookupFieldLocId;
 
 	static inline void TriggerEvent(irr::gui::IGUIElement* target, irr::gui::EGUI_EVENT_TYPE type) {
@@ -115,10 +117,11 @@ namespace ygo {
 					ScreenReader::getReader()->readScreen(StringBuilder::getBuiltMessage(), false);
 				}
 				else if (!event.KeyInput.PressedDown && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
+					if(std::find(mainGame->dField.spsummonable_cards.begin(), mainGame->dField.spsummonable_cards.end(), mainGame->dField.clicked_card) == mainGame->dField.spsummonable_cards.end())
+						EffectResolver(event);
 					ChangeFieldByCard();
 					UseCard(AccessibilityFieldFocus::UseType::ACTIVATE, event);
 				}
-
 				break;
 			}
 			case irr::KEY_KEY_G: {
@@ -550,13 +553,8 @@ namespace ygo {
 				else if (!event.KeyInput.PressedDown) {
 					if (mainGame->btnBP->isEnabled() && battlePhase != AccessibilityFieldFocus::BattleStep::MP1)
 						battlePhase = AccessibilityFieldFocus::BattleStep::MP1;
-					//Criar função de trigger ok vai quebrar algo?
-					if (mainGame->btnMsgOK->isTrulyVisible())
-						TriggerEvent(mainGame->btnMsgOK, irr::gui::EGET_BUTTON_CLICKED);
-					if (mainGame->btnOptionOK->isVisible())
-						TriggerEvent(mainGame->btnOptionOK, irr::gui::EGET_BUTTON_CLICKED);
-					if (mainGame->btnANNumberOK->isTrulyVisible())
-						TriggerEvent(mainGame->btnANNumberOK, irr::gui::EGET_BUTTON_CLICKED);
+					//Criar função de trigger ok ?
+					TriggerOk();
 					if (mainGame->btnOption[0]->isTrulyVisible()) {
 						SetResponseSelectedOption();
 					}
@@ -564,7 +562,7 @@ namespace ygo {
 						mainGame->dField.clicked_card = mainGame->dField.display_cards[indexLookedUpCard];
 						std::wstring cardName = fmt::format(L"Selected {}", gDataManager->GetName(mainGame->dField.clicked_card->code));
 						ScreenReader::getReader()->readScreen(cardName.c_str());
-						if (mainGame->btnCardSelect[0]->isTrulyVisible() || mainGame->dField.clicked_card->cmdFlag == 4)
+						if (mainGame->btnCardSelect[0]->isTrulyVisible() || mainGame->dField.clicked_card->cmdFlag == 4 && std::find(mainGame->dField.spsummonable_cards.begin(), mainGame->dField.spsummonable_cards.end(), mainGame->dField.clicked_card) == mainGame->dField.spsummonable_cards.end())
 							UseCard(AccessibilityFieldFocus::UseType::NO_USE, event);
 						else
 							UseCard(AccessibilityFieldFocus::UseType::SELECT_CARD, event);
@@ -739,6 +737,12 @@ namespace ygo {
 					}
 					else
 					{
+						if (mainGame->btnDisplayOK->isTrulyVisible())
+							TriggerEvent(mainGame->btnDisplayOK, irr::gui::EGET_BUTTON_CLICKED);
+						if (lookupFieldLocId != AccessibilityFieldFocus::FieldLookerLocId::PLAYER_MONSTERS &&
+							lookupFieldLocId != AccessibilityFieldFocus::FieldLookerLocId::PLAYER_SPELLS &&
+							lookupFieldLocId != AccessibilityFieldFocus::FieldLookerLocId::LINK_ZONE)
+							lookupFieldLocId = AccessibilityFieldFocus::FieldLookerLocId::PLAYER_MONSTERS;
 						SelectFieldSlot(1, displayedField);
 						MouseClick(event);
 					}
@@ -768,6 +772,10 @@ namespace ygo {
 					{
 						if (mainGame->btnDisplayOK->isTrulyVisible())
 							TriggerEvent(mainGame->btnDisplayOK, irr::gui::EGET_BUTTON_CLICKED);
+						if (lookupFieldLocId != AccessibilityFieldFocus::FieldLookerLocId::PLAYER_MONSTERS &&
+							lookupFieldLocId != AccessibilityFieldFocus::FieldLookerLocId::PLAYER_SPELLS &&
+							lookupFieldLocId != AccessibilityFieldFocus::FieldLookerLocId::LINK_ZONE)
+							lookupFieldLocId = AccessibilityFieldFocus::FieldLookerLocId::PLAYER_MONSTERS;
 						SelectFieldSlot(2, displayedField);
 						MouseClick(event);
 					}
@@ -797,6 +805,10 @@ namespace ygo {
 					{
 						if (mainGame->btnDisplayOK->isTrulyVisible())
 							TriggerEvent(mainGame->btnDisplayOK, irr::gui::EGET_BUTTON_CLICKED);
+						if (lookupFieldLocId != AccessibilityFieldFocus::FieldLookerLocId::PLAYER_MONSTERS &&
+							lookupFieldLocId != AccessibilityFieldFocus::FieldLookerLocId::PLAYER_SPELLS &&
+							lookupFieldLocId != AccessibilityFieldFocus::FieldLookerLocId::LINK_ZONE)
+							lookupFieldLocId = AccessibilityFieldFocus::FieldLookerLocId::PLAYER_MONSTERS;
 						SelectFieldSlot(3, displayedField);
 						MouseClick(event);
 					}
@@ -818,6 +830,10 @@ namespace ygo {
 					else {
 						if (mainGame->btnDisplayOK->isTrulyVisible())
 							TriggerEvent(mainGame->btnDisplayOK, irr::gui::EGET_BUTTON_CLICKED);
+						if (lookupFieldLocId != AccessibilityFieldFocus::FieldLookerLocId::PLAYER_MONSTERS &&
+							lookupFieldLocId != AccessibilityFieldFocus::FieldLookerLocId::PLAYER_SPELLS &&
+							lookupFieldLocId != AccessibilityFieldFocus::FieldLookerLocId::LINK_ZONE)
+							lookupFieldLocId = AccessibilityFieldFocus::FieldLookerLocId::PLAYER_MONSTERS;
 						SelectFieldSlot(4, displayedField);
 						MouseClick(event);
 					}
@@ -839,6 +855,10 @@ namespace ygo {
 					else {
 						if (mainGame->btnDisplayOK->isTrulyVisible())
 							TriggerEvent(mainGame->btnDisplayOK, irr::gui::EGET_BUTTON_CLICKED);
+						if (lookupFieldLocId != AccessibilityFieldFocus::FieldLookerLocId::PLAYER_MONSTERS &&
+							lookupFieldLocId != AccessibilityFieldFocus::FieldLookerLocId::PLAYER_SPELLS &&
+							lookupFieldLocId != AccessibilityFieldFocus::FieldLookerLocId::LINK_ZONE)
+							lookupFieldLocId = AccessibilityFieldFocus::FieldLookerLocId::PLAYER_MONSTERS;
 						SelectFieldSlot(5, displayedField);
 						MouseClick(event);
 					}
@@ -855,6 +875,10 @@ namespace ygo {
 				else if (!event.KeyInput.PressedDown && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
 					if (mainGame->btnDisplayOK->isTrulyVisible())
 						TriggerEvent(mainGame->btnDisplayOK, irr::gui::EGET_BUTTON_CLICKED);
+					if (lookupFieldLocId != AccessibilityFieldFocus::FieldLookerLocId::PLAYER_MONSTERS &&
+						lookupFieldLocId != AccessibilityFieldFocus::FieldLookerLocId::PLAYER_SPELLS &&
+						lookupFieldLocId != AccessibilityFieldFocus::FieldLookerLocId::LINK_ZONE)
+						lookupFieldLocId = AccessibilityFieldFocus::FieldLookerLocId::PLAYER_MONSTERS;
 					SelectFieldSlot(6, displayedField);
 					MouseClick(event);
 				}
@@ -868,8 +892,13 @@ namespace ygo {
 					ScreenReader::getReader()->readScreen(StringBuilder::getBuiltMessage(), false);
 				}
 				else if (!event.KeyInput.PressedDown && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
+					//TODO - Transformar isso em função Select Slot
 					if (mainGame->btnDisplayOK->isTrulyVisible())
 						TriggerEvent(mainGame->btnDisplayOK, irr::gui::EGET_BUTTON_CLICKED);
+					if (lookupFieldLocId != AccessibilityFieldFocus::FieldLookerLocId::PLAYER_MONSTERS &&
+						lookupFieldLocId != AccessibilityFieldFocus::FieldLookerLocId::PLAYER_SPELLS &&
+						lookupFieldLocId != AccessibilityFieldFocus::FieldLookerLocId::LINK_ZONE)
+						lookupFieldLocId = AccessibilityFieldFocus::FieldLookerLocId::PLAYER_MONSTERS;
 					SelectFieldSlot(7, displayedField);
 					MouseClick(event);
 				}
@@ -911,6 +940,56 @@ namespace ygo {
 			newEvent.GUIEvent.EventType = irr::gui::EGUI_EVENT_TYPE::EGET_SCROLL_BAR_CHANGED;
 			mainGame->scrCardList->OnEvent(newEvent);
 		}
+	}
+
+	void EventHandler::TriggerOk() {
+		if (mainGame->btnCardSelect[indexLookedUpCard]->isTrulyVisible())
+			TriggerEvent(mainGame->btnCardSelect[indexLookedUpCard], irr::gui::EGET_BUTTON_CLICKED);
+		if (mainGame->btnMsgOK->isTrulyVisible())
+			TriggerEvent(mainGame->btnMsgOK, irr::gui::EGET_BUTTON_CLICKED);
+		if (mainGame->btnOptionOK->isVisible())
+			TriggerEvent(mainGame->btnOptionOK, irr::gui::EGET_BUTTON_CLICKED);
+		if (mainGame->btnANNumberOK->isTrulyVisible())
+			TriggerEvent(mainGame->btnANNumberOK, irr::gui::EGET_BUTTON_CLICKED);
+		if (mainGame->btnANCardOK->isTrulyVisible())
+			TriggerEvent(mainGame->btnANCardOK, irr::gui::EGET_BUTTON_CLICKED);
+		if (mainGame->btnSelectOK->isTrulyVisible())
+			TriggerEvent(mainGame->btnSelectOK, irr::gui::EGET_BUTTON_CLICKED);
+		if (mainGame->btnDisplayOK->isTrulyVisible())
+			TriggerEvent(mainGame->btnDisplayOK, irr::gui::EGET_BUTTON_CLICKED);
+		if (mainGame->btnSideOK->isTrulyVisible())
+			TriggerEvent(mainGame->btnSideOK, irr::gui::EGET_BUTTON_CLICKED);
+		if (mainGame->btnCategoryOK->isTrulyVisible())
+			TriggerEvent(mainGame->btnCategoryOK, irr::gui::EGET_BUTTON_CLICKED);
+		if (mainGame->btnMarksOK->isTrulyVisible())
+			TriggerEvent(mainGame->btnMarksOK, irr::gui::EGET_BUTTON_CLICKED);
+	}
+
+	void EventHandler::EffectResolver(irr::SEvent event) {
+		float effectResolverXPosition = 0.36f;
+		float effectResolverYPosition = 0.6f;
+		auto cursor = mainGame->device->getCursorControl();
+		auto pos = cursor->getRelativePosition();
+		pos.X = effectResolverXPosition;
+		pos.Y = effectResolverYPosition;
+		auto clamp = [](auto& val) { val = (val < 0.f) ? 0.f : (1.f < val) ? 1.f : val;	};
+		clamp(pos.X);
+		clamp(pos.Y);
+		cursor->setPosition(pos.X, pos.Y);
+		MouseClick(event);
+		if(mainGame->btnOperation->isTrulyVisible())
+			TriggerEvent(mainGame->btnOperation, irr::gui::EGET_BUTTON_CLICKED);
+	}
+
+	void EventHandler::GetCardLocation(ClientCard* card) {
+		if (card->location == LOCATION_EXTRA)
+			mainGame->dField.command_location = LOCATION_EXTRA;
+		else if (card->location == LOCATION_DECK)
+			mainGame->dField.command_location = LOCATION_DECK;
+		else if (card->location == LOCATION_GRAVE)
+			mainGame->dField.command_location = LOCATION_GRAVE;
+		else if (card->location == LOCATION_REMOVED)
+			mainGame->dField.command_location = LOCATION_REMOVED;
 	}
 
 	bool EventHandler::CheckIfCanViewCards(irr::SEvent event) {
@@ -1148,8 +1227,13 @@ namespace ygo {
 			}
 			case AccessibilityFieldFocus::UseType::ACTIVATE: {
 				lookupFieldLocId = AccessibilityFieldFocus::FieldLookerLocId::SELECTABLE_CARDS;
+				GetCardLocation(mainGame->dField.clicked_card);
 				if (mainGame->btnActivate->isTrulyVisible()) {
 					TriggerEvent(mainGame->btnActivate, irr::gui::EGET_BUTTON_CLICKED);
+					canUse = true;
+				}
+				else if (mainGame->btnOperation->isTrulyVisible()) {
+					TriggerEvent(mainGame->btnOperation, irr::gui::EGET_BUTTON_CLICKED);
 					canUse = true;
 				}
 				else
@@ -1186,7 +1270,7 @@ namespace ygo {
 				break;
 			}
 			case AccessibilityFieldFocus::UseType::SELECT_CARD: {
-				SelectFieldSlotNoPlayer(SearchFieldSlot(displayedField));
+				SelectFieldSlotHandAllowed(SearchFieldSlot(displayedField), displayedField);
 				MouseClick(event);
 				canUse = true;
 				break;
@@ -1241,27 +1325,172 @@ namespace ygo {
 		auto pos = cursor->getRelativePosition();
 		int fieldSlot = GetFieldSlot(slot, player);
 		pos.X = GetXPosition(fieldSlot, player);
-		pos.Y = GetYPosition();
-		auto test = matManager.vFieldMzone[1][0][2].Pos.X;
+		pos.Y = GetYPosition(player);
 		auto clamp = [](auto& val) { val = (val < 0.f) ? 0.f : (1.f < val) ? 1.f : val;	};
 		clamp(pos.X);
 		clamp(pos.Y);
 		cursor->setPosition(pos.X, pos.Y);
 	}
 
-	void EventHandler::SelectFieldSlotNoPlayer(int slot) {
+	void EventHandler::SelectFieldSlotHandAllowed(int slot, const AccessibilityFieldFocus::DisplayedField& player) {
 		if (slot == 0) slot = 1;
 		auto cursor = mainGame->device->getCursorControl();
-		auto pos = cursor->getRelativePosition();
-		pos.X = GetXPosition(slot);
-		pos.Y = GetYPosition(slot);
-		auto clamp = [](auto& val) { val = (val < 0.f) ? 0.f : (1.f < val) ? 1.f : val;	};
-		clamp(pos.X);
-		clamp(pos.Y);
 		if (GetCardField() == AccessibilityFieldFocus::DisplayedCards::DISPLAY_HAND)
 			cursor->setPosition(mainGame->dField.clicked_card->hand_collision.getCenter());
-		else
+		else {
+			auto pos = cursor->getRelativePosition();
+			int fieldSlot = GetFieldSlot(slot, player);
+			pos.X = GetXPosition(fieldSlot, player);
+			pos.Y = GetYPosition(player);
+			auto clamp = [](auto& val) { val = (val < 0.f) ? 0.f : (1.f < val) ? 1.f : val;	};
+			clamp(pos.X);
+			clamp(pos.Y);
 			cursor->setPosition(pos.X, pos.Y);
+		}
+	}
+
+	float EventHandler::GetXPosition(int slot, const AccessibilityFieldFocus::DisplayedField& player) {
+		float posX = 0.f;
+		if (lookupFieldLocId == AccessibilityFieldFocus::FieldLookerLocId::LINK_ZONE)
+			posX = GetXPositionLink(slot);
+		else if (player == AccessibilityFieldFocus::DisplayedField::PLAYER)
+			posX = GetXPositionPlayer(slot);
+		else if (player == AccessibilityFieldFocus::DisplayedField::ENEMY_PLAYER)
+			posX = GetXPositionEnemy(slot);
+		return posX;
+	}
+
+	float EventHandler::GetXPositionPlayer(int slot) {
+		float posX = 0.f;
+		auto fieldSlotSize = 0.08;
+		float startPosition = 0.40f;
+		if (slot > 5 && lookupFieldLocId == AccessibilityFieldFocus::FieldLookerLocId::PLAYER_SPELLS)
+			slot = -0.5;//041
+		float localSlot = slot;
+		if (lookupFieldLocId == AccessibilityFieldFocus::FieldLookerLocId::PLAYER_GRAVEYARD)
+			localSlot = 6;
+		else if (lookupFieldLocId == AccessibilityFieldFocus::FieldLookerLocId::PLAYER_DECK)
+			localSlot = 6.5f;
+		else if (lookupFieldLocId == AccessibilityFieldFocus::FieldLookerLocId::PLAYER_EXTRA_DECK)
+			localSlot = -0.5;
+		posX = startPosition + (localSlot * fieldSlotSize);
+		return posX;
+	}
+
+	float EventHandler::GetXPositionEnemy(int slot) {
+
+		float posX = 0.f;
+		auto fieldSlotSize = 0.073f;
+		float startPosition = 0.43f;
+		if (slot == 0 && lookupFieldLocId == AccessibilityFieldFocus::FieldLookerLocId::PLAYER_SPELLS) {
+			slot = 6;//041
+		}
+		int localSlot = slot;
+		if (lookupFieldLocId == AccessibilityFieldFocus::FieldLookerLocId::PLAYER_GRAVEYARD || lookupFieldLocId == AccessibilityFieldFocus::FieldLookerLocId::PLAYER_DECK) {
+			localSlot = 6;
+		}
+		posX = startPosition + (localSlot * fieldSlotSize);
+		return posX;
+	}
+
+	float EventHandler::GetXPositionLink(int slot) {
+		cardType = AccessibilityFieldFocus::CardType::LINK;
+
+		float posX = 0.f;
+		auto fieldSlotSize = 0.08;
+		switch (slot)
+		{
+		case 1: {
+			posX = 0.40 + (2 * fieldSlotSize);
+			break;
+		}
+		case 2: {
+			posX = 0.40 + (4 * fieldSlotSize);
+			break;
+		}
+		case 4: {
+			posX = 0.40 + (4 * fieldSlotSize);
+			break;
+		}
+		case 5: {
+			posX = 0.40 + (2 * fieldSlotSize);
+			break;
+		}
+		case 6: {
+			posX = 0.40 + (4 * fieldSlotSize);
+			break;
+		}
+		default:
+			posX = 0.60;
+			break;
+		}
+		return posX;
+	}
+
+	float EventHandler::GetXPosition(const AccessibilityFieldFocus::Scroll& position) {
+		float posX = 0.f;
+		switch (position)
+		{
+		case ygo::AccessibilityFieldFocus::Scroll::RIGHT: {
+			posX = 0.94f;
+			break;
+		}
+		case ygo::AccessibilityFieldFocus::Scroll::LEFT: {
+			posX = 0.36f;
+			break;
+		}
+		default:
+			break;
+		}
+		return posX;
+	}
+
+
+	float EventHandler::GetYPosition(const AccessibilityFieldFocus::DisplayedField& player) {
+		float posX = 0.f;
+		if (lookupFieldLocId == AccessibilityFieldFocus::FieldLookerLocId::LINK_ZONE)
+			posX = GetYPositionLink();
+		else if (player == AccessibilityFieldFocus::DisplayedField::PLAYER)
+			posX = GetYPositionPlayer();
+		else if (player == AccessibilityFieldFocus::DisplayedField::ENEMY_PLAYER)
+			posX = GetYPositionEnemy();
+		return posX;
+	}
+
+	float EventHandler::GetYPositionPlayer() {
+		float posY = 0.f;
+		auto fieldSlotSize = 0.08;
+		float startPosition = 0.40f;
+		if (lookupFieldLocId == AccessibilityFieldFocus::FieldLookerLocId::PLAYER_MONSTERS || lookupFieldLocId == AccessibilityFieldFocus::FieldLookerLocId::PLAYER_GRAVEYARD) {
+			posY = 0.64f;
+		}
+		if (lookupFieldLocId == AccessibilityFieldFocus::FieldLookerLocId::PLAYER_SPELLS) {
+			posY = 0.72f;
+		}
+		if (lookupFieldLocId == AccessibilityFieldFocus::FieldLookerLocId::PLAYER_DECK || lookupFieldLocId == AccessibilityFieldFocus::FieldLookerLocId::PLAYER_EXTRA_DECK) {
+			posY = 0.8f;
+		}
+		return posY;
+	}
+
+	float EventHandler::GetYPositionEnemy() {
+		float posY = 0.f;
+		float startPosY = 0.6f;
+		float startSpellPosY = 0.f;
+		float LinkSummonZoneY = 0.515f;
+		if (cardType == AccessibilityFieldFocus::CardType::SPELL) {
+			startSpellPosY = 0.15f;
+		}
+		//else if (lookupFieldLocId == AccessibilityFieldFocus::FieldLookerLocId::PLAYER_GRAVEYARD || slot > 5) {
+		//	startSpellPosY = 0.05f;
+		//}
+		posY = startPosY + startSpellPosY;
+		return posY;
+	}
+
+	float EventHandler::GetYPositionLink() {
+		float LinkSummonZoneY = 0.515f;
+		return LinkSummonZoneY;
 	}
 
 	void EventHandler::ChangeFieldByCard() {
@@ -1405,10 +1634,10 @@ namespace ygo {
 		//	lookupFieldLocId = AccessibilityFieldFocus::PLAYER_BANNED_CARDS;
 		//	cardType = AccessibilityFieldFocus::CardType::BANNED;
 		//}
-		//else if (mainGame->dField.clicked_card && mainGame->dField.clicked_card->location == AccessibilityFieldFocus::PLAYER_EXTRA_DECK) {
-		//	lookupFieldLocId = AccessibilityFieldFocus::PLAYER_EXTRA_DECK;
-		//	cardType = AccessibilityFieldFocus::CardType::MONSTER;
-		//}
+		else if (mainGame->dField.clicked_card && mainGame->dField.clicked_card->location == AccessibilityFieldFocus::PLAYER_EXTRA_DECK) {
+			lookupFieldLocId = AccessibilityFieldFocus::PLAYER_EXTRA_DECK;
+			cardType = AccessibilityFieldFocus::CardType::EXTRA_DECK;
+		}
 	}
 
 	void EventHandler::ReadCardName() {
@@ -1451,144 +1680,40 @@ namespace ygo {
 		SetLookUpField();
 		auto selectedCard = card == NULL ? mainGame->dField.clicked_card : card;
 		int fieldSlot = 0;
-		for (int i = 0; i < 7; i++) {
-			if ((mainGame->dField.mzone[displayedField][i] && mainGame->dField.mzone[displayedField][i] == selectedCard) || (mainGame->dField.szone[displayedField][i] && mainGame->dField.szone[displayedField][i] == selectedCard)) {
-				if (displayedField == AccessibilityFieldFocus::DisplayedField::PLAYER && i < 5)
-					fieldSlot = i + 1;
-				else if (i < 5)
-					fieldSlot = 5 - i;
-				else if (mainGame->dField.szone[displayedField][i] == selectedCard)
-					fieldSlot = i + 1;
-				else {
-					lookupFieldLocId = AccessibilityFieldFocus::FieldLookerLocId::LINK_ZONE;
-					if (displayedField == AccessibilityFieldFocus::DisplayedField::PLAYER)
-						fieldSlot = i - 4;
+		if (lookupFieldLocId != AccessibilityFieldFocus::PLAYER_GRAVEYARD &&
+			lookupFieldLocId != AccessibilityFieldFocus::PLAYER_EXTRA_DECK) {
+			for (int i = 0; i < 7; i++) {
+				if ((mainGame->dField.mzone[displayedField][i] && mainGame->dField.mzone[displayedField][i] == selectedCard) || (mainGame->dField.szone[displayedField][i] && mainGame->dField.szone[displayedField][i] == selectedCard)) {
+					if (displayedField == AccessibilityFieldFocus::DisplayedField::PLAYER && i < 5)
+						fieldSlot = i + 1;
+					else if (i < 5)
+						fieldSlot = 5 - i;
+					else if (mainGame->dField.szone[displayedField][i] == selectedCard)
+						fieldSlot = i + 1;
 					else {
-						if (i == 5)
-							fieldSlot = 2;
-						else
-							fieldSlot = 1;
+						lookupFieldLocId = AccessibilityFieldFocus::FieldLookerLocId::LINK_ZONE;
+						if (displayedField == AccessibilityFieldFocus::DisplayedField::PLAYER)
+							fieldSlot = i - 4;
+						else {
+							if (i == 5)
+								fieldSlot = 2;
+							else
+								fieldSlot = 1;
+						}
 					}
-				}
 
-				break;
+					break;
+				}
 			}
 		}
 		return fieldSlot;
-	}
-
-	float EventHandler::GetXPosition(int slot, const AccessibilityFieldFocus::DisplayedField& player) {
-		if (lookupFieldLocId == AccessibilityFieldFocus::FieldLookerLocId::LINK_ZONE) {
-			cardType = AccessibilityFieldFocus::CardType::LINK;
-		}
-		else if (slot > 5 && lookupFieldLocId == AccessibilityFieldFocus::FieldLookerLocId::PLAYER_SPELLS) {
-			slot = -0.5;//041
-		}
-		float posX = 0.f;
-		auto fieldSlotSize = 0.08;
-		float startPosition = 0.40f;
-		if (player == AccessibilityFieldFocus::DisplayedField::ENEMY_PLAYER && cardType != AccessibilityFieldFocus::CardType::LINK) {
-			fieldSlotSize = 0.073f;
-			startPosition = 0.43f;
-		}
-		if (cardType == AccessibilityFieldFocus::CardType::MONSTER || cardType == AccessibilityFieldFocus::CardType::SPELL)
-			posX = startPosition + (slot * fieldSlotSize);
-		else if (cardType == AccessibilityFieldFocus::CardType::LINK) {
-			switch (slot)
-			{
-			case 1: {
-				posX = 0.40 + (2 * fieldSlotSize);
-				break;
-			}
-			case 2: {
-				posX = 0.40 + (4 * fieldSlotSize);
-				break;
-			}
-			case 4: {
-				posX = 0.40 + (4 * fieldSlotSize);
-				break;
-			}
-			case 5: {
-				posX = 0.40 + (2 * fieldSlotSize);
-				break;
-			}
-			default:
-				posX = 0.60;
-				break;
-			}
-		}
-		else if (lookupFieldLocId == AccessibilityFieldFocus::FieldLookerLocId::PLAYER_GRAVEYARD || lookupFieldLocId == AccessibilityFieldFocus::FieldLookerLocId::PLAYER_DECK) {
-			int localSlot = 6;
-			if (displayedField == AccessibilityFieldFocus::DisplayedField::PLAYER) {
-				startPosition = 0.43f;
-			}
-			else {
-				startPosition = 0.0f;
-			}
-			posX = startPosition + (localSlot * fieldSlotSize);
-		}
-		return posX;
-	}
-
-	float EventHandler::GetXPosition(const AccessibilityFieldFocus::Scroll& position) {
-		float posX = 0.f;
-		switch (position)
-		{
-		case ygo::AccessibilityFieldFocus::Scroll::RIGHT: {
-			posX = 0.94f;
-			break;
-		}
-		case ygo::AccessibilityFieldFocus::Scroll::LEFT: {
-			posX = 0.36f;
-			break;
-		}
-		default:
-			break;
-		}
-		return posX;
-	}
-
-	float EventHandler::GetYPosition(int slot) {
-		float posY = 0.f;
-		float startPosY = 0.6f;
-		float startSpellPosY = 0.15f;
-		float LinkSummonZoneY = 0.515f;
-		if (displayedField == AccessibilityFieldFocus::DisplayedField::ENEMY_PLAYER) {
-			startPosY = 0.4f;
-			startSpellPosY = -0.05f;
-		}
-		if (lookupFieldLocId == AccessibilityFieldFocus::FieldLookerLocId::PLAYER_GRAVEYARD) {
-			/*if (displayedField == AccessibilityFieldFocus::DisplayedField::ENEMY_PLAYER)
-				startSpellPosY = -0.04f;
-			else*/
-			startSpellPosY = 0.05f;
-			posY = startPosY + startSpellPosY;
-		}
-		/*else if (lookupFieldLocId == AccessibilityFieldFocus::FieldLookerLocId::PLAYER_DECK) {
-			if (displayedField == AccessibilityFieldFocus::DisplayedField::ENEMY_PLAYER)
-				startSpellPosY = -0.09f;
-			else
-				startSpellPosY = 0.18f;
-			posY = startPosY + startSpellPosY;
-		}*/
-		else if (cardType == AccessibilityFieldFocus::CardType::MONSTER)
-			posY = startPosY;
-		else if (cardType == AccessibilityFieldFocus::CardType::SPELL) {
-			if (slot > 5) {
-				startSpellPosY = 0.05f;
-			}
-			posY = startPosY + startSpellPosY;
-		}
-		else if (cardType == AccessibilityFieldFocus::CardType::LINK)
-			posY = LinkSummonZoneY;
-		return posY;
 	}
 
 	void EventHandler::ChangeField(const AccessibilityFieldFocus::CardType& cardField) {
 		std::wstring nvdaString = L"";
 		cardType = cardField;
 		if (cardType == AccessibilityFieldFocus::CardType::LINK) {
-			lookupFieldLocId = AccessibilityFieldFocus::PLAYER_MONSTERS;
+			lookupFieldLocId = AccessibilityFieldFocus::LINK_ZONE;
 			cardType = AccessibilityFieldFocus::LINK;
 			nvdaString = fmt::format(L"Link Field");
 		}

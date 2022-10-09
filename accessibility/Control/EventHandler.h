@@ -29,12 +29,13 @@ namespace ygo {
 		void GuiEvent(const irr::SEvent& event) override;
 		static IEventHandler* eventHandler;
 		static int indexLookedUpCard;
+		static int battlePhase;
+		static bool effectResolver;
 	private:
 		bool selectZone = false;
 		int cardSelectPosition = 0;
 		AccessibilityFieldFocus::DisplayedField displayedField = AccessibilityFieldFocus::DisplayedField::PLAYER;
 		int displayedCards = AccessibilityFieldFocus::DisplayedCards::NO_DISPLAY;
-		int battlePhase = AccessibilityFieldFocus::BattleStep::MP1;
 		int cardType = AccessibilityFieldFocus::CardType::MONSTER;
 		bool CheckIfCanViewCards(irr::SEvent event);
 		void DisplayCards(const std::vector<ClientCard*>& field, const std::wstring& text);
@@ -46,9 +47,15 @@ namespace ygo {
 		void ShowMenu(int flag, int x, int y);
 		void MouseClick(const irr::SEvent& event, bool rightClick = false);
 		void ChangeFieldAndLook();
-		void SelectFieldSlotNoPlayer(int slot);
-		float GetYPosition(int slot = 1);
+		void SelectFieldSlotHandAllowed(int slot, const AccessibilityFieldFocus::DisplayedField& player = AccessibilityFieldFocus::DisplayedField::PLAYER);
+		float GetYPosition(const AccessibilityFieldFocus::DisplayedField& player = AccessibilityFieldFocus::DisplayedField::PLAYER);
+		float GetYPositionPlayer();
+		float GetYPositionEnemy();
+		float GetYPositionLink();
 		float GetXPosition(int slot, const AccessibilityFieldFocus::DisplayedField& player = AccessibilityFieldFocus::DisplayedField::PLAYER);
+		float GetXPositionPlayer(int slot);
+		float GetXPositionEnemy(int slot);
+		float GetXPositionLink(int slot);
 		AccessibilityFieldFocus::DisplayedCards GetCardField();
 		void SelectFieldSlot(int slot, const AccessibilityFieldFocus::DisplayedField& player = AccessibilityFieldFocus::DisplayedField::PLAYER, const AccessibilityFieldFocus::CardType& cardType = AccessibilityFieldFocus::CardType::NO_CARD_TYPE);
 		int SearchFieldSlot(const int& displayedField, ClientCard* card = NULL);
@@ -62,6 +69,9 @@ namespace ygo {
 		void ReadCardName();
 		void SetSelectableCards();
 		void SetResponseSelectedOption() const;
+		void TriggerOk();
+		void EffectResolver(irr::SEvent event);
+		void GetCardLocation(ClientCard* card);
 		/*
 		void SimulateButton(irr::gui::IGUIElement* caller = nullptr);
 		void SetMouseOnCard();

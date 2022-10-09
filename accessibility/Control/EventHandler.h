@@ -19,6 +19,7 @@
 #include <IGUIStaticText.h>
 #include <IGUIScrollBar.h>
 #include <IGUIComboBox.h>
+#include <IGUIListBox.h>
 
 namespace ygo {
 	class EventHandler : public IEventHandler

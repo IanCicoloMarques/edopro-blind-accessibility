@@ -463,6 +463,10 @@ namespace ygo {
 						else if (mainGame->dField.selectable_cards.size() != 0) {
 							DisplayCards(mainGame->dField.selectable_cards, fmt::format(L"Selectable Cards"));
 						}
+						else if (mainGame->ebANCard->isTrulyVisible()) {
+							ScreenReader::getReader()->readScreen(L"Declare Card Name", false);
+							mainGame->env->setFocus(mainGame->ebANCard);
+						}
 					}
 					else
 						CloseDialog();
@@ -677,6 +681,14 @@ namespace ygo {
 						mainGame->dField.selected_option--;
 						ScreenReader::getReader()->readScreen(gDataManager->GetDesc(mainGame->dField.select_options[mainGame->dField.selected_option], mainGame->dInfo.compat_mode).data(), false);
 					}
+					else if (mainGame->lstANCard->isTrulyVisible()) {
+						if (!mainGame->env->hasFocus(mainGame->lstANCard))
+							mainGame->env->setFocus(mainGame->lstANCard);
+						if (mainGame->lstANCard->getSelected() != -1) {
+							std::wstring nvdaString = fmt::format(L"{}", mainGame->lstANCard->getListItem(mainGame->lstANCard->getSelected()));
+							ScreenReader::getReader()->readScreen(nvdaString.c_str(), false);
+						}
+					}
 					else if (displayedField != AccessibilityFieldFocus::DisplayedField::ENEMY_PLAYER) {
 						displayedField = AccessibilityFieldFocus::DisplayedField::ENEMY_PLAYER;
 						std::wstring nvdaString = fmt::format(L"Enemy Player Field");
@@ -706,6 +718,14 @@ namespace ygo {
 					else if (mainGame->btnOption[0]->isTrulyVisible() && mainGame->dField.selected_option + 1 < mainGame->dField.select_options.size()) {
 						mainGame->dField.selected_option++;
 						ScreenReader::getReader()->readScreen(gDataManager->GetDesc(mainGame->dField.select_options[mainGame->dField.selected_option], mainGame->dInfo.compat_mode).data(), false);
+					}
+					else if (mainGame->lstANCard->isTrulyVisible()) {
+						if (!mainGame->env->hasFocus(mainGame->lstANCard))
+							mainGame->env->setFocus(mainGame->lstANCard);
+						if (mainGame->lstANCard->getSelected() != -1) {
+							std::wstring nvdaString = fmt::format(L"{}", mainGame->lstANCard->getListItem(mainGame->lstANCard->getSelected()));
+							ScreenReader::getReader()->readScreen(nvdaString.c_str(), false);
+						}
 					}
 					else if (displayedField != AccessibilityFieldFocus::DisplayedField::PLAYER) {
 						displayedField = AccessibilityFieldFocus::DisplayedField::PLAYER;
@@ -1782,6 +1802,16 @@ namespace ygo {
 		switch (event.GUIEvent.EventType) {
 			case irr::gui::EGET_BUTTON_CLICKED: {
 				switch (id) {
+					case BUTTON_ANCARD_OK: {
+						//This changes the cards to the enemy field when attacking a monster, so the player doesn't have to do this manually
+						if (AccessibilityConfiguration::accessibilityShortcuts) {
+							if (mainGame->lstANCard->getSelected() != -1) {
+								std::wstring nvdaString = fmt::format(L"{} card name selected", mainGame->lstANCard->getListItem(mainGame->lstANCard->getSelected()));
+								ScreenReader::getReader()->readScreen(nvdaString.c_str(), false);
+							}
+						}
+						break;
+					}
 					case BUTTON_CMD_ATTACK: {
 						//This changes the cards to the enemy field when attacking a monster, so the player doesn't have to do this manually
 						if (AccessibilityConfiguration::accessibilityShortcuts) {

@@ -75,6 +75,7 @@ namespace ygo {
 		void TriggerOk();
 		void EffectResolver(irr::SEvent event);
 		void GetCardLocation(ClientCard* card);
+		bool CheckAttributeSelector();
 		/*
 		void SimulateButton(irr::gui::IGUIElement* caller = nullptr);
 		void SetMouseOnCard();

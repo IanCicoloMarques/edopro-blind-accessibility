@@ -10,6 +10,7 @@
 #include "../gframe/data_manager.h"
 #include "../gframe/sound_manager.h"
 #include "../gframe/CGUIImageButton/CGUIImageButton.h"
+#include "../gframe/CGUIFileSelectListBox/CGUIFileSelectListBox.h"
 #include "../accessibility/Control/IEventHandler.h"
 #include "../accessibility/ScreenReader/StringBuilder.h"
 #include "../accessibility/ScreenReader/ScreenReader.h"
@@ -43,7 +44,7 @@ namespace ygo {
 		std::wstring currentMenu = L"Online Duel";
 		std::wstring oldMenu = L"Online Duel";
 		std::vector<std::wstring> menu;
-		std::vector<std::wstring> menuMain = { L"Online Duel", L"Duel", L"Deck Editor", L"Game Options", L"Accessibility" };
+		std::vector<std::wstring> menuMain = { L"Online Duel", L"Duel", L"Puzzles", L"Deck Editor", L"Game Options", L"Accessibility"};
 		std::vector<std::wstring> menuSinglePlayer = { L"Host Duel", L"Player Name" };
 		std::vector<std::wstring> menuHostDuel = { L"Rules ok", L"Num Players Team 1", L"Num Players Team 2", L"Best of", L"Time Limit", L"Starting LP", L"Starting Hand", L"Cards per Draw", L"Don't check deck", L"Don't shuffle deck", L"Room Name", L"Room Password" };
 		std::vector<std::wstring> menuRulesOk = { L"Start Duel", L"Select Deck", L"Player Ready", L"Select AI" };
@@ -53,6 +54,7 @@ namespace ygo {
 		std::vector<std::wstring> menuPassword = { L"Change Password", L"OK", L"Cancel" };
 		std::vector<std::wstring> menuDeckEditor = { L"OK", L"Cancel" };
 		std::vector<std::wstring> menuGameOptions = { L"Enable Sound Effects", L"Sound Effects Volume", L"Enable Music", L"Music Volume" };
+		std::vector<std::wstring> menuPuzzles = { L"" };
 		void CheckMenu();
 		void MainMenu();
 		void HostDuel();

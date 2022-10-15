@@ -138,6 +138,15 @@ namespace ygo {
 						else
 							ScreenReader::getReader()->textToSpeech(fmt::format(L"{} Player {}, {}", numPlayers, mainGame->roomListTable->getCellText(onlineMatchCounter, 5), mainGame->roomListTable->getCellText(onlineMatchCounter, 6)));
 					}
+					else if (mainGame->lstSinglePlayList->isTrulyVisible()) {
+						mainGame->env->setFocus(mainGame->lstSinglePlayList);
+						irr::s32 listItem = mainGame->lstSinglePlayList->getSelected();
+						if (listItem == -1) {
+							listItem = 0;
+							mainGame->lstSinglePlayList->setSelected(mainGame->lstSinglePlayList->getListItem(listItem));
+						}
+						ScreenReader::getReader()->textToSpeech(fmt::format(L"{}", mainGame->lstSinglePlayList->getListItem(listItem)));
+					}
 				}
 				break;
 			}
@@ -157,6 +166,15 @@ namespace ygo {
 							ScreenReader::getReader()->textToSpeech(fmt::format(L"{} Players {}, {}", numPlayers, mainGame->roomListTable->getCellText(onlineMatchCounter, 5), mainGame->roomListTable->getCellText(onlineMatchCounter, 6)));
 						else
 							ScreenReader::getReader()->textToSpeech(fmt::format(L"{} Player {}, {}", numPlayers, mainGame->roomListTable->getCellText(onlineMatchCounter, 5), mainGame->roomListTable->getCellText(onlineMatchCounter, 6)));
+					}
+					else if (mainGame->lstSinglePlayList->isTrulyVisible()) {
+						mainGame->env->setFocus(mainGame->lstSinglePlayList);
+						irr::s32 listItem = mainGame->lstSinglePlayList->getSelected();
+						if (listItem == -1) {
+							listItem = 0;
+							mainGame->lstSinglePlayList->setSelected(mainGame->lstSinglePlayList->getListItem(listItem));
+						}
+						ScreenReader::getReader()->textToSpeech(fmt::format(L"{}", mainGame->lstSinglePlayList->getListItem(listItem)));
 					}
 				}
 				break;
@@ -255,6 +273,8 @@ namespace ygo {
 						ClickButton(mainGame->btnJoinCancel2);
 					else if (mainGame->gSettings.window->isTrulyVisible())
 						mainGame->HideElement(mainGame->gSettings.window);
+					else if (mainGame->btnSinglePlayCancel->isTrulyVisible())
+						ClickButton(mainGame->btnSinglePlayCancel);
 					else if (mainGame->btnModeExit->isTrulyVisible())
 						ClickButton(mainGame->btnModeExit);
 					if (menu.empty())
@@ -475,6 +495,8 @@ namespace ygo {
 			menu = menuRulesOk;
 		else if (mainGame->btnCreateHost2->isEnabled() && mainGame->btnCreateHost2->isTrulyVisible())
 			menu = menuOnline;
+		else if (mainGame->btnSinglePlayCancel->isEnabled() && mainGame->btnSinglePlayCancel->isTrulyVisible())
+			menu = menuPuzzles;
 		else if ((mainGame->btnHostPrepDuelist->isEnabled() && mainGame->btnHostPrepDuelist->isTrulyVisible()) ||
 			mainGame->btnHostPrepOB->isEnabled() && mainGame->btnHostPrepOB->isTrulyVisible())
 			menu = menuRulesOkOnline;
@@ -487,6 +509,9 @@ namespace ygo {
 		}
 		else if (menuSelectCounter == MenuType::MainMenu::MM_SP_DUEL && mainGame->btnLanMode->isEnabled()) {
 			ClickButton(mainGame->btnLanMode);
+		}
+		else if (menuSelectCounter == MenuType::MainMenu::MM_PUZZLES && mainGame->btnSingleMode->isEnabled()) {
+			ClickButton(mainGame->btnSingleMode);
 		}
 		else if (menuSelectCounter == MenuType::MainMenu::MM_DECK_EDITOR && mainGame->btnDeckEdit->isEnabled()) {
 			ClickButton(mainGame->btnDeckEdit);

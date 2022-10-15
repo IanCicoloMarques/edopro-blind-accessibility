@@ -1672,6 +1672,8 @@ int DuelClient::ClientAnalyze(const uint8_t* msg, uint32_t len) {
 		mainGame->dField.Initial(mainGame->LocalPlayer(1), deckc, extrac);
 		mainGame->dInfo.turn = 0;
 		mainGame->dInfo.is_shuffling = false;
+		mainGame->dField.selectable_cards.clear();
+		mainGame->dField.display_cards.clear();
 		if (mainGame->dInfo.isFirst)
 			ScreenReader::getReader()->readScreen(gDataManager->GetAccessibilityString(59).data(), false);
 		else

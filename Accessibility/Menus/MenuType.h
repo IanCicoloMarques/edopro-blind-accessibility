@@ -17,12 +17,13 @@ namespace ygo {
 			ONLINE_MENU,
 			ROOM_PASSWORD_MENU,
 			DECK_EDITOR,
-			AI_CONFIGURATION
+			AI_CONFIGURATION, 
 		};
 
 		enum MainMenu {
 			MM_ONLINE_DUEL,
 			MM_SP_DUEL,
+			MM_PUZZLES,
 			MM_DECK_EDITOR,
 			MM_GAME_OPTIONS,
 			MM_ACCESSILITY_KEYS
@@ -113,6 +114,10 @@ namespace ygo {
 			DECKOP_LINK_MARKER,
 			DECKOP_EFFECT,
 			DECKOP_CLEAR_SEARCH
+		};
+
+		enum PuzzlesMenu {
+			PUZZLES_START
 		};
 	};
 }

@@ -61,7 +61,7 @@ namespace ygo {
 		float GetXPositionLink(int slot);
 		AccessibilityFieldFocus::DisplayedCards GetCardField();
 		void SelectFieldSlot(int slot, const AccessibilityFieldFocus::DisplayedField& player = AccessibilityFieldFocus::DisplayedField::PLAYER, const AccessibilityFieldFocus::CardType& cardType = AccessibilityFieldFocus::CardType::NO_CARD_TYPE);
-		int SearchFieldSlot(const int& displayedField, ClientCard* card = NULL);
+		int SearchFieldSlot(const int& displayedField, ClientCard* card = NULL, bool looped = false);
 		void ChangeFieldByCard();
 		std::wstring GetLinkMarks(ClientCard* card);
 		std::wstring GetOverlayedCards(ClientCard* card);

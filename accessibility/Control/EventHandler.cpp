@@ -1552,8 +1552,14 @@ namespace ygo {
 		float posY = 0.f;
 		float startSpellPosY = 0.f;
 		float LinkSummonZoneY = 0.515f;
-		if (lookupFieldLocId == AccessibilityFieldFocus::FieldLookerLocId::PLAYER_MONSTERS || lookupFieldLocId == AccessibilityFieldFocus::FieldLookerLocId::PLAYER_GRAVEYARD || lookupFieldLocId == AccessibilityFieldFocus::FieldLookerLocId::PLAYER_BANNED_CARDS) {
+		if (lookupFieldLocId == AccessibilityFieldFocus::FieldLookerLocId::PLAYER_MONSTERS) {
+			posY = 0.41f;
+		}
+		else if (lookupFieldLocId == AccessibilityFieldFocus::FieldLookerLocId::PLAYER_BANNED_CARDS) {
 			posY = 0.43f;
+		}
+		else if (lookupFieldLocId == AccessibilityFieldFocus::FieldLookerLocId::PLAYER_GRAVEYARD) {
+			posY = 0.39f;
 		}
 		else if (lookupFieldLocId == AccessibilityFieldFocus::FieldLookerLocId::PLAYER_SPELLS) {
 			posY = 0.35f;

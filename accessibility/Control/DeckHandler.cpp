@@ -47,6 +47,13 @@ namespace ygo {
 				}
 				break;
 			}
+			case irr::KEY_KEY_D: {
+				if (event.KeyInput.Control && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
+					mainGame->env->setFocus(mainGame->btnDeleteDeck);
+					TriggerEvent(mainGame->btnDeleteDeck, irr::gui::EGET_BUTTON_CLICKED);
+				}
+				break;
+			}
 			case irr::KEY_KEY_E: {
 				if (!event.KeyInput.PressedDown && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
 					indexLookedUpCard = 0;
@@ -64,12 +71,23 @@ namespace ygo {
 					}
 					ScreenReader::getReader()->readScreen(fmt::format(L"Deck {}", dname.data()));
 				}
+				else if (!event.KeyInput.PressedDown && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
+					if (deckEditor == AccessibilityDeckFocus::DeckLookerLocId::MAIN_DECK) {
+						deckEditor = AccessibilityDeckFocus::DeckLookerLocId::SIDE_DECK;
+						ScreenReader::getReader()->readScreen(L"Addind cards to Side Deck");
+					}
+					else{
+						deckEditor = AccessibilityDeckFocus::DeckLookerLocId::MAIN_DECK;
+						ScreenReader::getReader()->readScreen(L"Addind cards to Main Deck");
+					}
+				}
 				break;
 			}
 			case irr::KEY_KEY_G: {
 				if (event.KeyInput.Control && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
 					mainGame->env->setFocus(mainGame->btnClearDeck);
 					TriggerEvent(mainGame->btnClearDeck, irr::gui::EGET_BUTTON_CLICKED);
+					newDeck = true;
 				}
 				break;
 			}
@@ -85,6 +103,7 @@ namespace ygo {
 					std::wstring cardEffect;
 					std::wstring leftScale;
 					std::wstring rightScale;
+					//TODO - Transformar isso em função
 					if (deckLooker == AccessibilityDeckFocus::DeckLookerLocId::MAIN_DECK) {
 						auto pointer = gDataManager->GetCardData(mainGame->deckBuilder.GetCurrentDeck().main[indexLookedUpCard]->code);
 						if (pointer) {
@@ -193,9 +212,13 @@ namespace ygo {
 				break;
 			}
 			case irr::KEY_KEY_S: {
-				if (event.KeyInput.Control && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
+				if (event.KeyInput.Control && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX) && newDeck) {
 					mainGame->env->setFocus(mainGame->btnSaveDeckAs);
 					TriggerEvent(mainGame->btnSaveDeckAs, irr::gui::EGET_BUTTON_CLICKED);
+				}
+				else if (event.KeyInput.Control && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX) && !newDeck) {
+					mainGame->env->setFocus(mainGame->btnSaveDeck);
+					TriggerEvent(mainGame->btnSaveDeck, irr::gui::EGET_BUTTON_CLICKED);
 				}
 				break;
 			}
@@ -222,12 +245,14 @@ namespace ygo {
 							mainGame->deckBuilder.pop_side(indexLookedUpCard);
 					}
 					else if (deckLooker == AccessibilityDeckFocus::DeckLookerLocId::SEARCH) {
+						if (mainGame->deckBuilder.results.size() < indexLookedUpCard)
+							break;
 						auto pointer = gDataManager->GetCardData(mainGame->deckBuilder.results[indexLookedUpCard]->code);
 						if (!pointer || !mainGame->deckBuilder.check_limit(pointer)) {
 							ScreenReader::getReader()->readScreen(L"Already has the limit of this card on the deck");
 							break;
 						}
-						if (event.KeyInput.Shift) {
+						if (deckEditor == AccessibilityDeckFocus::DeckLookerLocId::SIDE_DECK) {
 							mainGame->deckBuilder.push_side(pointer);
 							ScreenReader::getReader()->readScreen(L"Added to the side deck");
 						}
@@ -340,6 +365,26 @@ namespace ygo {
 					TriggerEvent(mainGame->btnLeaveGame, irr::gui::EGET_BUTTON_CLICKED);
 				break;
 			}
+			case irr::KEY_COMMA: {
+				if (!event.KeyInput.PressedDown && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
+					if (mainGame->btnYes->isTrulyVisible()) {
+						TriggerEvent(mainGame->btnYes, irr::gui::EGET_BUTTON_CLICKED);
+						std::wstring nvdaString = fmt::format(L"Yes");
+						ScreenReader::getReader()->readScreen(nvdaString.c_str(), false);
+					}
+				}
+				break;
+			}
+			case irr::KEY_PERIOD: {
+				if (!event.KeyInput.PressedDown && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
+					if (mainGame->btnNo->isTrulyVisible()) {
+						TriggerEvent(mainGame->btnNo, irr::gui::EGET_BUTTON_CLICKED);
+						std::wstring nvdaString = fmt::format(L"No");
+						ScreenReader::getReader()->readScreen(nvdaString.c_str(), false);
+					}
+				}
+				break;
+			}
 		}
 	}
 
@@ -388,6 +433,7 @@ namespace ygo {
 				ScreenReader::getReader()->readScreen(fmt::format(L"Deck set to {}", mainGame->cbDBDecks->getItem(mainGame->cbDBDecks->getSelected())));
 				mainGame->env->removeFocus(mainGame->env->getFocus());
 				scrollSelected = false;
+				newDeck = false;
 			}
 		}
 		else if (menuSelectCounter == MenuType::DeckOptionsMenu::DECKOP_SEARCH && mainGame->ebCardName->isTrulyVisible()) {

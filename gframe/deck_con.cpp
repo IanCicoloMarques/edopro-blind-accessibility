@@ -294,6 +294,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				if(sel >= 0 && DeckManager::SaveDeck(Utils::ToPathString(mainGame->cbDBDecks->getItem(sel)), current_deck)) {
 					mainGame->stACMessage->setText(gDataManager->GetSysString(1335).data());
 					mainGame->PopupElement(mainGame->wACMessage, 20);
+					ScreenReader::getReader()->readScreen(fmt::format(L"Deck {} saved", mainGame->cbDBDecks->getItem(sel)));
 				}
 				break;
 			}
@@ -334,6 +335,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 					break;
 				std::lock_guard<std::mutex> lock(mainGame->gMutex);
 				mainGame->stQMessage->setText(fmt::format(L"{}\n{}", mainGame->cbDBDecks->getItem(sel), gDataManager->GetSysString(1337)).data());
+				ScreenReader::getReader()->readScreen(fmt::format(fmt::format(L"{}\n{}", mainGame->cbDBDecks->getItem(sel), gDataManager->GetSysString(1337)).data()));
 				mainGame->PopupElement(mainGame->wQuery);
 				prev_operation = id;
 				break;

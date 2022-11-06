@@ -708,7 +708,10 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					break;
 				}
 				case MSG_SELECT_CARD: {
-					command_card = selectable_cards[id - BUTTON_CARD_0 + mainGame->scrCardList->getPos() / 10];
+					if(mainGame->scrCardList->isTrulyVisible())
+						command_card = selectable_cards[id - BUTTON_CARD_0 + mainGame->scrCardList->getPos() / 10];
+					else
+						command_card = selectable_cards[EventHandler::indexLookedUpCard];
 					if (command_card->is_selected) {
 						command_card->is_selected = false;
 						auto it = std::find(selected_cards.begin(), selected_cards.end(), command_card);

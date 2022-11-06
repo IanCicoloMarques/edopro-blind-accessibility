@@ -787,6 +787,8 @@ namespace ygo {
 		menu = menuGameOptions;
 		if (menuSelectCounter == MenuType::GameOptionsMenu::GAMEOP_ENABLE_SOUND_EFFECTS && mainGame->gSettings.chkEnableSound->isTrulyVisible()) {
 			CheckBox(mainGame->gSettings.chkEnableSound);
+			gSoundManager->EnableSounds(mainGame->gSettings.chkEnableSound->isChecked());
+			gGameConfig->enablesound = mainGame->gSettings.chkEnableSound->isChecked();
 		}
 		else if (menuSelectCounter == MenuType::GameOptionsMenu::GAMEOP_SOUND_EFFECTS_VOLUME && mainGame->gSettings.scrSoundVolume->isTrulyVisible()) {
 			if (!scrollSelected) {
@@ -803,6 +805,8 @@ namespace ygo {
 		}
 		else if (menuSelectCounter == MenuType::GameOptionsMenu::GAMEOP_ENABLE_MUSIC && mainGame->gSettings.chkEnableMusic->isTrulyVisible()) {
 			CheckBox(mainGame->gSettings.chkEnableMusic);
+			gSoundManager->EnableMusic(mainGame->gSettings.chkEnableMusic->isChecked());
+			gGameConfig->enablemusic = mainGame->gSettings.chkEnableMusic->isChecked();
 		}
 		else if (menuSelectCounter == MenuType::GameOptionsMenu::GAMEOP_MUSIC_VOLUME && mainGame->gSettings.scrMusicVolume->isTrulyVisible()) {
 			if (!scrollSelected) {

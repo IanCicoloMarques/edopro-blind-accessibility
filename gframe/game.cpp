@@ -2568,6 +2568,9 @@ void Game::SaveConfig() {
 	gGameConfig->chkIgnore2 = gSettings.chkIgnoreSpectators->isChecked();
 	gGameConfig->chkHideHintButton = gSettings.chkHideChainButtons->isChecked();
 	gGameConfig->chkAnime = chkAnime->isChecked();
+	TrySaveInt(gGameConfig->enablemusic, gSettings.chkEnableMusic);
+	TrySaveInt(gGameConfig->enablesound, gSettings.chkEnableSound);
+	TrySaveInt(gGameConfig->chkIgnore1, gSettings.chkIgnoreOpponents);
 #ifdef UPDATE_URL
 	gGameConfig->noClientUpdates = gSettings.chkUpdates->isChecked();
 #endif
@@ -2895,6 +2898,7 @@ void Game::AddChatMsg(epro::wstringview name, epro::wstringview msg, int type) {
 	else
 		chatMsg[0] = fmt::format(L"System: {}", msg);
 	lstChat->addItem(chatMsg[0].data());
+	ScreenReader::getReader()->readScreen(fmt::format(L"Chat: {}", chatMsg[0].data()), false);
 	gSoundManager->PlaySoundEffect(SoundManager::SFX::CHAT);
 }
 void Game::AddLog(epro::wstringview msg, int param) {

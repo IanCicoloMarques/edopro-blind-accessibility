@@ -87,6 +87,7 @@ namespace ygo {
 				else if (!event.KeyInput.PressedDown && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
 					lookupFieldLocId = AccessibilityFieldFocus::PLAYER_MONSTERS;
 					cardType = AccessibilityFieldFocus::CardType::MONSTER;
+					displayedField = AccessibilityFieldFocus::DisplayedField::PLAYER;
 					UseCard(AccessibilityFieldFocus::UseType::SPECIAL_SUMMON, event);
 				}
 				break;
@@ -714,6 +715,8 @@ namespace ygo {
 						mainGame->dField.selected_option--;
 						ScreenReader::getReader()->readScreen(gDataManager->GetDesc(mainGame->dField.select_options[mainGame->dField.selected_option], mainGame->dInfo.compat_mode).data(), false);
 					}
+					else if (mainGame->btnOption[0]->isTrulyVisible())
+						ScreenReader::getReader()->readScreen(gDataManager->GetDesc(mainGame->dField.select_options[mainGame->dField.selected_option], mainGame->dInfo.compat_mode).data(), false);
 					else if (displayedField != AccessibilityFieldFocus::DisplayedField::ENEMY_PLAYER) {
 						displayedField = AccessibilityFieldFocus::DisplayedField::ENEMY_PLAYER;
 						std::wstring nvdaString = fmt::format(L"Enemy Player Field");
@@ -756,6 +759,8 @@ namespace ygo {
 						mainGame->dField.selected_option++;
 						ScreenReader::getReader()->readScreen(gDataManager->GetDesc(mainGame->dField.select_options[mainGame->dField.selected_option], mainGame->dInfo.compat_mode).data(), false);
 					}
+					else if (mainGame->btnOption[0]->isTrulyVisible())
+						ScreenReader::getReader()->readScreen(gDataManager->GetDesc(mainGame->dField.select_options[mainGame->dField.selected_option], mainGame->dInfo.compat_mode).data(), false);
 					else if (mainGame->lstANCard->isTrulyVisible()) {
 						if (!mainGame->env->hasFocus(mainGame->lstANCard))
 							mainGame->env->setFocus(mainGame->lstANCard);
@@ -1008,8 +1013,8 @@ namespace ygo {
 	}
 
 	void EventHandler::TriggerOk() {
-		if (mainGame->btnCardSelect[indexLookedUpCard]->isTrulyVisible())
-			TriggerEvent(mainGame->btnCardSelect[indexLookedUpCard], irr::gui::EGET_BUTTON_CLICKED);
+		//if (mainGame->btnCardSelect[indexLookedUpCard]->isTrulyVisible())
+		//	TriggerEvent(mainGame->btnCardSelect[indexLookedUpCard], irr::gui::EGET_BUTTON_CLICKED);
 		if (mainGame->btnMsgOK->isTrulyVisible())
 			TriggerEvent(mainGame->btnMsgOK, irr::gui::EGET_BUTTON_CLICKED);
 		if (mainGame->btnOptionOK->isVisible())
@@ -1579,7 +1584,7 @@ namespace ygo {
 		bool selected = false;
 		if (!mainGame->dField.clicked_card)
 			return;
-		for (int i = 0; i < 5; i++) {
+		for (int i = 0; i < 6; i++) {
 			if (mainGame->dField.mzone[0][i] && mainGame->dField.mzone[0][i] == mainGame->dField.clicked_card) {
 				cardType = AccessibilityFieldFocus::CardType::MONSTER;
 				lookupFieldLocId = AccessibilityFieldFocus::PLAYER_MONSTERS;
@@ -1789,7 +1794,8 @@ namespace ygo {
 		}
 		if (fieldSlot != 0) {
 			displayedField = localDisplayedField == AccessibilityFieldFocus::DisplayedField::PLAYER ? AccessibilityFieldFocus::DisplayedField::PLAYER : AccessibilityFieldFocus::DisplayedField::ENEMY_PLAYER;
-			fieldSlot = GetFieldSlot(fieldSlot, displayedField);
+			if (fieldSlot < 6)
+				fieldSlot = GetFieldSlot(fieldSlot, displayedField);
 		}
 		//Caso não encontre a carta, busca no outro campo;
 		if (fieldSlot == 0 && !looped) {

@@ -42,14 +42,15 @@ namespace ygo {
 		int cardType = AccessibilityFieldFocus::CardType::MONSTER;
 		bool CheckIfCanViewCards(irr::SEvent event);
 		void DisplayCards(const std::vector<ClientCard*>& field, const std::wstring& text);
+		void SelectCard(const std::vector<ClientCard*>& field, const std::wstring& text);
 		void DisplayCards(const std::vector<ChainInfo>& field, const std::wstring& text);
 		void CloseDialog();
-		void ShowLocationCard();
 		bool UseCard(const AccessibilityFieldFocus::UseType& useType, irr::SEvent event);
 		void SetLookUpField();
+		void ShowSelectCard();
 		void ShowMenu(int flag, int x, int y);
 		void MouseClick(const irr::SEvent& event, bool rightClick = false);
-		void ChangeFieldAndLook();
+		void ChangeFieldAndLook(bool click = false);
 		void SelectFieldSlotHandAllowed(int slot, const AccessibilityFieldFocus::DisplayedField& player = AccessibilityFieldFocus::DisplayedField::PLAYER);
 		float GetYPosition(const AccessibilityFieldFocus::DisplayedField& player = AccessibilityFieldFocus::DisplayedField::PLAYER);
 		float GetYPositionPlayer();
@@ -75,6 +76,7 @@ namespace ygo {
 		void TriggerOk();
 		void EffectResolver(irr::SEvent event);
 		void GetCardLocation(ClientCard* card);
+		std::wstring GetCardLocationName(ClientCard* card);
 		bool CheckAttributeSelector();
 		/*
 		void SimulateButton(irr::gui::IGUIElement* caller = nullptr);

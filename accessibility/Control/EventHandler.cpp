@@ -17,6 +17,8 @@ namespace ygo {
 		event.EventType = irr::EET_GUI_EVENT;
 		event.GUIEvent.EventType = type;
 		event.GUIEvent.Caller = target;
+		event.GUIEvent.Caller->setVisible(true);
+		mainGame->fadingList.clear();
 		ygo::mainGame->device->postEventFromUser(event);
 	}
 	
@@ -336,7 +338,9 @@ namespace ygo {
 					if (canViewCards) {
 						lookupFieldLocId = AccessibilityFieldFocus::FieldLookerLocId::PLAYER_GRAVEYARD;
 						cardType = AccessibilityFieldFocus::CardType::GRAVEYARD;
-						DisplayCards(mainGame->dField.grave[displayedField], fmt::format(L"Graveyard"));
+						/*DisplayCards(mainGame->dField.grave[displayedField], fmt::format(L"Graveyard"));*/
+						SelectFieldSlotHandAllowed(SearchFieldSlot(displayedField), displayedField);
+						MouseClick(event);
 					}
 					else
 						CloseDialog();
@@ -355,24 +359,6 @@ namespace ygo {
 						cardType = AccessibilityFieldFocus::CardType::MONSTER;
 						lookupFieldLocId = AccessibilityFieldFocus::FieldLookerLocId::PLAYER_DECK;
 						DisplayCards(mainGame->dField.deck[displayedField], fmt::format(L"Deck"));
-					}
-					else
-						CloseDialog();
-				}
-				break;
-			}
-			case irr::KEY_KEY_W: {
-				if (event.KeyInput.Control && !event.KeyInput.PressedDown && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
-					StringBuilder::cleanBuiltMessage();
-					StringBuilder::AddLine(gDataManager->GetAccessibilityString(14).data());
-					ScreenReader::getReader()->readScreen(StringBuilder::getBuiltMessage(), false);
-				}
-				else if (!event.KeyInput.PressedDown && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
-					bool canViewCards = CheckIfCanViewCards(event);
-					if (canViewCards) {
-						lookupFieldLocId = AccessibilityFieldFocus::FieldLookerLocId::PLAYER_MONSTERS;
-						cardType = AccessibilityFieldFocus::CardType::MONSTER;
-						DisplayCards(mainGame->dField.mzone[displayedField], fmt::format(L"Monster Zone"));
 					}
 					else
 						CloseDialog();
@@ -398,6 +384,24 @@ namespace ygo {
 					else {
 						ChangeField(AccessibilityFieldFocus::CardType::LINK);
 					}
+				}
+				break;
+			}
+			case irr::KEY_KEY_W: {
+				if (event.KeyInput.Control && !event.KeyInput.PressedDown && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
+					StringBuilder::cleanBuiltMessage();
+					StringBuilder::AddLine(gDataManager->GetAccessibilityString(14).data());
+					ScreenReader::getReader()->readScreen(StringBuilder::getBuiltMessage(), false);
+				}
+				else if (!event.KeyInput.PressedDown && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
+					bool canViewCards = CheckIfCanViewCards(event);
+					if (canViewCards) {
+						lookupFieldLocId = AccessibilityFieldFocus::FieldLookerLocId::PLAYER_MONSTERS;
+						cardType = AccessibilityFieldFocus::CardType::MONSTER;
+						DisplayCards(mainGame->dField.mzone[displayedField], fmt::format(L"Monster Zone"));
+					}
+					else
+						CloseDialog();
 				}
 				break;
 			}
@@ -461,9 +465,8 @@ namespace ygo {
 							ScreenReader::getReader()->readScreen(fmt::format(L"Selectable Cards {} cards", mainGame->dField.display_cards.size()).data(), false);
 							mainGame->env->setFocus(mainGame->wCardSelect);
 						}
-						else if (mainGame->dField.selectable_cards.size() != 0) {
-							DisplayCards(mainGame->dField.selectable_cards, fmt::format(L"Selectable Cards"));
-						}
+						else if (mainGame->dField.selectable_cards.size() != 0)
+							SelectCard(mainGame->dField.selectable_cards, fmt::format(L"Selectable Cards"));
 					}
 					else
 						CloseDialog();
@@ -1066,6 +1069,25 @@ namespace ygo {
 			mainGame->dField.command_location = LOCATION_REMOVED;
 	}
 
+	std::wstring EventHandler::GetCardLocationName(ClientCard* card) {
+		std::wstring locationName = L"";
+		if (card->location == LOCATION_EXTRA)
+			locationName = L"Extra Deck";
+		else if (card->location == LOCATION_DECK)
+			locationName = L"Main Deck";
+		else if (card->location == LOCATION_GRAVE)
+			locationName = L"Grave";
+		else if (card->location == LOCATION_REMOVED)
+			locationName = L"Removed";
+		else if (card->location == LOCATION_HAND)
+			locationName = L"Hand";
+		else if (card->location == LOCATION_MZONE)
+			locationName = L"Monster Zone";
+		else if (card->location == LOCATION_SZONE)
+			locationName = L"Spells Zone";
+		return locationName;
+	}
+
 	bool EventHandler::CheckIfCanViewCards(irr::SEvent event) {
 		event.KeyInput.PressedDown = false;
 		bool canViewCards = false;
@@ -1085,7 +1107,8 @@ namespace ygo {
 		}
 		if (mainGame->dField.display_cards.size()) {
 			mainGame->wCardDisplay->setText(fmt::format(L"{}({})", text, mainGame->dField.display_cards.size()).data());
-			ShowLocationCard();
+			mainGame->dField.ShowLocationCard();
+
 			if (text.compare(L"") != 0) {
 				ScreenReader::getReader()->readScreen(fmt::format(L"{}{} cards", text, mainGame->dField.display_cards.size()).data(), false);
 			}
@@ -1098,7 +1121,33 @@ namespace ygo {
 			CloseDialog();
 		}
 	}
-	void EventHandler::ShowLocationCard() {
+
+	void EventHandler::SelectCard(const std::vector<ClientCard*>& field, const std::wstring& text = L"") {
+		indexLookedUpCard = 0;
+		mainGame->dField.display_cards.clear();
+		for (auto it = field.begin(); it != field.end(); ++it) {
+			if (*it) {
+				mainGame->dField.display_cards.push_back(*it);
+			}
+		}
+		if (mainGame->dField.display_cards.size()) {
+			mainGame->wCardSelect->setText(fmt::format(L"{}({})", text, mainGame->dField.display_cards.size()).data());
+			ShowSelectCard();
+
+			if (text.compare(L"") != 0) {
+				ScreenReader::getReader()->readScreen(fmt::format(L"{}{} cards", text, mainGame->dField.display_cards.size()).data(), false);
+			}
+			mainGame->ShowCardInfo(mainGame->dField.display_cards[0]->code);
+		}
+		else
+		{
+			std::wstring nvdaString = fmt::format(L"There are no cards to display");
+			ScreenReader::getReader()->readScreen(nvdaString.c_str(), false);
+			CloseDialog();
+		}
+	}
+
+	void EventHandler::ShowSelectCard() {
 		int startpos;
 		size_t ct;
 		if (mainGame->dField.display_cards.size() <= 5) {
@@ -1110,67 +1159,90 @@ namespace ygo {
 			ct = 5;
 		}
 		for (size_t i = 0; i < ct; ++i) {
-			auto& curstring = mainGame->stDisplayPos[i];
+			auto& curstring = mainGame->stCardPos[i];
 			auto& curcard = mainGame->dField.display_cards[i];
 			curstring->enableOverrideColor(false);
+			// image
 			if (curcard->code)
-				mainGame->imageLoading[mainGame->btnCardDisplay[i]] = curcard->code;
+				mainGame->imageLoading[mainGame->btnCardSelect[i]] = curcard->code;
+			else if (mainGame->dField.conti_selecting)
+				mainGame->imageLoading[mainGame->btnCardSelect[i]] = curcard->chain_code;
 			else
-				mainGame->btnCardDisplay[i]->setImage(mainGame->imageManager.tCover[curcard->controler]);
-			mainGame->btnCardDisplay[i]->setRelativePosition(mainGame->Scale<irr::s32>(startpos + i * 125, 55, startpos + 120 + i * 125, 225));
-			mainGame->btnCardDisplay[i]->setPressed(false);
-			mainGame->btnCardDisplay[i]->setVisible(true);
-			std::wstring text;
-			if (curcard->location == LOCATION_OVERLAY) {
-				text = fmt::format(L"{}[{}]({})", gDataManager->FormatLocation(curcard->overlayTarget->location, curcard->overlayTarget->sequence),
-					curcard->overlayTarget->sequence + 1, curcard->sequence + 1);
-			}
-			else if (curcard->location) {
-				text = fmt::format(L"{}[{}]", gDataManager->FormatLocation(curcard->location, curcard->sequence),
-					curcard->sequence + 1);
-			}
-			curstring->setText(text.data());
-			if (curcard->location == LOCATION_OVERLAY) {
-				if (curcard->owner != curcard->overlayTarget->controler)
-					curstring->setOverrideColor(skin::DUELFIELD_CARD_SELECT_WINDOW_OVERLAY_TEXT_VAL);
-				if (curcard->overlayTarget->controler)
-					curstring->setBackgroundColor(skin::DUELFIELD_CARD_OPPONENT_WINDOW_BACKGROUND_VAL);
-				else
-					curstring->setBackgroundColor(skin::DUELFIELD_CARD_SELF_WINDOW_BACKGROUND_VAL);
-			}
-			else if (curcard->location == LOCATION_EXTRA || curcard->location == LOCATION_REMOVED) {
-				if (curcard->position & POS_FACEDOWN)
-					curstring->setOverrideColor(skin::DUELFIELD_CARD_SELECT_WINDOW_SET_TEXT_VAL);
-				if (curcard->controler)
-					curstring->setBackgroundColor(skin::DUELFIELD_CARD_OPPONENT_WINDOW_BACKGROUND_VAL);
-				else
-					curstring->setBackgroundColor(skin::DUELFIELD_CARD_SELF_WINDOW_BACKGROUND_VAL);
+				mainGame->btnCardSelect[i]->setImage(mainGame->imageManager.tCover[curcard->controler]);
+			mainGame->btnCardSelect[i]->setRelativePosition(mainGame->Scale<irr::s32>(startpos + i * 125, 55, startpos + 120 + i * 125, 225));
+			mainGame->btnCardSelect[i]->setPressed(false);
+			mainGame->btnCardSelect[i]->setVisible(true);
+			if (mainGame->dInfo.curMsg != MSG_SORT_CHAIN && mainGame->dInfo.curMsg != MSG_SORT_CARD) {
+				// text
+				std::wstring text = L"";
+				if (mainGame->dField.conti_selecting)
+					text = std::wstring{ DataManager::unknown_string };
+				else if (curcard->location == LOCATION_OVERLAY) {
+					text = fmt::format(L"{}[{}]({})", gDataManager->FormatLocation(curcard->overlayTarget->location, curcard->overlayTarget->sequence),
+						curcard->overlayTarget->sequence + 1, curcard->sequence + 1);
+				}
+				else if (curcard->location) {
+					text = fmt::format(L"{}[{}]", gDataManager->FormatLocation(curcard->location, curcard->sequence),
+						curcard->sequence + 1);
+				}
+				curstring->setText(text.data());
+				// color
+				if (curcard->is_selected)
+					curstring->setBackgroundColor(skin::DUELFIELD_CARD_SELECTED_WINDOW_BACKGROUND_VAL);
+				else {
+					if (mainGame->dField.conti_selecting)
+						curstring->setBackgroundColor(skin::DUELFIELD_CARD_SELF_WINDOW_BACKGROUND_VAL);
+					else if (curcard->location == LOCATION_OVERLAY) {
+						if (curcard->owner != curcard->overlayTarget->controler)
+							curstring->setOverrideColor(skin::DUELFIELD_CARD_SELECT_WINDOW_OVERLAY_TEXT_VAL);
+						if (curcard->overlayTarget->controler)
+							curstring->setBackgroundColor(skin::DUELFIELD_CARD_OPPONENT_WINDOW_BACKGROUND_VAL);
+						else
+							curstring->setBackgroundColor(skin::DUELFIELD_CARD_SELF_WINDOW_BACKGROUND_VAL);
+					}
+					else if (curcard->location == LOCATION_DECK || curcard->location == LOCATION_EXTRA || curcard->location == LOCATION_REMOVED) {
+						if (curcard->position & POS_FACEDOWN)
+							curstring->setOverrideColor(skin::DUELFIELD_CARD_SELECT_WINDOW_SET_TEXT_VAL);
+						if (curcard->controler)
+							curstring->setBackgroundColor(skin::DUELFIELD_CARD_OPPONENT_WINDOW_BACKGROUND_VAL);
+						else
+							curstring->setBackgroundColor(skin::DUELFIELD_CARD_SELF_WINDOW_BACKGROUND_VAL);
+					}
+					else {
+						if (curcard->controler)
+							curstring->setBackgroundColor(skin::DUELFIELD_CARD_OPPONENT_WINDOW_BACKGROUND_VAL);
+						else
+							curstring->setBackgroundColor(skin::DUELFIELD_CARD_SELF_WINDOW_BACKGROUND_VAL);
+					}
+				}
 			}
 			else {
-				if (curcard->controler)
-					curstring->setBackgroundColor(skin::DUELFIELD_CARD_OPPONENT_WINDOW_BACKGROUND_VAL);
+				if (mainGame->dField.sort_list[i]) {
+					curstring->setText(fmt::to_wstring(mainGame->dField.sort_list[i]).data());
+				}
 				else
-					curstring->setBackgroundColor(skin::DUELFIELD_CARD_SELF_WINDOW_BACKGROUND_VAL);
+					curstring->setText(L"");
+				curstring->setBackgroundColor(skin::DUELFIELD_CARD_SELF_WINDOW_BACKGROUND_VAL);
 			}
 			curstring->setVisible(true);
 			curstring->setRelativePosition(mainGame->Scale<irr::s32>(startpos + i * 125, 30, startpos + 120 + i * 125, 50));
 		}
 		if (mainGame->dField.display_cards.size() <= 5) {
 			for (int i = mainGame->dField.display_cards.size(); i < 5; ++i) {
-				mainGame->btnCardDisplay[i]->setVisible(false);
-				mainGame->stDisplayPos[i]->setVisible(false);
+				mainGame->btnCardSelect[i]->setVisible(false);
+				mainGame->stCardPos[i]->setVisible(false);
 			}
-			mainGame->scrDisplayList->setPos(0);
-			mainGame->scrDisplayList->setVisible(false);
+			mainGame->scrCardList->setPos(0);
+			mainGame->scrCardList->setVisible(false);
 		}
 		else {
-			mainGame->scrDisplayList->setVisible(true);
-			mainGame->scrDisplayList->setMin(0);
-			mainGame->scrDisplayList->setMax((mainGame->dField.display_cards.size() - 5) * 10 + 9);
-			mainGame->scrDisplayList->setPos(0);
+			mainGame->scrCardList->setVisible(true);
+			mainGame->scrCardList->setMin(0);
+			mainGame->scrCardList->setMax((mainGame->dField.display_cards.size() - 5) * 10 + 9);
+			mainGame->scrCardList->setPos(0);
 		}
-		mainGame->btnDisplayOK->setVisible(true);
-		mainGame->PopupElement(mainGame->wCardDisplay);
+		mainGame->btnSelectOK->setVisible(true);
+		mainGame->PopupElement(mainGame->wCardSelect);
 	}
 
 	void EventHandler::ShowMenu(int flag, int x, int y) {
@@ -1322,7 +1394,7 @@ namespace ygo {
 					MouseClick(event);
 					displayedField = AccessibilityFieldFocus::DisplayedField::PLAYER;
 					std::wstring nvdaString = fmt::format(L"Player Field");
-					ChangeFieldAndLook();
+					ChangeFieldAndLook(true);
 				}
 				else {
 					ShowMenu(64, 500, 500);
@@ -1357,7 +1429,7 @@ namespace ygo {
 				}
 				break;
 			}
-		}
+		}	
 		if (!canUse)
 			ScreenReader::getReader()->readScreen(AccessibilityMessages::getCommandNotAvaliableMessage(command));
 		return canUse;
@@ -1371,7 +1443,7 @@ namespace ygo {
 		}
 		if (mainGame->dField.display_cards.size()) {
 			mainGame->wCardDisplay->setText(fmt::format(L"{}({})", gDataManager->GetSysString(lookupFieldLocId), mainGame->dField.display_cards.size()).data());
-			ShowLocationCard();
+			mainGame->dField.ShowLocationCard();
 			mainGame->ShowCardInfo(mainGame->dField.display_cards[0]->code);
 		}
 	}
@@ -1445,7 +1517,7 @@ namespace ygo {
 		if (lookupFieldLocId == AccessibilityFieldFocus::FieldLookerLocId::PLAYER_BANNED_CARDS)
 			localSlot = 6;
 		if (lookupFieldLocId == AccessibilityFieldFocus::FieldLookerLocId::PLAYER_GRAVEYARD)
-			localSlot = 6;
+			localSlot = 6.3;
 		else if (lookupFieldLocId == AccessibilityFieldFocus::FieldLookerLocId::PLAYER_DECK)
 			localSlot = 6.5f;
 		else if (lookupFieldLocId == AccessibilityFieldFocus::FieldLookerLocId::PLAYER_EXTRA_DECK)
@@ -1538,8 +1610,11 @@ namespace ygo {
 
 	float EventHandler::GetYPositionPlayer() {
 		float posY = 0.f;
-		if (lookupFieldLocId == AccessibilityFieldFocus::FieldLookerLocId::PLAYER_MONSTERS || lookupFieldLocId == AccessibilityFieldFocus::FieldLookerLocId::PLAYER_GRAVEYARD) {
+		if (lookupFieldLocId == AccessibilityFieldFocus::FieldLookerLocId::PLAYER_MONSTERS) {
 			posY = 0.64f;
+		}
+		else if (lookupFieldLocId == AccessibilityFieldFocus::FieldLookerLocId::PLAYER_GRAVEYARD) {
+			posY = 0.68f;
 		}
 		else if (lookupFieldLocId == AccessibilityFieldFocus::FieldLookerLocId::PLAYER_SPELLS) {
 			posY = 0.72f;
@@ -1729,21 +1804,34 @@ namespace ygo {
 		std::wstring nvdaString;
 		SetLookUpField();
 		if (lookupFieldLocId == AccessibilityFieldFocus::FieldLookerLocId::PLAYER_MONSTERS || lookupFieldLocId == AccessibilityFieldFocus::FieldLookerLocId::PLAYER_SPELLS) {
-			if (mainGame->dField.display_cards[indexLookedUpCard]->code != 0)
-				nvdaString = fmt::format(L"{} {} attack {} defense zone {}", gDataManager->GetName(mainGame->dField.display_cards[indexLookedUpCard]->code), mainGame->dField.display_cards[indexLookedUpCard]->attack, mainGame->dField.display_cards[indexLookedUpCard]->defense, SearchFieldSlot(displayedField, mainGame->dField.display_cards[indexLookedUpCard]));
+			if (mainGame->dField.display_cards[indexLookedUpCard]->code != 0) {
+				int slot = SearchFieldSlot(displayedField, mainGame->dField.display_cards[indexLookedUpCard]);
+				nvdaString = fmt::format(L"{} {} attack {} defense", gDataManager->GetName(mainGame->dField.display_cards[indexLookedUpCard]->code), mainGame->dField.display_cards[indexLookedUpCard]->attack, mainGame->dField.display_cards[indexLookedUpCard]->defense);
+				if (mainGame->dField.display_cards[indexLookedUpCard]->is_selected)
+					nvdaString.append(L" selected");
+				if (slot != 0)
+					nvdaString.append(fmt::format(L" {} {}", GetCardLocationName(mainGame->dField.display_cards[indexLookedUpCard]), mainGame->dField.display_cards[indexLookedUpCard]->position));
+			}
 			else
 				nvdaString = fmt::format(L"Face-down zone {}", SearchFieldSlot(displayedField, mainGame->dField.display_cards[indexLookedUpCard]));
 		}
 		else {
-			if (mainGame->dField.display_cards[indexLookedUpCard]->code != 0)
+			if (mainGame->dField.display_cards[indexLookedUpCard]->code != 0) {
 				nvdaString = fmt::format(L"{} slot {}", gDataManager->GetName(mainGame->dField.display_cards[indexLookedUpCard]->code), indexLookedUpCard);
+				if (mainGame->dField.display_cards[indexLookedUpCard]->is_selected)
+					nvdaString.append(L" selected");
+				else
+					nvdaString.append(L" unselected");
+
+				nvdaString.append(fmt::format(L" {} {}", GetCardLocationName(mainGame->dField.display_cards[indexLookedUpCard]), mainGame->dField.display_cards[indexLookedUpCard]->sequence));
+			}
 			else
 				nvdaString = fmt::format(L"Face-down slot {}", indexLookedUpCard);
 		}
 		ScreenReader::getReader()->readScreen(nvdaString.c_str());
 	}
 
-	void EventHandler::ChangeFieldAndLook()
+	void EventHandler::ChangeFieldAndLook(bool click)
 	{
 		if (lookupFieldLocId == AccessibilityFieldFocus::FieldLookerLocId::PLAYER_HAND)
 			DisplayCards(mainGame->dField.hand[displayedField], fmt::format(L"Hand"));
@@ -1902,7 +1990,7 @@ namespace ygo {
 								if (CheckIfCanViewCards(event)) {
 									lookupFieldLocId = AccessibilityFieldFocus::FieldLookerLocId::PLAYER_MONSTERS;
 									cardType = AccessibilityFieldFocus::CardType::MONSTER;
-									DisplayCards(mainGame->dField.mzone[displayedField], fmt::format(L"Monster Zone"));
+									SelectCard(mainGame->dField.mzone[displayedField], fmt::format(L"Monster Zone"));
 								}
 							}
 							else

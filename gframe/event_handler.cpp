@@ -655,8 +655,11 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 			case BUTTON_CARD_2:
 			case BUTTON_CARD_3:
 			case BUTTON_CARD_4: {
-				if(mainGame->dInfo.isReplay)
+				if (mainGame->dInfo.isReplay) {
+				
+					TriggerEvent(mainGame->btnCardSelect[0], irr::gui::EGET_BUTTON_CLICKED);
 					break;
+				}
 				mainGame->stCardListTip->setVisible(false);
 				switch(mainGame->dInfo.curMsg) {
 				case MSG_SELECT_IDLECMD:
@@ -1636,8 +1639,8 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					SetShowMark(hovered_card, false);
 				}
 				if(mcard) {
-					if(mcard != clicked_card)
-						mainGame->wCmdMenu->setVisible(false);
+					//if(mcard != clicked_card)
+					//	mainGame->wCmdMenu->setVisible(false);
 					if(hovered_location == LOCATION_HAND) {
 						mcard->is_hovered = true;
 						MoveCard(mcard, 5);

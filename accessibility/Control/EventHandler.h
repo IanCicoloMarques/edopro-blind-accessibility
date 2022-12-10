@@ -34,6 +34,8 @@ namespace ygo {
 		static int battlePhase;
 		static bool effectResolver;
 	private:
+		const int selectAttributeMax = 7;
+		const int selectTypeMax = 25;
 		bool selectZone = false;
 		int cardSelectPosition = 0;
 		int selectAttribute = 0;
@@ -82,6 +84,8 @@ namespace ygo {
 		bool CheckTypeSelector();
 		void AnnounceNumber();
 		void AnnounceCard();
+		void AttributeSelector(bool up);
+		void RaceSelector(bool up);
 		/*
 		void SimulateButton(irr::gui::IGUIElement* caller = nullptr);
 		void SetMouseOnCard();

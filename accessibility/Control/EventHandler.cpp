@@ -21,6 +21,18 @@ namespace ygo {
 		mainGame->fadingList.clear();
 		ygo::mainGame->device->postEventFromUser(event);
 	}
+
+	static inline void FocusAndRead(irr::gui::IGUICheckBox* chkbox) {
+		if (!mainGame->env->hasFocus(chkbox))
+			mainGame->env->setFocus(chkbox);
+		std::wstring nvdaString = fmt::format(L"{}", chkbox->getText());
+		ScreenReader::getReader()->readScreen(nvdaString.c_str(), false);
+	}
+
+	static inline void Focus(irr::gui::IGUIElement* target) {
+		if (!mainGame->env->hasFocus(target))
+			mainGame->env->setFocus(target);
+	}
 	
 	IEventHandler* EventHandler::getEventHandler()
 	{
@@ -583,26 +595,21 @@ namespace ygo {
 					ScreenReader::getReader()->readScreen(StringBuilder::getBuiltMessage(), false);
 				}
 				else if (!event.KeyInput.PressedDown && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
-					//Fazer função de focus
 					if (mainGame->cbANNumber->isTrulyVisible()) {
-						if (!mainGame->env->hasFocus(mainGame->cbANNumber))
-							mainGame->env->setFocus(mainGame->cbANNumber);
+						Focus(mainGame->cbANNumber);
 						std::wstring nvdaString = fmt::format(L"{}", mainGame->cbANNumber->getItem(mainGame->cbANNumber->getSelected()));
 						ScreenReader::getReader()->readScreen(nvdaString.c_str(), false);
 					}
 					else if (mainGame->ebANCard->isTrulyVisible()) {
-						if (!mainGame->env->hasFocus(mainGame->ebANCard))
-							mainGame->env->setFocus(mainGame->ebANCard);
+						Focus(mainGame->ebANCard);
 						ScreenReader::getReader()->readScreen(L"Type Card Name", false);
 					}
 					else if (mainGame->wANRace->isTrulyVisible()) {
-						if (!mainGame->env->hasFocus(mainGame->wANRace))
-							mainGame->env->setFocus(mainGame->wANRace);
+						Focus(mainGame->wANRace);
 						ScreenReader::getReader()->readScreen(L"Select Race", false);
 					}
 					else if (mainGame->wANAttribute->isTrulyVisible()) {
-						if (!mainGame->env->hasFocus(mainGame->wANAttribute))
-							mainGame->env->setFocus(mainGame->wANAttribute);
+						Focus(mainGame->wANAttribute);
 						ScreenReader::getReader()->readScreen(L"Select Attribute", false);
 					}
 				}
@@ -685,42 +692,14 @@ namespace ygo {
 					ScreenReader::getReader()->readScreen(StringBuilder::getBuiltMessage(), false);
 				}
 				else if (!event.KeyInput.PressedDown && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
-					//Criar funções menores pra dividir
-					if (mainGame->cbANNumber->isTrulyVisible()) {
+					if (mainGame->cbANNumber->isTrulyVisible())
 						AnnounceNumber();
-					}
-					else if (mainGame->lstANCard->isTrulyVisible()) {
-						if (!mainGame->env->hasFocus(mainGame->lstANCard))
-							mainGame->env->setFocus(mainGame->lstANCard);
-						if (mainGame->lstANCard->getSelected() != -1) {
-							std::wstring nvdaString = fmt::format(L"{}", mainGame->lstANCard->getListItem(mainGame->lstANCard->getSelected()));
-							ScreenReader::getReader()->readScreen(nvdaString.c_str(), false);
-						}
-					}
-					else if (selectAttribute < 7 && CheckAttributeSelector()) {
-						for (int i = selectAttribute+1; i < 7; i++) {
-							if (mainGame->chkAttribute[i]->isVisible()) {
-								if (!mainGame->env->hasFocus(mainGame->chkAttribute[i]))
-									mainGame->env->setFocus(mainGame->chkAttribute[i]);
-								std::wstring nvdaString = fmt::format(L"{}", mainGame->chkAttribute[i]->getText());
-								ScreenReader::getReader()->readScreen(nvdaString.c_str(), false);
-								selectAttribute = i;
-								break;
-							}
-						}
-					}
-					else if (selectType < 25 && CheckTypeSelector()) {
-						for (int i = selectType + 1; i < 25; i++) {
-							if (mainGame->chkRace[i]->isVisible()) {
-								if (!mainGame->env->hasFocus(mainGame->chkRace[i]))
-									mainGame->env->setFocus(mainGame->chkRace[i]);
-								std::wstring nvdaString = fmt::format(L"{}", mainGame->chkRace[i]->getText());
-								ScreenReader::getReader()->readScreen(nvdaString.c_str(), false);
-								selectType = i;
-								break;
-							}
-						}
-					}
+					else if (mainGame->lstANCard->isTrulyVisible())
+						AnnounceCard();
+					else if (selectAttribute < selectAttributeMax && CheckAttributeSelector())
+						AttributeSelector(true);
+					else if (selectType < selectTypeMax && CheckTypeSelector())
+						RaceSelector(true);
 					else if (mainGame->btnOptionn->isTrulyVisible())
 						TriggerEvent(mainGame->btnOptionn, irr::gui::EGET_BUTTON_CLICKED);
 					else if (mainGame->btnOption[0]->isTrulyVisible() && mainGame->dField.selected_option - 1 >= 0 && mainGame->dField.selected_option - 1 < mainGame->dField.select_options.size()) {
@@ -749,30 +728,10 @@ namespace ygo {
 				else if (!event.KeyInput.PressedDown && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
 					if (mainGame->cbANNumber->isTrulyVisible())
 						AnnounceNumber();
-					else if (selectAttribute > 0 && CheckAttributeSelector()) {
-						for (int i = selectAttribute - 1; i >= 0; i--) {
-							if (mainGame->chkAttribute[i]->isVisible()) {
-								if (!mainGame->env->hasFocus(mainGame->chkAttribute[i]))
-									mainGame->env->setFocus(mainGame->chkAttribute[i]);
-								std::wstring nvdaString = fmt::format(L"{}", mainGame->chkAttribute[i]->getText());
-								ScreenReader::getReader()->readScreen(nvdaString.c_str(), false);
-								selectAttribute = i;
-								break;
-							}
-						}
-					}
-					else if (selectType > 0 && CheckTypeSelector()) {
-						for (int i = selectType - 1; i >= 0; i--) {
-							if (mainGame->chkRace[i]->isVisible()) {
-								if (!mainGame->env->hasFocus(mainGame->chkRace[i]))
-									mainGame->env->setFocus(mainGame->chkRace[i]);
-								std::wstring nvdaString = fmt::format(L"{}", mainGame->chkRace[i]->getText());
-								ScreenReader::getReader()->readScreen(nvdaString.c_str(), false);
-								selectType = i;
-								break;
-							}
-						}
-					}
+					else if (selectAttribute > 0 && CheckAttributeSelector())
+						AttributeSelector(false);
+					else if (selectType > 0 && CheckTypeSelector())
+						RaceSelector(false);
 					else if (mainGame->btnOptionp->isTrulyVisible())
 						TriggerEvent(mainGame->btnOptionp, irr::gui::EGET_BUTTON_CLICKED);
 					else if (mainGame->btnOption[0]->isTrulyVisible() && mainGame->dField.selected_option + 1 < mainGame->dField.select_options.size()) {
@@ -781,14 +740,8 @@ namespace ygo {
 					}
 					else if (mainGame->btnOption[0]->isTrulyVisible())
 						ScreenReader::getReader()->readScreen(gDataManager->GetDesc(mainGame->dField.select_options[mainGame->dField.selected_option], mainGame->dInfo.compat_mode).data(), false);
-					else if (mainGame->lstANCard->isTrulyVisible()) {
-						if (!mainGame->env->hasFocus(mainGame->lstANCard))
-							mainGame->env->setFocus(mainGame->lstANCard);
-						if (mainGame->lstANCard->getSelected() != -1) {
-							std::wstring nvdaString = fmt::format(L"{}", mainGame->lstANCard->getListItem(mainGame->lstANCard->getSelected()));
-							ScreenReader::getReader()->readScreen(nvdaString.c_str(), false);
-						}
-					}
+					else if (mainGame->lstANCard->isTrulyVisible())
+						AnnounceCard();
 					else if (displayedField != AccessibilityFieldFocus::DisplayedField::PLAYER) {
 						displayedField = AccessibilityFieldFocus::DisplayedField::PLAYER;
 						std::wstring nvdaString = fmt::format(L"Player Field");
@@ -1021,8 +974,6 @@ namespace ygo {
 		return false;
 	}
 
-	
-
 	void EventHandler::AnnounceNumber() {
 		if (!mainGame->env->hasFocus(mainGame->cbANNumber))
 			mainGame->env->setFocus(mainGame->cbANNumber);
@@ -1036,6 +987,48 @@ namespace ygo {
 		if (mainGame->lstANCard->getSelected() != -1) {
 			std::wstring nvdaString = fmt::format(L"{}", mainGame->lstANCard->getListItem(mainGame->lstANCard->getSelected()));
 			ScreenReader::getReader()->readScreen(nvdaString.c_str(), false);
+		}
+	}
+
+	void EventHandler::AttributeSelector(bool up) {
+		if (up) {
+			for (int i = selectAttribute + 1; i < selectAttributeMax; i++) {
+				if (mainGame->chkAttribute[i]->isVisible()) {
+					FocusAndRead(mainGame->chkAttribute[i]);
+					selectAttribute = i;
+					break;
+				}
+			}
+		}
+		else {
+			for (int i = selectAttribute - 1; i >= 0; i--) {
+				if (mainGame->chkAttribute[i]->isVisible()) {
+					FocusAndRead(mainGame->chkAttribute[i]);
+					selectAttribute = i;
+					break;
+				}
+			}
+		}
+	}
+
+	void EventHandler::RaceSelector(bool up) {
+		if (up) {
+			for (int i = selectType + 1; i < selectTypeMax; i++) {
+				if (mainGame->chkRace[i]->isVisible()) {
+					FocusAndRead(mainGame->chkRace[i]);
+					selectType = i;
+					break;
+				}
+			}
+		}
+		else {
+			for (int i = selectType - 1; i >= 0; i--) {
+				if (mainGame->chkRace[i]->isVisible()) {
+					FocusAndRead(mainGame->chkRace[i]);
+					selectType = i;
+					break;
+				}
+			}
 		}
 	}
 

@@ -338,7 +338,7 @@ namespace ygo {
 					if (canViewCards) {
 						lookupFieldLocId = AccessibilityFieldFocus::FieldLookerLocId::PLAYER_GRAVEYARD;
 						cardType = AccessibilityFieldFocus::CardType::GRAVEYARD;
-						/*DisplayCards(mainGame->dField.grave[displayedField], fmt::format(L"Graveyard"));*/
+						DisplayCards(mainGame->dField.grave[displayedField], fmt::format(L"Graveyard"));
 						SelectFieldSlotHandAllowed(SearchFieldSlot(displayedField), displayedField);
 						MouseClick(event);
 					}

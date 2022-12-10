@@ -3189,6 +3189,7 @@ int DuelClient::ClientAnalyze(const uint8_t* msg, uint32_t len) {
 			//GRAVEYARD -- EXCEPT FIELD
 			else if (current.location & LOCATION_GRAVE) {
 				string_buffer = fmt::format(L" sent to GY");
+				Play(SoundManager::SFX::SEND_GRAVEYARD);
 			}
 			//EXTRA DECK
 			else if (current.location & LOCATION_EXTRA) {

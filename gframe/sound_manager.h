@@ -39,6 +39,7 @@ public:
 		NP,
 		CONFIRM,
 		UNCONFIRM,
+		SEND_GRAVEYARD,
 		SFX_TOTAL_SIZE
 	};
 	enum BGM {

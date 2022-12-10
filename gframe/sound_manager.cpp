@@ -103,6 +103,7 @@ void SoundManager::RefreshSoundsList() {
 		{NP, EPRO_TEXT("./sound/np.{}"_sv)},
 		{CONFIRM, EPRO_TEXT("./sound/confirm.{}"_sv)},
 		{UNCONFIRM, EPRO_TEXT("./sound/unconfirm.{}"_sv)},
+		{SEND_GRAVEYARD, EPRO_TEXT("./sound/sendgraveyard.{}"_sv)}
 	};
 	const auto extensions = mixer->GetSupportedSoundExtensions();
 	for(const auto& sound : fx) {

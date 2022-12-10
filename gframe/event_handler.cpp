@@ -782,7 +782,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				case MSG_SORT_CARD: {
 					int offset = mainGame->scrCardList->getPos() / 10;
 					int sel_seq = id - BUTTON_CARD_0 + offset;
-					if(sort_list[sel_seq]) {
+					if(!sort_list.empty() && sort_list[sel_seq]) {
 						select_min--;
 						int sel = sort_list[sel_seq];
 						sort_list[sel_seq] = 0;

@@ -37,6 +37,7 @@ namespace ygo {
 		bool selectZone = false;
 		int cardSelectPosition = 0;
 		int selectAttribute = 0;
+		int selectType = 0;
 		AccessibilityFieldFocus::DisplayedField displayedField = AccessibilityFieldFocus::DisplayedField::PLAYER;
 		int displayedCards = AccessibilityFieldFocus::DisplayedCards::NO_DISPLAY;
 		int cardType = AccessibilityFieldFocus::CardType::MONSTER;
@@ -78,6 +79,9 @@ namespace ygo {
 		void GetCardLocation(ClientCard* card);
 		std::wstring GetCardLocationName(ClientCard* card);
 		bool CheckAttributeSelector();
+		bool CheckTypeSelector();
+		void AnnounceNumber();
+		void AnnounceCard();
 		/*
 		void SimulateButton(irr::gui::IGUIElement* caller = nullptr);
 		void SetMouseOnCard();

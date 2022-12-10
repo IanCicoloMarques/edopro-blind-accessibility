@@ -15,6 +15,8 @@ namespace ygo {
 		event.GUIEvent.EventType = type;
 		event.GUIEvent.Caller = target;
 		ygo::mainGame->device->postEventFromUser(event);
+		if(target == mainGame->btnSaveDeck)
+			mainGame->env->removeFocus(mainGame->env->getFocus());
 	}
 
 	static inline void ReadComboBox(irr::gui::IGUIComboBox* comboBox) {
@@ -212,13 +214,16 @@ namespace ygo {
 				break;
 			}
 			case irr::KEY_KEY_S: {
-				if (event.KeyInput.Control && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX) && newDeck) {
-					mainGame->env->setFocus(mainGame->btnSaveDeckAs);
-					TriggerEvent(mainGame->btnSaveDeckAs, irr::gui::EGET_BUTTON_CLICKED);
-				}
-				else if (event.KeyInput.Control && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX) && !newDeck) {
-					mainGame->env->setFocus(mainGame->btnSaveDeck);
-					TriggerEvent(mainGame->btnSaveDeck, irr::gui::EGET_BUTTON_CLICKED);
+				if (event.KeyInput.Control) {
+					if (mainGame->env->getFocus() == mainGame->ebDeckname && mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX) && newDeck) {
+						TriggerEvent(mainGame->btnSaveDeckAs, irr::gui::EGET_BUTTON_CLICKED);
+						mainGame->env->setFocus(mainGame->btnSaveDeckAs);
+						newDeck = false;
+					}
+					else{
+						TriggerEvent(mainGame->btnSaveDeck, irr::gui::EGET_BUTTON_CLICKED);
+						mainGame->env->setFocus(mainGame->btnSaveDeck);
+					}
 				}
 				break;
 			}
@@ -344,8 +349,10 @@ namespace ygo {
 			case irr::KEY_DOWN:
 			case irr::KEY_UP: {
 				if (!event.KeyInput.PressedDown && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX) && deckLooker == AccessibilityDeckFocus::DeckLookerLocId::MENU) {
-					if (mainGame->cbDBDecks->isTrulyVisible() && menuSelectCounter == MenuType::DeckOptionsMenu::DECKOP_SELECT_DECK)
+					if (mainGame->cbDBDecks->isTrulyVisible() && menuSelectCounter == MenuType::DeckOptionsMenu::DECKOP_SELECT_DECK) {
 						ReadComboBox(mainGame->cbDBDecks);
+						newDeck = false;
+					}
 					else if(mainGame->cbCardType->isTrulyVisible() && menuSelectCounter == MenuType::DeckOptionsMenu::DECKOP_CATEGORY)
 						ReadComboBox(mainGame->cbCardType);
 					else if (mainGame->cbCardType2->isTrulyVisible() && menuSelectCounter == MenuType::DeckOptionsMenu::DECKOP_SUB_CATEGORY)

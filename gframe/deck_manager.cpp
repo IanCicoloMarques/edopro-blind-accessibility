@@ -517,7 +517,7 @@ void DeckManager::ImportDeckBase64(Deck& deck, const wchar_t* buffer) {
 	const auto extralist = BufferToCardlist(base64_decode(buffer + delimiters[0] + 1, delimiters[1] - delimiters[0]));
 	const auto sidelist = BufferToCardlist(base64_decode(buffer + delimiters[1] + 1, delimiters[2] - delimiters[1]));
 	LoadDeck(deck, mainlist, sidelist, &extralist);
-	ScreenReader::getReader()->readScreen(fmt::format(L"Deck imported"));
+	ScreenReader::getReader()->readScreen(fmt::format(gDataManager->GetAccessibilityString(258).data()));
 }
 template<size_t N>
 uint32_t gzinflate(const std::vector<uint8_t>& in, uint8_t(&buffer)[N]) {

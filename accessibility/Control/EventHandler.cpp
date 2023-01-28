@@ -84,7 +84,7 @@ namespace ygo {
 				if (canViewCards) {
 					cardType = AccessibilityFieldFocus::CardType::MONSTER;
 					lookupFieldLocId = AccessibilityFieldFocus::FieldLookerLocId::PLAYER_ACTIVABLE_CARDS;
-					DisplayCards(mainGame->dField.activatable_cards, fmt::format(L"Activable Cards"));
+					DisplayCards(mainGame->dField.activatable_cards, fmt::format(gDataManager->GetAccessibilityString(65).data()));
 				}
 				else
 					CloseDialog();
@@ -117,7 +117,7 @@ namespace ygo {
 					if (canViewCards) {
 						lookupFieldLocId = AccessibilityFieldFocus::FieldLookerLocId::PLAYER_SPELLS;
 						cardType = AccessibilityFieldFocus::CardType::SPELL;
-						DisplayCards(mainGame->dField.szone[displayedField], fmt::format(L"Spells"));
+						DisplayCards(mainGame->dField.szone[displayedField], fmt::format(gDataManager->GetAccessibilityString(66).data()));
 					}
 					else
 						CloseDialog();
@@ -177,45 +177,45 @@ namespace ygo {
 						std::wstring cardType = fmt::format(L"{}", gDataManager->FormatType(selectedCard->type));
 						std::wstring cardAttribute = fmt::format(L"{}", gDataManager->FormatAttribute(selectedCard->attribute));
 						std::wstring cardLevel = selectedCard->link_marker != 0 ?
-							fmt::format(L"Link {}", gDataManager->GetCardData(selectedCard->code)->level) :
-							fmt::format(L"Level {}", gDataManager->GetCardData(selectedCard->code)->level);
+							fmt::format(gDataManager->GetAccessibilityString(67).data(), gDataManager->GetCardData(selectedCard->code)->level) :
+							fmt::format(gDataManager->GetAccessibilityString(68).data(), gDataManager->GetCardData(selectedCard->code)->level);
 						std::wstring cardRace = fmt::format(L"{}", gDataManager->FormatRace(selectedCard->race));
-						std::wstring cardAttack = fmt::format(L"Attack {}", selectedCard->attack);
-						std::wstring cardDefense = fmt::format(L"Defense: {}", selectedCard->defense);
+						std::wstring cardAttack = fmt::format(gDataManager->GetAccessibilityString(69).data(), selectedCard->attack);
+						std::wstring cardDefense = fmt::format(gDataManager->GetAccessibilityString(70).data(), selectedCard->defense);
 						std::wstring cardEffect = fmt::format(L"{}", gDataManager->GetText(selectedCard->code));
-						std::wstring position = selectedCard->position == 1 ? fmt::format(L"Attack Position") : fmt::format(L"Defense Position");
-						std::wstring leftScale = fmt::format(L"Left Scale {}", selectedCard->lscstring);
-						std::wstring rightScale = fmt::format(L"Right Scale {}", selectedCard->rscstring);
-						std::wstring fieldSlot = fmt::format(L"Zone {}", SearchFieldSlot(displayedField, selectedCard));
+						std::wstring position = selectedCard->position == 1 ? fmt::format(gDataManager->GetAccessibilityString(71).data()) : fmt::format(gDataManager->GetAccessibilityString(72).data());
+						std::wstring leftScale = fmt::format(gDataManager->GetAccessibilityString(73).data(), selectedCard->lscstring);
+						std::wstring rightScale = fmt::format(gDataManager->GetAccessibilityString(74).data(), selectedCard->rscstring);
+						std::wstring fieldSlot = fmt::format(gDataManager->GetAccessibilityString(75).data(), SearchFieldSlot(displayedField, selectedCard));
 						std::wstring linkMarks = GetLinkMarks(selectedCard);
 						std::wstring overlayedCards = GetOverlayedCards(selectedCard);
 						std::wstring location = fmt::format(L"{}[{}]", gDataManager->FormatLocation(selectedCard->location, selectedCard->sequence), selectedCard->sequence + 1);
 						ScreenReader::getReader()->readScreen(cardName.c_str(), false);
 						ScreenReader::getReader()->readScreen(location.c_str(), false);
-						if (fieldSlot.compare(L"Zone 0") != 0)
+						if (fieldSlot.compare(fmt::format(gDataManager->GetAccessibilityString(75).data(), 0)) != 0)
 							ScreenReader::getReader()->readScreen(fieldSlot.c_str(), false);
 						if (selectedCard->position != 10)
 							ScreenReader::getReader()->readScreen(position.c_str(), false);
 						ScreenReader::getReader()->readScreen(cardType.c_str(), false);
 						ScreenReader::getReader()->readScreen(cardAttribute.c_str(), false);
-						if (cardType.find(L"Spell") == std::string::npos && cardType.find(L"Trap") == std::string::npos) {
+						if (cardType.find(gDataManager->GetAccessibilityString(76).data()) == std::string::npos && cardType.find(gDataManager->GetAccessibilityString(77).data()) == std::string::npos) {
 							ScreenReader::getReader()->readScreen(cardLevel.c_str(), false);
 							ScreenReader::getReader()->readScreen(cardRace.c_str(), false);
 							ScreenReader::getReader()->readScreen(cardAttack.c_str(), false);
 							ScreenReader::getReader()->readScreen(cardDefense.c_str(), false);
 						}
 						if (!linkMarks.empty())
-							ScreenReader::getReader()->readScreen(fmt::format(L"Link Marks: {}", linkMarks), false);
+							ScreenReader::getReader()->readScreen(fmt::format(gDataManager->GetAccessibilityString(78).data(), linkMarks), false);
 						if (!overlayedCards.empty())
-							ScreenReader::getReader()->readScreen(fmt::format(L"Overlayed Cards: {}", overlayedCards), false);
-						if (leftScale.compare(L"Left Scale ") != 0)
+							ScreenReader::getReader()->readScreen(fmt::format(gDataManager->GetAccessibilityString(79).data(), overlayedCards), false);
+						if (leftScale.compare(gDataManager->GetAccessibilityString(80).data()) != 0)
 							ScreenReader::getReader()->readScreen(leftScale.c_str(), false);
-						if (rightScale.compare(L"Right Scale ") != 0)
+						if (rightScale.compare(gDataManager->GetAccessibilityString(81).data()) != 0)
 							ScreenReader::getReader()->readScreen(rightScale.c_str(), false);
 						ScreenReader::getReader()->readScreen(cardEffect.c_str(), false);
 					}
 					else if (!mainGame->dField.display_cards.empty() && indexLookedUpCard <= mainGame->dField.display_cards.size() && mainGame->dField.display_cards[indexLookedUpCard]->code == 0)
-						ScreenReader::getReader()->readScreen(fmt::format(L"Face-down Zone {}", SearchFieldSlot(displayedField, mainGame->dField.display_cards[indexLookedUpCard])), false);
+						ScreenReader::getReader()->readScreen(fmt::format(gDataManager->GetAccessibilityString(82).data(), SearchFieldSlot(displayedField, mainGame->dField.display_cards[indexLookedUpCard])), false);
 				}
 				break;
 			}
@@ -227,9 +227,9 @@ namespace ygo {
 				}
 				else if (!event.KeyInput.PressedDown && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
 					if (mainGame->btnEP->isVisible() && mainGame->btnEP->isEnabled() && mainGame->dInfo.selfnames.size() > 0)
-						ScreenReader::getReader()->readScreen(fmt::format(L"Your turn {}", mainGame->dInfo.selfnames.at(0)), false);
+						ScreenReader::getReader()->readScreen(fmt::format(gDataManager->GetAccessibilityString(83).data(), mainGame->dInfo.selfnames.at(0)), false);
 					else if (mainGame->dInfo.opponames.size() > 0)
-						ScreenReader::getReader()->readScreen(fmt::format(L"Opponent turn {}", mainGame->dInfo.opponames.at(0)), false);
+						ScreenReader::getReader()->readScreen(fmt::format(gDataManager->GetAccessibilityString(84).data(), mainGame->dInfo.opponames.at(0)), false);
 				}
 				break;
 			}
@@ -240,9 +240,9 @@ namespace ygo {
 					ScreenReader::getReader()->readScreen(StringBuilder::getBuiltMessage(), false);
 				}
 				else if (!event.KeyInput.PressedDown && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
-					ScreenReader::getReader()->readScreen(fmt::format(L"Player: {} LP", mainGame->dInfo.lp[AccessibilityFieldFocus::DisplayedField::PLAYER]).c_str(), false);
-					ScreenReader::getReader()->readScreen(fmt::format(L"Enemy: {} LP", mainGame->dInfo.lp[AccessibilityFieldFocus::DisplayedField::ENEMY_PLAYER]).c_str(), false);
-					ScreenReader::getReader()->readScreen(fmt::format(L"{} seconds left to play", mainGame->dInfo.time_left[AccessibilityFieldFocus::DisplayedField::PLAYER]).c_str(), false);
+					ScreenReader::getReader()->readScreen(fmt::format(gDataManager->GetAccessibilityString(85).data(), mainGame->dInfo.lp[AccessibilityFieldFocus::DisplayedField::PLAYER]).c_str(), false);
+					ScreenReader::getReader()->readScreen(fmt::format(gDataManager->GetAccessibilityString(86).data(), mainGame->dInfo.lp[AccessibilityFieldFocus::DisplayedField::ENEMY_PLAYER]).c_str(), false);
+					ScreenReader::getReader()->readScreen(fmt::format(gDataManager->GetAccessibilityString(87).data(), mainGame->dInfo.time_left[AccessibilityFieldFocus::DisplayedField::PLAYER]).c_str(), false);
 
 				}
 				break;
@@ -254,7 +254,7 @@ namespace ygo {
 					ScreenReader::getReader()->readScreen(StringBuilder::getBuiltMessage(), false);
 				}
 				else if (!event.KeyInput.PressedDown && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
-					ScreenReader::getReader()->readScreen(fmt::format(L"Chat active"), false);
+					ScreenReader::getReader()->readScreen(fmt::format(gDataManager->GetAccessibilityString(88).data()), false);
 					mainGame->env->setFocus(mainGame->ebChatInput);
 				}
 				break;
@@ -271,7 +271,7 @@ namespace ygo {
 					if (canViewCards) {
 						cardType = AccessibilityFieldFocus::CardType::CHAIN;
 						lookupFieldLocId = AccessibilityFieldFocus::FieldLookerLocId::CHAINED_CARDS;
-						DisplayCards(mainGame->dField.chains, fmt::format(L"Chained Cards"));
+						DisplayCards(mainGame->dField.chains, fmt::format(gDataManager->GetAccessibilityString(89).data()));
 					}
 					else
 						CloseDialog();
@@ -301,7 +301,7 @@ namespace ygo {
 						if (canViewCards) {
 							lookupFieldLocId = AccessibilityFieldFocus::FieldLookerLocId::PLAYER_HAND;
 							cardType = AccessibilityFieldFocus::CardType::MONSTER;
-							DisplayCards(mainGame->dField.hand[displayedField], fmt::format(L"Hand"));
+							DisplayCards(mainGame->dField.hand[displayedField], fmt::format(gDataManager->GetAccessibilityString(90).data()));
 						}
 						else
 							CloseDialog();
@@ -314,12 +314,17 @@ namespace ygo {
 					StringBuilder::AddLine(gDataManager->GetAccessibilityString(16).data());
 					ScreenReader::getReader()->readScreen(StringBuilder::getBuiltMessage(), false);
 				}
+				if (event.KeyInput.Control && !event.KeyInput.PressedDown && mainGame->ebFileSaveName->isTrulyVisible()) {
+					mainGame->ebFileSaveName->setText(L"");
+					mainGame->env->setFocus(mainGame->ebFileSaveName);
+					ScreenReader::getReader()->readScreen(gDataManager->GetAccessibilityString(91).data());
+				}
 				else if (!event.KeyInput.PressedDown && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
 					bool canViewCards = CheckIfCanViewCards(event);
 					if (canViewCards) {
 						lookupFieldLocId = AccessibilityFieldFocus::FieldLookerLocId::PLAYER_EXTRA_DECK;
 						cardType = AccessibilityFieldFocus::CardType::MONSTER;
-						DisplayCards(mainGame->dField.extra[displayedField], fmt::format(L"Extra Deck"));
+						DisplayCards(mainGame->dField.extra[displayedField], fmt::format(gDataManager->GetAccessibilityString(92).data()));
 					}
 					else
 						CloseDialog();
@@ -350,7 +355,7 @@ namespace ygo {
 					if (canViewCards) {
 						lookupFieldLocId = AccessibilityFieldFocus::FieldLookerLocId::PLAYER_GRAVEYARD;
 						cardType = AccessibilityFieldFocus::CardType::GRAVEYARD;
-						DisplayCards(mainGame->dField.grave[displayedField], fmt::format(L"Graveyard"));
+						DisplayCards(mainGame->dField.grave[displayedField], fmt::format(gDataManager->GetAccessibilityString(93).data()));
 						SelectFieldSlotHandAllowed(SearchFieldSlot(displayedField), displayedField);
 						MouseClick(event);
 					}
@@ -370,7 +375,7 @@ namespace ygo {
 					if (canViewCards) {
 						cardType = AccessibilityFieldFocus::CardType::MONSTER;
 						lookupFieldLocId = AccessibilityFieldFocus::FieldLookerLocId::PLAYER_DECK;
-						DisplayCards(mainGame->dField.deck[displayedField], fmt::format(L"Deck"));
+						DisplayCards(mainGame->dField.deck[displayedField], fmt::format(gDataManager->GetAccessibilityString(94).data()));
 					}
 					else
 						CloseDialog();
@@ -410,7 +415,7 @@ namespace ygo {
 					if (canViewCards) {
 						lookupFieldLocId = AccessibilityFieldFocus::FieldLookerLocId::PLAYER_MONSTERS;
 						cardType = AccessibilityFieldFocus::CardType::MONSTER;
-						DisplayCards(mainGame->dField.mzone[displayedField], fmt::format(L"Monster Zone"));
+						DisplayCards(mainGame->dField.mzone[displayedField], fmt::format(gDataManager->GetAccessibilityString(95).data()));
 					}
 					else
 						CloseDialog();
@@ -430,11 +435,11 @@ namespace ygo {
 						lookupFieldLocId = AccessibilityFieldFocus::FieldLookerLocId::PLAYER_SPECIAL_SUMMONABLE_MONSTERS;
 						if (mainGame->wCardSelect->isTrulyVisible()) {
 							mainGame->dField.display_cards = mainGame->dField.selectable_cards;
-							ScreenReader::getReader()->readScreen(fmt::format(L"Special Summonable Cards {} cards", mainGame->dField.display_cards.size()).data(), false);
+							ScreenReader::getReader()->readScreen(fmt::format(gDataManager->GetAccessibilityString(96).data(), mainGame->dField.display_cards.size()).data(), false);
 							mainGame->env->setFocus(mainGame->wCardSelect);
 						}
 						else
-							DisplayCards(mainGame->dField.spsummonable_cards, fmt::format(L"Special Summonable Cards"));
+							DisplayCards(mainGame->dField.spsummonable_cards, fmt::format(gDataManager->GetAccessibilityString(97).data()));
 					}
 					else
 						CloseDialog();
@@ -452,7 +457,7 @@ namespace ygo {
 					if (canViewCards) {
 						cardType = AccessibilityFieldFocus::CardType::MONSTER;
 						lookupFieldLocId = AccessibilityFieldFocus::FieldLookerLocId::PLAYER_BANNED_CARDS;
-						DisplayCards(mainGame->dField.remove[displayedField], fmt::format(L"Removed Cards"));
+						DisplayCards(mainGame->dField.remove[displayedField], fmt::format(gDataManager->GetAccessibilityString(98).data()));
 					}
 					else
 						CloseDialog();
@@ -474,11 +479,11 @@ namespace ygo {
 						lookupFieldLocId = AccessibilityFieldFocus::FieldLookerLocId::SELECTABLE_CARDS;
 						if (mainGame->wCardSelect->isTrulyVisible()) {
 							mainGame->dField.display_cards = mainGame->dField.selectable_cards;
-							ScreenReader::getReader()->readScreen(fmt::format(L"Selectable Cards {} cards", mainGame->dField.display_cards.size()).data(), false);
+							ScreenReader::getReader()->readScreen(fmt::format(gDataManager->GetAccessibilityString(99).data(), mainGame->dField.display_cards.size()).data(), false);
 							mainGame->env->setFocus(mainGame->wCardSelect);
 						}
 						else if (mainGame->dField.selectable_cards.size() != 0)
-							SelectCard(mainGame->dField.selectable_cards, fmt::format(L"Selectable Cards"));
+							SelectCard(mainGame->dField.selectable_cards, fmt::format(gDataManager->GetAccessibilityString(100).data()));
 					}
 					else
 						CloseDialog();
@@ -495,24 +500,29 @@ namespace ygo {
 					ScreenReader::getReader()->readScreen(StringBuilder::getBuiltMessage(), false);
 				}
 				else if (!event.KeyInput.PressedDown && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
-					if (mainGame->btnYes->isTrulyVisible()) {
+					if (mainGame->btnFileSaveYes->isTrulyVisible()) {
+						TriggerEvent(mainGame->btnFileSaveYes, irr::gui::EGET_BUTTON_CLICKED);
+						std::wstring nvdaString = fmt::format(gDataManager->GetAccessibilityString(101).data(), mainGame->ebFileSaveName->getText());
+						ScreenReader::getReader()->readScreen(nvdaString.c_str(), false);
+					}
+					else if (mainGame->btnYes->isTrulyVisible()) {
 						TriggerEvent(mainGame->btnYes, irr::gui::EGET_BUTTON_CLICKED);
-						std::wstring nvdaString = fmt::format(L"Yes");
+						std::wstring nvdaString = fmt::format(gDataManager->GetAccessibilityString(102).data());
 						ScreenReader::getReader()->readScreen(nvdaString.c_str(), false);
 					}
 					else if (mainGame->btnFirst->isTrulyVisible()) {
 						TriggerEvent(mainGame->btnFirst, irr::gui::EGET_BUTTON_CLICKED);
-						std::wstring nvdaString = fmt::format(L"First turn");
+						std::wstring nvdaString = fmt::format(gDataManager->GetAccessibilityString(103).data());
 						ScreenReader::getReader()->readScreen(nvdaString.c_str());
 					}
 					else if (mainGame->btnPSAU->isTrulyVisible()) {
 						TriggerEvent(mainGame->btnPSAU, irr::gui::EGET_BUTTON_CLICKED);
-						std::wstring nvdaString = fmt::format(L"Attack Up");
+						std::wstring nvdaString = fmt::format(gDataManager->GetAccessibilityString(104).data());
 						ScreenReader::getReader()->readScreen(nvdaString.c_str(), false);
 					}
 					else if (mainGame->btnPSAD->isTrulyVisible()) {
 						TriggerEvent(mainGame->btnPSAU, irr::gui::EGET_BUTTON_CLICKED);
-						std::wstring nvdaString = fmt::format(L"Attack Down");
+						std::wstring nvdaString = fmt::format(gDataManager->GetAccessibilityString(105).data());
 						ScreenReader::getReader()->readScreen(nvdaString.c_str(), false);
 					}
 					else {
@@ -532,27 +542,27 @@ namespace ygo {
 				else if (!event.KeyInput.PressedDown && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
 					if (mainGame->btnFileSaveNo->isTrulyVisible()) {
 						TriggerEvent(mainGame->btnFileSaveNo, irr::gui::EGET_BUTTON_CLICKED);
-						std::wstring nvdaString = fmt::format(L"No");
+						std::wstring nvdaString = fmt::format(gDataManager->GetAccessibilityString(106).data());
 						ScreenReader::getReader()->readScreen(nvdaString.c_str(), false);
 					}
 					else if (mainGame->btnNo->isTrulyVisible()) {
 						TriggerEvent(mainGame->btnNo, irr::gui::EGET_BUTTON_CLICKED);
-						std::wstring nvdaString = fmt::format(L"No");
+						std::wstring nvdaString = fmt::format(gDataManager->GetAccessibilityString(106).data());
 						ScreenReader::getReader()->readScreen(nvdaString.c_str(), false);
 					}
 					else if (mainGame->btnSecond->isTrulyVisible()) {
 						TriggerEvent(mainGame->btnSecond, irr::gui::EGET_BUTTON_CLICKED);
-						std::wstring nvdaString = fmt::format(L"Second Turn");
+						std::wstring nvdaString = fmt::format(gDataManager->GetAccessibilityString(107).data());
 						ScreenReader::getReader()->readScreen(nvdaString.c_str());
 					}
 					else if (mainGame->btnPSDU->isTrulyVisible()) {
 						TriggerEvent(mainGame->btnPSDU, irr::gui::EGET_BUTTON_CLICKED);
-						std::wstring nvdaString = fmt::format(L"Defense Up");
+						std::wstring nvdaString = fmt::format(gDataManager->GetAccessibilityString(108).data());
 						ScreenReader::getReader()->readScreen(nvdaString.c_str(), false);
 					}
 					else if (mainGame->btnPSDD->isTrulyVisible()) {
 						TriggerEvent(mainGame->btnPSDD, irr::gui::EGET_BUTTON_CLICKED);
-						std::wstring nvdaString = fmt::format(L"Defense Down");
+						std::wstring nvdaString = fmt::format(gDataManager->GetAccessibilityString(109).data());
 						ScreenReader::getReader()->readScreen(nvdaString.c_str(), false);
 					}
 				}
@@ -576,7 +586,7 @@ namespace ygo {
 					}
 					else if (!mainGame->dField.display_cards.empty() && indexLookedUpCard <= mainGame->dField.display_cards.size()) {
 						mainGame->dField.clicked_card = mainGame->dField.display_cards[indexLookedUpCard];
-						std::wstring cardName = fmt::format(L"Selected {}", gDataManager->GetName(mainGame->dField.clicked_card->code));
+						std::wstring cardName = fmt::format(gDataManager->GetAccessibilityString(110).data(), gDataManager->GetName(mainGame->dField.clicked_card->code));
 						ScreenReader::getReader()->readScreen(cardName.c_str());
 						if (mainGame->btnCardSelect[0]->isTrulyVisible() || mainGame->dField.clicked_card->cmdFlag == 4 && std::find(mainGame->dField.spsummonable_cards.begin(), mainGame->dField.spsummonable_cards.end(), mainGame->dField.clicked_card) == mainGame->dField.spsummonable_cards.end())
 							UseCard(AccessibilityFieldFocus::UseType::NO_USE, event);
@@ -602,15 +612,15 @@ namespace ygo {
 					}
 					else if (mainGame->ebANCard->isTrulyVisible()) {
 						Focus(mainGame->ebANCard);
-						ScreenReader::getReader()->readScreen(L"Type Card Name", false);
+						ScreenReader::getReader()->readScreen(gDataManager->GetAccessibilityString(111).data(), false);
 					}
 					else if (mainGame->wANRace->isTrulyVisible()) {
 						Focus(mainGame->wANRace);
-						ScreenReader::getReader()->readScreen(L"Select Race", false);
+						ScreenReader::getReader()->readScreen(gDataManager->GetAccessibilityString(112).data(), false);
 					}
 					else if (mainGame->wANAttribute->isTrulyVisible()) {
 						Focus(mainGame->wANAttribute);
-						ScreenReader::getReader()->readScreen(L"Select Attribute", false);
+						ScreenReader::getReader()->readScreen(gDataManager->GetAccessibilityString(113).data(), false);
 					}
 				}
 				break;
@@ -710,7 +720,7 @@ namespace ygo {
 						ScreenReader::getReader()->readScreen(gDataManager->GetDesc(mainGame->dField.select_options[mainGame->dField.selected_option], mainGame->dInfo.compat_mode).data(), false);
 					else if (displayedField != AccessibilityFieldFocus::DisplayedField::ENEMY_PLAYER) {
 						displayedField = AccessibilityFieldFocus::DisplayedField::ENEMY_PLAYER;
-						std::wstring nvdaString = fmt::format(L"Enemy Player Field");
+						std::wstring nvdaString = fmt::format(gDataManager->GetAccessibilityString(114).data());
 						ScreenReader::getReader()->readScreen(nvdaString.c_str());
 						CloseDialog();
 						MouseClick(event, true);
@@ -744,7 +754,7 @@ namespace ygo {
 						AnnounceCard();
 					else if (displayedField != AccessibilityFieldFocus::DisplayedField::PLAYER) {
 						displayedField = AccessibilityFieldFocus::DisplayedField::PLAYER;
-						std::wstring nvdaString = fmt::format(L"Player Field");
+						std::wstring nvdaString = fmt::format(gDataManager->GetAccessibilityString(115).data());
 						ScreenReader::getReader()->readScreen(nvdaString.c_str());
 						CloseDialog();
 						MouseClick(event, true);
@@ -767,7 +777,7 @@ namespace ygo {
 						TriggerEvent(mainGame->btnDisplayOK, irr::gui::EGET_BUTTON_CLICKED);
 					if (mainGame->btnHand[0]->isTrulyVisible()) {
 						TriggerEvent(mainGame->btnHand[0], irr::gui::EGET_BUTTON_CLICKED);
-						std::wstring nvdaString = fmt::format(L"SCISSORS");
+						std::wstring nvdaString = fmt::format(gDataManager->GetAccessibilityString(116).data());
 						ScreenReader::getReader()->readScreen(nvdaString.c_str(), false);
 					}
 					else
@@ -796,7 +806,7 @@ namespace ygo {
 				else if (!event.KeyInput.PressedDown && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
 					if (mainGame->btnHand[1]->isTrulyVisible()) {
 						TriggerEvent(mainGame->btnHand[1], irr::gui::EGET_BUTTON_CLICKED);
-						std::wstring nvdaString = fmt::format(L"ROCK");
+						std::wstring nvdaString = fmt::format(gDataManager->GetAccessibilityString(117).data());
 						ScreenReader::getReader()->readScreen(nvdaString.c_str(), false);
 					}
 					else if (mainGame->btnOption[1]->isTrulyVisible()) {
@@ -829,7 +839,7 @@ namespace ygo {
 				else if (!event.KeyInput.PressedDown && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
 					if (mainGame->btnHand[2]->isTrulyVisible()) {
 						TriggerEvent(mainGame->btnHand[2], irr::gui::EGET_BUTTON_CLICKED);
-						std::wstring nvdaString = fmt::format(L"Paper");
+						std::wstring nvdaString = fmt::format(gDataManager->GetAccessibilityString(118).data());
 						ScreenReader::getReader()->readScreen(nvdaString.c_str(), false);
 					}
 					else if (mainGame->btnOption[2]->isTrulyVisible()) {
@@ -949,7 +959,7 @@ namespace ygo {
 				else if (!event.KeyInput.PressedDown && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
 					if (mainGame->btnLeaveGame->isTrulyVisible()) {
 						TriggerEvent(mainGame->btnLeaveGame, irr::gui::EGET_BUTTON_CLICKED);
-						std::wstring nvdaString = fmt::format(L"Surrender");
+						std::wstring nvdaString = fmt::format(gDataManager->GetAccessibilityString(119).data());
 						ScreenReader::getReader()->readScreen(nvdaString.c_str(), false);
 					}
 				}
@@ -1112,19 +1122,19 @@ namespace ygo {
 	std::wstring EventHandler::GetCardLocationName(ClientCard* card) {
 		std::wstring locationName = L"";
 		if (card->location == LOCATION_EXTRA)
-			locationName = L"Extra Deck";
+			locationName = gDataManager->GetAccessibilityString(120).data();
 		else if (card->location == LOCATION_DECK)
-			locationName = L"Main Deck";
+			locationName = gDataManager->GetAccessibilityString(121).data();
 		else if (card->location == LOCATION_GRAVE)
-			locationName = L"Grave";
+			locationName = gDataManager->GetAccessibilityString(122).data();
 		else if (card->location == LOCATION_REMOVED)
-			locationName = L"Removed";
+			locationName = gDataManager->GetAccessibilityString(123).data();
 		else if (card->location == LOCATION_HAND)
-			locationName = L"Hand";
+			locationName = gDataManager->GetAccessibilityString(124).data();
 		else if (card->location == LOCATION_MZONE)
-			locationName = L"Monster Zone";
+			locationName = gDataManager->GetAccessibilityString(125).data();
 		else if (card->location == LOCATION_SZONE)
-			locationName = L"Spells Zone";
+			locationName = gDataManager->GetAccessibilityString(126).data();
 		return locationName;
 	}
 
@@ -1150,13 +1160,13 @@ namespace ygo {
 			mainGame->dField.ShowLocationCard();
 
 			if (text.compare(L"") != 0) {
-				ScreenReader::getReader()->readScreen(fmt::format(L"{}{} cards", text, mainGame->dField.display_cards.size()).data(), false);
+				ScreenReader::getReader()->readScreen(fmt::format(gDataManager->GetAccessibilityString(127).data(), text, mainGame->dField.display_cards.size()).data(), false);
 			}
 			mainGame->ShowCardInfo(mainGame->dField.display_cards[0]->code);
 		}
 		else
 		{
-			std::wstring nvdaString = fmt::format(L"There are no cards to display");
+			std::wstring nvdaString = fmt::format(gDataManager->GetAccessibilityString(128).data());
 			ScreenReader::getReader()->readScreen(nvdaString.c_str(), false);
 			CloseDialog();
 		}
@@ -1175,13 +1185,13 @@ namespace ygo {
 			ShowSelectCard();
 
 			if (text.compare(L"") != 0) {
-				ScreenReader::getReader()->readScreen(fmt::format(L"{}{} cards", text, mainGame->dField.display_cards.size()).data(), false);
+				ScreenReader::getReader()->readScreen(fmt::format(gDataManager->GetAccessibilityString(127).data(), text, mainGame->dField.display_cards.size()).data(), false);
 			}
 			mainGame->ShowCardInfo(mainGame->dField.display_cards[0]->code);
 		}
 		else
 		{
-			std::wstring nvdaString = fmt::format(L"There are no cards to display");
+			std::wstring nvdaString = fmt::format(gDataManager->GetAccessibilityString(128).data());
 			ScreenReader::getReader()->readScreen(nvdaString.c_str(), false);
 			CloseDialog();
 		}
@@ -1433,7 +1443,7 @@ namespace ygo {
 					displayedField = AccessibilityFieldFocus::DisplayedField::PLAYER;
 					MouseClick(event);
 					displayedField = AccessibilityFieldFocus::DisplayedField::PLAYER;
-					std::wstring nvdaString = fmt::format(L"Player Field");
+					std::wstring nvdaString = fmt::format(gDataManager->GetAccessibilityString(129).data());
 					ChangeFieldAndLook(true);
 				}
 				else {
@@ -1500,7 +1510,7 @@ namespace ygo {
 		}
 		else
 		{
-			std::wstring nvdaString = fmt::format(L"There are no cards to display");
+			std::wstring nvdaString = fmt::format(gDataManager->GetAccessibilityString(128).data());
 			ScreenReader::getReader()->readScreen(nvdaString.c_str(), false);
 			CloseDialog();
 		}
@@ -1715,7 +1725,7 @@ namespace ygo {
 		}
 		if (!selected) {
 			std::wstring cardTypeString = fmt::format(L"{}", gDataManager->FormatType(mainGame->dField.clicked_card->type));
-			if (cardTypeString.find(L"Spell") == std::string::npos && cardTypeString.find(L"Trap") == std::string::npos) {
+			if (cardTypeString.find(gDataManager->GetAccessibilityString(76).data()) == std::string::npos && cardTypeString.find(gDataManager->GetAccessibilityString(77).data()) == std::string::npos) {
 				lookupFieldLocId = AccessibilityFieldFocus::PLAYER_MONSTERS;
 				cardType = AccessibilityFieldFocus::CardType::MONSTER;
 			}
@@ -1777,22 +1787,22 @@ namespace ygo {
 		std::wstring linkMark = std::wstring();
 		const int mark = card->link_marker;
 		if (mark & LINK_MARKER_BOTTOM_LEFT) {
-			linkMark += L"Bottom Left,";
+			linkMark += gDataManager->GetAccessibilityString(130).data();
 		}
 		if (mark & LINK_MARKER_BOTTOM) {
-			linkMark += L"Bottom, ";
+			linkMark += gDataManager->GetAccessibilityString(131).data();
 		}
 		if (mark & LINK_MARKER_BOTTOM_RIGHT) {
-			linkMark += L"Bottom Right, ";
+			linkMark += gDataManager->GetAccessibilityString(132).data();
 		}
 		if (mark & LINK_MARKER_TOP_LEFT) {
-			linkMark += L"Top Left, ";
+			linkMark += gDataManager->GetAccessibilityString(133).data();
 		}
 		if (mark & LINK_MARKER_TOP) {
-			linkMark += L"Top, ";
+			linkMark += gDataManager->GetAccessibilityString(134).data();
 		}
 		if (mark & LINK_MARKER_TOP_RIGHT) {
-			linkMark += L"Top Right, ";
+			linkMark += gDataManager->GetAccessibilityString(135).data();
 		}
 		return linkMark;
 	}
@@ -1846,27 +1856,27 @@ namespace ygo {
 		if (lookupFieldLocId == AccessibilityFieldFocus::FieldLookerLocId::PLAYER_MONSTERS || lookupFieldLocId == AccessibilityFieldFocus::FieldLookerLocId::PLAYER_SPELLS) {
 			if (mainGame->dField.display_cards[indexLookedUpCard]->code != 0) {
 				int slot = SearchFieldSlot(displayedField, mainGame->dField.display_cards[indexLookedUpCard]);
-				nvdaString = fmt::format(L"{} {} attack {} defense", gDataManager->GetName(mainGame->dField.display_cards[indexLookedUpCard]->code), mainGame->dField.display_cards[indexLookedUpCard]->attack, mainGame->dField.display_cards[indexLookedUpCard]->defense);
+				nvdaString = fmt::format(gDataManager->GetAccessibilityString(136).data(), gDataManager->GetName(mainGame->dField.display_cards[indexLookedUpCard]->code), mainGame->dField.display_cards[indexLookedUpCard]->attack, mainGame->dField.display_cards[indexLookedUpCard]->defense);
 				if (mainGame->dField.display_cards[indexLookedUpCard]->is_selected)
-					nvdaString.append(L" selected");
+					nvdaString.append(gDataManager->GetAccessibilityString(137).data());
 				if (slot != 0)
 					nvdaString.append(fmt::format(L" {} {}", GetCardLocationName(mainGame->dField.display_cards[indexLookedUpCard]), mainGame->dField.display_cards[indexLookedUpCard]->position));
 			}
 			else
-				nvdaString = fmt::format(L"Face-down zone {}", SearchFieldSlot(displayedField, mainGame->dField.display_cards[indexLookedUpCard]));
+				nvdaString = fmt::format(gDataManager->GetAccessibilityString(138).data(), SearchFieldSlot(displayedField, mainGame->dField.display_cards[indexLookedUpCard]));
 		}
 		else {
 			if (mainGame->dField.display_cards[indexLookedUpCard]->code != 0) {
-				nvdaString = fmt::format(L"{} slot {}", gDataManager->GetName(mainGame->dField.display_cards[indexLookedUpCard]->code), indexLookedUpCard);
+				nvdaString = fmt::format(gDataManager->GetAccessibilityString(139).data(), gDataManager->GetName(mainGame->dField.display_cards[indexLookedUpCard]->code), indexLookedUpCard);
 				if (mainGame->dField.display_cards[indexLookedUpCard]->is_selected)
-					nvdaString.append(L" selected");
+					nvdaString.append(gDataManager->GetAccessibilityString(137).data());
 				else
-					nvdaString.append(L" unselected");
+					nvdaString.append(gDataManager->GetAccessibilityString(140).data());
 
 				nvdaString.append(fmt::format(L" {} {}", GetCardLocationName(mainGame->dField.display_cards[indexLookedUpCard]), mainGame->dField.display_cards[indexLookedUpCard]->sequence));
 			}
 			else
-				nvdaString = fmt::format(L"Face-down slot {}", indexLookedUpCard);
+				nvdaString = fmt::format(gDataManager->GetAccessibilityString(141).data(), indexLookedUpCard);
 		}
 		ScreenReader::getReader()->readScreen(nvdaString.c_str());
 	}
@@ -1874,19 +1884,19 @@ namespace ygo {
 	void EventHandler::ChangeFieldAndLook(bool click)
 	{
 		if (lookupFieldLocId == AccessibilityFieldFocus::FieldLookerLocId::PLAYER_HAND)
-			DisplayCards(mainGame->dField.hand[displayedField], fmt::format(L"Hand"));
+			DisplayCards(mainGame->dField.hand[displayedField], fmt::format(gDataManager->GetAccessibilityString(124).data()));
 		else if (lookupFieldLocId == AccessibilityFieldFocus::FieldLookerLocId::PLAYER_MONSTERS)
-			DisplayCards(mainGame->dField.mzone[displayedField], fmt::format(L"Monster Zone"));
+			DisplayCards(mainGame->dField.mzone[displayedField], fmt::format(gDataManager->GetAccessibilityString(125).data()));
 		else if (lookupFieldLocId == AccessibilityFieldFocus::FieldLookerLocId::PLAYER_SPELLS)
-			DisplayCards(mainGame->dField.szone[displayedField], fmt::format(L"Spells"));
+			DisplayCards(mainGame->dField.szone[displayedField], fmt::format(gDataManager->GetAccessibilityString(66).data()));
 		else if (lookupFieldLocId == AccessibilityFieldFocus::FieldLookerLocId::PLAYER_EXTRA_DECK)
-			DisplayCards(mainGame->dField.extra[displayedField], fmt::format(L"Extra Deck"));
+			DisplayCards(mainGame->dField.extra[displayedField], fmt::format(gDataManager->GetAccessibilityString(92).data()));
 		else if (lookupFieldLocId == AccessibilityFieldFocus::FieldLookerLocId::PLAYER_GRAVEYARD)
-			DisplayCards(mainGame->dField.grave[displayedField], fmt::format(L"Graveyard"));
+			DisplayCards(mainGame->dField.grave[displayedField], fmt::format(gDataManager->GetAccessibilityString(93).data()));
 		else if (lookupFieldLocId == AccessibilityFieldFocus::FieldLookerLocId::PLAYER_BANNED_CARDS)
-			DisplayCards(mainGame->dField.remove[displayedField], fmt::format(L"Removed Cards"));
+			DisplayCards(mainGame->dField.remove[displayedField], fmt::format(gDataManager->GetAccessibilityString(142).data()));
 		else if (lookupFieldLocId == AccessibilityFieldFocus::FieldLookerLocId::PLAYER_DECK)
-			DisplayCards(mainGame->dField.deck[displayedField], fmt::format(L"Deck"));
+			DisplayCards(mainGame->dField.deck[displayedField], fmt::format(gDataManager->GetAccessibilityString(143).data()));
 	}
 
 	int EventHandler::SearchFieldSlot(const int& localDisplayedField, ClientCard* card, bool looped) {
@@ -1939,15 +1949,15 @@ namespace ygo {
 		if (cardType == AccessibilityFieldFocus::CardType::LINK) {
 			lookupFieldLocId = AccessibilityFieldFocus::LINK_ZONE;
 			cardType = AccessibilityFieldFocus::LINK;
-			nvdaString = fmt::format(L"Link Field");
+			nvdaString = fmt::format(gDataManager->GetAccessibilityString(144).data());
 		}
 		else if (cardType == AccessibilityFieldFocus::CardType::MONSTER) {
 			lookupFieldLocId = AccessibilityFieldFocus::PLAYER_MONSTERS;
-			nvdaString = fmt::format(L"Monster Field");
+			nvdaString = fmt::format(gDataManager->GetAccessibilityString(145).data());
 		}
 		else if (cardType == AccessibilityFieldFocus::CardType::SPELL) {
 			lookupFieldLocId = AccessibilityFieldFocus::PLAYER_SPELLS;
-			nvdaString = fmt::format(L"Spell Field");
+			nvdaString = fmt::format(gDataManager->GetAccessibilityString(146).data());
 		}
 		ScreenReader::getReader()->readScreen(nvdaString.c_str());
 	}
@@ -2009,7 +2019,7 @@ namespace ygo {
 					case BUTTON_ANCARD_OK: {
 						if (AccessibilityConfiguration::accessibilityShortcuts) {
 							if (mainGame->lstANCard->getSelected() != -1) {
-								std::wstring nvdaString = fmt::format(L"{} card name selected", mainGame->lstANCard->getListItem(mainGame->lstANCard->getSelected()));
+								std::wstring nvdaString = fmt::format(gDataManager->GetAccessibilityString(147).data(), mainGame->lstANCard->getListItem(mainGame->lstANCard->getSelected()));
 								ScreenReader::getReader()->readScreen(nvdaString.c_str(), false);
 							}
 						}
@@ -2030,7 +2040,7 @@ namespace ygo {
 								if (CheckIfCanViewCards(event)) {
 									lookupFieldLocId = AccessibilityFieldFocus::FieldLookerLocId::PLAYER_MONSTERS;
 									cardType = AccessibilityFieldFocus::CardType::MONSTER;
-									SelectCard(mainGame->dField.mzone[displayedField], fmt::format(L"Monster Zone"));
+									SelectCard(mainGame->dField.mzone[displayedField], fmt::format(gDataManager->GetAccessibilityString(95).data()));
 								}
 							}
 							else
@@ -2045,7 +2055,7 @@ namespace ygo {
 				switch (id) {
 					case CHECK_ATTRIBUTE: {
 						if (AccessibilityConfiguration::accessibilityShortcuts) {
-							std::wstring nvdaString = fmt::format(L"Element {} selected", mainGame->chkAttribute[selectAttribute]->getText());
+							std::wstring nvdaString = fmt::format(gDataManager->GetAccessibilityString(148).data(), mainGame->chkAttribute[selectAttribute]->getText());
 							ScreenReader::getReader()->readScreen(nvdaString.c_str(), false);
 							selectAttribute = 0;
 						}
@@ -2053,7 +2063,7 @@ namespace ygo {
 					}
 					case CHECK_RACE: {
 						if (AccessibilityConfiguration::accessibilityShortcuts) {
-							std::wstring nvdaString = fmt::format(L"Type {} selected", mainGame->chkRace[selectType]->getText());
+							std::wstring nvdaString = fmt::format(gDataManager->GetAccessibilityString(149).data(), mainGame->chkRace[selectType]->getText());
 							ScreenReader::getReader()->readScreen(nvdaString.c_str(), false);
 							selectType = 0;
 						}

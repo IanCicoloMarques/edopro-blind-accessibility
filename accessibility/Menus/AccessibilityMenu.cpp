@@ -78,12 +78,12 @@ namespace ygo {
 			case irr::KEY_KEY_I: {
 				if (!event.KeyInput.PressedDown && mainGame->roomListTable->isTrulyVisible() && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
 					//ScreenReader::getReader()->textToSpeech(fmt::format(L"Player {}", mainGame->roomListTable->getCellData(onlineMatchCounter, 0)));
-					ScreenReader::getReader()->textToSpeech(fmt::format(L"Allowed Cards {}", mainGame->roomListTable->getCellText(onlineMatchCounter, 1)));
-					ScreenReader::getReader()->textToSpeech(fmt::format(L"Duel Mode {}", mainGame->roomListTable->getCellText(onlineMatchCounter, 2)));
-					ScreenReader::getReader()->textToSpeech(fmt::format(L"Rule {}", mainGame->roomListTable->getCellText(onlineMatchCounter, 3)));
-					ScreenReader::getReader()->textToSpeech(fmt::format(L"Forbidden List {}", mainGame->roomListTable->getCellText(onlineMatchCounter, 4)));
-					ScreenReader::getReader()->textToSpeech(fmt::format(L"Status {}", mainGame->roomListTable->getCellText(onlineMatchCounter, 5)));
-					ScreenReader::getReader()->textToSpeech(fmt::format(L"Notes {}", mainGame->roomListTable->getCellText(onlineMatchCounter, 6)));
+					ScreenReader::getReader()->textToSpeech(fmt::format(gDataManager->GetAccessibilityString(186).data(), mainGame->roomListTable->getCellText(onlineMatchCounter, 1)));
+					ScreenReader::getReader()->textToSpeech(fmt::format(gDataManager->GetAccessibilityString(187).data(), mainGame->roomListTable->getCellText(onlineMatchCounter, 2)));
+					ScreenReader::getReader()->textToSpeech(fmt::format(gDataManager->GetAccessibilityString(188).data(), mainGame->roomListTable->getCellText(onlineMatchCounter, 3)));
+					ScreenReader::getReader()->textToSpeech(fmt::format(gDataManager->GetAccessibilityString(189).data(), mainGame->roomListTable->getCellText(onlineMatchCounter, 4)));
+					ScreenReader::getReader()->textToSpeech(fmt::format(gDataManager->GetAccessibilityString(190).data(), mainGame->roomListTable->getCellText(onlineMatchCounter, 5)));
+					ScreenReader::getReader()->textToSpeech(fmt::format(gDataManager->GetAccessibilityString(191).data(), mainGame->roomListTable->getCellText(onlineMatchCounter, 6)));
 				}
 				break;
 			}
@@ -95,7 +95,7 @@ namespace ygo {
 			case irr::KEY_KEY_C: {
 				if (!event.KeyInput.PressedDown && mainGame->cbDeckSelect->isTrulyVisible() && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
 					mainGame->env->setFocus(mainGame->cbDeckSelect);
-					std::wstring nvdaString = fmt::format(L"Deck {}", mainGame->cbDeckSelect->getItem(mainGame->cbDeckSelect->getSelected()));
+					std::wstring nvdaString = fmt::format(gDataManager->GetAccessibilityString(192).data(), mainGame->cbDeckSelect->getItem(mainGame->cbDeckSelect->getSelected()));
 					ScreenReader::getReader()->readScreen(nvdaString.c_str());
 				}
 				break;
@@ -103,7 +103,7 @@ namespace ygo {
 			case irr::KEY_KEY_V: {
 				if (!event.KeyInput.PressedDown && mainGame->gBot.cbBotDeck->isTrulyVisible() && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
 					mainGame->env->setFocus(mainGame->gBot.cbBotDeck);
-					std::wstring nvdaString = fmt::format(L"Deck {}", mainGame->gBot.cbBotDeck->getItem(mainGame->gBot.cbBotDeck->getSelected()));
+					std::wstring nvdaString = fmt::format(gDataManager->GetAccessibilityString(192).data(), mainGame->gBot.cbBotDeck->getItem(mainGame->gBot.cbBotDeck->getSelected()));
 					ScreenReader::getReader()->readScreen(nvdaString.c_str());
 				}
 				break;
@@ -116,7 +116,7 @@ namespace ygo {
 			}
 			case irr::KEY_KEY_M: {
 				if (!event.KeyInput.PressedDown && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
-					ScreenReader::getReader()->readScreen(fmt::format(L"Chat active"), false);
+					ScreenReader::getReader()->readScreen(fmt::format(gDataManager->GetAccessibilityString(193).data()), false);
 					mainGame->env->setFocus(mainGame->ebChatInput);
 				}
 				break;
@@ -124,19 +124,19 @@ namespace ygo {
 			case irr::KEY_DOWN: {
 				if (!event.KeyInput.PressedDown && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
 					if (!event.KeyInput.PressedDown && mainGame->cbDeckSelect->isTrulyVisible() && menuSelectCounter == MenuType::PlayerDuel::PD_SELECT_DECK && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
-						std::wstring nvdaString = fmt::format(L"Deck {}", mainGame->cbDeckSelect->getItem(mainGame->cbDeckSelect->getSelected()));
+						std::wstring nvdaString = fmt::format(gDataManager->GetAccessibilityString(192).data(), mainGame->cbDeckSelect->getItem(mainGame->cbDeckSelect->getSelected()));
 						ScreenReader::getReader()->readScreen(nvdaString.c_str());
 					}
-					else if (mainGame->roomListTable->isTrulyVisible() && currentMenu == L"Rooms") {
+					else if (mainGame->roomListTable->isTrulyVisible() && currentMenu == gDataManager->GetAccessibilityString(194).data()) {
 						if (onlineMatchCounter < mainGame->roomListTable->getRowCount() - 1)
 							onlineMatchCounter++;
 						mainGame->roomListTable->setSelected(onlineMatchCounter);
 						std::wstring numberPlayers = std::wstring(mainGame->roomListTable->getCellText(onlineMatchCounter, 5));
 						int numPlayers = std::count(numberPlayers.begin(), numberPlayers.end(), ',') + 1;
 						if (numPlayers > 1)
-							ScreenReader::getReader()->textToSpeech(fmt::format(L"{} Players {}, {}", numPlayers, mainGame->roomListTable->getCellText(onlineMatchCounter, 5), mainGame->roomListTable->getCellText(onlineMatchCounter, 6)));
+							ScreenReader::getReader()->textToSpeech(fmt::format(gDataManager->GetAccessibilityString(195).data(), numPlayers, mainGame->roomListTable->getCellText(onlineMatchCounter, 5), mainGame->roomListTable->getCellText(onlineMatchCounter, 6)));
 						else
-							ScreenReader::getReader()->textToSpeech(fmt::format(L"{} Player {}, {}", numPlayers, mainGame->roomListTable->getCellText(onlineMatchCounter, 5), mainGame->roomListTable->getCellText(onlineMatchCounter, 6)));
+							ScreenReader::getReader()->textToSpeech(fmt::format(gDataManager->GetAccessibilityString(196).data(), numPlayers, mainGame->roomListTable->getCellText(onlineMatchCounter, 5), mainGame->roomListTable->getCellText(onlineMatchCounter, 6)));
 					}
 					else if (mainGame->lstSinglePlayList->isTrulyVisible()) {
 						mainGame->env->setFocus(mainGame->lstSinglePlayList);
@@ -153,19 +153,19 @@ namespace ygo {
 			case irr::KEY_UP: {
 				if (!event.KeyInput.PressedDown && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
 					if (!event.KeyInput.PressedDown && mainGame->cbDeckSelect->isTrulyVisible() && menuSelectCounter == MenuType::PlayerDuel::PD_SELECT_DECK  && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
-						std::wstring nvdaString = fmt::format(L"Deck {}", mainGame->cbDeckSelect->getItem(mainGame->cbDeckSelect->getSelected()));
+						std::wstring nvdaString = fmt::format(gDataManager->GetAccessibilityString(192).data(), mainGame->cbDeckSelect->getItem(mainGame->cbDeckSelect->getSelected()));
 						ScreenReader::getReader()->readScreen(nvdaString.c_str());
 					}
-					else if (mainGame->roomListTable->isTrulyVisible() && currentMenu == L"Rooms") {
+					else if (mainGame->roomListTable->isTrulyVisible() && currentMenu == gDataManager->GetAccessibilityString(194).data()) {
 						if (onlineMatchCounter > 0)
 							onlineMatchCounter--;
 						mainGame->roomListTable->setSelected(onlineMatchCounter);
 						std::wstring numberPlayers = std::wstring(mainGame->roomListTable->getCellText(onlineMatchCounter, 5));
 						int numPlayers = std::count(numberPlayers.begin(), numberPlayers.end(), ',') + 1;
 						if (numPlayers > 1)
-							ScreenReader::getReader()->textToSpeech(fmt::format(L"{} Players {}, {}", numPlayers, mainGame->roomListTable->getCellText(onlineMatchCounter, 5), mainGame->roomListTable->getCellText(onlineMatchCounter, 6)));
+							ScreenReader::getReader()->textToSpeech(fmt::format(gDataManager->GetAccessibilityString(195).data(), numPlayers, mainGame->roomListTable->getCellText(onlineMatchCounter, 5), mainGame->roomListTable->getCellText(onlineMatchCounter, 6)));
 						else
-							ScreenReader::getReader()->textToSpeech(fmt::format(L"{} Player {}, {}", numPlayers, mainGame->roomListTable->getCellText(onlineMatchCounter, 5), mainGame->roomListTable->getCellText(onlineMatchCounter, 6)));
+							ScreenReader::getReader()->textToSpeech(fmt::format(gDataManager->GetAccessibilityString(196).data(), numPlayers, mainGame->roomListTable->getCellText(onlineMatchCounter, 5), mainGame->roomListTable->getCellText(onlineMatchCounter, 6)));
 					}
 					else if (mainGame->lstSinglePlayList->isTrulyVisible()) {
 						mainGame->env->setFocus(mainGame->lstSinglePlayList);
@@ -192,8 +192,8 @@ namespace ygo {
 							menuSelectCounter = 0;
 						currentMenu = menu.at(menuSelectCounter);
 						ScreenReader::getReader()->readScreen(menu.at(menuSelectCounter).c_str());
-						if (menu.at(menuSelectCounter) == L"Rooms")
-							ScreenReader::getReader()->textToSpeech(fmt::format(L"{} games", mainGame->roomListTable->getRowCount()));
+						if (menu.at(menuSelectCounter) == gDataManager->GetAccessibilityString(194).data())
+							ScreenReader::getReader()->textToSpeech(fmt::format(gDataManager->GetAccessibilityString(197).data(), mainGame->roomListTable->getRowCount()));
 					}
 				}
 				break;
@@ -211,8 +211,8 @@ namespace ygo {
 							menuSelectCounter = menu.size() - 1;
 						currentMenu = menu.at(menuSelectCounter);
 						ScreenReader::getReader()->readScreen(menu.at(menuSelectCounter).c_str());
-						if (menu.at(menuSelectCounter) == L"Rooms")
-							ScreenReader::getReader()->textToSpeech(fmt::format(L"{} games", mainGame->roomListTable->getRowCount()));
+						if (menu.at(menuSelectCounter) == gDataManager->GetAccessibilityString(194).data())
+							ScreenReader::getReader()->textToSpeech(fmt::format(gDataManager->GetAccessibilityString(197).data(), mainGame->roomListTable->getRowCount()));
 					}
 				}
 				break;
@@ -223,35 +223,35 @@ namespace ygo {
 				if (!event.KeyInput.PressedDown) {
 					if (menu.empty())
 						menu = menuMain;
-					if (menu.at(0) == L"Online Duel") {
+					if (menu.at(0) == gDataManager->GetAccessibilityString(198).data()) {
 						MainMenu();
 					}
 					//else if (selectedMenu == MainMenu::MAIN_MENU) {
-					else if (menu.at(0) == L"Host Duel") {
+					else if (menu.at(0) == gDataManager->GetAccessibilityString(199).data()) {
 						SPDuel();
 					}
 					//else if (selectedMenu == MainMenu::HOST_DUEL) {
-					else if (menu.at(0) == L"Rules ok") {
+					else if (menu.at(0) == gDataManager->GetAccessibilityString(200).data()) {
 						HostDuel();
 					}
 					//else if (selectedMenu == MainMenu::DUEL_MENU) {
-					else if (menu.at(0) == L"Start Duel") {
+					else if (menu.at(0) == gDataManager->GetAccessibilityString(201).data()) {
 						DuelMenu();
 					}
 					//else if (selectedMenu == MainMenu::AI_CONFIGURATION) {
-					else if (menu.at(0) == L"AI Ok") {
+					else if (menu.at(0) == gDataManager->GetAccessibilityString(202).data()) {
 						AIConfigMenu();
 					}
 					//else if (selectedMenu == MainMenu::ONLINE) {
-					else if (menu.at(0) == L"Host") {
+					else if (menu.at(0) == gDataManager->GetAccessibilityString(203).data()) {
 						OnlineDuel();
 					}
 					//else if (selectedMenu == MainMenu::ONLINE) {
-					else if (menu.at(0) == L"Change Password") {
+					else if (menu.at(0) == gDataManager->GetAccessibilityString(204).data()) {
 						PasswordMenu();
 					}
 					//else if (selectedMenu == MainMenu::ONLINE) {
-					else if (menu.at(0) == L"Enable Sound Effects") {
+					else if (menu.at(0) == gDataManager->GetAccessibilityString(205).data()) {
 						GameOptions();
 					}
 				}
@@ -325,7 +325,7 @@ namespace ygo {
 						break;
 					}
 					case BUTTON_LAN_MODE: {
-						ScreenReader::getReader()->readScreen(L"LAN + AI");
+						ScreenReader::getReader()->readScreen(gDataManager->GetAccessibilityString(206).data());
 						menu = menuSinglePlayer;
 						menuSelectCounter = 0;
 						currentMenu = menu.at(menuSelectCounter);
@@ -337,9 +337,9 @@ namespace ygo {
 					}
 					case BUTTON_CREATE_HOST: {
 						if (wcslen(mainGame->ebNickName->getText())) {
-							mainGame->ebNickName->setText(L"Player");
+							mainGame->ebNickName->setText(gDataManager->GetAccessibilityString(207).data());
 						}
-						ScreenReader::getReader()->readScreen(L"Host game");
+						ScreenReader::getReader()->readScreen(gDataManager->GetAccessibilityString(208).data());
 						menu = menuHostDuel;
 						menuSelectCounter = 0;
 						currentMenu = menu.at(menuSelectCounter);
@@ -347,9 +347,9 @@ namespace ygo {
 					}
 					case BUTTON_CREATE_HOST2: {
 						if (wcslen(mainGame->ebNickName->getText())) {
-							mainGame->ebNickName->setText(L"Player");
+							mainGame->ebNickName->setText(gDataManager->GetAccessibilityString(207).data());
 						}
-						ScreenReader::getReader()->readScreen(L"Host online game");
+						ScreenReader::getReader()->readScreen(gDataManager->GetAccessibilityString(209).data());
 						menu = menuHostDuel;
 						menuSelectCounter = 0;
 						currentMenu = menu.at(menuSelectCounter);
@@ -361,7 +361,7 @@ namespace ygo {
 						}
 						else {
 							menu = menuRulesOk;
-							ScreenReader::getReader()->readScreen(L"Rules ok.");
+							ScreenReader::getReader()->readScreen(gDataManager->GetAccessibilityString(210).data());
 						}
 						menuSelectCounter = 0;
 						currentMenu = menu.at(menuSelectCounter);
@@ -377,23 +377,23 @@ namespace ygo {
 						break;
 					}
 					case BUTTON_HP_DUELIST: {
-						ScreenReader::getReader()->readScreen(L"Duel mode");
+						ScreenReader::getReader()->readScreen(gDataManager->GetAccessibilityString(211).data());
 						break;
 					}
 					case BUTTON_HP_OBSERVER: {
-						ScreenReader::getReader()->readScreen(L"Spectator mode");
+						ScreenReader::getReader()->readScreen(gDataManager->GetAccessibilityString(212).data());
 						break;
 					}
 					case BUTTON_HP_READY: {
-						ScreenReader::getReader()->readScreen(L"Player ready");
+						ScreenReader::getReader()->readScreen(gDataManager->GetAccessibilityString(213).data());
 						break;
 					}
 					case BUTTON_HP_NOTREADY: {
-						ScreenReader::getReader()->readScreen(L"Player not ready");
+						ScreenReader::getReader()->readScreen(gDataManager->GetAccessibilityString(214).data());
 						break;
 					}
 					case BUTTON_HP_START: {
-						ScreenReader::getReader()->readScreen(L"Start game");
+						ScreenReader::getReader()->readScreen(gDataManager->GetAccessibilityString(215).data());
 						break;
 					}
 					case BUTTON_HP_CANCEL: {
@@ -406,7 +406,7 @@ namespace ygo {
 						break;
 					}
 					case BUTTON_HP_AI_TOGGLE: {
-						ScreenReader::getReader()->readScreen(L"Bot Configuration");
+						ScreenReader::getReader()->readScreen(gDataManager->GetAccessibilityString(216).data());
 						menu = menuSelectAI;
 						menuSelectCounter = 0;
 						currentMenu = menu.at(menuSelectCounter);
@@ -416,11 +416,11 @@ namespace ygo {
 						menu = menuRulesOk;
 						menuSelectCounter = 0;
 						currentMenu = menu.at(menuSelectCounter);
-						ScreenReader::getReader()->readScreen(L"Added Bot");
+						ScreenReader::getReader()->readScreen(gDataManager->GetAccessibilityString(217).data());
 						break;
 					}
 					case BUTTON_DECK_EDIT: {
-						ScreenReader::getReader()->readScreen(L"Deck Editor");
+						ScreenReader::getReader()->readScreen(gDataManager->GetAccessibilityString(218).data());
 						break;
 					}
 				}
@@ -430,18 +430,18 @@ namespace ygo {
 					case CHECK_SHOW_LOCKED_ROOMS: {
 						std::wstring screenReaderString;
 						if (mainGame->chkShowPassword->isChecked())
-							screenReaderString = L"Show locked rooms";
+							screenReaderString = gDataManager->GetAccessibilityString(219).data();
 						else
-							screenReaderString = L"Do not show locked rooms";
+							screenReaderString = gDataManager->GetAccessibilityString(220).data();
 						ScreenReader::getReader()->readScreen(screenReaderString);
 						break;
 					}
 					case CHECK_SHOW_ACTIVE_ROOMS: {
 						std::wstring screenReaderString;
 						if (mainGame->chkShowActiveRooms->isChecked())
-							screenReaderString = L"Show active rooms";
+							screenReaderString = gDataManager->GetAccessibilityString(221).data();
 						else
-							screenReaderString = L"Do not show active rooms";
+							screenReaderString = gDataManager->GetAccessibilityString(222).data();
 						ScreenReader::getReader()->readScreen(screenReaderString);
 						break;
 					}
@@ -450,12 +450,12 @@ namespace ygo {
 			case irr::gui::EGET_COMBO_BOX_CHANGED: {
 				switch (id) {
 					case COMBOBOX_PLAYER_DECK: {
-						std::wstring nvdaString = fmt::format(L"Deck {}", mainGame->cbDeckSelect->getItem(mainGame->cbDeckSelect->getSelected()));
+						std::wstring nvdaString = fmt::format(gDataManager->GetAccessibilityString(192).data(), mainGame->cbDeckSelect->getItem(mainGame->cbDeckSelect->getSelected()));
 						ScreenReader::getReader()->readScreen(nvdaString.c_str());
 						break;
 					}
 					case COMBOBOX_BOT_DECK: {
-						std::wstring nvdaString = fmt::format(L"Deck {}", mainGame->gBot.cbBotDeck->getItem(mainGame->gBot.cbBotDeck->getSelected()));
+						std::wstring nvdaString = fmt::format(gDataManager->GetAccessibilityString(192).data(), mainGame->gBot.cbBotDeck->getItem(mainGame->gBot.cbBotDeck->getSelected()));
 						ScreenReader::getReader()->readScreen(nvdaString.c_str());
 						break;
 					}
@@ -528,14 +528,14 @@ namespace ygo {
 	void MenuEventHandler::PasswordMenu() {
 		if (menuSelectCounter == MenuType::PasswordMenu::PASS_SET_PASSWORD && mainGame->ebRPName->isTrulyVisible()) {
 			if (!typing) {
-				ScreenReader::getReader()->readScreen(std::wstring(L"Type the password").c_str());
+				ScreenReader::getReader()->readScreen(std::wstring(gDataManager->GetAccessibilityString(223).data()).c_str());
 				FocusTextBox(mainGame->ebRPName);
 				typing = true;
 			}
 			else {
 				typing = false;
 				mainGame->env->removeFocus(mainGame->env->getFocus());
-				ScreenReader::getReader()->readScreen(fmt::format(L"Password: {}", mainGame->ebRPName->getText()));
+				ScreenReader::getReader()->readScreen(fmt::format(gDataManager->GetAccessibilityString(224).data(), mainGame->ebRPName->getText()));
 			}
 		}
 		else if (menuSelectCounter == MenuType::PasswordMenu::PASS_OK && mainGame->btnRPYes->isEnabled()) {
@@ -552,7 +552,7 @@ namespace ygo {
 		}
 		else if (menuSelectCounter == MenuType::AIConfigMenu::AIC_SELECT_DECK && mainGame->gBot.cbBotDeck->isTrulyVisible()) {
 			mainGame->env->setFocus(mainGame->gBot.cbBotDeck);
-			std::wstring nvdaString = fmt::format(L"Deck {}", mainGame->gBot.cbBotDeck->getItem(mainGame->gBot.cbBotDeck->getSelected()));
+			std::wstring nvdaString = fmt::format(gDataManager->GetAccessibilityString(192).data(), mainGame->gBot.cbBotDeck->getItem(mainGame->gBot.cbBotDeck->getSelected()));
 			ScreenReader::getReader()->readScreen(nvdaString.c_str());
 		}
 		else if (menuSelectCounter == MenuType::AIConfigMenu::AIC_ATR && mainGame->gBot.chkThrowRock->isTrulyVisible()) {
@@ -566,14 +566,14 @@ namespace ygo {
 		}
 		else if (menuSelectCounter == MenuType::SinglePlayerMenu::SP_PLAYER_NAME && mainGame->ebNickName->isTrulyVisible()) {
 			if (!typing) {
-				ScreenReader::getReader()->readScreen(std::wstring(L"Type your name").c_str());
+				ScreenReader::getReader()->readScreen(std::wstring(gDataManager->GetAccessibilityString(225).data()).c_str());
 				FocusTextBox(mainGame->ebNickName);
 				typing = true;
 			}
 			else {
 				typing = false;
 				mainGame->env->removeFocus(mainGame->env->getFocus());
-				ScreenReader::getReader()->readScreen(fmt::format(L"Set name as {}", mainGame->ebNickName->getText()));
+				ScreenReader::getReader()->readScreen(fmt::format(gDataManager->GetAccessibilityString(226).data(), mainGame->ebNickName->getText()));
 			}
 		}
 	}
@@ -585,9 +585,9 @@ namespace ygo {
 		else if (menuSelectCounter == MenuType::PlayerDuel::PD_START_DUEL && !mainGame->btnHostPrepStart->isEnabled() && mainGame->btnHostPrepStart->isTrulyVisible()) {
 			std::wstring nvdaString;
 			if (oldMenu == L"SinglePlayer")
-				nvdaString = L"Get ready and select enemy before start the game";
+				nvdaString = gDataManager->GetAccessibilityString(227).data();
 			else
-				nvdaString = L"Get ready and wait for enemy before start the game";
+				nvdaString = gDataManager->GetAccessibilityString(228).data();
 			ScreenReader::getReader()->readScreen(nvdaString);
 		}
 		else if (menuSelectCounter == MenuType::PlayerDuel::PD_PLAYER_READY && mainGame->btnHostPrepReady->isTrulyVisible() && mainGame->btnHostPrepReady->isEnabled()) {
@@ -598,7 +598,7 @@ namespace ygo {
 		}
 		else if (menuSelectCounter == MenuType::PlayerDuel::PD_SELECT_DECK && mainGame->cbDeckSelect->isTrulyVisible()) {
 			mainGame->env->setFocus(mainGame->cbDeckSelect);
-			std::wstring nvdaString = fmt::format(L"Deck {}", mainGame->cbDeckSelect->getItem(mainGame->cbDeckSelect->getSelected()));
+			std::wstring nvdaString = fmt::format(gDataManager->GetAccessibilityString(192).data(), mainGame->cbDeckSelect->getItem(mainGame->cbDeckSelect->getSelected()));
 			ScreenReader::getReader()->readScreen(nvdaString.c_str());
 		}
 		else if (menuSelectCounter == MenuType::SinglePlayerDuel::SP_AI_MENU && mainGame->btnHostPrepWindBot->isTrulyVisible() && mainGame->btnHostPrepWindBot->isEnabled()) {
@@ -608,13 +608,13 @@ namespace ygo {
 			ClickButton(mainGame->btnHostPrepDuelist);
 		}
 		else if (menuSelectCounter == MenuType::OnlineDuel::OD_DUEL_MODE && mainGame->btnHostPrepDuelist->isTrulyVisible() && !mainGame->btnHostPrepDuelist->isEnabled()) {
-			ScreenReader::getReader()->readScreen(L"You are already on duel mode");
+			ScreenReader::getReader()->readScreen(gDataManager->GetAccessibilityString(229).data());
 		}
 		else if (menuSelectCounter == MenuType::OnlineDuel::OD_SPECTATE_MODE && mainGame->btnHostPrepOB->isTrulyVisible() && mainGame->btnHostPrepOB->isEnabled()) {
 			ClickButton(mainGame->btnHostPrepOB);
 		}
 		else if (menuSelectCounter == MenuType::OnlineDuel::OD_SPECTATE_MODE && mainGame->btnHostPrepOB->isTrulyVisible() && !mainGame->btnHostPrepOB->isEnabled()) {
-			ScreenReader::getReader()->readScreen(L"You are already on spectator mode");
+			ScreenReader::getReader()->readScreen(gDataManager->GetAccessibilityString(230).data());
 		}
 	}
 
@@ -624,86 +624,86 @@ namespace ygo {
 		}
 		else if (menuSelectCounter == MenuType::HostDuel::NUM_PLAYERS_T1 && mainGame->ebTeam1->isTrulyVisible()) {
 			if (!typing) {
-				ScreenReader::getReader()->readScreen(std::wstring(L"Type number of players in the team 1").c_str());
+				ScreenReader::getReader()->readScreen(std::wstring(gDataManager->GetAccessibilityString(231).data()).c_str());
 				FocusTextBox(mainGame->ebTeam1);
 				typing = true;
 			}
 			else {
 				typing = false;
 				mainGame->env->removeFocus(mainGame->env->getFocus());
-				ScreenReader::getReader()->readScreen(fmt::format(L"Set number of players as {}", mainGame->ebTeam1->getText()));
+				ScreenReader::getReader()->readScreen(fmt::format(gDataManager->GetAccessibilityString(232).data(), mainGame->ebTeam1->getText()));
 			}
 		}
 		else if (menuSelectCounter == MenuType::HostDuel::NUM_PLAYERS_T2 && mainGame->ebTeam2->isTrulyVisible()) {
 			if (!typing) {
-				ScreenReader::getReader()->readScreen(std::wstring(L"Type number of players in the team 2").c_str());
+				ScreenReader::getReader()->readScreen(std::wstring(gDataManager->GetAccessibilityString(233).data()).c_str());
 				FocusTextBox(mainGame->ebTeam2);
 				typing = true;
 			}
 			else {
 				typing = false;
 				mainGame->env->removeFocus(mainGame->env->getFocus());
-				ScreenReader::getReader()->readScreen(fmt::format(L"Set number of players as {}", mainGame->ebTeam2->getText()));
+				ScreenReader::getReader()->readScreen(fmt::format(gDataManager->GetAccessibilityString(234).data(), mainGame->ebTeam2->getText()));
 			}
 		}
 		else if (menuSelectCounter == MenuType::HostDuel::BEST_OF && mainGame->ebBestOf->isTrulyVisible()) {
 			if (!typing) {
-				ScreenReader::getReader()->readScreen(std::wstring(L"Type number of matches").c_str());
+				ScreenReader::getReader()->readScreen(std::wstring(gDataManager->GetAccessibilityString(235).data()).c_str());
 				FocusTextBox(mainGame->ebBestOf);
 				typing = true;
 			}
 			else {
 				typing = false;
 				mainGame->env->removeFocus(mainGame->env->getFocus());
-				ScreenReader::getReader()->readScreen(fmt::format(L"Set number of matches as {}", mainGame->ebBestOf->getText()));
+				ScreenReader::getReader()->readScreen(fmt::format(gDataManager->GetAccessibilityString(236).data(), mainGame->ebBestOf->getText()));
 			}
 		}
 		else if (menuSelectCounter == MenuType::HostDuel::TIME_LIMIT && mainGame->ebTimeLimit->isTrulyVisible()) {
 			if (!typing) {
-				ScreenReader::getReader()->readScreen(std::wstring(L"Type limit of time, in seconds, per turn").c_str());
+				ScreenReader::getReader()->readScreen(std::wstring(gDataManager->GetAccessibilityString(237).data()).c_str());
 				FocusTextBox(mainGame->ebTimeLimit);
 				typing = true;
 			}
 			else {
 				typing = false;
 				mainGame->env->removeFocus(mainGame->env->getFocus());
-				ScreenReader::getReader()->readScreen(fmt::format(L"Set limit of time as {} seconds", mainGame->ebTimeLimit->getText()));
+				ScreenReader::getReader()->readScreen(fmt::format(gDataManager->GetAccessibilityString(238).data(), mainGame->ebTimeLimit->getText()));
 			}
 		}
 		else if (menuSelectCounter == MenuType::HostDuel::STARTING_LP && mainGame->ebStartLP->isTrulyVisible()) {
 			if (!typing) {
-				ScreenReader::getReader()->readScreen(L"Type number of starting Life points");
+				ScreenReader::getReader()->readScreen(gDataManager->GetAccessibilityString(239).data());
 				FocusTextBox(mainGame->ebStartLP);
 				typing = true;
 			}
 			else {
 				typing = false;
 				mainGame->env->removeFocus(mainGame->env->getFocus());
-				ScreenReader::getReader()->readScreen(fmt::format(L"Set starting life points as {}", mainGame->ebStartLP->getText()));
+				ScreenReader::getReader()->readScreen(fmt::format(gDataManager->GetAccessibilityString(240).data(), mainGame->ebStartLP->getText()));
 			}
 		}
 		else if (menuSelectCounter == MenuType::HostDuel::STARTING_HAND && mainGame->ebStartHand->isTrulyVisible()) {
 			if (!typing) {
-				ScreenReader::getReader()->readScreen(L"Type starting number of cards on hand");
+				ScreenReader::getReader()->readScreen(gDataManager->GetAccessibilityString(241).data());
 				FocusTextBox(mainGame->ebStartHand);
 				typing = true;
 			}
 			else {
 				typing = false;
 				mainGame->env->removeFocus(mainGame->env->getFocus());
-				ScreenReader::getReader()->readScreen(fmt::format(L"Set starting cards on hand as {}", mainGame->ebStartHand->getText()));
+				ScreenReader::getReader()->readScreen(fmt::format(gDataManager->GetAccessibilityString(242).data(), mainGame->ebStartHand->getText()));
 			}
 		}
 		else if (menuSelectCounter == MenuType::HostDuel::CARDS_DRAW && mainGame->ebDrawCount->isTrulyVisible()) {
 			if (!typing) {
-				ScreenReader::getReader()->readScreen(L"Type number of cards per draw");
+				ScreenReader::getReader()->readScreen(gDataManager->GetAccessibilityString(243).data());
 				FocusTextBox(mainGame->ebDrawCount);
 				typing = true;
 			}
 			else {
 				typing = false;
 				mainGame->env->removeFocus(mainGame->env->getFocus());
-				ScreenReader::getReader()->readScreen(fmt::format(L"Set cards per draw as {}", mainGame->ebDrawCount->getText()));
+				ScreenReader::getReader()->readScreen(fmt::format(gDataManager->GetAccessibilityString(244).data(), mainGame->ebDrawCount->getText()));
 			}
 		}
 		else if (menuSelectCounter == MenuType::HostDuel::CHECK_DECK && mainGame->chkNoCheckDeckContent->isTrulyVisible()) {
@@ -715,26 +715,26 @@ namespace ygo {
 		}
 		else if (menuSelectCounter == MenuType::HostDuel::ROOM_NAME && mainGame->ebHostNotes->isTrulyVisible()) {
 			if (!typing) {
-				ScreenReader::getReader()->readScreen(L"Type room's name");
+				ScreenReader::getReader()->readScreen(gDataManager->GetAccessibilityString(245).data());
 				FocusTextBox(mainGame->ebHostNotes);
 				typing = true;
 			}
 			else {
 				typing = false;
 				mainGame->env->removeFocus(mainGame->env->getFocus());
-				ScreenReader::getReader()->readScreen(fmt::format(L"Set room's name as {}", mainGame->ebHostNotes->getText()));
+				ScreenReader::getReader()->readScreen(fmt::format(gDataManager->GetAccessibilityString(246).data(), mainGame->ebHostNotes->getText()));
 			}
 		}
 		else if (menuSelectCounter == MenuType::HostDuel::ROOM_PASSWORD && mainGame->ebServerPass->isTrulyVisible()) {
 			if (!typing) {
-				ScreenReader::getReader()->readScreen(L"Type room's password");
+				ScreenReader::getReader()->readScreen(gDataManager->GetAccessibilityString(247).data());
 				FocusTextBox(mainGame->ebServerPass);
 				typing = true;
 			}
 			else {
 				typing = false;
 				mainGame->env->removeFocus(mainGame->env->getFocus());
-				ScreenReader::getReader()->readScreen(fmt::format(L"Set password as {}", mainGame->ebServerPass->getText()));
+				ScreenReader::getReader()->readScreen(fmt::format(gDataManager->GetAccessibilityString(248).data(), mainGame->ebServerPass->getText()));
 			}
 		}
 	}
@@ -752,19 +752,19 @@ namespace ygo {
 			ClickButton(mainGame->btnJoinHost2);
 		}
 		else if (menuSelectCounter == MenuType::OnlineMenu::SERVER && mainGame->serverChoice->isTrulyVisible()) {
-			ScreenReader::getReader()->readScreen(fmt::format(L"Server {}", mainGame->serverChoice->getItem(mainGame->serverChoice->getSelected())));
+			ScreenReader::getReader()->readScreen(fmt::format(gDataManager->GetAccessibilityString(249).data(), mainGame->serverChoice->getItem(mainGame->serverChoice->getSelected())));
 			mainGame->env->setFocus(mainGame->serverChoice);
 		}
 		else if (menuSelectCounter == MenuType::OnlineMenu::PLAYER_NAME && mainGame->ebNickNameOnline->isTrulyVisible()) {
 			if (!typing) {
-				ScreenReader::getReader()->readScreen(L"Type your name");
+				ScreenReader::getReader()->readScreen(gDataManager->GetAccessibilityString(250).data());
 				FocusTextBox(mainGame->ebNickNameOnline);
 				typing = true;
 			}
 			else {
 				typing = false;
 				mainGame->env->removeFocus(mainGame->env->getFocus());
-				ScreenReader::getReader()->readScreen(fmt::format(L"Set Player name as {}", mainGame->ebNickNameOnline->getText()));
+				ScreenReader::getReader()->readScreen(fmt::format(gDataManager->GetAccessibilityString(251).data(), mainGame->ebNickNameOnline->getText()));
 			}
 		}
 		else if (menuSelectCounter == MenuType::OnlineMenu::ALLOWED_CARDS && mainGame->cbFilterRule->isTrulyVisible()) {
@@ -798,7 +798,7 @@ namespace ygo {
 				scrollSelected = true;
 			}
 			else {
-				ScreenReader::getReader()->readScreen(fmt::format(L"Volume set to {}", gGameConfig->soundVolume));
+				ScreenReader::getReader()->readScreen(fmt::format(gDataManager->GetAccessibilityString(252).data(), gGameConfig->soundVolume));
 				scrollSelected = false;
 				mainGame->env->removeFocus(mainGame->env->getFocus());
 			}
@@ -816,7 +816,7 @@ namespace ygo {
 				scrollSelected = true;
 			}
 			else {
-				ScreenReader::getReader()->readScreen(fmt::format(L"Volume set to {}", gGameConfig->musicVolume));
+				ScreenReader::getReader()->readScreen(fmt::format(gDataManager->GetAccessibilityString(252).data(), gGameConfig->musicVolume));
 				scrollSelected = false;
 				mainGame->env->removeFocus(mainGame->env->getFocus());
 			}

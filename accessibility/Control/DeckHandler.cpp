@@ -45,7 +45,7 @@ namespace ygo {
 			case irr::KEY_KEY_A: {
 				if (!event.KeyInput.PressedDown && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
 					deckLooker = AccessibilityDeckFocus::DeckLookerLocId::MENU;
-					ScreenReader::getReader()->readScreen(L"Main Menu");
+					ScreenReader::getReader()->readScreen(gDataManager->GetAccessibilityString(150).data());
 				}
 				break;
 			}
@@ -60,7 +60,7 @@ namespace ygo {
 				if (!event.KeyInput.PressedDown && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
 					indexLookedUpCard = 0;
 					deckLooker = AccessibilityDeckFocus::DeckLookerLocId::SIDE_DECK;
-					ScreenReader::getReader()->readScreen(fmt::format(L"Side Deck - {} cards", mainGame->deckBuilder.GetCurrentDeck().side.size()));
+					ScreenReader::getReader()->readScreen(fmt::format(gDataManager->GetAccessibilityString(151).data(), mainGame->deckBuilder.GetCurrentDeck().side.size()));
 				}
 				break;
 			}
@@ -68,19 +68,19 @@ namespace ygo {
 				if (event.KeyInput.Control && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
 					epro::wstringview dname(mainGame->ebDeckname->getText());
 					if (dname.empty()) {
-						ScreenReader::getReader()->readScreen(L"No name");
+						ScreenReader::getReader()->readScreen(gDataManager->GetAccessibilityString(152).data());
 						break;
 					}
-					ScreenReader::getReader()->readScreen(fmt::format(L"Deck {}", dname.data()));
+					ScreenReader::getReader()->readScreen(fmt::format(gDataManager->GetAccessibilityString(153).data(), dname.data()));
 				}
 				else if (!event.KeyInput.PressedDown && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
 					if (deckEditor == AccessibilityDeckFocus::DeckLookerLocId::MAIN_DECK) {
 						deckEditor = AccessibilityDeckFocus::DeckLookerLocId::SIDE_DECK;
-						ScreenReader::getReader()->readScreen(L"Addind cards to Side Deck");
+						ScreenReader::getReader()->readScreen(gDataManager->GetAccessibilityString(154).data());
 					}
 					else{
 						deckEditor = AccessibilityDeckFocus::DeckLookerLocId::MAIN_DECK;
-						ScreenReader::getReader()->readScreen(L"Addind cards to Main Deck");
+						ScreenReader::getReader()->readScreen(gDataManager->GetAccessibilityString(155).data());
 					}
 				}
 				break;
@@ -109,20 +109,21 @@ namespace ygo {
 					//TODO - Transformar isso em função
 					if (deckLooker == AccessibilityDeckFocus::DeckLookerLocId::MAIN_DECK) {
 						auto pointer = gDataManager->GetCardData(mainGame->deckBuilder.GetCurrentDeck().main[indexLookedUpCard]->code);
+						bool limited = mainGame->deckBuilder.check_limit(pointer);
 						limit = GetCardLimit(pointer);
 						if (pointer) {
 							cardName = fmt::format(L"{}", gDataManager->GetName(mainGame->deckBuilder.GetCurrentDeck().main[indexLookedUpCard]->code));
 							cardType = fmt::format(L"{}", gDataManager->FormatType(mainGame->deckBuilder.GetCurrentDeck().main[indexLookedUpCard]->type));
 							cardAttribute = fmt::format(L"{}", gDataManager->FormatAttribute(mainGame->deckBuilder.GetCurrentDeck().main[indexLookedUpCard]->attribute));
 							cardLevel = mainGame->deckBuilder.GetCurrentDeck().main[indexLookedUpCard]->link_marker != 0 ?
-								fmt::format(L"Link {}", gDataManager->GetCardData(mainGame->deckBuilder.GetCurrentDeck().main[indexLookedUpCard]->code)->level) :
-								fmt::format(L"Level {}", gDataManager->GetCardData(mainGame->deckBuilder.GetCurrentDeck().main[indexLookedUpCard]->code)->level);
+								fmt::format(gDataManager->GetAccessibilityString(67).data(), gDataManager->GetCardData(mainGame->deckBuilder.GetCurrentDeck().main[indexLookedUpCard]->code)->level) :
+								fmt::format(gDataManager->GetAccessibilityString(68).data(), gDataManager->GetCardData(mainGame->deckBuilder.GetCurrentDeck().main[indexLookedUpCard]->code)->level);
 							cardRace = fmt::format(L"{}", gDataManager->FormatRace(mainGame->deckBuilder.GetCurrentDeck().main[indexLookedUpCard]->race));
-							cardAttack = fmt::format(L"Attack {}", mainGame->deckBuilder.GetCurrentDeck().main[indexLookedUpCard]->attack);
-							cardDefense = fmt::format(L"Defense: {}", mainGame->deckBuilder.GetCurrentDeck().main[indexLookedUpCard]->defense);
+							cardAttack = fmt::format(gDataManager->GetAccessibilityString(69).data(), mainGame->deckBuilder.GetCurrentDeck().main[indexLookedUpCard]->attack);
+							cardDefense = fmt::format(gDataManager->GetAccessibilityString(70).data(), mainGame->deckBuilder.GetCurrentDeck().main[indexLookedUpCard]->defense);
 							cardEffect = fmt::format(L"{}", gDataManager->GetText(mainGame->deckBuilder.GetCurrentDeck().main[indexLookedUpCard]->code));
-							leftScale = fmt::format(L"Left Scale {}", mainGame->deckBuilder.GetCurrentDeck().main[indexLookedUpCard]->lscale);
-							rightScale = fmt::format(L"Right Scale {}", mainGame->deckBuilder.GetCurrentDeck().main[indexLookedUpCard]->rscale);
+							leftScale = fmt::format(gDataManager->GetAccessibilityString(73).data(), mainGame->deckBuilder.GetCurrentDeck().main[indexLookedUpCard]->lscale);
+							rightScale = fmt::format(gDataManager->GetAccessibilityString(74).data(), mainGame->deckBuilder.GetCurrentDeck().main[indexLookedUpCard]->rscale);
 						}
 					}
 					else if (deckLooker == AccessibilityDeckFocus::DeckLookerLocId::EXTRA_DECK) {
@@ -132,14 +133,14 @@ namespace ygo {
 							cardType = fmt::format(L"{}", gDataManager->FormatType(mainGame->deckBuilder.GetCurrentDeck().extra[indexLookedUpCard]->type));
 							cardAttribute = fmt::format(L"{}", gDataManager->FormatAttribute(mainGame->deckBuilder.GetCurrentDeck().extra[indexLookedUpCard]->attribute));
 							cardLevel = mainGame->deckBuilder.GetCurrentDeck().extra[indexLookedUpCard]->link_marker != 0 ?
-								fmt::format(L"Link {}", gDataManager->GetCardData(mainGame->deckBuilder.GetCurrentDeck().extra[indexLookedUpCard]->code)->level) :
-								fmt::format(L"Level {}", gDataManager->GetCardData(mainGame->deckBuilder.GetCurrentDeck().extra[indexLookedUpCard]->code)->level);
+								fmt::format(gDataManager->GetAccessibilityString(67).data(), gDataManager->GetCardData(mainGame->deckBuilder.GetCurrentDeck().extra[indexLookedUpCard]->code)->level) :
+								fmt::format(gDataManager->GetAccessibilityString(68).data(), gDataManager->GetCardData(mainGame->deckBuilder.GetCurrentDeck().extra[indexLookedUpCard]->code)->level);
 							cardRace = fmt::format(L"{}", gDataManager->FormatRace(mainGame->deckBuilder.GetCurrentDeck().extra[indexLookedUpCard]->race));
-							cardAttack = fmt::format(L"Attack {}", mainGame->deckBuilder.GetCurrentDeck().extra[indexLookedUpCard]->attack);
-							cardDefense = fmt::format(L"Defense: {}", mainGame->deckBuilder.GetCurrentDeck().extra[indexLookedUpCard]->defense);
+							cardAttack = fmt::format(gDataManager->GetAccessibilityString(69).data(), mainGame->deckBuilder.GetCurrentDeck().extra[indexLookedUpCard]->attack);
+							cardDefense = fmt::format(gDataManager->GetAccessibilityString(70).data(), mainGame->deckBuilder.GetCurrentDeck().extra[indexLookedUpCard]->defense);
 							cardEffect = fmt::format(L"{}", gDataManager->GetText(mainGame->deckBuilder.GetCurrentDeck().extra[indexLookedUpCard]->code));
-							leftScale = fmt::format(L"Left Scale {}", mainGame->deckBuilder.GetCurrentDeck().extra[indexLookedUpCard]->lscale);
-							rightScale = fmt::format(L"Right Scale {}", mainGame->deckBuilder.GetCurrentDeck().extra[indexLookedUpCard]->rscale);
+							leftScale = fmt::format(gDataManager->GetAccessibilityString(73).data(), mainGame->deckBuilder.GetCurrentDeck().extra[indexLookedUpCard]->lscale);
+							rightScale = fmt::format(gDataManager->GetAccessibilityString(74).data(), mainGame->deckBuilder.GetCurrentDeck().extra[indexLookedUpCard]->rscale);
 						}
 					}
 					else if (deckLooker == AccessibilityDeckFocus::DeckLookerLocId::SIDE_DECK) {
@@ -152,11 +153,11 @@ namespace ygo {
 								fmt::format(L"Link {}", gDataManager->GetCardData(mainGame->deckBuilder.GetCurrentDeck().side[indexLookedUpCard]->code)->level) :
 								fmt::format(L"Level {}", gDataManager->GetCardData(mainGame->deckBuilder.GetCurrentDeck().side[indexLookedUpCard]->code)->level);
 							cardRace = fmt::format(L"{}", gDataManager->FormatRace(mainGame->deckBuilder.GetCurrentDeck().side[indexLookedUpCard]->race));
-							cardAttack = fmt::format(L"Attack {}", mainGame->deckBuilder.GetCurrentDeck().side[indexLookedUpCard]->attack);
-							cardDefense = fmt::format(L"Defense: {}", mainGame->deckBuilder.GetCurrentDeck().side[indexLookedUpCard]->defense);
+							cardAttack = fmt::format(gDataManager->GetAccessibilityString(69).data(), mainGame->deckBuilder.GetCurrentDeck().side[indexLookedUpCard]->attack);
+							cardDefense = fmt::format(gDataManager->GetAccessibilityString(70).data(), mainGame->deckBuilder.GetCurrentDeck().side[indexLookedUpCard]->defense);
 							cardEffect = fmt::format(L"{}", gDataManager->GetText(mainGame->deckBuilder.GetCurrentDeck().side[indexLookedUpCard]->code));
-							leftScale = fmt::format(L"Left Scale {}", mainGame->deckBuilder.GetCurrentDeck().side[indexLookedUpCard]->lscale);
-							rightScale = fmt::format(L"Right Scale {}", mainGame->deckBuilder.GetCurrentDeck().side[indexLookedUpCard]->rscale);
+							leftScale = fmt::format(gDataManager->GetAccessibilityString(73).data(), mainGame->deckBuilder.GetCurrentDeck().side[indexLookedUpCard]->lscale);
+							rightScale = fmt::format(gDataManager->GetAccessibilityString(74).data(), mainGame->deckBuilder.GetCurrentDeck().side[indexLookedUpCard]->rscale);
 						}
 					}
 					else if (deckLooker == AccessibilityDeckFocus::DeckLookerLocId::SEARCH) {
@@ -166,16 +167,15 @@ namespace ygo {
 							cardType = fmt::format(L"{}", gDataManager->FormatType(mainGame->deckBuilder.results[indexLookedUpCard]->type));
 							cardAttribute = fmt::format(L"{}", gDataManager->FormatAttribute(mainGame->deckBuilder.results[indexLookedUpCard]->attribute));
 							cardLevel = mainGame->deckBuilder.results[indexLookedUpCard]->link_marker != 0 ?
-								fmt::format(L"Link {}", gDataManager->GetCardData(mainGame->deckBuilder.results[indexLookedUpCard]->code)->level) :
-								fmt::format(L"Level {}", gDataManager->GetCardData(mainGame->deckBuilder.results[indexLookedUpCard]->code)->level);
+								fmt::format(gDataManager->GetAccessibilityString(67).data(), gDataManager->GetCardData(mainGame->deckBuilder.results[indexLookedUpCard]->code)->level) :
+								fmt::format(gDataManager->GetAccessibilityString(68).data(), gDataManager->GetCardData(mainGame->deckBuilder.results[indexLookedUpCard]->code)->level);
 							cardRace = fmt::format(L"{}", gDataManager->FormatRace(mainGame->deckBuilder.results[indexLookedUpCard]->race));
-							cardAttack = fmt::format(L"Attack {}", mainGame->deckBuilder.results[indexLookedUpCard]->attack);
-							cardDefense = fmt::format(L"Defense: {}", mainGame->deckBuilder.results[indexLookedUpCard]->defense);
+							cardAttack = fmt::format(gDataManager->GetAccessibilityString(69).data(), mainGame->deckBuilder.results[indexLookedUpCard]->attack);
+							cardDefense = fmt::format(gDataManager->GetAccessibilityString(70).data(), mainGame->deckBuilder.results[indexLookedUpCard]->defense);
 							cardEffect = fmt::format(L"{}", gDataManager->GetText(mainGame->deckBuilder.results[indexLookedUpCard]->code));
-							leftScale = fmt::format(L"Left Scale {}", mainGame->deckBuilder.results[indexLookedUpCard]->lscale);
-							rightScale = fmt::format(L"Right Scale {}", mainGame->deckBuilder.results[indexLookedUpCard]->rscale);
+							leftScale = fmt::format(gDataManager->GetAccessibilityString(73).data(), mainGame->deckBuilder.results[indexLookedUpCard]->lscale);
+							rightScale = fmt::format(gDataManager->GetAccessibilityString(74).data(), mainGame->deckBuilder.results[indexLookedUpCard]->rscale);
 						}
-
 					}
 					
 					ScreenReader::getReader()->readScreen(cardName.c_str(), false);
@@ -183,15 +183,15 @@ namespace ygo {
 						ScreenReader::getReader()->readScreen(limit.c_str(), false);
 					ScreenReader::getReader()->readScreen(cardType.c_str(), false);
 					ScreenReader::getReader()->readScreen(cardAttribute.c_str(), false);
-					if (cardType.find(L"Spell") == std::string::npos && cardType.find(L"Trap") == std::string::npos) {
+					if (cardType.find(gDataManager->GetAccessibilityString(76).data()) == std::string::npos && cardType.find(gDataManager->GetAccessibilityString(77).data()) == std::string::npos) {
 						ScreenReader::getReader()->readScreen(cardLevel.c_str(), false);
 						ScreenReader::getReader()->readScreen(cardRace.c_str(), false);
 						ScreenReader::getReader()->readScreen(cardAttack.c_str(), false);
 						ScreenReader::getReader()->readScreen(cardDefense.c_str(), false);
 					}
-					if (leftScale.compare(L"Left Scale ") != 0)
+					if (leftScale.compare(gDataManager->GetAccessibilityString(80).data()) != 0)
 						ScreenReader::getReader()->readScreen(leftScale.c_str(), false);
-					if (rightScale.compare(L"Right Scale ") != 0)
+					if (rightScale.compare(gDataManager->GetAccessibilityString(81).data()) != 0)
 						ScreenReader::getReader()->readScreen(rightScale.c_str(), false);
 					ScreenReader::getReader()->readScreen(cardEffect.c_str(), false);
 				}
@@ -201,19 +201,19 @@ namespace ygo {
 				if (!event.KeyInput.PressedDown && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
 					indexLookedUpCard = 0;
 					deckLooker = AccessibilityDeckFocus::DeckLookerLocId::MAIN_DECK;
-					ScreenReader::getReader()->readScreen(fmt::format(L"Main Deck - {} cards", mainGame->deckBuilder.GetCurrentDeck().main.size()));
+					ScreenReader::getReader()->readScreen(fmt::format(gDataManager->GetAccessibilityString(156).data(), mainGame->deckBuilder.GetCurrentDeck().main.size()));
 				}
 				break;
 			}
 			case irr::KEY_KEY_R: {
 				if (event.KeyInput.Control && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
 					mainGame->env->setFocus(mainGame->ebDeckname);
-					ScreenReader::getReader()->readScreen(L"Set deck's name");
+					ScreenReader::getReader()->readScreen(gDataManager->GetAccessibilityString(157).data());
 				}
 				else if (!event.KeyInput.PressedDown && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
 					indexLookedUpCard = 0;
 					deckLooker = AccessibilityDeckFocus::DeckLookerLocId::SEARCH;
-					ScreenReader::getReader()->readScreen(fmt::format(L"Search - {} cards", mainGame->deckBuilder.results.size()));
+					ScreenReader::getReader()->readScreen(fmt::format(gDataManager->GetAccessibilityString(158).data(), mainGame->deckBuilder.results.size()));
 				}
 				break;
 			}
@@ -238,7 +238,7 @@ namespace ygo {
 				if (!event.KeyInput.PressedDown && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
 					indexLookedUpCard = 0;
 					deckLooker = AccessibilityDeckFocus::DeckLookerLocId::EXTRA_DECK;
-					ScreenReader::getReader()->readScreen(fmt::format(L"Extra Deck - {} cards", mainGame->deckBuilder.GetCurrentDeck().extra.size()));
+					ScreenReader::getReader()->readScreen(fmt::format(gDataManager->GetAccessibilityString(162).data(), mainGame->deckBuilder.GetCurrentDeck().extra.size()));
 				}
 				break;
 			}
@@ -261,18 +261,18 @@ namespace ygo {
 							break;
 						auto pointer = gDataManager->GetCardData(mainGame->deckBuilder.results[indexLookedUpCard]->code);
 						if (!pointer || !mainGame->deckBuilder.check_limit(pointer)) {
-							ScreenReader::getReader()->readScreen(L"Already has the limit of this card on the deck");
+							ScreenReader::getReader()->readScreen(gDataManager->GetAccessibilityString(163).data());
 							break;
 						}
 						if (deckEditor == AccessibilityDeckFocus::DeckLookerLocId::SIDE_DECK) {
 							mainGame->deckBuilder.push_side(pointer);
-							ScreenReader::getReader()->readScreen(L"Added to the side deck");
+							ScreenReader::getReader()->readScreen(gDataManager->GetAccessibilityString(164).data());
 						}
 						else {
 							if (mainGame->deckBuilder.push_extra(pointer))
-								ScreenReader::getReader()->readScreen(L"Added to the extra deck");
+								ScreenReader::getReader()->readScreen(gDataManager->GetAccessibilityString(165).data());
 							else if (mainGame->deckBuilder.push_main(pointer))
-								ScreenReader::getReader()->readScreen(L"Added to the main deck");
+								ScreenReader::getReader()->readScreen(gDataManager->GetAccessibilityString(166).data());
 						}
 					}
 					else if (deckLooker == AccessibilityDeckFocus::DeckLookerLocId::MENU) {
@@ -383,7 +383,7 @@ namespace ygo {
 				if (!event.KeyInput.PressedDown && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
 					if (mainGame->btnYes->isTrulyVisible()) {
 						TriggerEvent(mainGame->btnYes, irr::gui::EGET_BUTTON_CLICKED);
-						std::wstring nvdaString = fmt::format(L"Yes");
+						std::wstring nvdaString = fmt::format(gDataManager->GetAccessibilityString(102).data());
 						ScreenReader::getReader()->readScreen(nvdaString.c_str(), false);
 					}
 				}
@@ -393,7 +393,7 @@ namespace ygo {
 				if (!event.KeyInput.PressedDown && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
 					if (mainGame->btnNo->isTrulyVisible()) {
 						TriggerEvent(mainGame->btnNo, irr::gui::EGET_BUTTON_CLICKED);
-						std::wstring nvdaString = fmt::format(L"No");
+						std::wstring nvdaString = fmt::format(gDataManager->GetAccessibilityString(106).data());
 						ScreenReader::getReader()->readScreen(nvdaString.c_str(), false);
 					}
 				}
@@ -448,7 +448,7 @@ namespace ygo {
 	void DeckHandler::ReadCardName(const std::vector<const CardDataC*> &deck) {
 		std::wstring nvdaString;
 		if (deck.size() > indexLookedUpCard && deck[indexLookedUpCard]->code != 0)
-			nvdaString = fmt::format(L"{} {} attack {} defense", gDataManager->GetName(deck[indexLookedUpCard]->code), deck[indexLookedUpCard]->attack, deck[indexLookedUpCard]->defense);
+			nvdaString = fmt::format(gDataManager->GetAccessibilityString(169).data(), gDataManager->GetName(deck[indexLookedUpCard]->code), deck[indexLookedUpCard]->attack, deck[indexLookedUpCard]->defense);
 		ScreenReader::getReader()->readScreen(nvdaString.c_str());
 	}
 
@@ -459,7 +459,7 @@ namespace ygo {
 				scrollSelected = true;
 			}
 			else {
-				ScreenReader::getReader()->readScreen(fmt::format(L"Deck set to {}", mainGame->cbDBDecks->getItem(mainGame->cbDBDecks->getSelected())));
+				ScreenReader::getReader()->readScreen(fmt::format(gDataManager->GetAccessibilityString(170).data(), mainGame->cbDBDecks->getItem(mainGame->cbDBDecks->getSelected())));
 				mainGame->env->removeFocus(mainGame->env->getFocus());
 				scrollSelected = false;
 				newDeck = false;
@@ -468,11 +468,11 @@ namespace ygo {
 		else if (menuSelectCounter == MenuType::DeckOptionsMenu::DECKOP_SEARCH && mainGame->ebCardName->isTrulyVisible()) {
 			if (!typing) {
 				mainGame->env->setFocus(mainGame->ebCardName);
-				ScreenReader::getReader()->readScreen(L"Type what to search");
+				ScreenReader::getReader()->readScreen(gDataManager->GetAccessibilityString(171).data());
 				typing = true;
 			}
 			else {
-				ScreenReader::getReader()->readScreen(fmt::format(L"Searching for {}", mainGame->ebCardName->getText()));
+				ScreenReader::getReader()->readScreen(fmt::format(gDataManager->GetAccessibilityString(172).data(), mainGame->ebCardName->getText()));
 				mainGame->env->removeFocus(mainGame->env->getFocus());
 				typing = false;
 			}
@@ -483,7 +483,7 @@ namespace ygo {
 				scrollSelected = true;
 			}
 			else {
-				ScreenReader::getReader()->readScreen(fmt::format(L"Category set to {}", mainGame->cbCardType->getItem(mainGame->cbCardType->getSelected())));
+				ScreenReader::getReader()->readScreen(fmt::format(gDataManager->GetAccessibilityString(173).data(), mainGame->cbCardType->getItem(mainGame->cbCardType->getSelected())));
 				scrollSelected = false;
 				mainGame->env->removeFocus(mainGame->env->getFocus());
 			}
@@ -494,7 +494,7 @@ namespace ygo {
 				scrollSelected = true;
 			}
 			else {
-				ScreenReader::getReader()->readScreen(fmt::format(L"Sub-Category set to {}", mainGame->cbCardType2->getItem(mainGame->cbCardType2->getSelected())));
+				ScreenReader::getReader()->readScreen(fmt::format(gDataManager->GetAccessibilityString(174).data(), mainGame->cbCardType2->getItem(mainGame->cbCardType2->getSelected())));
 				scrollSelected = false;
 				mainGame->env->removeFocus(mainGame->env->getFocus());
 			}
@@ -505,7 +505,7 @@ namespace ygo {
 				scrollSelected = true;
 			}
 			else {
-				ScreenReader::getReader()->readScreen(fmt::format(L"Attribute set to {}", mainGame->cbAttribute->getItem(mainGame->cbAttribute->getSelected())));
+				ScreenReader::getReader()->readScreen(fmt::format(gDataManager->GetAccessibilityString(175).data(), mainGame->cbAttribute->getItem(mainGame->cbAttribute->getSelected())));
 				scrollSelected = false;
 				mainGame->env->removeFocus(mainGame->env->getFocus());
 			}
@@ -516,7 +516,7 @@ namespace ygo {
 				scrollSelected = true;
 			}
 			else {
-				ScreenReader::getReader()->readScreen(fmt::format(L"Type set to {}", mainGame->cbRace->getItem(mainGame->cbRace->getSelected())));
+				ScreenReader::getReader()->readScreen(fmt::format(gDataManager->GetAccessibilityString(176).data(), mainGame->cbRace->getItem(mainGame->cbRace->getSelected())));
 				scrollSelected = false;
 				mainGame->env->removeFocus(mainGame->env->getFocus());
 			}
@@ -524,11 +524,11 @@ namespace ygo {
 		else if (menuSelectCounter == MenuType::DeckOptionsMenu::DECKOP_LEVEL && mainGame->ebStar->isTrulyVisible()) {
 			if (!typing) {
 				mainGame->env->setFocus(mainGame->ebStar);
-				ScreenReader::getReader()->readScreen(L"Type the card level");
+				ScreenReader::getReader()->readScreen(gDataManager->GetAccessibilityString(177).data());
 				typing = true;
 			}
 			else {
-				ScreenReader::getReader()->readScreen(fmt::format(L"Card level set to {}", mainGame->ebStar->getText()));
+				ScreenReader::getReader()->readScreen(fmt::format(gDataManager->GetAccessibilityString(178).data(), mainGame->ebStar->getText()));
 				mainGame->env->removeFocus(mainGame->env->getFocus());
 				typing = false;
 			}
@@ -536,11 +536,11 @@ namespace ygo {
 		else if (menuSelectCounter == MenuType::DeckOptionsMenu::DECKOP_SCALE && mainGame->ebScale->isTrulyVisible()) {
 			if (!typing) {
 				mainGame->env->setFocus(mainGame->ebScale);
-				ScreenReader::getReader()->readScreen(L"Type the card scale");
+				ScreenReader::getReader()->readScreen(gDataManager->GetAccessibilityString(179).data());
 				typing = true;
 			}
 			else {
-				ScreenReader::getReader()->readScreen(fmt::format(L"Card scale set to {}", mainGame->ebScale->getText()));
+				ScreenReader::getReader()->readScreen(fmt::format(gDataManager->GetAccessibilityString(180).data(), mainGame->ebScale->getText()));
 				mainGame->env->removeFocus(mainGame->env->getFocus());
 				typing = false;
 			}
@@ -551,7 +551,7 @@ namespace ygo {
 				scrollSelected = true;
 			}
 			else {
-				ScreenReader::getReader()->readScreen(fmt::format(L"Limit set to {}", mainGame->cbLimit->getItem(mainGame->cbLimit->getSelected())));
+				ScreenReader::getReader()->readScreen(fmt::format(gDataManager->GetAccessibilityString(181).data(), mainGame->cbLimit->getItem(mainGame->cbLimit->getSelected())));
 				scrollSelected = false;
 				mainGame->env->removeFocus(mainGame->env->getFocus());
 			}
@@ -559,11 +559,11 @@ namespace ygo {
 		else if (menuSelectCounter == MenuType::DeckOptionsMenu::DECKOP_ATTACK && mainGame->ebAttack->isTrulyVisible()) {
 			if (!typing) {
 				mainGame->env->setFocus(mainGame->ebAttack);
-				ScreenReader::getReader()->readScreen(L"Type the card attack");
+				ScreenReader::getReader()->readScreen(gDataManager->GetAccessibilityString(182).data());
 				typing = true;
 			}
 			else {
-				ScreenReader::getReader()->readScreen(fmt::format(L"Card attack set to {}", mainGame->ebAttack->getText()));
+				ScreenReader::getReader()->readScreen(fmt::format(gDataManager->GetAccessibilityString(183).data(), mainGame->ebAttack->getText()));
 				mainGame->env->removeFocus(mainGame->env->getFocus());
 				typing = false;
 			}
@@ -571,11 +571,11 @@ namespace ygo {
 		else if (menuSelectCounter == MenuType::DeckOptionsMenu::DECKOP_DEFENSE && mainGame->ebDefense->isTrulyVisible()) {
 			if (!typing) {
 				mainGame->env->setFocus(mainGame->ebDefense);
-				ScreenReader::getReader()->readScreen(L"Type the card defense");
+				ScreenReader::getReader()->readScreen(gDataManager->GetAccessibilityString(184).data());
 				typing = true;
 			}
 			else {
-				ScreenReader::getReader()->readScreen(fmt::format(L"Card defense set to {}", mainGame->ebDefense->getText()));
+				ScreenReader::getReader()->readScreen(fmt::format(gDataManager->GetAccessibilityString(185).data(), mainGame->ebDefense->getText()));
 				mainGame->env->removeFocus(mainGame->env->getFocus());
 				typing = false;
 			}

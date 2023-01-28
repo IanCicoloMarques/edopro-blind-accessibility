@@ -361,7 +361,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 			}
 			case BUTTON_ANNUMBER_OK: {
 				DuelClient::SetResponseI(mainGame->cbANNumber->getSelected());
-				ScreenReader::getReader()->textToSpeech(fmt::format(L"Selected {}", mainGame->cbANNumber->getText()));
+				ScreenReader::getReader()->textToSpeech(fmt::format(gDataManager->GetAccessibilityString(259).data(), mainGame->cbANNumber->getText()));
 				mainGame->HideElement(mainGame->wANNumber, true);
 				break;
 			}
@@ -1458,12 +1458,12 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					clicked_card->is_selected = false;
 					auto it = std::find(selected_cards.begin(), selected_cards.end(), clicked_card);
 					selected_cards.erase(it);
-					ScreenReader::getReader()->readScreen(fmt::format(L"{} uncofirmed", gDataManager->GetName(clicked_card->code)));
+					ScreenReader::getReader()->readScreen(fmt::format(gDataManager->GetAccessibilityString(260).data(), gDataManager->GetName(clicked_card->code)));
 					gSoundManager->PlaySoundEffect(SoundManager::SFX::UNCONFIRM);
 				} else {
 					clicked_card->is_selected = true;
 					selected_cards.push_back(clicked_card);
-					ScreenReader::getReader()->readScreen(fmt::format(L"{} confirmed", gDataManager->GetName(clicked_card->code)));
+					ScreenReader::getReader()->readScreen(fmt::format(gDataManager->GetAccessibilityString(261).data(), gDataManager->GetName(clicked_card->code)));
 					gSoundManager->PlaySoundEffect(SoundManager::SFX::CONFIRM);
 				}
 				uint32_t min = selected_cards.size(), max = 0;
@@ -1500,13 +1500,13 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					break;
 				if (clicked_card->is_selected) {
 					if (!mainGame->dInfo.isCatchingUp) {
-						ScreenReader::getReader()->readScreen(fmt::format(L"{} uncofirmed", gDataManager->GetName(clicked_card->code)));
+						ScreenReader::getReader()->readScreen(fmt::format(gDataManager->GetAccessibilityString(262).data(), gDataManager->GetName(clicked_card->code)));
 						gSoundManager->PlaySoundEffect(SoundManager::SFX::UNCONFIRM);
 					}
 					clicked_card->is_selected = false;
 				} else {
 					if (!mainGame->dInfo.isCatchingUp) {
-						ScreenReader::getReader()->readScreen(fmt::format(L"{} selected", gDataManager->GetName(clicked_card->code)));
+						ScreenReader::getReader()->readScreen(fmt::format(gDataManager->GetAccessibilityString(263).data(), gDataManager->GetName(clicked_card->code)));
 						gSoundManager->PlaySoundEffect(SoundManager::SFX::CONFIRM);
 					}
 					clicked_card->is_selected = true;

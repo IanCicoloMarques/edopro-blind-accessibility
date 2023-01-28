@@ -301,7 +301,7 @@ void ServerLobby::JoinServer(bool host) {
 			return;
 		if(room->locked) {
 			if(!mainGame->wRoomPassword->isVisible()) {
-				ScreenReader::getReader()->readScreen(L"Use the arrow keys to set the password");
+				ScreenReader::getReader()->readScreen(gDataManager->GetAccessibilityString(264).data());
 				mainGame->ebRPName->setText(L"");
 				mainGame->wRoomPassword->setVisible(true);
 				mainGame->env->setFocus(mainGame->ebRPName);

@@ -610,9 +610,9 @@ void ClientField::ShowSelectOption(uint64_t select_hint, bool should_lock) {
 		}
 	}
 	if (count > 1) {
-		ScreenReader::getReader()->readScreen(L"Use the arrow keys to select an option");
+		ScreenReader::getReader()->readScreen(gDataManager->GetAccessibilityString(253).data());
 		ScreenReader::getReader()->cleanBuiltMessage();
-		ScreenReader::getReader()->buildMessage(L"Use the arrow keys to select an option");
+		ScreenReader::getReader()->buildMessage(gDataManager->GetAccessibilityString(253).data());
 	}
 	for(int i = 0; (i < count) && (i < 5) && quickmode; i++)
 		mainGame->btnOption[i]->setText(gDataManager->GetDesc(select_options[i], mainGame->dInfo.compat_mode).data());

@@ -200,27 +200,11 @@ void Game::Initialize() {
 	wAbout->setDraggable(false);
 	wAbout->setDrawTitlebar(false);
 	wAbout->setDrawBackground(false);
-	stAbout = irr::gui::CGUICustomText::addCustomText(L"Project Ignis: EDOPro\n"
-											L"The bleeding-edge automatic duel simulator\n"
-											L"\n"
-											L"Copyright (C) 2020-2022  Edoardo Lolletti (edo9300) and others\n"
-											L"Card scripts and supporting resources by Project Ignis.\n"
-											L"https://github.com/edo9300/edopro\n"
-											L"https://github.com/edo9300/ygopro-core\n"
-											L"https://github.com/ProjectIgnis/CardScripts\n"
-											L"https://github.com/ProjectIgnis/BabelCDB\n"
-											L"https://github.com/ProjectIgnis/windbot\n"
-											L"Software components licensed under the GNU AGPLv3 or later. See LICENSE for more details.\n"
-											L"Supporting resources and app icon are distributed under separate licenses in their subfolders.\n"
-											L"\n"
-											L"Project Ignis:\n"
-											L"ahtelel, Cybercatman, Dragon3989, DyXel, edo9300, EerieCode,"
-											L"Gideon, Hatter, Icematoro, Larry126, LogicalNonsense, pyrQ, Sanct,"
-											L"senpaizuri, Steeldarkeagel, TheRazgriz, WolfOfWolves, Yamato, YoshiDuels\n"
-											L"Default background and icon: LogicalNonsense\n"
-											L"Default fields: Icematoro\n"
-											L"\n"
-											L"Forked from Fluorohydride's YGOPro, maintainer mercury233.\n"
+	stAbout = irr::gui::CGUICustomText::addCustomText(L"Project Accessibility: Based on Project Ignis: EDOPro\n"
+											L"This project is an accessible version of the client EDOPro\n"
+											L"Where blind people are able to play the game using the keyboard and text-to-speech software\n"
+											L"https://github.com/IanCicoloMarques/edopro-blind-accessibility\n"
+											L"Forked from edo9300 / edopro.\n"
 											L"Yu-Gi-Oh! is a trademark of Shueisha and Konami.\n"
 											L"This project is not affiliated with or endorsed by Shueisha or Konami.", false, env, wAbout, -1, Scale(10, 10, 440, 690));
 	((irr::gui::CGUICustomText*)stAbout)->enableScrollBar();

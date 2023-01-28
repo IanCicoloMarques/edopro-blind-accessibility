@@ -272,7 +272,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 					break;
 				}
 				ClearDeck();
-				ScreenReader::getReader()->readScreen(L"New deck");
+				ScreenReader::getReader()->readScreen(gDataManager->GetAccessibilityString(254).data());
 				break;
 			}
 			case BUTTON_SORT_DECK: {
@@ -294,17 +294,17 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				if(sel >= 0 && DeckManager::SaveDeck(Utils::ToPathString(mainGame->cbDBDecks->getItem(sel)), current_deck)) {
 					mainGame->stACMessage->setText(gDataManager->GetSysString(1335).data());
 					mainGame->PopupElement(mainGame->wACMessage, 20);
-					ScreenReader::getReader()->readScreen(fmt::format(L"Deck {} saved", mainGame->cbDBDecks->getItem(sel)));
+					ScreenReader::getReader()->readScreen(fmt::format(gDataManager->GetAccessibilityString(255).data(), mainGame->cbDBDecks->getItem(sel)));
 				}
 				break;
 			}
 			case BUTTON_SAVE_DECK_AS: {
 				epro::wstringview dname(mainGame->ebDeckname->getText());
 				if (dname.empty()) {
-					ScreenReader::getReader()->readScreen(L"Cannot save deck without a name");
+					ScreenReader::getReader()->readScreen(gDataManager->GetAccessibilityString(256).data());
 					break;
 				}
-				ScreenReader::getReader()->readScreen(fmt::format(L"Deck {} saved", dname.data()));
+				ScreenReader::getReader()->readScreen(fmt::format(gDataManager->GetAccessibilityString(255).data(), dname.data()));
 				int sel = -1;
 				{
 					const auto upper = Utils::ToUpperNoAccents<std::wstring>({ dname.data(), dname.size() });
@@ -363,7 +363,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case BUTTON_LEAVE_GAME: {
-				ScreenReader::getReader()->readScreen(L"Leaving deck editor");
+				ScreenReader::getReader()->readScreen(gDataManager->GetAccessibilityString(257).data());
 				Terminate();
 				break;
 			}

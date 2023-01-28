@@ -96,6 +96,7 @@ namespace ygo {
 			case irr::KEY_KEY_I: {
 				if (!mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
 					std::wstring cardName;
+					std::wstring limit;
 					std::wstring cardType;
 					std::wstring cardAttribute;
 					std::wstring cardLevel;
@@ -108,6 +109,7 @@ namespace ygo {
 					//TODO - Transformar isso em função
 					if (deckLooker == AccessibilityDeckFocus::DeckLookerLocId::MAIN_DECK) {
 						auto pointer = gDataManager->GetCardData(mainGame->deckBuilder.GetCurrentDeck().main[indexLookedUpCard]->code);
+						limit = GetCardLimit(pointer);
 						if (pointer) {
 							cardName = fmt::format(L"{}", gDataManager->GetName(mainGame->deckBuilder.GetCurrentDeck().main[indexLookedUpCard]->code));
 							cardType = fmt::format(L"{}", gDataManager->FormatType(mainGame->deckBuilder.GetCurrentDeck().main[indexLookedUpCard]->type));
@@ -177,6 +179,8 @@ namespace ygo {
 					}
 					
 					ScreenReader::getReader()->readScreen(cardName.c_str(), false);
+					if(!limit.empty())
+						ScreenReader::getReader()->readScreen(limit.c_str(), false);
 					ScreenReader::getReader()->readScreen(cardType.c_str(), false);
 					ScreenReader::getReader()->readScreen(cardAttribute.c_str(), false);
 					if (cardType.find(L"Spell") == std::string::npos && cardType.find(L"Trap") == std::string::npos) {
@@ -215,14 +219,17 @@ namespace ygo {
 			}
 			case irr::KEY_KEY_S: {
 				if (event.KeyInput.Control) {
-					if (mainGame->env->getFocus() == mainGame->ebDeckname && mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX) && newDeck) {
-						TriggerEvent(mainGame->btnSaveDeckAs, irr::gui::EGET_BUTTON_CLICKED);
-						mainGame->env->setFocus(mainGame->btnSaveDeckAs);
-						newDeck = false;
-					}
-					else{
+					epro::wstringview dname(mainGame->ebDeckname->getText());
+					if (dname.empty()) {
 						TriggerEvent(mainGame->btnSaveDeck, irr::gui::EGET_BUTTON_CLICKED);
 						mainGame->env->setFocus(mainGame->btnSaveDeck);
+						ScreenReader::getReader()->readScreen(fmt::format(gDataManager->GetAccessibilityString(159).data(), mainGame->cbDBDecks->getItem(mainGame->cbDBDecks->getSelected())));
+						ScreenReader::getReader()->readScreen(fmt::format(gDataManager->GetAccessibilityString(160).data()));
+					}
+					else{
+						TriggerEvent(mainGame->btnSaveDeckAs, irr::gui::EGET_BUTTON_CLICKED);
+						mainGame->env->setFocus(mainGame->btnSaveDeckAs);
+						ScreenReader::getReader()->readScreen(fmt::format(gDataManager->GetAccessibilityString(161).data()));
 					}
 				}
 				break;
@@ -421,6 +428,21 @@ namespace ygo {
 			mainGame->ShowCardInfo(deck[indexLookedUpCard]->code);
 			ReadCardName(deck);
 		}
+	}
+
+	std::wstring DeckHandler::GetCardLimit(const CardDataC* card)
+	{
+		std::wstring limited = std::wstring();
+		int limit = mainGame->deckBuilder.filterList->whitelist ? 0 : 3;
+		auto endit = mainGame->deckBuilder.filterList->content.end();
+		auto it = mainGame->deckBuilder.filterList->GetLimitationIterator(card);
+		if (it != endit)
+			limit = it->second;
+		if (limit == 0)
+			limited = gDataManager->GetAccessibilityString(167).data();
+		else if (limit != 0)
+			limited = fmt::format(gDataManager->GetAccessibilityString(168).data(), limit);
+		return limited;
 	}
 
 	void DeckHandler::ReadCardName(const std::vector<const CardDataC*> &deck) {

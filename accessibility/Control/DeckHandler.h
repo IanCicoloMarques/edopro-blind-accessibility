@@ -42,6 +42,7 @@ namespace ygo {
 		void ReadCardName(const std::vector<const CardDataC*> &deck);
 		void RightKeyLookCard(const std::vector<const CardDataC*> &deck);
 		void LeftKeyLookCard(const std::vector<const CardDataC*> &deck);
+		std::wstring GetCardLimit(const CardDataC* card);
 
 		void DeckOptionsMenu();
 	};

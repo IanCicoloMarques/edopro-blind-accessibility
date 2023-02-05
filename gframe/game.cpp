@@ -2980,6 +2980,7 @@ void Game::PopupSaveWindow(epro::wstringview caption, epro::wstringview text, ep
 	ebFileSaveName->setText(text.data());
 	stFileSaveHint->setText(hint.data());
 	PopupElement(wFileSave);
+	ScreenReader::getReader()->readScreen(gDataManager->GetAccessibilityString(327).data(), false);
 }
 uint8_t Game::LocalPlayer(uint8_t player) {
 	return dInfo.isFirst ? player : 1 - player;

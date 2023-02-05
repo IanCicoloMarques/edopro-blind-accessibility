@@ -447,8 +447,13 @@ namespace ygo {
 
 	void DeckHandler::ReadCardName(const std::vector<const CardDataC*> &deck) {
 		std::wstring nvdaString;
-		if (deck.size() > indexLookedUpCard && deck[indexLookedUpCard]->code != 0)
-			nvdaString = fmt::format(gDataManager->GetAccessibilityString(169).data(), gDataManager->GetName(deck[indexLookedUpCard]->code), deck[indexLookedUpCard]->attack, deck[indexLookedUpCard]->defense);
+		std::wstring cardType = gDataManager->FormatType(deck[indexLookedUpCard]->type);
+		if (deck.size() > indexLookedUpCard && deck[indexLookedUpCard]->code != 0) {
+			if (cardType.find(gDataManager->GetAccessibilityString(76).data()) == std::string::npos && cardType.find(gDataManager->GetAccessibilityString(77).data()) == std::string::npos) 
+				nvdaString = fmt::format(gDataManager->GetAccessibilityString(169).data(), gDataManager->GetName(deck[indexLookedUpCard]->code), gDataManager->FormatType(deck[indexLookedUpCard]->type), deck[indexLookedUpCard]->attack, deck[indexLookedUpCard]->defense);
+			else
+				nvdaString = fmt::format(L"{}, {}", gDataManager->GetName(deck[indexLookedUpCard]->code), gDataManager->FormatType(deck[indexLookedUpCard]->type));
+		}
 		ScreenReader::getReader()->readScreen(nvdaString.c_str());
 	}
 

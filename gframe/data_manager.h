@@ -139,7 +139,7 @@ public:
 		return _setnameStrings.GetLocale(code, L"");
 	}
 	inline epro::wstringview GetAccessibilityString(uint32_t code)  const {
-		return _accessibilityStrings.GetLocale(code);
+		return _accessibilityStrings.GetLocale(code, L"");
 	}
 	inline int GetAccessibilityStringSize()  const {
 		return _accessibilityStrings.map.size();

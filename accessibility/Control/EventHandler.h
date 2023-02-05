@@ -45,6 +45,7 @@ namespace ygo {
 		int cardType = AccessibilityFieldFocus::CardType::MONSTER;
 		bool CheckIfCanViewCards(irr::SEvent event);
 		void DisplayCards(const std::vector<ClientCard*>& field, const std::wstring& text);
+		void DisplayCardsReverse(const std::vector<ClientCard*>& field, const std::wstring& text);
 		void SelectCard(const std::vector<ClientCard*>& field, const std::wstring& text);
 		void DisplayCards(const std::vector<ChainInfo>& field, const std::wstring& text);
 		void CloseDialog();

@@ -147,6 +147,16 @@ namespace ygo {
 						}
 						ScreenReader::getReader()->textToSpeech(fmt::format(L"{}", mainGame->lstSinglePlayList->getListItem(listItem)));
 					}
+					else if (mainGame->lstReplayList->isTrulyVisible()) {
+						mainGame->env->setFocus(mainGame->lstReplayList);
+						irr::s32 listItem = mainGame->lstReplayList->getSelected();
+						if (listItem == -1) {
+							listItem = 0;
+							mainGame->lstReplayList->setSelected(mainGame->lstReplayList->getListItem(listItem));
+						}
+						ScreenReader::getReader()->textToSpeech(fmt::format(L"{}", mainGame->lstReplayList->getListItem(listItem)));
+					}
+					
 				}
 				break;
 			}
@@ -175,6 +185,15 @@ namespace ygo {
 							mainGame->lstSinglePlayList->setSelected(mainGame->lstSinglePlayList->getListItem(listItem));
 						}
 						ScreenReader::getReader()->textToSpeech(fmt::format(L"{}", mainGame->lstSinglePlayList->getListItem(listItem)));
+					}
+					else if (mainGame->lstReplayList->isTrulyVisible()) {
+						mainGame->env->setFocus(mainGame->lstReplayList);
+						irr::s32 listItem = mainGame->lstReplayList->getSelected();
+						if (listItem == -1) {
+							listItem = 0;
+							mainGame->lstReplayList->setSelected(mainGame->lstReplayList->getListItem(listItem));
+						}
+						ScreenReader::getReader()->textToSpeech(fmt::format(L"{}", mainGame->lstReplayList->getListItem(listItem)));
 					}
 				}
 				break;
@@ -226,31 +245,24 @@ namespace ygo {
 					if (menu.at(0) == gDataManager->GetAccessibilityString(198).data()) {
 						MainMenu();
 					}
-					//else if (selectedMenu == MainMenu::MAIN_MENU) {
 					else if (menu.at(0) == gDataManager->GetAccessibilityString(199).data()) {
 						SPDuel();
 					}
-					//else if (selectedMenu == MainMenu::HOST_DUEL) {
 					else if (menu.at(0) == gDataManager->GetAccessibilityString(200).data()) {
 						HostDuel();
 					}
-					//else if (selectedMenu == MainMenu::DUEL_MENU) {
 					else if (menu.at(0) == gDataManager->GetAccessibilityString(201).data()) {
 						DuelMenu();
 					}
-					//else if (selectedMenu == MainMenu::AI_CONFIGURATION) {
 					else if (menu.at(0) == gDataManager->GetAccessibilityString(202).data()) {
 						AIConfigMenu();
 					}
-					//else if (selectedMenu == MainMenu::ONLINE) {
 					else if (menu.at(0) == gDataManager->GetAccessibilityString(203).data()) {
 						OnlineDuel();
 					}
-					//else if (selectedMenu == MainMenu::ONLINE) {
 					else if (menu.at(0) == gDataManager->GetAccessibilityString(204).data()) {
 						PasswordMenu();
 					}
-					//else if (selectedMenu == MainMenu::ONLINE) {
 					else if (menu.at(0) == gDataManager->GetAccessibilityString(205).data()) {
 						GameOptions();
 					}
@@ -275,6 +287,8 @@ namespace ygo {
 						mainGame->HideElement(mainGame->gSettings.window);
 					else if (mainGame->btnSinglePlayCancel->isTrulyVisible())
 						ClickButton(mainGame->btnSinglePlayCancel);
+					else if (mainGame->btnReplayCancel->isTrulyVisible())
+						ClickButton(mainGame->btnReplayCancel);
 					else if (mainGame->btnModeExit->isTrulyVisible())
 						ClickButton(mainGame->btnModeExit);
 					if (menu.empty())
@@ -512,6 +526,9 @@ namespace ygo {
 		}
 		else if (menuSelectCounter == MenuType::MainMenu::MM_PUZZLES && mainGame->btnSingleMode->isEnabled()) {
 			ClickButton(mainGame->btnSingleMode);
+		}
+		else if (menuSelectCounter == MenuType::MainMenu::MM_REPLAY && mainGame->btnReplayMode->isEnabled()) {
+			ClickButton(mainGame->btnReplayMode);
 		}
 		else if (menuSelectCounter == MenuType::MainMenu::MM_DECK_EDITOR && mainGame->btnDeckEdit->isEnabled()) {
 			ClickButton(mainGame->btnDeckEdit);

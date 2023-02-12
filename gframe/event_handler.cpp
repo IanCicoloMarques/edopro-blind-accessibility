@@ -796,7 +796,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 								mainGame->stCardPos[i]->setText(fmt::to_wstring(sort_list[offset + i]).data());
 							} else mainGame->stCardPos[i]->setText(L"");
 						}
-					} else {
+					} else if (!sort_list.empty()) {
 						select_min++;
 						sort_list[sel_seq] = select_min;
 						mainGame->stCardPos[id - BUTTON_CARD_0]->setText(fmt::to_wstring(select_min).data());

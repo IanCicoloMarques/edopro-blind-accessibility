@@ -511,6 +511,8 @@ namespace ygo {
 			menu = menuOnline;
 		else if (mainGame->btnSinglePlayCancel->isEnabled() && mainGame->btnSinglePlayCancel->isTrulyVisible())
 			menu = menuPuzzles;
+		else if (mainGame->btnReplayCancel->isEnabled() && mainGame->btnReplayCancel->isTrulyVisible())
+			menu = menuPuzzles;
 		else if ((mainGame->btnHostPrepDuelist->isEnabled() && mainGame->btnHostPrepDuelist->isTrulyVisible()) ||
 			mainGame->btnHostPrepOB->isEnabled() && mainGame->btnHostPrepOB->isTrulyVisible())
 			menu = menuRulesOkOnline;

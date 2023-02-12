@@ -4700,6 +4700,53 @@ static bool getAddresses(std::array<uint32_t, 8>& addresses) {
 #endif
 }
 
+static std::vector<uint32_t> getAddresses() {
+	std::vector<uint32_t> addresses;
+#ifdef __ANDROID__
+	return porting::getLocalIP();
+#elif defined(_WIN32)
+	char hname[256];
+	gethostname(hname, 256);
+	evutil_addrinfo hints;
+	evutil_addrinfo* res;
+	memset(&hints, 0, sizeof(hints));
+	hints.ai_family = AF_UNSPEC;
+	hints.ai_socktype = SOCK_DGRAM;
+	if (evutil_getaddrinfo(hname, nullptr, &hints, &res) != 0)
+		return {};
+	int i = 0;
+	for (auto ptr = res; ptr != nullptr && i < 8; ptr = ptr->ai_next, ++i) {
+		if (ptr->ai_family == PF_INET) {
+			auto addr_in = reinterpret_cast<sockaddr_in*>(ptr->ai_addr);
+			if (addr_in->sin_addr.s_addr != 0)
+				addresses.emplace_back(addr_in->sin_addr.s_addr);
+		}
+	}
+	evutil_freeaddrinfo(res);
+#else
+	ifaddrs* allInterfaces;
+	// Get list of all interfaces on the local machine:
+	if (getifaddrs(&allInterfaces) != 0)
+		return {};
+	int i = 0;
+	// For each interface ...
+	for (ifaddrs* interface = allInterfaces; interface != nullptr && i < 8; interface = interface->ifa_next, ++i) {
+		unsigned int flags = interface->ifa_flags;
+		sockaddr* addr = interface->ifa_addr;
+		// Check for running IPv4 interfaces.
+		if ((flags & (IFF_UP | IFF_RUNNING | IFF_LOOPBACK)) == (IFF_UP | IFF_RUNNING)) {
+			if (addr->sa_family == AF_INET) {
+				auto addr_in = reinterpret_cast<sockaddr_in*>(addr);
+				if (addr_in->sin_addr.s_addr != 0)
+					addresses.emplace_back(addr_in->sin_addr.s_addr);
+			}
+		}
+	}
+	freeifaddrs(allInterfaces);
+#endif
+	return addresses;
+}
+
 void DuelClient::BeginRefreshHost() {
 	if(is_refreshing)
 		return;
@@ -4708,8 +4755,14 @@ void DuelClient::BeginRefreshHost() {
 	mainGame->lstHostList->clear();
 	remotes.clear();
 	hosts.clear();
-	std::array<uint32_t, 8> addresses{};
+	/*std::array<uint32_t, 8> addresses{};
 	if(!getAddresses(addresses)) {
+		mainGame->btnLanRefresh->setEnabled(true);
+		is_refreshing = false;
+		return;
+	}*/
+	const auto addresses = getAddresses();
+	if (addresses.empty()) {
 		mainGame->btnLanRefresh->setEnabled(true);
 		is_refreshing = false;
 		return;

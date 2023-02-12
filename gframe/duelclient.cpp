@@ -4787,7 +4787,7 @@ void DuelClient::BeginRefreshHost() {
 		is_refreshing = false;
 		return;
 	}
-	timeval timeout = { 3, 0 };
+	timeval timeout = { 5, 0 };
 	resp_event = event_new(broadev, reply, EV_TIMEOUT | EV_READ | EV_PERSIST, BroadcastReply, broadev);
 	event_add(resp_event, &timeout);
 	std::thread(RefreshThread, broadev).detach();

@@ -2587,6 +2587,9 @@ int DuelClient::ClientAnalyze(const uint8_t* msg, uint32_t len) {
 			mainGame->wCardSelect->setText(gDataManager->GetSysString(206).data());
 		else
 			mainGame->wCardSelect->setText(gDataManager->GetSysString(205).data());
+		ScreenReader::getReader()->readScreen(mainGame->wCardSelect->getText());
+		ScreenReader::getReader()->cleanBuiltMessage();
+		ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
 		mainGame->dField.select_min = 0;
 		mainGame->dField.select_max = count;
 		mainGame->dField.ShowSelectCard();

@@ -13,7 +13,7 @@
 #include <IGUIButton.h>
 #include <IGUIContextMenu.h>
 #include <IGUITabControl.h>
-#include <ScreenReader/ScreenReader.h>
+#include "../accessibility/ScreenReader/ScreenReader.h"
 
 namespace ygo {
 

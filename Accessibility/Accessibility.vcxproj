@@ -134,6 +134,7 @@
       </PrecompiledHeaderFile>
       <AdditionalIncludeDirectories>..\Readers\src</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <WholeProgramOptimization>false</WholeProgramOptimization>
     </ClCompile>
     <Link>
       <SubSystem>

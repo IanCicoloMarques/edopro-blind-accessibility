@@ -229,7 +229,7 @@ namespace ygo {
 					else{
 						TriggerEvent(mainGame->btnSaveDeckAs, irr::gui::EGET_BUTTON_CLICKED);
 						mainGame->env->setFocus(mainGame->btnSaveDeckAs);
-						ScreenReader::getReader()->readScreen(fmt::format(gDataManager->GetAccessibilityString(161).data()));
+						ScreenReader::getReader()->readScreen(fmt::format(gDataManager->GetAccessibilityString(161).data(), dname));
 					}
 				}
 				break;
@@ -362,11 +362,11 @@ namespace ygo {
 					}
 					else if(mainGame->cbCardType->isTrulyVisible() && menuSelectCounter == MenuType::DeckOptionsMenu::DECKOP_CATEGORY)
 						ReadComboBox(mainGame->cbCardType);
-					else if (mainGame->cbCardType2->isTrulyVisible() && menuSelectCounter == MenuType::DeckOptionsMenu::DECKOP_SUB_CATEGORY)
+					else if (mainGame->cbCardType2->isTrulyVisible() && mainGame->cbCardType2->isEnabled() && menuSelectCounter == MenuType::DeckOptionsMenu::DECKOP_SUB_CATEGORY)
 						ReadComboBox(mainGame->cbCardType2);
-					else if (mainGame->cbRace->isTrulyVisible() && menuSelectCounter == MenuType::DeckOptionsMenu::DECKOP_TYPE)
+					else if (mainGame->cbRace->isTrulyVisible() && mainGame->cbCardType2->isEnabled() && menuSelectCounter == MenuType::DeckOptionsMenu::DECKOP_TYPE)
 						ReadComboBox(mainGame->cbRace);
-					else if (mainGame->cbAttribute->isTrulyVisible() && menuSelectCounter == MenuType::DeckOptionsMenu::DECKOP_ATTRIBUTE)
+					else if (mainGame->cbAttribute->isTrulyVisible() && mainGame->cbCardType2->isEnabled() && menuSelectCounter == MenuType::DeckOptionsMenu::DECKOP_ATTRIBUTE)
 						ReadComboBox(mainGame->cbAttribute);
 					else if (mainGame->cbLimit->isTrulyVisible() && menuSelectCounter == MenuType::DeckOptionsMenu::DECKOP_LIMIT)
 						ReadComboBox(mainGame->cbLimit);

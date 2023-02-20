@@ -160,17 +160,19 @@ bool DeckBuilder::SetCurrentDeckFromFile(epro::path_stringview file, bool separa
 }
 void DeckBuilder::ImportDeck() {
 	const wchar_t* deck_string = Utils::OSOperator->getTextFromClipboard();
-	std::wstring wstringDeckString = std::wstring(deck_string);
-	std::size_t startPosition = wstringDeckString.find(L"ydke://");
-	if(deck_string) {
-		if(wcsncmp(L"ydke://", deck_string, sizeof(L"ydke://") / sizeof(wchar_t) - 1) == 0)
-			DeckManager::ImportDeckBase64(current_deck, deck_string);
-		else if (startPosition != 0 && startPosition != std::string::npos) {
-			DeckManager::ImportDeckBase64(current_deck, (wstringDeckString.substr(startPosition)).c_str());
+	if (deck_string != NULL) {
+		std::wstring wstringDeckString = std::wstring(deck_string);
+		std::size_t startPosition = wstringDeckString.find(L"ydke://");
+		if(deck_string) {
+			if(wcsncmp(L"ydke://", deck_string, sizeof(L"ydke://") / sizeof(wchar_t) - 1) == 0)
+				DeckManager::ImportDeckBase64(current_deck, deck_string);
+			else if (startPosition != 0 && startPosition != std::string::npos) {
+				DeckManager::ImportDeckBase64(current_deck, (wstringDeckString.substr(startPosition)).c_str());
+			}
+			else
+				(void)DeckManager::ImportDeckBase64Omega(current_deck, deck_string);
+			RefreshLimitationStatus();
 		}
-		else
-			(void)DeckManager::ImportDeckBase64Omega(current_deck, deck_string);
-		RefreshLimitationStatus();
 	}
 }
 void DeckBuilder::ExportDeckToClipboard(bool plain_text) {

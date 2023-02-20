@@ -10,4 +10,5 @@ Using a screen reader and your keyboard, you can navigate through the menus, edi
 You can find us on our [discord server](https://discord.gg/4zKcttmtu4)
 
 Yu-Gi-Oh! is a trademark of Shueisha and Konami. This project is not affiliated with or endorsed by Shueisha or Konami.
+
 This is a fork of [Project Ignis](https://github.com/ProjectIgnis), is a separated project and is not maintained by their team.

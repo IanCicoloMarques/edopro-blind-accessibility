@@ -1,6 +1,5 @@
 #include "single_mode.h"
 #include <fmt/chrono.h>
-#include "random_fwd.h"
 #include "game_config.h"
 #include "duelclient.h"
 #include "game.h"
@@ -14,6 +13,7 @@
 #include <IGUIButton.h>
 #include <IGUIContextMenu.h>
 #include <IGUITabControl.h>
+#include "../accessibility/ScreenReader/ScreenReader.h"
 
 namespace ygo {
 
@@ -25,11 +25,14 @@ Replay SingleMode::last_replay;
 Replay SingleMode::new_replay;
 ReplayStream SingleMode::replay_stream;
 Signal SingleMode::singleSignal;
+std::thread SingleMode::single_mode_thread;
 
 bool SingleMode::StartPlay(DuelOptions&& duelOptions) {
 	if(mainGame->dInfo.isSingleMode)
 		return false;
-	std::thread(SinglePlayThread, std::move(duelOptions)).detach();
+	if(single_mode_thread.joinable())
+		single_mode_thread.join();
+	single_mode_thread = std::thread(SinglePlayThread, std::move(duelOptions));
 	return true;
 }
 void SingleMode::StopPlay(bool is_exiting) {
@@ -37,9 +40,11 @@ void SingleMode::StopPlay(bool is_exiting) {
 	is_continuing = false;
 	is_restarting = false;
 	mainGame->actionSignal.Set();
-	if(is_closing)
+	if(is_closing) {
 		singleSignal.SetNoWait(true);
-	else
+		if(single_mode_thread.joinable())
+			single_mode_thread.join();
+	} else
 		singleSignal.Set();
 }
 void SingleMode::Restart() {
@@ -77,16 +82,21 @@ int SingleMode::SinglePlayThread(DuelOptions&& duelOptions) {
 	mainGame->btnLeaveGame->setRelativePosition(mainGame->Resize(205, 5, 295, 45));
 	is_continuing = false;
 	is_restarting = false;
+	auto rnd = Utils::GetRandomNumberGenerator();
 restart:
-	uint32_t seed = static_cast<uint32_t>(time(0));;
-	DuelClient::rnd.seed(seed);
 	mainGame->dInfo.isSingleMode = true;
 	OCG_Player team = { duelOptions.startingLP, duelOptions.startingDrawCount, duelOptions.drawCountPerTurn };
 	bool hand_test = mainGame->dInfo.isHandTest = (duelOptions.scriptName == "hand-test-mode");
 	if(hand_test)
 		opt |= DUEL_ATTACK_FIRST_TURN;
-	pduel = mainGame->SetupDuel({ DuelClient::rnd(), opt, team, team });
+	const auto seed = Utils::GetRandomNumberGeneratorSeed();
+	pduel = mainGame->SetupDuel({ { seed[0], seed[1], seed[2], seed[3] }, opt, team, team });
+	mainGame->dInfo.duel_params = opt;
+	mainGame->dInfo.duel_field = mainGame->GetMasterRule(mainGame->dInfo.duel_params);
+	matManager.SetActiveVertices((mainGame->dInfo.duel_params & DUEL_3_COLUMNS_FIELD) ? 1 : 0,
+								 (mainGame->dInfo.duel_field == 3 || mainGame->dInfo.duel_field == 5) ? 0 : 1);
 	mainGame->dInfo.compat_mode = false;
+	mainGame->dInfo.legacy_race_size = false;
 	mainGame->dInfo.startlp = mainGame->dInfo.lp[0] = mainGame->dInfo.lp[1] = duelOptions.startingLP;
 	mainGame->dInfo.strLP[0] = mainGame->dInfo.strLP[1] = fmt::to_wstring(mainGame->dInfo.lp[0]);
 	mainGame->dInfo.selfnames = { mainGame->ebNickName->getText() };
@@ -94,29 +104,27 @@ restart:
 	mainGame->dInfo.player_type = 0;
 	mainGame->dInfo.turn = 0;
 	bool loaded = true;
-	ReplayHeader rh;
-	rh.id = REPLAY_YRP1;
-	rh.version = CLIENT_VERSION;
-	rh.flag = REPLAY_SINGLE_MODE | REPLAY_LUA64 | REPLAY_NEWREPLAY | REPLAY_64BIT_DUELFLAG;
-	if(hand_test)
-		rh.flag |= REPLAY_HAND_TEST;
-	rh.seed = seed;
 	bool saveReplay = !hand_test || gGameConfig->saveHandTest;
 	if(saveReplay) {
+		auto replay_header = ExtendedReplayHeader::CreateDefaultHeader(REPLAY_YRP1, static_cast<uint32_t>(time(nullptr)));
+		replay_header.SetSeed(seed);
+		replay_header.base.flag |= REPLAY_SINGLE_MODE;
+		if(hand_test)
+			replay_header.base.flag |= REPLAY_HAND_TEST;
 		last_replay.BeginRecord(true, EPRO_TEXT("./replay/_LastReplay.yrp"));
-		last_replay.WriteHeader(rh);
+		last_replay.WriteHeader(replay_header);
 		//records the replay with the new system
 		new_replay.BeginRecord();
-		rh.id = REPLAY_YRPX;
-		new_replay.WriteHeader(rh);
+		replay_header.base.id = REPLAY_YRPX;
+		new_replay.WriteHeader(replay_header);
 		replay_stream.clear();
 	}
 	if(hand_test) {
 		script_name = "hand-test-mode";
 		InitReplay();
-		Deck playerdeck(gdeckManager->current_deck);
+		Deck playerdeck(mainGame->deckBuilder.GetCurrentDeck());
 		if ((duelOptions.duelFlags & DUEL_PSEUDO_SHUFFLE) == 0)
-			std::shuffle(playerdeck.main.begin(), playerdeck.main.end(), DuelClient::rnd);
+			std::shuffle(playerdeck.main.begin(), playerdeck.main.end(), rnd);
 		auto LoadDeck = [&](uint8_t team) {
 			OCG_NewCardInfo card_info = { team, 0, 0, team, 0, 0, POS_FACEDOWN_DEFENSE };
 			card_info.loc = LOCATION_DECK;
@@ -193,8 +201,6 @@ restart:
 				mainGame->wPhase->setVisible(false);
 				mainGame->deckBuilder.Initialize(false);
 			}
-			if(exit_on_return)
-				mainGame->device->closeDevice();
 		} else
 			mainGame->btnLeaveGame->setRelativePosition(mainGame->Resize(205, 5, 295, 80));
 		is_restarting = false;
@@ -226,15 +232,13 @@ restart:
 	is_closing = false;
 	is_continuing = true;
 	int engFlag = 0;
-	auto msg = CoreUtils::ParseMessages(pduel);
-	for(auto& message : msg.packets)
+	for(auto& message : CoreUtils::ParseMessages(pduel))
 		is_continuing = SinglePlayAnalyze(message) && is_continuing;
 	if(is_continuing) {
 		OCG_StartDuel(pduel);
 		do {
 			engFlag = OCG_DuelProcess(pduel);
-			msg = CoreUtils::ParseMessages(pduel);
-			for(auto& message : msg.packets) {
+			for(auto& message : CoreUtils::ParseMessages(pduel)) {
 				if(message.message == MSG_WIN && hand_test)
 					continue;
 				is_continuing = SinglePlayAnalyze(message) && is_continuing;
@@ -246,9 +250,9 @@ restart:
 	if(saveReplay && !is_restarting) {
 		last_replay.EndRecord(0x1000);
 		auto oldbuffer = last_replay.GetSerializedBuffer();
-		ReplayPacket tmp{};
+		CoreUtils::Packet tmp{};
 		tmp.message = OLD_REPLAY_MODE;
-		tmp.data.swap(oldbuffer);
+		tmp.buffer.swap(oldbuffer);
 		new_replay.WritePacket(tmp);
 		new_replay.EndRecord();
 	}
@@ -325,20 +329,15 @@ restart:
 			mainGame->wPhase->setVisible(false);
 			mainGame->deckBuilder.Initialize(false);
 		}
-		if(exit_on_return)
-			mainGame->device->closeDevice();
 	}
 	open_file = false;
 	return 0;
 }
 
-bool SingleMode::SinglePlayAnalyze(CoreUtils::Packet packet) {
+bool SingleMode::SinglePlayAnalyze(CoreUtils::Packet& packet) {
 	auto Analyze = [&packet]()->bool {
 		DuelClient::answered = false;
-		return DuelClient::ClientAnalyze((char*)packet.data.data(), packet.data.size());
-	};
-	auto Data = [&packet]()->char* {
-		return (char*)(packet.data.data() + sizeof(uint8_t));
+		return DuelClient::ClientAnalyze(packet);
 	};
 	int player;
 	replay_stream.clear();
@@ -356,11 +355,39 @@ bool SingleMode::SinglePlayAnalyze(CoreUtils::Packet packet) {
 			return false;
 		}
 		case MSG_HINT: {
-			char* pbuf = Data();
+			const auto* pbuf = packet.data();
 			int type = BufferIO::Read<uint8_t>(pbuf);
 			int player = BufferIO::Read<uint8_t>(pbuf);
 			/*uint64_t data = BufferIO::Read<uint64_t>(pbuf);*/
-			if(player == 0 || type >= HINT_SKILL)
+			bool analyze = false;
+			switch (type) {
+			case 1:
+			case 2:
+			case 3:
+			case 5: {
+				analyze = player == 0;
+				break;
+			}
+			case 4:
+			case 6:
+			case 7:
+			case 8:
+			case 9:
+			case 11: {
+				analyze = player != 0;
+				break;
+			}
+			case 10:
+			case 200:
+			case 201:
+			case 202:
+			case 203: {
+				analyze = true;
+				break;
+			
+			}
+			}
+			if(analyze)
 				Analyze();
 			if(type > 0 && type < 6 && type != 4)
 				record = false;
@@ -368,16 +395,17 @@ bool SingleMode::SinglePlayAnalyze(CoreUtils::Packet packet) {
 		}
 		case MSG_AI_NAME:
 		case MSG_SHOW_HINT: {
-			char* pbuf = Data();
-			int len = BufferIO::Read<uint16_t>(pbuf);
-			if((len + 1) != packet.data.size() - (sizeof(uint8_t) + sizeof(uint16_t)))
+			auto* pbuf = packet.data();
+			auto len = BufferIO::Read<uint16_t>(pbuf);
+			if((len + 1) != packet.buff_size() - (sizeof(uint16_t)))
 				break;
 			pbuf[len] = 0;
 			if(packet.message == MSG_AI_NAME) {
-				mainGame->dInfo.opponames[0] = BufferIO::DecodeUTF8(pbuf);
+				mainGame->dInfo.opponames[0] = BufferIO::DecodeUTF8({ reinterpret_cast<char*>(pbuf), len });
 			} else {
 				std::unique_lock<std::mutex> lock(mainGame->gMutex);
-				mainGame->stMessage->setText(BufferIO::DecodeUTF8(pbuf).data());
+				mainGame->stMessage->setText(BufferIO::DecodeUTF8({ reinterpret_cast<char*>(pbuf), len }).data());
+				ScreenReader::getReader()->readScreen(BufferIO::DecodeUTF8({ reinterpret_cast<char*>(pbuf), len }).data());
 				mainGame->PopupElement(mainGame->wMessage);
 				mainGame->actionSignal.Wait(lock);
 			}
@@ -427,7 +455,7 @@ bool SingleMode::SinglePlayAnalyze(CoreUtils::Packet packet) {
 			break;
 		}
 	}
-	char* pbuf = Data();
+	auto* pbuf = packet.data();
 	switch(mainGame->dInfo.curMsg) {
 		case MSG_SHUFFLE_DECK: {
 			player = BufferIO::Read<uint8_t>(pbuf);
@@ -497,11 +525,11 @@ void SingleMode::SinglePlayRefresh(uint8_t player, uint8_t location, uint32_t fl
 	buffer.resize(buffer.size() + len);
 	memcpy(buffer.data(), buff, len);
 	mainGame->gMutex.lock();
-	mainGame->dField.UpdateFieldCard(mainGame->LocalPlayer(player), location, (char*)buffer.data());
+	mainGame->dField.UpdateFieldCard(mainGame->LocalPlayer(player), location, buffer.data());
 	mainGame->gMutex.unlock();
 	buffer.insert(buffer.begin(), location);
 	buffer.insert(buffer.begin(), player);
-	replay_stream.emplace_back(MSG_UPDATE_DATA, (char*)buffer.data(), buffer.size());
+	replay_stream.emplace_back(MSG_UPDATE_DATA, buffer.data(), buffer.size());
 }
 void SingleMode::SinglePlayRefreshSingle(uint8_t player, uint8_t location, uint8_t sequence, uint32_t flag) {
 	std::vector<uint8_t> buffer;
@@ -512,12 +540,12 @@ void SingleMode::SinglePlayRefreshSingle(uint8_t player, uint8_t location, uint8
 	buffer.resize(buffer.size() + len);
 	memcpy(buffer.data(), buff, len);
 	mainGame->gMutex.lock();
-	mainGame->dField.UpdateCard(mainGame->LocalPlayer(player), location, sequence, (char*)buffer.data());
+	mainGame->dField.UpdateCard(mainGame->LocalPlayer(player), location, sequence, buffer.data());
 	mainGame->gMutex.unlock();
 	buffer.insert(buffer.begin(), sequence);
 	buffer.insert(buffer.begin(), location);
 	buffer.insert(buffer.begin(), player);
-	replay_stream.emplace_back(MSG_UPDATE_CARD, (char*)buffer.data(), buffer.size());
+	replay_stream.emplace_back(MSG_UPDATE_CARD, buffer.data(), buffer.size());
 }
 void SingleMode::SinglePlayRefresh(uint32_t flag) {
 	for(int p = 0; p < 2; p++)

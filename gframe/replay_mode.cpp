@@ -23,6 +23,7 @@ bool ReplayMode::exit_pending = false;
 int ReplayMode::skip_turn = 0;
 int ReplayMode::current_step = 0;
 int ReplayMode::skip_step = 0;
+std::thread ReplayMode::replay_thread;
 
 bool ReplayMode::StartReplay(int skipturn, bool is_yrp) {
 	if(mainGame->dInfo.isReplay)
@@ -35,16 +36,18 @@ bool ReplayMode::StartReplay(int skipturn, bool is_yrp) {
 	is_pausing = false;
 	is_paused = false;
 	is_restarting = false;
+	if(replay_thread.joinable())
+		replay_thread.join();
 	if(is_yrp) {
-		if(cur_replay.pheader.id == REPLAY_YRP1)
+		if(cur_replay.IsOldReplayMode())
 			cur_yrp = &cur_replay;
 		else
 			cur_yrp = cur_replay.yrp.get();
 		if(!cur_yrp)
 			return false;
-		std::thread(OldReplayThread).detach();
+		replay_thread = std::thread(OldReplayThread);
 	} else
-		std::thread(ReplayThread).detach();
+		replay_thread = std::thread(ReplayThread);
 	return true;
 }
 void ReplayMode::StopReplay(bool is_exiting) {
@@ -53,6 +56,8 @@ void ReplayMode::StopReplay(bool is_exiting) {
 	is_closing = is_exiting;
 	exit_pending = true;
 	mainGame->actionSignal.Set();
+	if(is_exiting && replay_thread.joinable())
+		replay_thread.join();
 }
 void ReplayMode::SwapField() {
 	if(is_paused)
@@ -72,26 +77,29 @@ void ReplayMode::Pause(bool is_pause, bool is_step) {
 int ReplayMode::ReplayThread() {
 	Utils::SetThreadName("ReplayMode");
 	mainGame->dInfo.isReplay = true;
-	const ReplayHeader& rh = cur_replay.pheader;
+	const auto& replay_header = cur_replay.pheader;
 	mainGame->dInfo.isFirst = true;
 	mainGame->dInfo.isTeam1 = true;
 	mainGame->dInfo.isRelay = !!(cur_replay.params.duel_flags & DUEL_RELAY);
-	mainGame->dInfo.isSingleMode = !!(rh.flag & REPLAY_SINGLE_MODE);
-	mainGame->dInfo.isHandTest = !!(rh.flag & REPLAY_HAND_TEST);
-	mainGame->dInfo.compat_mode = !(rh.flag & REPLAY_LUA64);
+	mainGame->dInfo.isSingleMode = !!(replay_header.base.flag & REPLAY_SINGLE_MODE);
+	mainGame->dInfo.isHandTest = !!(replay_header.base.flag & REPLAY_HAND_TEST);
+	mainGame->dInfo.compat_mode = !(replay_header.base.flag & REPLAY_LUA64);
+	mainGame->dInfo.legacy_race_size = GET_CORE_VERSION_MAJOR(replay_header.base.version) < 10;
 	mainGame->dInfo.team1 = ReplayMode::cur_replay.GetPlayersCount(0);
 	mainGame->dInfo.team2 = ReplayMode::cur_replay.GetPlayersCount(1);
 	mainGame->dInfo.current_player[0] = 0;
 	mainGame->dInfo.current_player[1] = 0;
 	if(!mainGame->dInfo.isRelay)
 		mainGame->dInfo.current_player[1] = mainGame->dInfo.team2 - 1;
-	auto names = ReplayMode::cur_replay.GetPlayerNames();
+	const auto& names = ReplayMode::cur_replay.GetPlayerNames();
 	mainGame->dInfo.selfnames.clear();
 	mainGame->dInfo.opponames.clear();
 	mainGame->dInfo.selfnames.insert(mainGame->dInfo.selfnames.end(), names.begin(), names.begin() + mainGame->dInfo.team1);
 	mainGame->dInfo.opponames.insert(mainGame->dInfo.opponames.end(), names.begin() + mainGame->dInfo.team1, names.end());
 	mainGame->dInfo.duel_params = cur_replay.params.duel_flags;
 	mainGame->dInfo.duel_field = mainGame->GetMasterRule(mainGame->dInfo.duel_params);
+	matManager.SetActiveVertices((mainGame->dInfo.duel_params & DUEL_3_COLUMNS_FIELD) ? 1 : 0,
+								 (mainGame->dInfo.duel_field == 3 || mainGame->dInfo.duel_field == 5) ? 0 : 1);
 	mainGame->SetPhaseButtons();
 	auto& current_stream = cur_replay.packets_stream;
 	if(!current_stream.size()) {
@@ -166,8 +174,6 @@ void ReplayMode::EndDuel() {
 		mainGame->stTip->setVisible(false);
 		gSoundManager->StopSounds();
 		mainGame->device->setEventReceiver(&mainGame->menuHandler);
-		if(exit_on_return)
-			mainGame->device->closeDevice();
 	}
 }
 void ReplayMode::Restart(bool refresh) {
@@ -201,13 +207,13 @@ void ReplayMode::Restart(bool refresh) {
 	is_restarting = true;
 }
 void ReplayMode::Undo() {
-	if(skip_step > 0 || current_step == 0)
+	if(mainGame->dInfo.isCatchingUp || current_step == 0)
 		return;
 	mainGame->dInfo.isCatchingUp = true;
 	Restart(false);
 	Pause(false, false);
 }
-bool ReplayMode::ReplayAnalyze(ReplayPacket p) {
+bool ReplayMode::ReplayAnalyze(const CoreUtils::Packet& p) {
 	is_restarting = false;
 	{
 		if(is_closing)
@@ -235,13 +241,13 @@ bool ReplayMode::ReplayAnalyze(ReplayPacket p) {
 			return false;
 		}
 		case MSG_WIN: {
-			if(!yrp || !cur_yrp || !(cur_yrp->pheader.flag & REPLAY_HAND_TEST)) {
+			if(!yrp || !cur_yrp || !(cur_yrp->pheader.base.flag & REPLAY_HAND_TEST)) {
 				if (mainGame->dInfo.isCatchingUp) {
 					mainGame->dInfo.isCatchingUp = false;
 					mainGame->dField.RefreshAllCards();
 					mainGame->gMutex.unlock();
 				}
-				DuelClient::ClientAnalyze((char*)p.data.data(), p.data.size());
+				DuelClient::ClientAnalyze(p);
 				return false;
 			}
 			return true;
@@ -284,20 +290,17 @@ bool ReplayMode::ReplayAnalyze(ReplayPacket p) {
 			break;
 		}
 		case MSG_AI_NAME: {
-			char* pbuf = (char*)p.data.data();
-			int len = BufferIO::Read<uint16_t>(pbuf);
-			char* begin = pbuf;
-			pbuf += len + 1;
-			std::string namebuf;
-			namebuf.resize(len);
-			memcpy(&namebuf[0], begin, len + 1);
-			mainGame->dInfo.opponames[0] = BufferIO::DecodeUTF8(namebuf);
+			const auto* pbuf = p.data();
+			auto len = BufferIO::Read<uint16_t>(pbuf);
+			if((len + 1) != p.buff_size() - (sizeof(uint16_t)))
+				break;
+			mainGame->dInfo.opponames[0] = BufferIO::DecodeUTF8({ reinterpret_cast<const char*>(pbuf), len });
 			return true;
 		}
 		case OLD_REPLAY_MODE:
 			return true;
 		}
-		DuelClient::ClientAnalyze((char*)p.data.data(), p.data.size());
+		DuelClient::ClientAnalyze(p);
 		if(pauseable) {
 			current_step++;
 			if(skip_step) {

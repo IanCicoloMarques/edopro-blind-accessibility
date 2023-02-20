@@ -1,5 +1,4 @@
 #include <algorithm>
-#include <fstream>
 #include <fmt/format.h>
 #include <zlib.h>
 #include "network.h"
@@ -10,13 +9,11 @@
 #include "Base64.h"
 #include "utils.h"
 #include "client_card.h"
-#if defined(__MINGW32__) && defined(UNICODE)
-#include <fcntl.h>
-#include <ext/stdio_filebuf.h>
-#endif
+#include "file_stream.h"
+#include <ScreenReader/ScreenReader.h>
 
 namespace ygo {
-CardDataC* DeckManager::GetDummyOrMappedCardData(uint32_t code) {
+const CardDataC* DeckManager::GetDummyOrMappedCardData(uint32_t code) const {
 	if(!load_dummies)
 		return gDataManager->GetMappedCardData(code);
 	auto it = dummy_entries.find(code);
@@ -36,15 +33,7 @@ void DeckManager::ClearDummies() {
 }
 bool DeckManager::LoadLFListSingle(const epro::path_string& path) {
 	static constexpr auto key = "$whitelist"_sv;
-#if defined(__MINGW32__) && defined(UNICODE)
-	auto fd = _wopen(path.data(), _O_RDONLY);
-	if(fd == -1)
-		return false;
-	__gnu_cxx::stdio_filebuf<char> b(fd, std::ios::in);
-	std::istream infile(&b);
-#else
-	std::ifstream infile(path);
-#endif
+	FileStream infile{ path, FileStream::in };
 	if(infile.fail())
 		return false;
 	bool loaded = false;
@@ -128,35 +117,46 @@ void DeckManager::RefreshDeck(Deck& deck) {
 	for(auto& list : { &deck.main, &deck.extra, &deck.side }) {
 		for(auto& card : *list) {
 			if(card->code == 0 && card->alias) {
-				if(auto cd = gDataManager->GetCardData(card->alias)) {
+				const CardDataC* cd;
+				if((cd = gDataManager->GetCardData(card->alias)) == nullptr)
+					cd = gDataManager->GetMappedCardData(card->alias);
+				if(cd != nullptr)
 					card = cd;
-				}
 			}
 		}
 	}
 }
-LFList* DeckManager::GetLFList(uint32_t lfhash) {
+LFList const* DeckManager::GetLFList(uint32_t lfhash) const {
 	auto it = std::find_if(_lfList.begin(), _lfList.end(), [lfhash](LFList list) {return list.hash == lfhash; });
 	return it != _lfList.end() ? &*it : nullptr;
 }
-epro::wstringview DeckManager::GetLFListName(uint32_t lfhash) {
+epro::wstringview DeckManager::GetLFListName(uint32_t lfhash) const {
 	auto lflist = GetLFList(lfhash);
 	if(lflist)
 		return lflist->listName;
 	return gDataManager->unknown_string;
 }
-int DeckManager::TypeCount(std::vector<CardDataC*> cards, uint32_t type) {
+int DeckManager::TypeCount(const Deck::Vector& cards, uint32_t type) {
 	int count = 0;
-	for(auto card : cards) {
+	for(const auto& card : cards) {
 		if(card->type & type)
 			count++;
 	}
 	return count;
 }
-inline DeckError CheckCards(const std::vector<CardDataC*> &cards, LFList* curlist, banlist_content_t* list,
+int DeckManager::OTCount(const Deck::Vector& cards, uint32_t ot) {
+	int count = 0;
+	for(const auto& card : cards) {
+		if(card->ot & ot)
+			count++;
+	}
+	return count;
+
+}
+static DeckError CheckCards(const Deck::Vector& cards, LFList const* curlist,
 					  DuelAllowedCards allowedCards,
-					  banlist_content_t &ccount,
-					  DeckError(*additionalCheck)(CardDataC*) = nullptr) {
+					  banlist_content_t& ccount,
+					  DeckError(*additionalCheck)(const CardDataC*) = nullptr) {
 	DeckError ret{ DeckError::NONE };
 	for (const auto cit : cards) {
 		ret.code = cit->code;
@@ -193,83 +193,62 @@ inline DeckError CheckCards(const std::vector<CardDataC*> &cards, LFList* curlis
 		int dc = ccount[code];
 		if (dc > 3)
 			return ret.type = DeckError::CARDCOUNT, ret;
-		auto it = list->find(cit->code);
-		if (it == list->end())
-			it = list->find(code);
-		if ((it != list->end() && dc > it->second) || (curlist->whitelist && it == list->end()))
+		auto it = curlist->GetLimitationIterator(cit);
+		auto is_end = it == curlist->content.end();
+		if ((!is_end && dc > it->second) || (curlist->whitelist && is_end))
 			return ret.type = DeckError::LFLIST, ret;
 	}
 	return { DeckError::NONE };
 }
-DeckError DeckManager::CheckDeck(Deck& deck, uint32_t lfhash, DuelAllowedCards allowedCards, bool doubled, uint32_t forbiddentypes) {
-	banlist_content_t ccount;
-	LFList* curlist = nullptr;
-	for(auto& list : _lfList) {
-		if(list.hash == lfhash) {
-			curlist = &list;
-			break;
-		}
-	}
+DeckError DeckManager::CheckDeckContent(const Deck& deck, LFList const* lflist, DuelAllowedCards allowedCards, uint32_t forbiddentypes) {
 	DeckError ret{ DeckError::NONE };
-	if(!curlist)
-		return ret;
-	auto list = &curlist->content;
 	if(TypeCount(deck.main, forbiddentypes) > 0 || TypeCount(deck.extra, forbiddentypes) > 0 || TypeCount(deck.side, forbiddentypes) > 0)
 		return ret.type = DeckError::FORBTYPE, ret;
-	bool speed = mainGame->extra_rules & DECK_LIMIT_20;
-	size_t minmain = 40, maxmain = 60, maxextra = 15, maxside = 15;
-	if(doubled){
-		if(speed){
-			maxextra = 10;
-			maxside = 12;
-		} else {
-			minmain = maxmain = 100;
-			maxextra = 30;
-			maxside = 30;
-		}
-	} else {
-		if(speed){
-			minmain = 20;
-			maxmain = 30;
-			maxextra = 5;
-			maxside = 6;
-		}
-	}
-	if(deck.main.size() < minmain || deck.main.size() > maxmain) {
-		ret.type = DeckError::MAINCOUNT;
-		ret.count.current = deck.main.size();
-		ret.count.minimum = minmain;
-		ret.count.maximum = maxmain;
-	} else if(deck.extra.size() > maxextra) {
-		ret.type = DeckError::EXTRACOUNT;
-		ret.count.current = deck.extra.size();
-		ret.count.minimum = 0;
-		ret.count.maximum = maxextra;
-	} else if(deck.side.size() > maxside) {
-		ret.type = DeckError::SIDECOUNT;
-		ret.count.current = deck.side.size();
-		ret.count.minimum = 0;
-		ret.count.maximum = maxside;
-	}
-	if(ret.type)
+	if((OTCount(deck.main, SCOPE_LEGEND) + OTCount(deck.extra, SCOPE_LEGEND)) > 1)
+		return ret.type = DeckError::TOOMANYLEGENDS, ret;
+	if(TypeCount(deck.main, TYPE_SKILL) > 1)
+		return ret.type = DeckError::TOOMANYSKILLS, ret;
+	banlist_content_t ccount;
+	if(!lflist)
 		return ret;
-	ret = CheckCards(deck.main, curlist, list, allowedCards, ccount, [](CardDataC* cit)->DeckError {
+	ret = CheckCards(deck.main, lflist, allowedCards, ccount, [](const CardDataC* cit)->DeckError {
 		if ((cit->type & (TYPE_FUSION | TYPE_SYNCHRO | TYPE_XYZ)) || (cit->type & TYPE_LINK && cit->type & TYPE_MONSTER))
 			return { DeckError::EXTRACOUNT };
 		return { DeckError::NONE };
 	});
 	if (ret.type) return ret;
-	ret = CheckCards(deck.extra, curlist, list, allowedCards , ccount, [](CardDataC* cit)->DeckError {
+	ret = CheckCards(deck.extra, lflist, allowedCards , ccount, [](const CardDataC* cit)->DeckError {
 		if (!(cit->type & (TYPE_FUSION | TYPE_SYNCHRO | TYPE_XYZ)) && !(cit->type & TYPE_LINK && cit->type & TYPE_MONSTER))
 			return { DeckError::EXTRACOUNT };
 		return { DeckError::NONE };
 	});
 	if (ret.type) return ret;
-	return CheckCards(deck.side, curlist, list, allowedCards, ccount);
+	return CheckCards(deck.side, lflist, allowedCards, ccount);
 }
-uint32_t DeckManager::LoadDeck(Deck& deck, uint32_t* dbuf, uint32_t mainc, uint32_t sidec, uint32_t mainc2, uint32_t sidec2) {
-	cardlist_type mainvect(mainc + mainc2);
-	cardlist_type sidevect(sidec + sidec2);
+DeckError DeckManager::CheckDeckSize(const Deck& deck, const DeckSizes& sizes) {
+	DeckError ret{ DeckError::NONE };
+	auto skills = TypeCount(deck.main, TYPE_SKILL);
+	if(sizes.main != (deck.main.size() - skills)) {
+		ret.type = DeckError::MAINCOUNT;
+		ret.count.current = deck.main.size() - skills;
+		ret.count.minimum = sizes.main.min;
+		ret.count.maximum = sizes.main.max;
+	} else if(sizes.extra != deck.extra.size()) {
+		ret.type = DeckError::EXTRACOUNT;
+		ret.count.current = deck.extra.size();
+		ret.count.minimum = sizes.extra.min;
+		ret.count.maximum = sizes.extra.max;
+	} else if(sizes.side != deck.side.size()) {
+		ret.type = DeckError::SIDECOUNT;
+		ret.count.current = deck.side.size();
+		ret.count.minimum = sizes.side.min;
+		ret.count.maximum = sizes.side.max;
+	}
+	return ret;
+}
+uint32_t DeckManager::LoadDeckFromBuffer(Deck& deck, uint32_t* dbuf, uint32_t mainc, uint32_t sidec) {
+	cardlist_type mainvect(mainc);
+	cardlist_type sidevect(sidec);
 	auto copy = [&dbuf](uint32_t* vec, uint32_t count) {
 		if(count > 0) {
 			memcpy(vec, dbuf, count * sizeof(uint32_t));
@@ -278,69 +257,10 @@ uint32_t DeckManager::LoadDeck(Deck& deck, uint32_t* dbuf, uint32_t mainc, uint3
 	};
 	copy(mainvect.data(), mainc);
 	copy(sidevect.data(), sidec);
-	copy(mainvect.data() + mainc, mainc2);
-	copy(sidevect.data() + sidec, sidec2);
 	return LoadDeck(deck, mainvect, sidevect);
 }
-uint32_t DeckManager::LoadDeck(Deck& deck, const cardlist_type& mainlist, const cardlist_type& sidelist, const cardlist_type* extralist) {
-	deck.clear();
-	uint32_t errorcode = 0;
-	CardDataC* cd = nullptr;
-	const bool loadalways = !!extralist;
-	for(auto code : mainlist) {
-		if(!(cd = gDataManager->GetCardData(code))) {
-			cd = gdeckManager->GetDummyOrMappedCardData(code);
-			if((!cd || cd->code == 0) && !loadalways) {
-				errorcode = code;
-				continue;
-			}
-		}
-		if(!cd || cd->type & TYPE_TOKEN)
-			continue;
-		else if(!extralist && (cd->type & (TYPE_FUSION | TYPE_SYNCHRO | TYPE_XYZ) || (cd->type & TYPE_LINK && cd->type & TYPE_MONSTER))) {
-			deck.extra.push_back(cd);
-		} else {
-			deck.main.push_back(cd);
-		}
-	}
-	if(extralist) {
-		for(auto code : *extralist) {
-			if(!(cd = gDataManager->GetCardData(code))) {
-				cd = gdeckManager->GetDummyOrMappedCardData(code);
-				if((!cd || cd->code == 0) && !loadalways) {
-					errorcode = code;
-					continue;
-				}
-			}
-			if(!cd || cd->type & TYPE_TOKEN)
-				continue;
-			deck.extra.push_back(cd);
-		}
-	}
-	for(auto code : sidelist) {
-		if(!(cd = gDataManager->GetCardData(code))) {
-			cd = gdeckManager->GetDummyOrMappedCardData(code);
-			if((!cd || cd->code == 0) && !loadalways) {
-				errorcode = code;
-				continue;
-			}
-		}
-		if(!cd || cd->type & TYPE_TOKEN)
-			continue;
-		deck.side.push_back(cd);
-	}
-	return errorcode;
-}
 static bool LoadCardList(const epro::path_string& name, cardlist_type* mainlist = nullptr, cardlist_type* extralist = nullptr, cardlist_type* sidelist = nullptr, uint32_t* retmainc = nullptr, uint32_t* retsidec = nullptr) {
-#if defined(__MINGW32__) && defined(UNICODE)
-	auto fd = _wopen(name.data(), _O_RDONLY);
-	if(fd == -1)
-		return false;
-	__gnu_cxx::stdio_filebuf<char> b(fd, std::ios::in);
-	std::istream deck(&b);
-#else
-	std::ifstream deck(name);
-#endif
+	FileStream deck{ name, FileStream::in };
 	if(deck.fail())
 		return false;
 	cardlist_type res;
@@ -386,6 +306,66 @@ static bool LoadCardList(const epro::path_string& name, cardlist_type* mainlist 
 		*retsidec = sidec;
 	return true;
 }
+bool DeckManager::LoadDeckFromFile(epro::path_stringview file, Deck& out, bool separated) {
+	cardlist_type mainlist;
+	cardlist_type sidelist;
+	cardlist_type extralist;
+	if(!LoadCardList(fmt::format(EPRO_TEXT("./deck/{}.ydk"), file), &mainlist, separated ? &extralist : nullptr, &sidelist)) {
+		if(!LoadCardList({ file.data(), file.size() }, &mainlist, separated ? &extralist : nullptr, &sidelist))
+			return false;
+	}
+	LoadDeck(out, mainlist, sidelist, separated ? &extralist : nullptr);
+	return true;
+}
+uint32_t DeckManager::LoadDeck(Deck& deck, const cardlist_type& mainlist, const cardlist_type& sidelist, const cardlist_type* extralist) {
+	deck.clear();
+	uint32_t errorcode = 0;
+	const CardDataC* cd = nullptr;
+	const bool loadalways = !!extralist;
+	for(auto code : mainlist) {
+		if(!(cd = gDataManager->GetCardData(code))) {
+			cd = gdeckManager->GetDummyOrMappedCardData(code);
+			if((!cd || cd->code == 0) && !loadalways) {
+				errorcode = code;
+				continue;
+			}
+		}
+		if(!cd || cd->type & TYPE_TOKEN)
+			continue;
+		else if((!extralist || cd->code != 0) && (cd->type & (TYPE_FUSION | TYPE_SYNCHRO | TYPE_XYZ) || (cd->type & TYPE_LINK && cd->type & TYPE_MONSTER))) {
+			deck.extra.push_back(cd);
+		} else {
+			deck.main.push_back(cd);
+		}
+	}
+	if(extralist) {
+		for(auto code : *extralist) {
+			if(!(cd = gDataManager->GetCardData(code))) {
+				cd = gdeckManager->GetDummyOrMappedCardData(code);
+				if((!cd || cd->code == 0) && !loadalways) {
+					errorcode = code;
+					continue;
+				}
+			}
+			if(!cd || cd->type & TYPE_TOKEN)
+				continue;
+			deck.extra.push_back(cd);
+		}
+	}
+	for(auto code : sidelist) {
+		if(!(cd = gDataManager->GetCardData(code))) {
+			cd = gdeckManager->GetDummyOrMappedCardData(code);
+			if((!cd || cd->code == 0) && !loadalways) {
+				errorcode = code;
+				continue;
+			}
+		}
+		if(!cd || cd->type & TYPE_TOKEN)
+			continue;
+		deck.side.push_back(cd);
+	}
+	return errorcode;
+}
 bool DeckManager::LoadSide(Deck& deck, uint32_t* dbuf, uint32_t mainc, uint32_t sidec) {
 	std::map<uint32_t, int> pcount;
 	std::map<uint32_t, int> ncount;
@@ -395,9 +375,20 @@ bool DeckManager::LoadSide(Deck& deck, uint32_t* dbuf, uint32_t mainc, uint32_t 
 		pcount[card->code]++;
 	for(auto& card : deck.side)
 		pcount[card->code]++;
+	auto old_skills = TypeCount(deck.main, TYPE_SKILL);
+	auto old_legends = OTCount(deck.main, SCOPE_LEGEND) + OTCount(deck.extra, SCOPE_LEGEND);
 	Deck ndeck;
-	LoadDeck(ndeck, dbuf, mainc, sidec);
-	if(ndeck.main.size() != deck.main.size() || ndeck.extra.size() != deck.extra.size())
+	LoadDeckFromBuffer(ndeck, dbuf, mainc, sidec);
+	auto new_skills = TypeCount(ndeck.main, TYPE_SKILL);
+	auto new_legends = OTCount(ndeck.main, SCOPE_LEGEND) + OTCount(ndeck.extra, SCOPE_LEGEND);
+	if(new_legends > std::max(old_legends, 1))
+		return false;
+	// ideally the check should be only new_skills > 1, but the player might host with don't check deck
+	// and thus have more than 1 skill in the deck, do this check to ensure that the sided deck will
+	// always be valid in such case and prevent softlocking during side decking
+	if(new_skills > std::max(old_skills, 1))
+		return false;
+	if((ndeck.main.size() - new_skills) != (deck.main.size() - old_skills) || ndeck.extra.size() != deck.extra.size())
 		return false;
 	for(auto& card : ndeck.main)
 		ncount[card->code]++;
@@ -410,42 +401,9 @@ bool DeckManager::LoadSide(Deck& deck, uint32_t* dbuf, uint32_t mainc, uint32_t 
 	deck = ndeck;
 	return true;
 }
-bool DeckManager::LoadDeck(epro::path_stringview file, Deck* deck, bool separated) {
-	cardlist_type mainlist;
-	cardlist_type sidelist;
-	cardlist_type extralist;
-	if(!LoadCardList(fmt::format(EPRO_TEXT("./deck/{}.ydk"), file), &mainlist, separated ? &extralist : nullptr, &sidelist)) {
-		if(!LoadCardList({ file.data(), file.size() }, &mainlist, separated ? &extralist : nullptr, &sidelist))
-			return false;
-	}
-	if(deck)
-		LoadDeck(*deck, mainlist, sidelist, separated ? &extralist : nullptr);
-	else
-		LoadDeck(current_deck, mainlist, sidelist, separated ? &extralist : nullptr);
-	return true;
-}
-bool DeckManager::LoadDeckDouble(epro::path_stringview file, epro::path_stringview file2, Deck* deck) {
-	cardlist_type mainlist;
-	cardlist_type sidelist;
-	LoadCardList(fmt::format(EPRO_TEXT("./deck/{}.ydk"), file), &mainlist, nullptr, &sidelist);
-	LoadCardList(fmt::format(EPRO_TEXT("./deck/{}.ydk"), file2), &mainlist, nullptr, &sidelist);
-	if(deck)
-		LoadDeck(*deck, mainlist, sidelist);
-	else
-		LoadDeck(current_deck, mainlist, sidelist);
-	return true;
-}
-bool DeckManager::SaveDeck(Deck& deck, epro::path_stringview name) {
+bool DeckManager::SaveDeck(epro::path_stringview name, const Deck& deck) {
 	const auto fullname = fmt::format(EPRO_TEXT("./deck/{}.ydk"), name);
-#if defined(__MINGW32__) && defined(UNICODE)
-	auto fd = _wopen(fullname.data(), _O_WRONLY);
-	if(fd == -1)
-		return false;
-	__gnu_cxx::stdio_filebuf<char> b(fd, std::ios::out);
-	std::ostream deckfile(&b);
-#else
-	std::ofstream deckfile(fullname);
-#endif
+	FileStream deckfile{ fullname, FileStream::out };
 	if(deckfile.fail())
 		return false;
 	deckfile << "#created by " << BufferIO::EncodeUTF8(mainGame->ebNickName->getText()) << "\n#main\n";
@@ -461,15 +419,7 @@ bool DeckManager::SaveDeck(Deck& deck, epro::path_stringview name) {
 }
 bool DeckManager::SaveDeck(epro::path_stringview name, const cardlist_type& mainlist, const cardlist_type& extralist, const cardlist_type& sidelist) {
 	const auto fullname = fmt::format(EPRO_TEXT("./deck/{}.ydk"), name);
-#if defined(__MINGW32__) && defined(UNICODE)
-	auto fd = _wopen(fullname.data(), _O_WRONLY);
-	if(fd == -1)
-		return false;
-	__gnu_cxx::stdio_filebuf<char> b(fd, std::ios::out);
-	std::ostream deckfile(&b);
-#else
-	std::ofstream deckfile(fullname);
-#endif
+	FileStream deckfile{ fullname, FileStream::out };
 	if(deckfile.fail())
 		return false;
 	deckfile << "#created by " << BufferIO::EncodeUTF8(mainGame->ebNickName->getText()) << "\n#main\n";
@@ -483,7 +433,7 @@ bool DeckManager::SaveDeck(epro::path_stringview name, const cardlist_type& main
 		deckfile << fmt::to_string(card) << "\n";
 	return true;
 }
-const wchar_t* DeckManager::ExportDeckBase64(Deck& deck) {
+const wchar_t* DeckManager::ExportDeckBase64(const Deck& deck) {
 	static std::wstring res;
 	auto decktobuf = [](const auto& src) {
 		static cardlist_type cards;
@@ -545,12 +495,14 @@ const wchar_t* DeckManager::ExportDeckCardNames(Deck deck) {
 	}
 	return res.data();
 }
-cardlist_type BufferToCardlist(const std::vector<uint8_t>& input) {
+static cardlist_type BufferToCardlist(const std::vector<uint8_t>& input) {
 	cardlist_type vect(input.size() / 4);
 	memcpy(vect.data(), input.data(), input.size());
 	return vect;
 }
 void DeckManager::ImportDeckBase64(Deck& deck, const wchar_t* buffer) {
+	std::wstring newBuffer = std::wstring(buffer) + L"!";
+	buffer = newBuffer.c_str();
 	buffer += (sizeof(L"ydke://") / sizeof(wchar_t)) - 1;
 	size_t delimiters[3];
 	int delim = 0;
@@ -565,6 +517,7 @@ void DeckManager::ImportDeckBase64(Deck& deck, const wchar_t* buffer) {
 	const auto extralist = BufferToCardlist(base64_decode(buffer + delimiters[0] + 1, delimiters[1] - delimiters[0]));
 	const auto sidelist = BufferToCardlist(base64_decode(buffer + delimiters[1] + 1, delimiters[2] - delimiters[1]));
 	LoadDeck(deck, mainlist, sidelist, &extralist);
+	ScreenReader::getReader()->readScreen(fmt::format(gDataManager->GetAccessibilityString(258).data()));
 }
 template<size_t N>
 uint32_t gzinflate(const std::vector<uint8_t>& in, uint8_t(&buffer)[N]) {
@@ -607,7 +560,7 @@ bool DeckManager::ImportDeckBase64Omega(Deck& deck, epro::wstringview buffer) {
 		return false;
 	if(size < BufferSize(mainc, sidec))
 		return false;
-	LoadDeck(deck, reinterpret_cast<uint32_t*>(out_buf + 2), mainc, sidec);
+	LoadDeckFromBuffer(deck, reinterpret_cast<uint32_t*>(out_buf + 2), mainc, sidec);
 	return true;
 }
 bool DeckManager::DeleteDeck(Deck& deck, epro::path_stringview name) {

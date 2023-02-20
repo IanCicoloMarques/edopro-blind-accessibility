@@ -7,6 +7,7 @@
 #include "network.h"
 #include "text_types.h"
 #include "data_manager.h"
+#include "deck.h"
 
 namespace ygo {
 
@@ -18,21 +19,13 @@ struct LFList {
 	std::wstring listName;
 	banlist_content_t content;
 	bool whitelist;
-};
-struct Deck {
-	std::vector<CardDataC*> main;
-	std::vector<CardDataC*> extra;
-	std::vector<CardDataC*> side;
-	Deck() {}
-	Deck(const Deck& ndeck) {
-		main = ndeck.main;
-		extra = ndeck.extra;
-		side = ndeck.side;
-	}
-	void clear() {
-		main.clear();
-		extra.clear();
-		side.clear();
+	auto GetLimitationIterator(const CardDataC* pcard) const {
+		auto flit = content.find(pcard->code);
+		if(flit == content.end() && pcard->alias) {
+			if(!whitelist || pcard->IsInArtworkOffsetRange())
+				flit = content.find(pcard->alias);
+		}
+		return flit;
 	}
 };
 enum class DuelAllowedCards {
@@ -45,11 +38,10 @@ enum class DuelAllowedCards {
 class DeckManager {
 private:
 	int null_lflist_index = -1;
-	std::unordered_map<uint32_t, CardDataC*> dummy_entries;
-	CardDataC* GetDummyOrMappedCardData(uint32_t code);
+	mutable std::unordered_map<uint32_t, CardDataC*> dummy_entries;
+	const CardDataC* GetDummyOrMappedCardData(uint32_t code) const;
 	bool load_dummies{ true };
 public:
-	Deck current_deck;
 	Deck sent_deck;
 	Deck pre_deck;
 	std::vector<LFList> _lfList;
@@ -64,19 +56,20 @@ public:
 	bool LoadLFListFolder(epro::path_stringview path);
 	void LoadLFList();
 	void RefreshLFList();
-	void RefreshDeck(Deck & deck);
-	LFList* GetLFList(uint32_t lfhash);
-	epro::wstringview GetLFListName(uint32_t lfhash);
-	DeckError CheckDeck(Deck& deck, uint32_t lfhash, DuelAllowedCards allowedCards, bool doubled, uint32_t forbiddentypes = 0);
-	int TypeCount(std::vector<CardDataC*> cards, uint32_t type);
-	static uint32_t LoadDeck(Deck& deck, uint32_t* dbuf, uint32_t mainc, uint32_t sidec, uint32_t mainc2 = 0, uint32_t sidec2 = 0);
+	LFList const* GetLFList(uint32_t lfhash) const;
+	epro::wstringview GetLFListName(uint32_t lfhash) const;
+	static void RefreshDeck(Deck& deck);
+	static DeckError CheckDeckContent(const Deck& deck, LFList const* lflist, DuelAllowedCards allowedCards, uint32_t forbiddentypes = 0);
+	static DeckError CheckDeckSize(const Deck& deck, const DeckSizes& sizes);
+	static int TypeCount(const Deck::Vector& cards, uint32_t type);
+	static int OTCount(const Deck::Vector& cards, uint32_t ot);
+	static uint32_t LoadDeckFromBuffer(Deck& deck, uint32_t* dbuf, uint32_t mainc, uint32_t sidec);
 	static uint32_t LoadDeck(Deck& deck, const cardlist_type& mainlist, const cardlist_type& sidelist, const cardlist_type* extralist = nullptr);
-	bool LoadSide(Deck& deck, uint32_t* dbuf, uint32_t mainc, uint32_t sidec);
-	bool LoadDeck(epro::path_stringview file, Deck* deck = nullptr, bool separated = false);
-	bool LoadDeckDouble(epro::path_stringview file, epro::path_stringview file2, Deck* deck = nullptr);
-	bool SaveDeck(Deck& deck, epro::path_stringview name);
-	bool SaveDeck(epro::path_stringview name, const cardlist_type& mainlist, const cardlist_type& extralist, const cardlist_type& sidelist);
-	static const wchar_t* ExportDeckBase64(Deck& deck);
+	static bool LoadSide(Deck& deck, uint32_t* dbuf, uint32_t mainc, uint32_t sidec);
+	static bool LoadDeckFromFile(epro::path_stringview file, Deck& out, bool separated = false);
+	static bool SaveDeck(epro::path_stringview name, const Deck& deck);
+	static bool SaveDeck(epro::path_stringview name, const cardlist_type& mainlist, const cardlist_type& extralist, const cardlist_type& sidelist);
+	static const wchar_t* ExportDeckBase64(const Deck& deck);
 	static const wchar_t* ExportDeckCardNames(Deck deck);
 	static void ImportDeckBase64(Deck& deck, const wchar_t* buffer);
 	static bool ImportDeckBase64Omega(Deck& deck, epro::wstringview buffer);

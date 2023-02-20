@@ -2,11 +2,12 @@
 #define REPLAY_H
 
 #include <memory> //std::unique_ptr
-#include "config.h"
-#include "core_utils.h"
 #include <ctime>
 #include <vector>
 #include <fstream>
+#include "RNG/Xoshiro256.hpp"
+#include "config.h"
+#include "core_utils.h"
 #include "text_types.h"
 
 namespace ygo {
@@ -20,6 +21,7 @@ namespace ygo {
 #define REPLAY_HAND_TEST	0x40
 #define REPLAY_DIRECT_SEED	0x80
 #define REPLAY_64BIT_DUELFLAG	0x100
+#define REPLAY_EXTENDED_HEADER	0x200
 
 #define REPLAY_YRP1			0x31707279
 #define REPLAY_YRPX			0x58707279
@@ -28,21 +30,34 @@ struct ReplayHeader {
 	uint32_t id;
 	uint32_t version;
 	uint32_t flag;
-	uint32_t seed;
+	uint32_t timestamp; //Used as both seed and timestamp if used as base header
 	uint32_t datasize;
 	uint32_t hash;
 	uint8_t props[8];
 };
 
-class ReplayPacket {
-public:
-	ReplayPacket() {}
-	ReplayPacket(const CoreUtils::Packet& packet);
-	ReplayPacket(char* buf, uint32_t len);
-	ReplayPacket(uint8_t msg, char* buf, uint32_t len);
-	void Set(uint8_t msg, char* buf, uint32_t len);
-	uint8_t message;
-	std::vector<uint8_t> data;
+struct ExtendedReplayHeader {
+	static constexpr uint64_t latest_header_version = 1;
+	ReplayHeader base;
+	uint64_t header_version;
+	uint64_t seed[4];
+	void SetSeed(const RNG::Xoshiro256StarStar::StateType& seed_) {
+		seed[0] = seed_[0];
+		seed[1] = seed_[1];
+		seed[2] = seed_[2];
+		seed[3] = seed_[3];
+	}
+	static ExtendedReplayHeader CreateDefaultHeader(uint32_t replay_id, uint32_t timestamp) {
+		ExtendedReplayHeader header{};
+		header.header_version = latest_header_version;
+		auto& base = header.base;
+		base.timestamp = timestamp;
+		base.id = replay_id;
+		base.version = CLIENT_VERSION;
+		base.flag = REPLAY_LUA64 | REPLAY_NEWREPLAY | REPLAY_64BIT_DUELFLAG | REPLAY_EXTENDED_HEADER;
+		return header;
+	}
+	static bool ParseReplayHeader(const void* data, uint32_t input_len, ExtendedReplayHeader& header, uint32_t* header_length);
 };
 
 using cardlist_type = std::vector<uint32_t>;
@@ -52,11 +67,11 @@ struct ReplayDeck {
 };
 
 using ReplayDeckList = std::vector<ReplayDeck>;
-using ReplayStream = std::vector<ReplayPacket>;
+using ReplayStream = std::vector<CoreUtils::Packet>;
 
 struct ReplayResponse {
 public:
-	int length;
+	uint8_t length;
 	std::vector<uint8_t> response;
 };
 
@@ -64,12 +79,22 @@ class Replay {
 public:
 	void BeginRecord(bool write = true, epro::path_string name = EPRO_TEXT("./replay/_LastReplay.yrpX"));
 	void WriteStream(const ReplayStream& stream);
-	void WritePacket(const ReplayPacket& p);
+	void WritePacket(const CoreUtils::Packet& p);
 	bool IsStreamedReplay();
+	bool CanBePlayedInOldMode();
+	bool CanBePlayedInStreamedMode() {
+		return IsStreamedReplay();
+	}
+	bool HasPlayableYrp() {
+		return yrp != nullptr && yrp->CanBePlayedInOldMode();
+	}
+	bool IsOldReplayMode() {
+		return pheader.base.id == REPLAY_YRP1;
+	}
 	template<typename T>
-	void Write(T data, bool flush = true);
+	void Write(const T& data, bool flush = true);
 	void WritetoFile(const void* data, size_t size, bool flush);
-	void WriteHeader(ReplayHeader& header);
+	void WriteHeader(ExtendedReplayHeader& header);
 	void WriteData(const void* data, size_t length, bool flush = true);
 	void Flush();
 	void EndRecord(size_t size = 0x20000);
@@ -79,7 +104,7 @@ public:
 	bool IsExportable();
 	static bool DeleteReplay(const epro::path_string& name);
 	static bool RenameReplay(const epro::path_string& oldname, const epro::path_string& newname);
-	bool GetNextResponse(ReplayResponse* res);
+	bool GetNextResponse(ReplayResponse*& res);
 	const std::vector<std::wstring>& GetPlayerNames();
 	const ReplayDeckList& GetPlayerDecks();
 	const std::vector<uint32_t>& GetRuleCards();
@@ -92,7 +117,7 @@ public:
 	std::vector<uint8_t> replay_data;
 	std::vector<uint8_t> comp_data;
 	std::vector<uint8_t> GetSerializedBuffer();
-	ReplayHeader pheader;
+	ExtendedReplayHeader pheader;
 	struct duel_parameters {
 		uint32_t start_lp;
 		uint32_t start_hand;
@@ -109,7 +134,7 @@ private:
 	T Read();
 	bool ReadNextResponse(ReplayResponse* res);
 	bool ReadName(wchar_t* data);
-	bool ReadNextPacket(ReplayPacket* packet);
+	bool ReadNextPacket(CoreUtils::Packet* packet);
 	FILE* fp{ nullptr };
 	size_t data_position;
 	void ParseNames();
@@ -131,7 +156,7 @@ private:
 	int turn_count;
 };
 template<typename T>
-inline void Replay::Write(T data, bool flush) {
+inline void Replay::Write(const T& data, bool flush) {
 	WriteData(&data, sizeof(T), flush);
 }
 

@@ -6,6 +6,7 @@
 #include <IEventReceiver.h>
 #include <unordered_map>
 #include <vector>
+#include "deck.h"
 
 namespace ygo {
 
@@ -28,6 +29,7 @@ public:
 		LIMITATION_FILTER_PRERELEASE,
 		LIMITATION_FILTER_SPEED,
 		LIMITATION_FILTER_RUSH,
+		LIMITATION_FILTER_LEGEND,
 		LIMITATION_FILTER_ANIME,
 		LIMITATION_FILTER_ILLEGAL,
 		LIMITATION_FILTER_VIDEOGAME,
@@ -42,29 +44,52 @@ public:
 	virtual bool OnEvent(const irr::SEvent& event);
 	void Initialize(bool refresh = true);
 	void Terminate(bool showmenu = true);
+	const Deck& GetCurrentDeck() const {
+		return current_deck;
+	}
+	bool SetCurrentDeckFromFile(epro::path_stringview file, bool separated = false);
+	void SetCurrentDeck(Deck new_deck) {
+		current_deck = std::move(new_deck);
+		RefreshLimitationStatus();
+	}
+	void StartFilter(bool force_refresh = false);
+	void RefreshCurrentDeck();
+
+	bool push_main(const CardDataC* pointer, int seq = -1, bool forced = false);
+	bool push_extra(const CardDataC* pointer, int seq = -1, bool forced = false);
+	bool push_side(const CardDataC* pointer, int seq = -1, bool forced = false);
+	void pop_main(int seq);
+	void pop_extra(int seq);
+	void pop_side(int seq);
+	bool check_limit(const CardDataC* pointer);
+private:
 	void GetHoveredCard();
 	bool FiltersChanged();
 	void FilterCards(bool force_refresh = false);
 	bool CheckCard(CardDataM* data, SEARCH_MODIFIER modifier, const std::vector<std::wstring>& tokens, const std::vector<uint16_t>& setcode);
-	void StartFilter(bool force_refresh = false);
 	void ClearFilter();
 	void ClearSearch();
 	void SortList();
 
-	bool push_main(CardDataC* pointer, int seq = -1, bool forced = false);
-	bool push_extra(CardDataC* pointer, int seq = -1, bool forced = false);
-	bool push_side(CardDataC* pointer, int seq = -1, bool forced = false);
-	void pop_main(int seq);
-	void pop_extra(int seq);
-	void pop_side(int seq);
-	bool check_limit(CardDataC* pointer);
+	void ClearDeck();
+	void RefreshLimitationStatus();
+	enum DeckType {
+		MAIN,
+		EXTRA,
+		SIDE
+	};
+	void RefreshLimitationStatusOnRemoved(const CardDataC* card, DeckType location);
+	void RefreshLimitationStatusOnAdded(const CardDataC* card, DeckType location);
+
+	void ImportDeck();
+	void ExportDeckToClipboard(bool plain_text);
 #define DECLARE_WITH_CACHE(type, name) type name;\
 										type prev_##name;
 	DECLARE_WITH_CACHE(uint64_t, filter_effect)
 	DECLARE_WITH_CACHE(uint32_t, filter_type)
 	DECLARE_WITH_CACHE(uint32_t, filter_type2)
 	DECLARE_WITH_CACHE(uint32_t, filter_attrib)
-	DECLARE_WITH_CACHE(uint32_t, filter_race)
+	DECLARE_WITH_CACHE(uint64_t, filter_race)
 	DECLARE_WITH_CACHE(uint32_t, filter_atktype)
 	DECLARE_WITH_CACHE(int32_t, filter_atk)
 	DECLARE_WITH_CACHE(uint32_t, filter_deftype)
@@ -78,6 +103,11 @@ public:
 #undef DECLARE_WITH_CACHE
 
 	irr::core::position2di mouse_pos;
+
+	uint16_t main_and_extra_legend_count;
+	uint16_t main_skill_count;
+	Deck current_deck;
+public:
 	uint32_t hovered_code;
 	int hovered_pos;
 	int hovered_seq;
@@ -87,13 +117,26 @@ public:
 	int scroll_pos;
 	int dragx;
 	int dragy;
-	CardDataC* draging_pointer;
+	const CardDataC* dragging_pointer;
 	int prev_deck;
 	int prev_operation;
 
+
+	uint16_t main_monster_count;
+	uint16_t main_spell_count;
+	uint16_t main_trap_count;
+
+	uint16_t extra_fusion_count;
+	uint16_t extra_xyz_count;
+	uint16_t extra_synchro_count;
+	uint16_t extra_link_count;
+
+	uint16_t side_monster_count;
+	uint16_t side_spell_count;
+	uint16_t side_trap_count;
 	LFList* filterList;
-	std::map<std::wstring, std::vector<CardDataC*>> searched_terms;
-	std::vector<CardDataC*> results;
+	std::map<std::wstring, std::vector<const CardDataC*>> searched_terms;
+	std::vector<const CardDataC*> results;
 	std::wstring result_string;
 };
 

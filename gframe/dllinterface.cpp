@@ -4,9 +4,7 @@
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
 #else
-#ifdef __ANDROID__
-#include "Android/porting_android.h"
-#endif
+#include "porting.h"
 #include <dlfcn.h>
 #endif
 #include "config.h"
@@ -17,6 +15,8 @@
 #define CORENAME EPRO_TEXT("ocgcore.dll")
 #elif defined(EDOPRO_MACOS)
 #define CORENAME EPRO_TEXT("libocgcore.dylib")
+#elif defined(EDOPRO_IOS)
+#define CORENAME EPRO_TEXT("libocgcore-ios.dylib")
 #elif defined(__ANDROID__)
 #include <fcntl.h> //open()
 #include <unistd.h> //close()
@@ -124,18 +124,24 @@ public:
 		valid = check_api_version();
 	}
 	~Core() {
-		if(enabled) {
-#define X(type,name,...) name = nullptr;
-#include "ocgcore_functions.inl"
-#undef X
-		}
-		if(library)
+		Disable();
+		if(library) {
 			CloseLibrary(library);
+		}
 	}
 	void Enable() {
 #define X(type,name,...) name = int_##name;
 #include "ocgcore_functions.inl"
 #undef X
+		enabled = true;
+	}
+	void Disable() {
+		if(enabled) {
+#define X(type,name,...) name = nullptr;
+#include "ocgcore_functions.inl"
+#undef X
+			enabled = false;
+		}
 	}
 	bool IsValid() const {
 		return valid;

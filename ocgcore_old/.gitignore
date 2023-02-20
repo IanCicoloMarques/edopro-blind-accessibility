@@ -1,0 +1,9 @@
+[Bb]uild*/
+bin/
+libs/
+obj/
+subprojects/
+tmp/
+.vscode/
+.idea/
+.DS_Store

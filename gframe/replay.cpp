@@ -1,57 +1,34 @@
 #include "replay.h"
 #include <algorithm>
-#include <fstream>
 #include <fmt/format.h>
 #include "lzma/LzmaLib.h"
 #include "common.h"
 #include "utils.h"
-#if defined(__MINGW32__) && defined(UNICODE)
-#include <fcntl.h>
-#include <ext/stdio_filebuf.h>
-#endif
-
-#ifdef UNICODE
-#define fileopen(file, mode) _wfopen(file, L##mode)
-#else
-#define fileopen(file, mode) fopen(file, mode)
-#endif
+#include "file_stream.h"
 
 namespace ygo {
-ReplayPacket::ReplayPacket(const CoreUtils::Packet& packet) {
-	char* buf = (char*)packet.data.data();
-	uint8_t msg = BufferIO::Read<uint8_t>(buf);
-	Set(msg, buf, (uint32_t)(packet.data.size() - sizeof(uint8_t)));
-}
-ReplayPacket::ReplayPacket(char* buf, uint32_t len) {
-	uint8_t msg = BufferIO::Read<uint8_t>(buf);
-	Set(msg, buf, len);
-}
-ReplayPacket::ReplayPacket(uint8_t msg, char* buf, uint32_t len) {
-	Set(msg, buf, len);
-}
-void ReplayPacket::Set(uint8_t msg, char* buf, uint32_t len) {
-	message = msg;
-	data.resize(len);
-	if(len)
-		memcpy(data.data(), buf, data.size());
-}
 void Replay::BeginRecord(bool write, epro::path_string name) {
 	Reset();
 	if(fp != nullptr) {
 		fclose(fp);
 		fp = nullptr;
 	}
-	if(write)
+	is_recording = true;
+	if(write) {
 		fp = fileopen(name.data(), "wb");
-	is_recording = fp != nullptr;
+		is_recording = fp != nullptr;
+	}
 }
-void Replay::WritePacket(const ReplayPacket& p) {
+void Replay::WritePacket(const CoreUtils::Packet& p) {
 	Write<uint8_t>(p.message, false);
-	Write<uint32_t>(p.data.size(), false);
-	WriteData((char*)p.data.data(), p.data.size());
+	Write<uint32_t>(p.buff_size(), false);
+	WriteData(p.data(), p.buff_size());
 }
 bool Replay::IsStreamedReplay() {
-	return pheader.id == REPLAY_YRPX;
+	return pheader.base.id == REPLAY_YRPX;
+}
+bool Replay::CanBePlayedInOldMode() {
+	return pheader.header_version == 1;
 }
 void Replay::WriteStream(const ReplayStream& stream) {
 	for(auto& packet : stream)
@@ -64,9 +41,9 @@ void Replay::WritetoFile(const void* data, size_t size, bool flush){
 	if(flush)
 		fflush(fp);
 }
-void Replay::WriteHeader(ReplayHeader& header) {
+void Replay::WriteHeader(ExtendedReplayHeader& header) {
 	pheader = header;
-	Write<ReplayHeader>(header, true);
+	Write<ExtendedReplayHeader>(header, true);
 }
 void Replay::WriteData(const void* data, size_t length, bool flush) {
 	if(!is_recording)
@@ -90,12 +67,12 @@ void Replay::EndRecord(size_t size) {
 		fclose(fp);
 		fp = nullptr;
 	}
-	pheader.datasize = replay_data.size() - sizeof(ReplayHeader);
-	pheader.flag |= REPLAY_COMPRESSED;
+	pheader.base.datasize = replay_data.size() - sizeof(ExtendedReplayHeader);
+	pheader.base.flag |= REPLAY_COMPRESSED;
 	size_t propsize = 5;
 	auto comp_size = size;
 	comp_data.resize(replay_data.size() * 2);
-	LzmaCompress(comp_data.data(), &comp_size, replay_data.data() + sizeof(ReplayHeader), pheader.datasize, pheader.props, &propsize, 5, 1 << 24, 3, 0, 2, 32, 1);
+	LzmaCompress(comp_data.data(), &comp_size, replay_data.data() + sizeof(ExtendedReplayHeader), pheader.base.datasize, pheader.base.props, &propsize, 5, 1 << 24, 3, 0, 2, 32, 1);
 	comp_data.resize(comp_size);
 	is_recording = false;
 }
@@ -112,19 +89,19 @@ static inline bool IsReplayValid(uint32_t id) {
 }
 bool Replay::OpenReplayFromBuffer(std::vector<uint8_t>&& contents) {
 	Reset();
-	memcpy(&pheader, contents.data(), sizeof(pheader));
-	if(!IsReplayValid(pheader.id)) {
+	uint32_t header_size;
+	if(!ExtendedReplayHeader::ParseReplayHeader(contents.data(), contents.size(), pheader, &header_size) || !IsReplayValid(pheader.base.id)) {
 		Reset();
 		return false;
 	}
-	if(pheader.flag & REPLAY_COMPRESSED) {
-		size_t replay_size = pheader.datasize;
-		auto comp_size = contents.size() - sizeof(ReplayHeader);
-		replay_data.resize(pheader.datasize);
-		if(LzmaUncompress(replay_data.data(), &replay_size, contents.data() + sizeof(ReplayHeader), &comp_size, pheader.props, 5) != SZ_OK)
+	if(pheader.base.flag & REPLAY_COMPRESSED) {
+		size_t replay_size = pheader.base.datasize;
+		auto comp_size = contents.size() - header_size;
+		replay_data.resize(pheader.base.datasize);
+		if(LzmaUncompress(replay_data.data(), &replay_size, contents.data() + header_size, &comp_size, pheader.base.props, 5) != SZ_OK)
 			return false;
 	} else {
-		contents.erase(contents.begin(), contents.begin() + sizeof(pheader));
+		contents.erase(contents.begin(), contents.begin() + header_size);
 		replay_data = std::move(contents);
 	}
 	data_position = 0;
@@ -132,7 +109,7 @@ bool Replay::OpenReplayFromBuffer(std::vector<uint8_t>&& contents) {
 	can_read = true;
 	ParseNames();
 	ParseParams();
-	if(pheader.id == REPLAY_YRP1) {
+	if(pheader.base.id == REPLAY_YRP1) {
 		ParseDecks();
 		ParseResponses();
 	} else {
@@ -152,28 +129,17 @@ bool Replay::OpenReplay(const epro::path_string& name) {
 		return true;
 	}
 	Reset();
-#if defined(__MINGW32__) && defined(UNICODE)
-	auto fd = _wopen(name.data(), _O_RDONLY | _O_BINARY);
-	if(fd == -1) {
-		auto fd = _wopen((EPRO_TEXT("./replay/") + name).data(), _O_RDONLY | _O_BINARY);
-		if(fd == -1) {
-			replay_name.clear();
-			return false;
-		}
-	}
-	__gnu_cxx::stdio_filebuf<char> b(fd, std::ios::in);
-	std::istream replay_file(&b);
-#else
-	std::ifstream replay_file(name, std::ifstream::binary);
+	std::vector<uint8_t> contents;
+	FileStream replay_file{ name, FileStream::in | FileStream::binary };
 	if(replay_file.fail()) {
-		replay_file.open(EPRO_TEXT("./replay/") + name, std::ifstream::binary);
-		if(replay_file.fail()) {
+		FileStream replay_file2{ EPRO_TEXT("./replay/") + name, FileStream::in | FileStream::binary };
+		if(replay_file2.fail()) {
 			replay_name.clear();
 			return false;
 		}
-	}
-#endif
-	std::vector<uint8_t> contents((std::istreambuf_iterator<char>(replay_file)), std::istreambuf_iterator<char>());
+		contents.assign(std::istreambuf_iterator<char>(replay_file2), std::istreambuf_iterator<char>());
+	} else
+		contents.assign(std::istreambuf_iterator<char>(replay_file), std::istreambuf_iterator<char>());
 	if (OpenReplayFromBuffer(std::move(contents))){
 		replay_name = name;
 		return true;
@@ -187,10 +153,10 @@ bool Replay::DeleteReplay(const epro::path_string& name) {
 bool Replay::RenameReplay(const epro::path_string& oldname, const epro::path_string& newname) {
 	return Utils::FileMove(oldname, newname);
 }
-bool Replay::GetNextResponse(ReplayResponse* res) {
+bool Replay::GetNextResponse(ReplayResponse*& res) {
 	if(responses_iterator == responses.end())
 		return false;
-	*res = *responses_iterator;
+	res = &*responses_iterator;
 	responses_iterator++;
 	return true;
 }
@@ -215,7 +181,7 @@ bool Replay::ReadNextResponse(ReplayResponse* res) {
 }
 void Replay::ParseNames() {
 	players.clear();
-	if(pheader.flag & REPLAY_SINGLE_MODE) {
+	if(pheader.base.flag & REPLAY_SINGLE_MODE) {
 		wchar_t namebuf[20];
 		ReadName(namebuf);
 		players.push_back(namebuf);
@@ -226,9 +192,9 @@ void Replay::ParseNames() {
 		return;
 	}
 	auto f = [this](uint32_t& count) {
-		if(pheader.flag & REPLAY_NEWREPLAY)
+		if(pheader.base.flag & REPLAY_NEWREPLAY)
 			count = Read<uint32_t>();
-		else if(pheader.flag & REPLAY_TAG)
+		else if(pheader.base.flag & REPLAY_TAG)
 			count = 2;
 		else
 			count = 1;
@@ -243,16 +209,16 @@ void Replay::ParseNames() {
 }
 void Replay::ParseParams() {
 	params = { 0 };
-	if(pheader.id == REPLAY_YRP1) {
+	if(pheader.base.id == REPLAY_YRP1) {
 		params.start_lp = Read<uint32_t>();
 		params.start_hand = Read<uint32_t>();
 		params.draw_count = Read<uint32_t>();
 	}
-	if(pheader.flag & REPLAY_64BIT_DUELFLAG)
+	if(pheader.base.flag & REPLAY_64BIT_DUELFLAG)
 		params.duel_flags = Read<uint64_t>();
 	else
 		params.duel_flags = Read<uint32_t>();
-	if(pheader.flag & REPLAY_SINGLE_MODE && pheader.id == REPLAY_YRP1) {
+	if(pheader.base.flag & REPLAY_SINGLE_MODE && pheader.base.id == REPLAY_YRP1) {
 		size_t slen = Read<uint16_t>();
 		scriptname.resize(slen);
 		ReadData(&scriptname[0], slen);
@@ -260,7 +226,7 @@ void Replay::ParseParams() {
 }
 void Replay::ParseDecks() {
 	decks.clear();
-	if(pheader.id != REPLAY_YRP1 || (pheader.flag & REPLAY_SINGLE_MODE && !(pheader.flag & REPLAY_HAND_TEST)))
+	if(pheader.base.id != REPLAY_YRP1 || (pheader.base.flag & REPLAY_SINGLE_MODE && !(pheader.base.flag & REPLAY_HAND_TEST)))
 		return;
 	for(uint32_t i = 0; i < home_count + opposing_count; i++) {
 		ReplayDeck tmp;
@@ -271,13 +237,13 @@ void Replay::ParseDecks() {
 		decks.push_back(std::move(tmp));
 	}
 	replay_custom_rule_cards.clear();
-	if(pheader.flag & REPLAY_NEWREPLAY && !(pheader.flag & REPLAY_HAND_TEST)) {
+	if(pheader.base.flag & REPLAY_NEWREPLAY && !(pheader.base.flag & REPLAY_HAND_TEST)) {
 		uint32_t rules = Read<uint32_t>();
 		for(uint32_t i = 0; i < rules && can_read; ++i)
 			replay_custom_rule_cards.push_back(Read<uint32_t>());
 	}
 }
-bool Replay::ReadNextPacket(ReplayPacket* packet) {
+bool Replay::ReadNextPacket(CoreUtils::Packet* packet) {
 	if(!can_read)
 		return false;
 	uint8_t message = Read<uint8_t>();
@@ -287,21 +253,21 @@ bool Replay::ReadNextPacket(ReplayPacket* packet) {
 	uint32_t len = Read<uint32_t>();
 	if(!can_read)
 		return false;
-	return ReadData(packet->data, len);
+	return ReadData(packet->buffer, len);
 }
 void Replay::ParseStream() {
 	packets_stream.clear();
 	if(!IsStreamedReplay())
 		return;
-	ReplayPacket p;
+	CoreUtils::Packet p;
 	while(ReadNextPacket(&p)) {
 		if(p.message == MSG_AI_NAME) {
-			char* pbuf = (char*)p.data.data();
-			int len = BufferIO::Read<uint16_t>(pbuf);
-			if((len + 1) != p.data.size() - sizeof(uint16_t))
+			auto* pbuf = p.data();
+			uint16_t len = BufferIO::Read<uint16_t>(pbuf);
+			if((len + 1) != p.buff_size() - sizeof(uint16_t))
 				break;
 			pbuf[len] = 0;
-			players[1] = BufferIO::DecodeUTF8(pbuf);
+			players[1] = BufferIO::DecodeUTF8({ reinterpret_cast<char*>(pbuf), len });
 			continue;
 		}
 		if(p.message == MSG_NEW_TURN) {
@@ -310,7 +276,7 @@ void Replay::ParseStream() {
 		if(p.message == OLD_REPLAY_MODE) {
 			if(!yrp) {
 				yrp = std::unique_ptr<Replay>(new Replay{});
-				if(!yrp->OpenReplayFromBuffer(std::move(p.data)))
+				if(!yrp->OpenReplayFromBuffer(std::move(p.buffer)))
 					yrp = nullptr;
 			}
 			continue;
@@ -358,8 +324,8 @@ epro::path_string Replay::GetReplayName() {
 }
 std::vector<uint8_t> Replay::GetSerializedBuffer() {
 	std::vector<uint8_t> serialized;
-	serialized.resize(sizeof(ReplayHeader));
-	memcpy(serialized.data(), &pheader, sizeof(ReplayHeader));
+	serialized.resize(sizeof(ExtendedReplayHeader));
+	memcpy(serialized.data(), &pheader, sizeof(ExtendedReplayHeader));
 	serialized.insert(serialized.end(), comp_data.begin(), comp_data.end());
 	return serialized;
 }
@@ -403,7 +369,7 @@ void Replay::Rewind() {
 }
 bool Replay::ParseResponses() {
 	responses.clear();
-	if(pheader.id != REPLAY_YRP1)
+	if(pheader.base.id != REPLAY_YRP1)
 		return false;
 	ReplayResponse r;
 	while(ReadNextResponse(&r)) {
@@ -411,6 +377,27 @@ bool Replay::ParseResponses() {
 	}
 	responses_iterator = responses.begin();
 	return !responses.empty();
+}
+
+bool ExtendedReplayHeader::ParseReplayHeader(const void* data, uint32_t input_len, ExtendedReplayHeader& header, uint32_t* header_length) {
+	if(input_len < sizeof(ReplayHeader))
+		return false;
+	ExtendedReplayHeader ret{};
+	memcpy(&ret.base, data, sizeof(ReplayHeader));
+	if(header_length)
+		*header_length = sizeof(ReplayHeader);
+	if(ret.base.flag & REPLAY_EXTENDED_HEADER) {
+		// for now there's only this "revision" of the header, so this will be the minimal extra size
+		// in future this check will have to be improved
+		if(input_len < sizeof(ExtendedReplayHeader))
+			return false;
+		*header_length = sizeof(ExtendedReplayHeader);
+		memcpy(&ret, data, sizeof(ExtendedReplayHeader));
+		if(ret.header_version > ExtendedReplayHeader::latest_header_version)
+			return false;
+	}
+	header = ret;
+	return true;
 }
 
 }

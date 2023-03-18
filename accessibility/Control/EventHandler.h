@@ -27,12 +27,38 @@ namespace ygo {
 	{
 	public:
 		static IEventHandler* getEventHandler();
+		void TriggerEndPhase();
+		void TriggerBattlePhase();
+		void TriggerMainPhase2();
+		void DisplaySpellField(const irr::SEvent& event, AccessibilityFieldFocus::DisplayedField displayed_field);
+		void ActivateCard(const irr::SEvent& event);
+		void DisplayGraveyard(const irr::SEvent& event, AccessibilityFieldFocus::DisplayedField displayed_field);
+		void DisplayHand(const irr::SEvent& event);
+		void StartChat();
+		void DisplayChain(const irr::SEvent& event);
+		void DisplayMonsterField(const irr::SEvent& event, AccessibilityFieldFocus::DisplayedField displayed_field);
+		void DisplayExtraDeck(const irr::SEvent& event, AccessibilityFieldFocus::DisplayedField displayed_field);
+		void DisplayDeck(const irr::SEvent& event, AccessibilityFieldFocus::DisplayedField displayed_field);
+		void DisplaySpecialSummonableMonsters(const irr::SEvent& event);
+		void DisplayRemovedCards(const irr::SEvent& event, AccessibilityFieldFocus::DisplayedField displayed_field);
+		void DisplaySelectableCards(const irr::SEvent& event);
+		void DisplayActivableCards(const irr::SEvent& event);
+		void ClickButton(irr::gui::IGUIButton* button, int message_code, bool saveHistory);
+		void UseSelectedCard(const irr::SEvent& event);
+		void ChangeLookedUpCardIndex(irr::EKEY_CODE ekey_code);
+		void ScrollDisplayCards(unsigned int initialIndex, irr::EKEY_CODE ekeyCode);
+		void ShowCardInfo();
+		void ChangeLookedUpField(const irr::SEvent& event, AccessibilityFieldFocus::DisplayedField displayedField, int messageCode);
+		void SetSlot(const irr::SEvent& event, int slot);
+		void RockPaperScissors(irr::EKEY_CODE ekeyCode);
 		void KeyInputEvent(const irr::SEvent& event) override;
 		void GuiEvent(const irr::SEvent& event) override;
+		int SearchFieldSlot(const int& displayedField, ClientCard* card = NULL, bool looped = false);
 		static IEventHandler* eventHandler;
-		static int indexLookedUpCard;
+		static unsigned int indexLookedUpCard;
 		static int battlePhase;
 		static bool effectResolver;
+		static bool mudConfiguration;
 	private:
 		const int selectAttributeMax = 7;
 		const int selectTypeMax = 25;
@@ -49,7 +75,7 @@ namespace ygo {
 		void SelectCard(const std::vector<ClientCard*>& field, const std::wstring& text);
 		void DisplayCards(const std::vector<ChainInfo>& field, const std::wstring& text);
 		void CloseDialog();
-		bool UseCard(const AccessibilityFieldFocus::UseType& useType, irr::SEvent event);
+		bool UseCard(const AccessibilityFieldFocus::UseType& useType, irr::SEvent event, ClientCard* card);
 		void SetLookUpField();
 		void ShowSelectCard();
 		void ShowMenu(int flag, int x, int y);
@@ -66,10 +92,7 @@ namespace ygo {
 		float GetXPositionLink(int slot);
 		AccessibilityFieldFocus::DisplayedCards GetCardField();
 		void SelectFieldSlot(int slot, const AccessibilityFieldFocus::DisplayedField& player = AccessibilityFieldFocus::DisplayedField::PLAYER, const AccessibilityFieldFocus::CardType& cardType = AccessibilityFieldFocus::CardType::NO_CARD_TYPE);
-		int SearchFieldSlot(const int& displayedField, ClientCard* card = NULL, bool looped = false);
 		void ChangeFieldByCard();
-		std::wstring GetLinkMarks(ClientCard* card);
-		std::wstring GetOverlayedCards(ClientCard* card);
 		void ChangeField(const AccessibilityFieldFocus::CardType& cardField);
 		int GetFieldSlot(const int& slot, const AccessibilityFieldFocus::DisplayedField& player = AccessibilityFieldFocus::DisplayedField::PLAYER, const AccessibilityFieldFocus::CardType& cardType = AccessibilityFieldFocus::CardType::NO_CARD_TYPE);
 		void ScrollCardList();
@@ -87,6 +110,7 @@ namespace ygo {
 		void AnnounceCard();
 		void AttributeSelector(bool up);
 		void RaceSelector(bool up);
+		void SpecialSummon(const irr::SEvent& event);
 		/*
 		void SimulateButton(irr::gui::IGUIElement* caller = nullptr);
 		void SetMouseOnCard();

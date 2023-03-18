@@ -24,9 +24,11 @@
     <ClInclude Include="FieldFocus\AccessibilityDeckFocus.h" />
     <ClInclude Include="FieldFocus\AccessibilityFieldFocus.h" />
     <ClInclude Include="Menus\MenuType.h" />
+    <ClInclude Include="Models\Card.h" />
     <ClInclude Include="ScreenReader\AccessibilityMessages.h" />
     <ClInclude Include="ScreenReader\CommandMessages.h" />
     <ClInclude Include="ScreenReader\IScreenReader.h" />
+    <ClInclude Include="ScreenReader\Messages\AccessibilityStringDictionary.h" />
     <ClInclude Include="ScreenReader\ScreenReader.h" />
     <ClInclude Include="ScreenReader\StringBuilder.h" />
     <ClInclude Include="ScreenReader\TolkController.h" />

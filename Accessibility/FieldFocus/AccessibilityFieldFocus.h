@@ -1,9 +1,16 @@
 #ifndef ACCESSIBILITY_FIELD_FOCUS_H
 #define ACCESSIBILITY_FIELD_FOCUS_H
+#include <vector>
 
 namespace ygo {
-	struct AccessibilityFieldFocus
+	class AccessibilityFieldFocus
 	{
+	private:
+	public:
+		static bool IsInMainTable(int location) {
+			std::vector<int> mainTable = { PLAYER_MONSTERS, PLAYER_SPELLS, LINK_ZONE };
+			return std::find(mainTable.begin(), mainTable.end(), location) != mainTable.end();
+		}
 		/** A identifier to tell where the accessibility reader will look at in the field*/
 		enum FieldLookerLocId
 		{

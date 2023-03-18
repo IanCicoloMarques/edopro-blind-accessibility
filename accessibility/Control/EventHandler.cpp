@@ -220,7 +220,7 @@ namespace ygo {
 				                                                  mainGame->dField.display_cards.size()), false);
 				mainGame->env->setFocus(mainGame->wCardSelect);
 			}
-			else if (mainGame->dField.selectable_cards.size() != 0)
+			else if (!mainGame->dField.selectable_cards.empty())
 				SelectCard(mainGame->dField.selectable_cards, fmt::format(gDataManager->GetAccessibilityString(100).data()));
 		}
 		else
@@ -1337,7 +1337,7 @@ namespace ygo {
 				mainGame->dField.display_cards.push_back(*it);
 			}
 		}
-		if (mainGame->dField.display_cards.size()) {
+		if (!mainGame->dField.display_cards.empty()) {
 			mainGame->wCardDisplay->setText(fmt::format(L"{}({})", text, mainGame->dField.display_cards.size()).data());
 			mainGame->dField.ShowLocationCard();
 
@@ -1359,7 +1359,7 @@ namespace ygo {
 		mainGame->dField.display_cards.clear();
 		indexLookedUpCard = 0;
 		mainGame->dField.display_cards.assign(field.crbegin(), field.crend());
-		if (mainGame->dField.display_cards.size()) {
+		if (!mainGame->dField.display_cards.empty()) {
 			mainGame->wCardDisplay->setText(fmt::format(L"{}({})", text, mainGame->dField.display_cards.size()).data());
 			mainGame->dField.ShowLocationCard();
 
@@ -1385,7 +1385,7 @@ namespace ygo {
 				mainGame->dField.display_cards.push_back(*it);
 			}
 		}
-		if (mainGame->dField.display_cards.size()) {
+		if (!mainGame->dField.display_cards.empty()) {
 			mainGame->wCardSelect->setText(fmt::format(L"{}({})", text, mainGame->dField.display_cards.size()).data());
 			ShowSelectCard();
 

@@ -160,7 +160,6 @@ bool DeckBuilder::SetCurrentDeckFromFile(epro::path_stringview file, bool separa
 }
 void DeckBuilder::ImportDeck() {
 	const wchar_t* deck_string = Utils::OSOperator->getTextFromClipboard();
-	if (deck_string != NULL) {
 	if (deck_string != nullptr){
 		std::wstring wstringDeckString = std::wstring(deck_string);
 		std::size_t startPosition = wstringDeckString.find(L"ydke://");
@@ -186,6 +185,7 @@ void DeckBuilder::ExportDeckToClipboard(bool plain_text) {
 	}
 	mainGame->PopupElement(mainGame->wACMessage, 20);
 }
+
 bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 	bool stopPropagation = false;
 	if(mainGame->dField.OnCommonEvent(event, stopPropagation))
@@ -622,7 +622,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 					}
 				}
 				StartFilter(true);
-				break; 
+				break;
 			}
 			case COMBOBOX_SORTTYPE: {
 				SortList();

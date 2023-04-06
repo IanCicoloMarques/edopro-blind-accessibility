@@ -445,10 +445,11 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 			case BUTTON_BOT_ADD: {
 				try {
 					int port = std::stoi(gGameConfig->serverport);
-					if(mainGame->gBot.LaunchSelected(port, mainGame->dInfo.secret.pass)) {
-						mainGame->HideElement(mainGame->gBot.window);
 					if(mainGame->gBot.LaunchSelected(port, mainGame->dInfo.secret.pass))
+					{
+						mainGame->HideElement(mainGame->gBot.window);
 						break;
+					}
 				} catch(...) {}
 				mainGame->PopupMessage(gDataManager->GetSysString(12122).data());
 				break;

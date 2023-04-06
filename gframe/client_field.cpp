@@ -376,6 +376,7 @@ void ClientField::ClearChainSelect() {
 	pzone_act[0] = pzone_act[1] = false;
 	conti_act = false;
 }
+
 // needs to be synchronized with EGET_SCROLL_BAR_CHANGED
 void ClientField::ShowSelectCard(bool buttonok, bool chain) {
 	size_t startpos;
@@ -465,10 +466,10 @@ void ClientField::ShowSelectCard(bool buttonok, bool chain) {
 		mainGame->scrCardList->setMax(static_cast<irr::s32>(selectable_cards.size() - 5) * 10 + 9);
 		mainGame->scrCardList->setPos(0);
 	}
-	}
 	mainGame->btnSelectOK->setVisible(buttonok);
 	mainGame->PopupElement(mainGame->wCardSelect);
 }
+
 void ClientField::ShowChainCard() {
 	sort_list.clear();
 	size_t startpos;

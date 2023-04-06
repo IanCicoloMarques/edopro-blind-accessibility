@@ -623,7 +623,6 @@ void DuelClient::HandleSTOCPacketLanAsync(const std::vector<uint8_t>& data) {
 		ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
 		ScreenReader::getReader()->buildMessage(gDataManager->GetAccessibilityString(48).data());
 		ScreenReader::getReader()->buildMessage(gDataManager->GetAccessibilityString(49).data());
-		std::lock_guard<epro::mutex> lock(mainGame->gMutex);
 		mainGame->PopupElement(mainGame->wFTSelect);
 		break;
 	}
@@ -1302,6 +1301,7 @@ inline std::unique_lock<epro::mutex> LockIf() {
 		return std::unique_lock<epro::mutex>(mainGame->gMutex);
 	return std::unique_lock<epro::mutex>();
 }
+
 int DuelClient::ClientAnalyze(const uint8_t* msg, uint32_t len) {
 	const auto* pbuf = msg;
 	if(!mainGame->dInfo.isReplay && !mainGame->dInfo.isSingleMode) {
@@ -1928,7 +1928,7 @@ int DuelClient::ClientAnalyze(const uint8_t* msg, uint32_t len) {
 		uint64_t desc = CompatRead<uint32_t, uint64_t>(pbuf);
 		std::wstring text;
 		if(desc == 0) {
-							   fmt::sprintf(gDataManager->GetSysString(200), gDataManager->GetName(code), gDataManager->FormatLocation(info.location, info.sequence)));
+			fmt::sprintf(gDataManager->GetSysString(200), gDataManager->GetName(code), gDataManager->FormatLocation(info.location, info.sequence));
 			std::wstring nvdaString = fmt::format(gDataManager->GetAccessibilityString(61).data(), gDataManager->GetName(code), gDataManager->FormatLocation(info.location, info.sequence));
 			ScreenReader::getReader()->readScreen(nvdaString.c_str());
 			ScreenReader::getReader()->cleanBuiltMessage();
@@ -2030,6 +2030,7 @@ int DuelClient::ClientAnalyze(const uint8_t* msg, uint32_t len) {
 		{
 			if (i < mainGame->dField.selectable_cards.size())
 				mainGame->dField.display_cards.push_back(mainGame->dField.selectable_cards[i]);
+		}
 		std::sort(mainGame->dField.selectable_cards.begin(), mainGame->dField.selectable_cards.end(), ClientCard::client_card_sort);
 		std::wstring text = epro::format(L"{}({}-{})", gDataManager->GetDesc(select_hint ? select_hint : 560, mainGame->dInfo.compat_mode),
 			mainGame->dField.select_min, mainGame->dField.select_max);
@@ -2234,7 +2235,7 @@ int DuelClient::ClientAnalyze(const uint8_t* msg, uint32_t len) {
 			return true;
 		}
 		std::lock_guard<epro::mutex> lock(mainGame->gMutex);
-		if(!conti_exist)
+		if(!conti_exist){
 			mainGame->stHintMsg->setText(gDataManager->GetSysString(550).data());
 			ScreenReader::getReader()->readScreen(gDataManager->GetSysString(550).data());
 			ScreenReader::getReader()->cleanBuiltMessage();
@@ -2555,7 +2556,6 @@ int DuelClient::ClientAnalyze(const uint8_t* msg, uint32_t len) {
 		ScreenReader::getReader()->readScreen(text.c_str());
 		ScreenReader::getReader()->cleanBuiltMessage();
 		ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
-		std::wstring text = epro::format(L"{}({})", gDataManager->GetDesc(select_hint ? select_hint : 560, mainGame->dInfo.compat_mode), mainGame->dField.select_sumval);
 		select_hint = 0;
 		mainGame->wCardSelect->setText(text.data());
 		mainGame->stHintMsg->setText(text.data());
@@ -4567,6 +4567,7 @@ int DuelClient::ClientAnalyze(const uint8_t* msg, uint32_t len) {
 	}
 	return true;
 }
+
 void DuelClient::SwapField() {
 	if(!analyzeMutex.try_lock())
 		is_swapping = !is_swapping;

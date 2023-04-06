@@ -61,9 +61,6 @@
     <Filter Include="nonstd">
       <UniqueIdentifier>{1B648D10-0706-B8E6-F0C0-CB3ADC013F37}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Accessibility">
-      <UniqueIdentifier>{a55535a2-bf0c-42fb-a4cc-1543eb94e772}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\gframe\Base64.h" />
@@ -244,15 +241,9 @@
     <ClInclude Include="..\gframe\utils_gui.h" />
     <ClInclude Include="..\gframe\windbot.h" />
     <ClInclude Include="..\gframe\windbot_panel.h" />
-    <ClInclude Include="..\accessibility\Control\EventHandler.h">
-      <Filter>Accessibility</Filter>
-    </ClInclude>
-    <ClInclude Include="..\accessibility\Menus\AccessibilityMenu.h">
-      <Filter>Accessibility</Filter>
-    </ClInclude>
-    <ClInclude Include="..\accessibility\Control\DeckHandler.h">
-      <Filter>Accessibility</Filter>
-    </ClInclude>
+    <ClInclude Include="..\accessibility\Control\DeckHandler.h" />
+    <ClInclude Include="..\accessibility\Control\EventHandler.h" />
+    <ClInclude Include="..\accessibility\Menus\AccessibilityMenu.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\gframe\CGUICustomCheckBox\CGUICustomCheckBox.cpp">
@@ -355,15 +346,9 @@
     <ClCompile Include="..\gframe\utils_gui.cpp" />
     <ClCompile Include="..\gframe\windbot.cpp" />
     <ClCompile Include="..\gframe\windbot_panel.cpp" />
-    <ClCompile Include="..\accessibility\Control\EventHandler.cpp">
-      <Filter>Accessibility</Filter>
-    </ClCompile>
-    <ClCompile Include="..\accessibility\Menus\AccessibilityMenu.cpp">
-      <Filter>Accessibility</Filter>
-    </ClCompile>
-    <ClCompile Include="..\accessibility\Control\DeckHandler.cpp">
-      <Filter>Accessibility</Filter>
-    </ClCompile>
+    <ClCompile Include="..\accessibility\Control\DeckHandler.cpp" />
+    <ClCompile Include="..\accessibility\Control\EventHandler.cpp" />
+    <ClCompile Include="..\accessibility\Menus\AccessibilityMenu.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\gframe\ygopro.exe.manifest" />

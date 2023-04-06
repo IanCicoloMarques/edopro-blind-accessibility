@@ -191,44 +191,54 @@ bool CGUICustomComboBox::OnEvent(const SEvent& event) {
 		case EET_KEY_INPUT_EVENT:
 			if(ListBox && event.KeyInput.PressedDown && event.KeyInput.Key == KEY_ESCAPE) {
 				// hide list box
+				openCloseMenu();
 				return true;
 			} else
-				if(event.KeyInput.PressedDown) {
-					s32 oldSelected = Selected;
-					bool absorb = true;
-					switch(event.KeyInput.Key) {
-					case KEY_DOWN:
-						setSelected(Selected + 1);
-						break;
-					case KEY_UP:
-						setSelected(Selected - 1);
-						break;
-					case KEY_HOME:
-					case KEY_PRIOR:
-						setSelected(0);
-						break;
-					case KEY_END:
-					case KEY_NEXT:
-						setSelected((s32)Items.size() - 1);
-						break;
-					default:
-						absorb = false;
+				if(event.KeyInput.Key == KEY_RETURN || event.KeyInput.Key == KEY_SPACE) {
+					if(!event.KeyInput.PressedDown) {
+						openCloseMenu();
 					}
 
-					if(Selected < 0)
-						setSelected(0);
+					ListButton->setPressed(ListBox == 0);
 
-					if(Selected >= (s32)Items.size())
-						setSelected((s32)Items.size() - 1);
+					return true;
+				} else
+					if(event.KeyInput.PressedDown) {
+						s32 oldSelected = Selected;
+						bool absorb = true;
+						switch(event.KeyInput.Key) {
+						case KEY_DOWN:
+							setSelected(Selected + 1);
+							break;
+						case KEY_UP:
+							setSelected(Selected - 1);
+							break;
+						case KEY_HOME:
+						case KEY_PRIOR:
+							setSelected(0);
+							break;
+						case KEY_END:
+						case KEY_NEXT:
+							setSelected((s32)Items.size() - 1);
+							break;
+						default:
+							absorb = false;
+						}
 
-					if(Selected != oldSelected) {
-						sendSelectionChangedEvent();
-						return true;
+						if(Selected < 0)
+							setSelected(0);
+
+						if(Selected >= (s32)Items.size())
+							setSelected((s32)Items.size() - 1);
+
+						if(Selected != oldSelected) {
+							sendSelectionChangedEvent();
+							return true;
+						}
+
+						if(absorb)
+							return true;
 					}
-
-					if(absorb)
-						return true;
-				}
 				break;
 
 		case EET_GUI_EVENT:
@@ -249,6 +259,7 @@ bool CGUICustomComboBox::OnEvent(const SEvent& event) {
 					if(!ygo::gGameConfig->native_mouse)
 #endif
 						Environment->setFocus(this);
+					openCloseMenu();
 					return true;
 				}
 				break;
@@ -408,7 +419,7 @@ void CGUICustomComboBox::openCloseMenu() {
 #endif
 	{
 		std::vector<std::string> parameters;
-		for(int i = 0; i < Items.size(); i++) {
+		for(auto i = 0u; i < Items.size(); i++) {
 			parameters.push_back(BufferIO::EncodeUTF8({ Items[i].Name.data(), Items[i].Name.size() }));
 		}
 		porting::showComboBox(parameters, Selected);

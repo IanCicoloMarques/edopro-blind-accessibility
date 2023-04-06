@@ -40,6 +40,7 @@ public:
 		CONFIRM,
 		UNCONFIRM,
 		SEND_GRAVEYARD,
+		CHAIN,
 		SFX_TOTAL_SIZE
 	};
 	enum BGM {

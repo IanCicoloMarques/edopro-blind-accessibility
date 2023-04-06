@@ -2648,10 +2648,11 @@ int DuelClient::ClientAnalyze(const uint8_t* msg, uint32_t len) {
 		}
 		if(mainGame->dInfo.isCatchingUp)
 			return true;
-			ScreenReader::getReader()->readScreen(fmt::format(L"{}", gDataManager->GetName(pcard->code)));
-			ScreenReader::getReader()->cleanBuiltMessage();
-			ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
-			mainGame->AddLog(fmt::format(L"*[{}]", gDataManager->GetName(pcard->code)), pcard->code);
+		ScreenReader::getReader()->readScreen(fmt::format(L"{}", gDataManager->GetName(pcard->code)));
+		ScreenReader::getReader()->cleanBuiltMessage();
+		ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
+		mainGame->AddLog(fmt::format(L"*[{}]", gDataManager->GetName(pcard->code)), pcard->code);
+		Play(SoundManager::SFX::REVEAL);
 		mainGame->AddLog(epro::sprintf(gDataManager->GetSysString(207), count));
 		for(auto it = mainGame->dField.extra[player].crbegin(), end = it + count; it != end; ++it) {
 			pcard = *it;
@@ -3353,6 +3354,7 @@ int DuelClient::ClientAnalyze(const uint8_t* msg, uint32_t len) {
 						mainGame->dField.display_cards.clear();
 						mainGame->dField.display_cards.push_back(pcard);
 						EventHandler::indexLookedUpCard = 0;
+						Play(SoundManager::SFX::REVEAL);
 						ScreenReader::getReader()->readScreen(fmt::format(gDataManager->GetAccessibilityString(301).data(), gDataManager->GetName(pcard->code)));
 					} else {
 						if (current.location == LOCATION_MZONE && pcard->overlayed.size() > 0) {
@@ -3594,6 +3596,7 @@ int DuelClient::ClientAnalyze(const uint8_t* msg, uint32_t len) {
 		return true;
 	}
 	case MSG_CHAINING: {
+		Play(SoundManager::SFX::ACTIVATE);
 		const auto code = BufferIO::Read<uint32_t>(pbuf);
 		if (!PlayChant(SoundManager::CHANT::ACTIVATE, code))
 			Play(SoundManager::SFX::ACTIVATE);

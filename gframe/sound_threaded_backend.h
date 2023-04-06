@@ -1,14 +1,14 @@
 #ifndef SOUND_THREADED_BACKEND_H
 #define SOUND_THREADED_BACKEND_H
 #include <queue>
-#include <thread>
-#include <mutex>
-#include <condition_variable>
+#include "epro_thread.h"
+#include "epro_mutex.h"
+#include "epro_condition_variable.h"
 #include "sound_backend.h"
 
 class SoundThreadedBackend : public SoundBackend {
 public:
-	~SoundThreadedBackend();
+	virtual ~SoundThreadedBackend() override;
 	virtual void SetSoundVolume(double volume) override;
 	virtual void SetMusicVolume(double volume) override;
 	virtual bool PlayMusic(const std::string& name, bool loop) override;
@@ -39,17 +39,23 @@ private:
 		TICK,
 		TERMINATE
 	};
-	enum class ResponseType {
-		PLAY_MUSIC,
-		PLAY_SOUND,
-		MUSIC_PLAYING
+	struct Response {
+		bool answer;
+		bool answered;
 	};
 	union Argument {
 		struct {
+			Response* response;
 			const std::string* name;
 			bool loop;
 		} play_music;
-		const std::string* play_sound;
+		struct {
+			Response* response;
+			const std::string* name;
+		} play_sound;
+		struct {
+			Response* response;
+		} is_playing;
 		double volume;
 		bool pause;
 	};
@@ -59,20 +65,23 @@ private:
 	};
 	void BaseLoop();
 	std::unique_ptr<SoundBackend> m_BaseBackend;
-	std::mutex m_ActionMutex;
-	std::condition_variable m_ActionCondVar;
-	std::mutex m_ResponseMutex;
-	std::condition_variable m_ResponseCondVar;
+	epro::mutex m_ActionMutex;
+	epro::condition_variable m_ActionCondVar;
+	epro::mutex m_ResponseMutex;
+	epro::condition_variable m_ResponseCondVar;
 	std::queue<Action> m_Actions;
-	bool response;
-	std::thread m_BaseThread;
+	epro::thread m_BaseThread;
+	bool WaitForResponse(std::unique_lock<epro::mutex>& lock, Response& res) {
+		m_ResponseCondVar.wait(lock, [&res] {return res.answered; });
+		return res.answer;
+	}
 };
 
 template<typename T>
-class SoundThreadedBackendHelper : public SoundThreadedBackend {
+class SoundThreadedBackendHelper final : public SoundThreadedBackend {
 public:
-	SoundThreadedBackendHelper() : SoundThreadedBackend(std::move(std::unique_ptr<SoundBackend>(new T()))) {}
-	~SoundThreadedBackendHelper() = default;
+	SoundThreadedBackendHelper() : SoundThreadedBackend(std::unique_ptr<SoundBackend>(new T())) {}
+	virtual ~SoundThreadedBackendHelper() override = default;
 };
 
 #endif //SOUND_THREADED_BACKEND_H

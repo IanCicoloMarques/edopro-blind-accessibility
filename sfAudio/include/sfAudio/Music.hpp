@@ -32,7 +32,7 @@
 #include "sfAudio/InputSoundFile.hpp"
 #include <string>
 #include <vector>
-#include <mutex>
+#include "../../gframe/epro_mutex.h"
 
 
 namespace sf
@@ -276,7 +276,7 @@ private:
     ////////////////////////////////////////////////////////////
     InputSoundFile     m_file;     //!< The streamed music file
     std::vector<int16_t> m_samples;  //!< Temporary buffer of samples
-	std::mutex              m_mutex;    //!< Mutex protecting the data
+	epro::mutex              m_mutex;    //!< Mutex protecting the data
     Span<uint64_t>       m_loopSpan; //!< Loop Range Specifier
 };
 

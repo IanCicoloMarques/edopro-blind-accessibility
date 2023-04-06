@@ -46,6 +46,9 @@
     <Filter Include="IrrlichtCommonIncludes1.9">
       <UniqueIdentifier>{1E8690F7-8A48-C481-D3F8-520E3FFA9C5F}</UniqueIdentifier>
     </Filter>
+    <Filter Include="MD5">
+      <UniqueIdentifier>{6B03880B-D70C-887C-6088-9E7CCC90937C}</UniqueIdentifier>
+    </Filter>
     <Filter Include="RNG">
       <UniqueIdentifier>{0C1A880B-7823-887C-019F-9E7C6DA7937C}</UniqueIdentifier>
     </Filter>
@@ -158,6 +161,9 @@
     <ClInclude Include="..\gframe\IrrlichtCommonIncludes1.9\os.h">
       <Filter>IrrlichtCommonIncludes1.9</Filter>
     </ClInclude>
+    <ClInclude Include="..\gframe\MD5\md5.h">
+      <Filter>MD5</Filter>
+    </ClInclude>
     <ClInclude Include="..\gframe\RNG\SplitMix64.hpp">
       <Filter>RNG</Filter>
     </ClInclude>
@@ -188,6 +194,9 @@
     <ClInclude Include="..\gframe\discord_wrapper.h" />
     <ClInclude Include="..\gframe\dllinterface.h" />
     <ClInclude Include="..\gframe\duelclient.h" />
+    <ClInclude Include="..\gframe\epro_condition_variable.h" />
+    <ClInclude Include="..\gframe\epro_mutex.h" />
+    <ClInclude Include="..\gframe\epro_thread.h" />
     <ClInclude Include="..\gframe\file_stream.h" />
     <ClInclude Include="..\gframe\game.h" />
     <ClInclude Include="..\gframe\game_config.h" />
@@ -287,6 +296,9 @@
     </ClCompile>
     <ClCompile Include="..\gframe\CXMLRegistry\CXMLRegistry.cpp">
       <Filter>CXMLRegistry</Filter>
+    </ClCompile>
+    <ClCompile Include="..\gframe\MD5\md5.c">
+      <Filter>MD5</Filter>
     </ClCompile>
     <ClCompile Include="..\gframe\ResizeablePanel\ResizeablePanel.cpp">
       <Filter>ResizeablePanel</Filter>

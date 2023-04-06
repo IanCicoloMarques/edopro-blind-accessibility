@@ -8,7 +8,7 @@
    More information at
 	 https://renenyffenegger.ch/notes/development/Base64/Encoding-and-decoding-base-64-with-cpp
    Version: 2.rc.04 (release candidate)
-   Copyright (C) 2004-2017, 2020 René Nyffenegger
+   Copyright (C) 2004-2017, 2020 Rene Nyffenegger
    Copyright (C) 2021 Edoardo Lolletti
    This source code is provided 'as-is', without any express or implied
    warranty. In no event will the author be held liable for any damages
@@ -23,7 +23,7 @@
    2. Altered source versions must be plainly marked as such, and must not be
 	  misrepresented as being the original source code.
    3. This notice may not be removed or altered from any source distribution.
-   René Nyffenegger rene.nyffenegger@adp-gmbh.ch
+   Rene Nyffenegger rene.nyffenegger@adp-gmbh.ch
 */
 #ifndef BASE64_H
 #define BASE64_H
@@ -34,6 +34,7 @@
 #endif
 #include <string>
 #include <algorithm>
+#include <vector>
 namespace B64 {
 	template<typename T>
 #if (defined(__cplusplus) && __cplusplus >= 201703L) || (defined(_HAS_CXX17) && _HAS_CXX17 == 1)
@@ -53,20 +54,6 @@ static const char* base64_chars[2] = {
 			 "abcdefghijklmnopqrstuvwxyz"
 			 "0123456789"
 			 "-_" };
-
-static int pos_of_char(int chr) {
-	//
-	// Return the position of chr within base64_encode()
-	//
-
-	if(chr >= 'A' && chr <= 'Z') return chr - 'A';
-	else if(chr >= 'a' && chr <= 'z') return chr - 'a' + ('Z' - 'A') + 1;
-	else if(chr >= '0' && chr <= '9') return chr - '0' + ('Z' - 'A') + ('z' - 'a') + 2;
-	else if(chr == '+' || chr == '-') return 62; // Be liberal with input and accept both url ('-') and non-url ('+') base 64 characters (
-	else if(chr == '/' || chr == '_') return 63; // Ditto for '/' and '_'
-
-	return -1;
-}
 
 template<typename T = std::wstring>
 static T insert_linebreaks(T str, size_t distance) {
@@ -163,6 +150,20 @@ R base64_encode_mime(const T& s) {
 template<typename R = std::vector<uint8_t>, typename T = wchar_t>
 R base64_decode(const T* encoded_string, size_t in_len, bool remove_linebreaks = false, bool abort_on_invalid = false) {
 	using valtype = typename R::value_type;
+
+	auto pos_of_char = [](int chr)->int {
+		//
+		// Return the position of chr within base64_encode()
+		//
+
+		if (chr >= 'A' && chr <= 'Z') return chr - 'A';
+		else if (chr >= 'a' && chr <= 'z') return chr - 'a' + ('Z' - 'A') + 1;
+		else if (chr >= '0' && chr <= '9') return chr - '0' + ('Z' - 'A') + ('z' - 'a') + 2;
+		else if (chr == '+' || chr == '-') return 62; // Be liberal with input and accept both url ('-') and non-url ('+') base 64 characters (
+		else if (chr == '/' || chr == '_') return 63; // Ditto for '/' and '_'
+
+		return -1;
+	};
 
 	if(remove_linebreaks) {
 

@@ -32,8 +32,8 @@ void Game::DrawSelectionLine(const Materials::QuadVertex vec, bool strip, int wi
 		drawLine(vec[3].Pos, vec[2].Pos);
 		drawLine(vec[2].Pos, vec[0].Pos);
 	} else {
-		std::vector<irr::core::vector3df> pos{ vec[0].Pos, vec[1].Pos, vec[3].Pos, vec[2].Pos };
-		driver->draw3DShapeW(pos.data(), pos.size(), color, width, strip ? linePatternGL : 0xffff);
+		const std::array<irr::core::vector3df, 4> pos{ vec[0].Pos, vec[1].Pos, vec[3].Pos, vec[2].Pos };
+		driver->draw3DShapeW(pos.data(), static_cast<irr::u32>(pos.size()), color, width, strip ? linePatternGL : 0xffff);
 	}
 }
 void Game::DrawBackGround() {
@@ -59,7 +59,7 @@ void Game::DrawBackGround() {
 		driver->setMaterial(matManager.mTexture);
 		driver->drawVertexPrimitiveList(vertices, 4, matManager.iRectangle, 2);
 	};
-	int speed = (dInfo.duel_params & DUEL_3_COLUMNS_FIELD) ? 1 : 0;
+	const int three_columns = dInfo.HasFieldFlag(DUEL_3_COLUMNS_FIELD);
 	auto DrawFieldSpell = [&]() -> bool {
 		if(!gGameConfig->draw_field_spell)
 			return false;
@@ -72,23 +72,23 @@ void Game::DrawBackGround() {
 		auto both = fieldcode1 | fieldcode2;
 		if(both == 0)
 			return false;
-		if(both != fieldcode1) {
-			auto* texture1 = imageManager.GetTextureField(fieldcode1);
-			if(texture1)
-				DrawTextureRect(matManager.vFieldSpell1[speed], texture1);
-			auto texture2 = imageManager.GetTextureField(fieldcode2);
-			if(texture2)
-				DrawTextureRect(matManager.vFieldSpell2[speed], texture2);
-			return texture1 || texture2;
+		if(fieldcode1 == 0 || fieldcode2 == 0 || fieldcode1 == fieldcode2) {
+			auto* texture = imageManager.GetTextureField(both);
+			if(texture)
+				DrawTextureRect(matManager.vFieldSpell[three_columns], texture);
+			return texture;
 		}
-		auto* texture = imageManager.GetTextureField(both);
-		if(texture)
-			DrawTextureRect(matManager.vFieldSpell[speed], texture);
-		return texture;
+		auto* texture1 = imageManager.GetTextureField(fieldcode1);
+		if(texture1)
+			DrawTextureRect(matManager.vFieldSpell1[three_columns], texture1);
+		auto texture2 = imageManager.GetTextureField(fieldcode2);
+		if(texture2)
+			DrawTextureRect(matManager.vFieldSpell2[three_columns], texture2);
+		return texture1 || texture2;
 	};
 
 	//draw field
-	DrawTextureRect(matManager.vField, DrawFieldSpell() ? imageManager.tFieldTransparent[speed][tfield] : imageManager.tField[speed][tfield]);
+	DrawTextureRect(matManager.vField, DrawFieldSpell() ? imageManager.tFieldTransparent[three_columns][tfield] : imageManager.tField[three_columns][tfield]);
 
 	driver->setMaterial(matManager.mBackLine);
 	//select field
@@ -153,47 +153,48 @@ void Game::DrawBackGround() {
 		material.AmbientColor = color;
 	};
 	//current sel
-	if (dField.hovered_location != 0 && dField.hovered_location != 2 && dField.hovered_location != POSITION_HINT
-		&& !(dInfo.duel_field < 4 && dField.hovered_location == LOCATION_MZONE && dField.hovered_sequence > 4)
-		&& !(dInfo.duel_field != 3 && dInfo.duel_field != 5 && dField.hovered_location == LOCATION_SZONE && dField.hovered_sequence > 5)) {
-		setAlpha(matManager.mLinkedField, skin::DUELFIELD_LINKED_VAL);
-		setAlpha(matManager.mMutualLinkedField, skin::DUELFIELD_MUTUAL_LINKED_VAL);
-		selFieldAlpha += selFieldDAlpha * (float)delta_time * 60.0f / 1000.0f;
-		if(selFieldAlpha <= 5) {
-			selFieldAlpha = 5;
-			selFieldDAlpha = 10;
-		}
-		if(selFieldAlpha >= 205) {
-			selFieldAlpha = 205;
-			selFieldDAlpha = -10;
-		}
-		setAlpha(matManager.mSelField, skin::DUELFIELD_HOVERED_VAL);
-		const irr::video::S3DVertex *vertex = nullptr;
-		if (dField.hovered_location == LOCATION_DECK)
-			vertex = matManager.getDeck()[dField.hovered_controler];
-		else if (dField.hovered_location == LOCATION_MZONE) {
-			vertex = matManager.vFieldMzone[dField.hovered_controler][dField.hovered_sequence];
-			ClientCard* pcard = dField.mzone[dField.hovered_controler][dField.hovered_sequence];
-			if(pcard && (pcard->type & TYPE_LINK) && (pcard->position & POS_FACEUP)) {
-				DrawLinkedZones(pcard);
-			}
-		} else if(dField.hovered_location == LOCATION_SZONE) {
-			vertex = matManager.getSzone()[dField.hovered_controler][dField.hovered_sequence];
-			ClientCard* pcard = dField.szone[dField.hovered_controler][dField.hovered_sequence];
-			if(pcard && (pcard->type & TYPE_LINK) && (pcard->position & POS_FACEUP))
-				DrawLinkedZones(pcard);
-		}
-		else if (dField.hovered_location == LOCATION_GRAVE)
-			vertex = matManager.getGrave()[dField.hovered_controler];
-		else if (dField.hovered_location == LOCATION_REMOVED)
-			vertex = matManager.getRemove()[dField.hovered_controler];
-		else if (dField.hovered_location == LOCATION_EXTRA)
-			vertex = matManager.getExtra()[dField.hovered_controler];
-		if(!vertex)
-			return;
-		driver->setMaterial(matManager.mSelField);
-		driver->drawVertexPrimitiveList(vertex, 4, matManager.iRectangle, 2);
+	if(dField.hovered_location == 0 || dField.hovered_location == LOCATION_HAND || dField.hovered_location == POSITION_HINT)
+		return;
+	if(!dInfo.HasFieldFlag(DUEL_EMZONE) && dField.hovered_location == LOCATION_MZONE && dField.hovered_sequence > 4)
+		return;
+	if((!dInfo.HasFieldFlag(DUEL_SEPARATE_PZONE) && dField.hovered_location == LOCATION_SZONE && dField.hovered_sequence > 5))
+		return;
+	setAlpha(matManager.mLinkedField, skin::DUELFIELD_LINKED_VAL);
+	setAlpha(matManager.mMutualLinkedField, skin::DUELFIELD_MUTUAL_LINKED_VAL);
+	selFieldAlpha += selFieldDAlpha * (float)delta_time * 60.0f / 1000.0f;
+	if(selFieldAlpha <= 5) {
+		selFieldAlpha = 5;
+		selFieldDAlpha = 10;
 	}
+	if(selFieldAlpha >= 205) {
+		selFieldAlpha = 205;
+		selFieldDAlpha = -10;
+	}
+	setAlpha(matManager.mSelField, skin::DUELFIELD_HOVERED_VAL);
+	const irr::video::S3DVertex* vertex = nullptr;
+	if(dField.hovered_location == LOCATION_DECK)
+		vertex = matManager.getDeck()[dField.hovered_controler];
+	else if(dField.hovered_location == LOCATION_MZONE) {
+		vertex = matManager.vFieldMzone[dField.hovered_controler][dField.hovered_sequence];
+		ClientCard* pcard = dField.mzone[dField.hovered_controler][dField.hovered_sequence];
+		if(pcard && (pcard->type & TYPE_LINK) && (pcard->position & POS_FACEUP)) {
+			DrawLinkedZones(pcard);
+		}
+	} else if(dField.hovered_location == LOCATION_SZONE) {
+		vertex = matManager.getSzone()[dField.hovered_controler][dField.hovered_sequence];
+		ClientCard* pcard = dField.szone[dField.hovered_controler][dField.hovered_sequence];
+		if(pcard && (pcard->type & TYPE_LINK) && (pcard->position & POS_FACEUP))
+			DrawLinkedZones(pcard);
+	} else if(dField.hovered_location == LOCATION_GRAVE)
+		vertex = matManager.getGrave()[dField.hovered_controler];
+	else if(dField.hovered_location == LOCATION_REMOVED)
+		vertex = matManager.getRemove()[dField.hovered_controler];
+	else if(dField.hovered_location == LOCATION_EXTRA)
+		vertex = matManager.getExtra()[dField.hovered_controler];
+	if(!vertex)
+		return;
+	driver->setMaterial(matManager.mSelField);
+	driver->drawVertexPrimitiveList(vertex, 4, matManager.iRectangle, 2);
 }
 void Game::DrawLinkedZones(ClientCard* pcard) {
 	auto CheckMutual = [&](ClientCard* pcard, int mark)->bool {
@@ -206,11 +207,11 @@ void Game::DrawLinkedZones(ClientCard* pcard) {
 	};
 	const int mark = pcard->link_marker;
 	ClientCard* pcard2;
-	const uint32_t speed = (dInfo.duel_params & DUEL_3_COLUMNS_FIELD) ? 1 : 0;
+	const uint32_t three_columns = dInfo.HasFieldFlag(DUEL_3_COLUMNS_FIELD);
 	if(dField.hovered_location == LOCATION_SZONE) {
 		if(dField.hovered_sequence > 4)
 			return;
-		if(mark & LINK_MARKER_TOP_LEFT && dField.hovered_sequence > (0 + speed)) {
+		if(mark & LINK_MARKER_TOP_LEFT && dField.hovered_sequence > (0 + three_columns)) {
 			pcard2 = dField.mzone[dField.hovered_controler][dField.hovered_sequence - 1];
 			CheckMutual(pcard2, LINK_MARKER_BOTTOM_RIGHT);
 			driver->drawVertexPrimitiveList(&matManager.vFieldMzone[dField.hovered_controler][dField.hovered_sequence - 1], 4, matManager.iRectangle, 2);
@@ -220,17 +221,17 @@ void Game::DrawLinkedZones(ClientCard* pcard) {
 			CheckMutual(pcard2, LINK_MARKER_BOTTOM);
 			driver->drawVertexPrimitiveList(&matManager.vFieldMzone[dField.hovered_controler][dField.hovered_sequence], 4, matManager.iRectangle, 2);
 		}
-		if(mark & LINK_MARKER_TOP_RIGHT && dField.hovered_sequence < (4 - speed)) {
+		if(mark & LINK_MARKER_TOP_RIGHT && dField.hovered_sequence < (4 - three_columns)) {
 			pcard2 = dField.mzone[dField.hovered_controler][dField.hovered_sequence + 1];
 			CheckMutual(pcard2, LINK_MARKER_BOTTOM_LEFT);
 			driver->drawVertexPrimitiveList(&matManager.vFieldMzone[dField.hovered_controler][dField.hovered_sequence + 1], 4, matManager.iRectangle, 2);
 		}
-		if(mark & LINK_MARKER_LEFT && dField.hovered_sequence >(0 + speed)) {
+		if(mark & LINK_MARKER_LEFT && dField.hovered_sequence >(0 + three_columns)) {
 			pcard2 = dField.szone[dField.hovered_controler][dField.hovered_sequence - 1];
 			CheckMutual(pcard2, LINK_MARKER_RIGHT);
 			driver->drawVertexPrimitiveList(&matManager.getSzone()[dField.hovered_controler][dField.hovered_sequence - 1], 4, matManager.iRectangle, 2);
 		}
-		if(mark & LINK_MARKER_RIGHT && dField.hovered_sequence < (4 - speed)) {
+		if(mark & LINK_MARKER_RIGHT && dField.hovered_sequence < (4 - three_columns)) {
 			pcard2 = dField.szone[dField.hovered_controler][dField.hovered_sequence + 1];
 			CheckMutual(pcard2, LINK_MARKER_LEFT);
 			driver->drawVertexPrimitiveList(&matManager.getSzone()[dField.hovered_controler][dField.hovered_sequence + 1], 4, matManager.iRectangle, 2);
@@ -238,22 +239,22 @@ void Game::DrawLinkedZones(ClientCard* pcard) {
 		return;
 	}
 	if (dField.hovered_sequence < 5) {
-		if (mark & LINK_MARKER_LEFT && dField.hovered_sequence > (0 + speed)) {
+		if (mark & LINK_MARKER_LEFT && dField.hovered_sequence > (0 + three_columns)) {
 			pcard2 = dField.mzone[dField.hovered_controler][dField.hovered_sequence - 1];
 			CheckMutual(pcard2, LINK_MARKER_RIGHT);
 			driver->drawVertexPrimitiveList(&matManager.vFieldMzone[dField.hovered_controler][dField.hovered_sequence - 1], 4, matManager.iRectangle, 2);
 		}
-		if (mark & LINK_MARKER_RIGHT && dField.hovered_sequence < (4 - speed)) {
+		if (mark & LINK_MARKER_RIGHT && dField.hovered_sequence < (4 - three_columns)) {
 			pcard2 = dField.mzone[dField.hovered_controler][dField.hovered_sequence + 1];
 			CheckMutual(pcard2, LINK_MARKER_LEFT);
 			driver->drawVertexPrimitiveList(&matManager.vFieldMzone[dField.hovered_controler][dField.hovered_sequence + 1], 4, matManager.iRectangle, 2);
 		}
-		if(mark & LINK_MARKER_BOTTOM_LEFT && dField.hovered_sequence > (0 + speed)) {
+		if(mark & LINK_MARKER_BOTTOM_LEFT && dField.hovered_sequence > (0 + three_columns)) {
 			pcard2 = dField.szone[dField.hovered_controler][dField.hovered_sequence - 1];
 			if(CheckMutual(pcard2, LINK_MARKER_TOP_RIGHT))
 				driver->drawVertexPrimitiveList(&matManager.getSzone()[dField.hovered_controler][dField.hovered_sequence - 1], 4, matManager.iRectangle, 2);
 		}
-		if(mark & LINK_MARKER_BOTTOM_RIGHT && dField.hovered_sequence < (4 - speed)) {
+		if(mark & LINK_MARKER_BOTTOM_RIGHT && dField.hovered_sequence < (4 - three_columns)) {
 			pcard2 = dField.szone[dField.hovered_controler][dField.hovered_sequence + 1];
 			if(CheckMutual(pcard2, LINK_MARKER_TOP_LEFT))
 				driver->drawVertexPrimitiveList(&matManager.getSzone()[dField.hovered_controler][dField.hovered_sequence + 1], 4, matManager.iRectangle, 2);
@@ -263,35 +264,35 @@ void Game::DrawLinkedZones(ClientCard* pcard) {
 			if(CheckMutual(pcard2, LINK_MARKER_TOP))
 				driver->drawVertexPrimitiveList(&matManager.getSzone()[dField.hovered_controler][dField.hovered_sequence], 4, matManager.iRectangle, 2);
 		}
-		if (dInfo.duel_field >= 4) {
+		if(dInfo.HasFieldFlag(DUEL_EMZONE)) {
 			if ((mark & LINK_MARKER_TOP_LEFT && dField.hovered_sequence == 2)
 				|| (mark & LINK_MARKER_TOP && dField.hovered_sequence == 1)
 				|| (mark & LINK_MARKER_TOP_RIGHT && dField.hovered_sequence == 0)) {
-				int mark = (dField.hovered_sequence == 2) ? LINK_MARKER_BOTTOM_RIGHT : (dField.hovered_sequence == 1) ? LINK_MARKER_BOTTOM : LINK_MARKER_BOTTOM_LEFT;
+				int other_mark = (dField.hovered_sequence == 2) ? LINK_MARKER_BOTTOM_RIGHT : (dField.hovered_sequence == 1) ? LINK_MARKER_BOTTOM : LINK_MARKER_BOTTOM_LEFT;
 				pcard2 = dField.mzone[dField.hovered_controler][5];
 				if (!pcard2) {
 					pcard2 = dField.mzone[1 - dField.hovered_controler][6];
-					mark = (dField.hovered_sequence == 2) ? LINK_MARKER_TOP_LEFT : (dField.hovered_sequence == 1) ? LINK_MARKER_TOP : LINK_MARKER_TOP_RIGHT;
+					other_mark = (dField.hovered_sequence == 2) ? LINK_MARKER_TOP_LEFT : (dField.hovered_sequence == 1) ? LINK_MARKER_TOP : LINK_MARKER_TOP_RIGHT;
 				}
-				CheckMutual(pcard2, mark);
+				CheckMutual(pcard2, other_mark);
 				driver->drawVertexPrimitiveList(&matManager.vFieldMzone[dField.hovered_controler][5], 4, matManager.iRectangle, 2);
 			}
 			if ((mark & LINK_MARKER_TOP_LEFT && dField.hovered_sequence == 4)
 				|| (mark & LINK_MARKER_TOP && dField.hovered_sequence == 3)
 				|| (mark & LINK_MARKER_TOP_RIGHT && dField.hovered_sequence == 2)) {
-				int mark = (dField.hovered_sequence == 4) ? LINK_MARKER_BOTTOM_RIGHT : (dField.hovered_sequence == 3) ? LINK_MARKER_BOTTOM : LINK_MARKER_BOTTOM_LEFT;
+				int other_mark = (dField.hovered_sequence == 4) ? LINK_MARKER_BOTTOM_RIGHT : (dField.hovered_sequence == 3) ? LINK_MARKER_BOTTOM : LINK_MARKER_BOTTOM_LEFT;
 				pcard2 = dField.mzone[dField.hovered_controler][6];
 				if (!pcard2) {
 					pcard2 = dField.mzone[1 - dField.hovered_controler][5];
-					mark = (dField.hovered_sequence == 4) ? LINK_MARKER_TOP_LEFT : (dField.hovered_sequence == 3) ? LINK_MARKER_TOP : LINK_MARKER_TOP_RIGHT;
+					other_mark = (dField.hovered_sequence == 4) ? LINK_MARKER_TOP_LEFT : (dField.hovered_sequence == 3) ? LINK_MARKER_TOP : LINK_MARKER_TOP_RIGHT;
 				}
-				CheckMutual(pcard2, mark);
+				CheckMutual(pcard2, other_mark);
 				driver->drawVertexPrimitiveList(&matManager.vFieldMzone[dField.hovered_controler][6], 4, matManager.iRectangle, 2);
 			}
 		}
 	} else {
 		int swap = (dField.hovered_sequence == 5) ? 0 : 2;
-		if (mark & LINK_MARKER_BOTTOM_LEFT && !(speed && swap == 0)) {
+		if (mark & LINK_MARKER_BOTTOM_LEFT && !(three_columns && swap == 0)) {
 			pcard2 = dField.mzone[dField.hovered_controler][0 + swap];
 			CheckMutual(pcard2, LINK_MARKER_TOP_RIGHT);
 			driver->drawVertexPrimitiveList(&matManager.vFieldMzone[dField.hovered_controler][0 + swap], 4, matManager.iRectangle, 2);
@@ -301,12 +302,12 @@ void Game::DrawLinkedZones(ClientCard* pcard) {
 			CheckMutual(pcard2, LINK_MARKER_TOP);
 			driver->drawVertexPrimitiveList(&matManager.vFieldMzone[dField.hovered_controler][1 + swap], 4, matManager.iRectangle, 2);
 		}
-		if (mark & LINK_MARKER_BOTTOM_RIGHT && !(speed && swap == 2)) {
+		if (mark & LINK_MARKER_BOTTOM_RIGHT && !(three_columns && swap == 2)) {
 			pcard2 = dField.mzone[dField.hovered_controler][2 + swap];
 			CheckMutual(pcard2, LINK_MARKER_TOP_LEFT);
 			driver->drawVertexPrimitiveList(&matManager.vFieldMzone[dField.hovered_controler][2 + swap], 4, matManager.iRectangle, 2);
 		}
-		if (mark & LINK_MARKER_TOP_LEFT && !(speed && swap == 0)) {
+		if (mark & LINK_MARKER_TOP_LEFT && !(three_columns && swap == 0)) {
 			pcard2 = dField.mzone[1 - dField.hovered_controler][4 - swap];
 			CheckMutual(pcard2, LINK_MARKER_TOP_LEFT);
 			driver->drawVertexPrimitiveList(&matManager.vFieldMzone[1 - dField.hovered_controler][4 - swap], 4, matManager.iRectangle, 2);
@@ -316,7 +317,7 @@ void Game::DrawLinkedZones(ClientCard* pcard) {
 			CheckMutual(pcard2, LINK_MARKER_TOP);
 			driver->drawVertexPrimitiveList(&matManager.vFieldMzone[1 - dField.hovered_controler][3 - swap], 4, matManager.iRectangle, 2);
 		}
-		if (mark & LINK_MARKER_TOP_RIGHT && !(speed && swap == 2)) {
+		if (mark & LINK_MARKER_TOP_RIGHT && !(three_columns && swap == 2)) {
 			pcard2 = dField.mzone[1 - dField.hovered_controler][2 - swap];
 			CheckMutual(pcard2, LINK_MARKER_TOP_RIGHT);
 			driver->drawVertexPrimitiveList(&matManager.vFieldMzone[1 - dField.hovered_controler][2 - swap], 4, matManager.iRectangle, 2);
@@ -363,9 +364,8 @@ void Game::DrawCard(ClientCard* pcard) {
 			pcard->aniFrame = 0;
 			pcard->is_moving = false;
 			pcard->is_fading = false;
-			if(pcard->refresh_on_stop)
+			if(std::exchange(pcard->refresh_on_stop, false))
 				pcard->UpdateDrawCoordinates(true);
-			pcard->refresh_on_stop = false;
 		}
 	}
 	matManager.mCard.AmbientColor = 0xffffffff;
@@ -460,7 +460,7 @@ void Game::DrawMisc() {
 		mat[1] = _sin;
 		mat[4] = -_sin;
 	};
-	const int speed = (dInfo.duel_params & DUEL_3_COLUMNS_FIELD) ? 1 : 0;
+	const int three_columns = dInfo.HasFieldFlag(DUEL_3_COLUMNS_FIELD);
 	irr::core::matrix4 im, ic, it;
 	act_rot += (1.2f / 1000.0f) * delta_time;
 	if(act_rot >= twoPI) {
@@ -481,7 +481,6 @@ void Game::DrawMisc() {
 		driver->drawVertexPrimitiveList(matManager.vActivate, 4, matManager.iRectangle, 2);
 	};
 
-	int pzseq = dInfo.duel_field == 4 ? (speed) ? 1 : 0 : 6;
 	for(int p = 0; p < 2; p++) {
 		if(dField.deck_act[p])
 			drawact(matManager.getDeck()[p], dField.deck[p].size() * 0.01f + 0.02f);
@@ -492,18 +491,18 @@ void Game::DrawMisc() {
 		if(dField.extra_act[p])
 			drawact(matManager.getExtra()[p], dField.extra[p].size() * 0.01f + 0.02f);
 		if(dField.pzone_act[p])
-			drawact(matManager.getSzone()[p][pzseq], 0.03f);
+			drawact(matManager.getSzone()[p][dInfo.GetPzoneIndex(0)], 0.03f);
 	}
 
 	if(dField.conti_act) {
-		im.setTranslation(irr::core::vector3df((matManager.vFieldContiAct[speed][0].X + matManager.vFieldContiAct[speed][1].X) / 2,
-			(matManager.vFieldContiAct[speed][0].Y + matManager.vFieldContiAct[speed][2].Y) / 2, 0.03f));
+		im.setTranslation(irr::core::vector3df((matManager.vFieldContiAct[three_columns][0].X + matManager.vFieldContiAct[three_columns][1].X) / 2,
+			(matManager.vFieldContiAct[three_columns][0].Y + matManager.vFieldContiAct[three_columns][2].Y) / 2, 0.03f));
 		driver->setTransform(irr::video::ETS_WORLD, im);
 		driver->drawVertexPrimitiveList(matManager.vActivate, 4, matManager.iRectangle, 2);
 	}
 
 	matManager.mTRTexture.AmbientColor = skin::DUELFIELD_CHAIN_COLOR_VAL;
-	auto setCoords = [&](int i) {
+	auto setCoords = [&](size_t i) {
 		const auto div = i / 5;
 		const auto mod = i % 5;
 		matManager.vChainNum[0].TCoords = irr::core::vector2df(0.19375f * mod, 0.2421875f * div);
@@ -532,11 +531,11 @@ void Game::DrawMisc() {
 	//lp bar
 	const auto& self = dInfo.isTeam1 ? dInfo.selfnames : dInfo.opponames;
 	const auto& oppo = dInfo.isTeam1 ? dInfo.opponames : dInfo.selfnames;
-	const auto rectpos = ((dInfo.turn % 2 && dInfo.isFirst) || (!(dInfo.turn % 2) && !dInfo.isFirst)) ?
-						Resize(327, 8, 630, 51 + (23 * (self.size() - 1))) :
-						Resize(689, 8, 991, 51 + (23 * (oppo.size() - 1)));
-	driver->draw2DRectangle(skin::DUELFIELD_TURNPLAYER_COLOR_VAL, rectpos);
-	driver->draw2DRectangleOutline(rectpos, skin::DUELFIELD_TURNPLAYER_OUTLINE_COLOR_VAL);
+	const auto lpframe_pos = ((dInfo.turn % 2 && dInfo.isFirst) || (!(dInfo.turn % 2) && !dInfo.isFirst)) ?
+						Resize(327, 8, 630, 51 + static_cast<irr::s32>(23 * (self.size() - 1))) :
+						Resize(689, 8, 991, 51 + static_cast<irr::s32>(23 * (oppo.size() - 1)));
+	driver->draw2DRectangle(skin::DUELFIELD_TURNPLAYER_COLOR_VAL, lpframe_pos);
+	driver->draw2DRectangleOutline(lpframe_pos, skin::DUELFIELD_TURNPLAYER_OUTLINE_COLOR_VAL);
 	driver->draw2DImage(imageManager.tLPFrame, Resize(330, 10, 629, 30), irr::core::recti(0, 0, 200, 20), 0, 0, true);
 	driver->draw2DImage(imageManager.tLPFrame, Resize(691, 10, 990, 30), irr::core::recti(0, 0, 200, 20), 0, 0, true);
 
@@ -544,21 +543,21 @@ void Game::DrawMisc() {
 #define RECTCOLOR(what) SKCOLOR(what##_TOP_LEFT), SKCOLOR(what##_TOP_RIGHT), SKCOLOR(what##_BOTTOM_LEFT), SKCOLOR(what##_BOTTOM_RIGHT)
 #define	DRAWRECT(rect_pos,what,clip) do { driver->draw2DRectangleClip(rect_pos, RECTCOLOR(what),nullptr,clip); } while(0)
 	if(dInfo.lp[0]) {
-		const auto rectpos = Resize(335, 12, 625, 28);
+		const auto lpbar_pos = Resize(335, 12, 625, 28);
 		if(dInfo.lp[0] < dInfo.startlp) {
 			auto cliprect = Resize(335, 12, 335 + 290 * (dInfo.lp[0] / static_cast<double>(dInfo.startlp)), 28);
-			DRAWRECT(rectpos, 1, &cliprect);
+			DRAWRECT(lpbar_pos, 1, &cliprect);
 		} else {
-			DRAWRECT(rectpos, 1, nullptr);
+			DRAWRECT(lpbar_pos, 1, nullptr);
 		}
 	}
 	if(dInfo.lp[1] > 0) {
-		const auto rectpos = Resize(696, 12, 986, 28);
+		const auto lpbar_pos = Resize(696, 12, 986, 28);
 		if(dInfo.lp[1] < dInfo.startlp) {
 			auto cliprect = Resize(986 - 290 * (dInfo.lp[1] / static_cast<double>(dInfo.startlp)), 12, 986, 28);
-			DRAWRECT(rectpos, 2, &cliprect);
+			DRAWRECT(lpbar_pos, 2, &cliprect);
 		} else {
-			DRAWRECT(rectpos, 2, nullptr);
+			DRAWRECT(lpbar_pos, 2, nullptr);
 		}
 	}
 	
@@ -594,25 +593,27 @@ void Game::DrawMisc() {
 
 	irr::core::recti p1size = Resize(335, 31, 629, 50);
 	irr::core::recti p2size = Resize(986, 31, 986, 50);
-	int i = 0;
-	for(const auto& player : self) {
-		if(i++== dInfo.current_player[0])
-			textFont->drawustring(player, p1size, 0xffffffff, false, false, 0);
-		else
-			textFont->drawustring(player, p1size, 0xff808080, false, false, 0);
-		p1size += irr::core::vector2di{ 0, p1size.getHeight() + ResizeY(4) };
-	}
-	i = 0;
-	const auto basecorner = p2size.UpperLeftCorner.X;
-	for(const auto& player : oppo) {
-		const irr::core::ustring utext(player);
-		auto cld = textFont->getDimensionustring(utext);
-		p2size.UpperLeftCorner.X = basecorner - cld.Width;
-		if(i++ == dInfo.current_player[1])
-			textFont->drawustring(utext, p2size, 0xffffffff, false, false, 0);
-		else
-			textFont->drawustring(utext, p2size, 0xff808080, false, false, 0);
-		p2size += irr::core::vector2di{ 0, p2size.getHeight() + ResizeY(4) };
+	{
+		int i = 0;
+		for (const auto& player : self) {
+			if (i++ == dInfo.current_player[0])
+				textFont->drawustring(player, p1size, 0xffffffff, false, false, 0);
+			else
+				textFont->drawustring(player, p1size, 0xff808080, false, false, 0);
+			p1size += irr::core::vector2di{ 0, p1size.getHeight() + ResizeY(4) };
+		}
+		i = 0;
+		const auto basecorner = p2size.UpperLeftCorner.X;
+		for (const auto& player : oppo) {
+			const irr::core::ustring utext(player);
+			auto cld = textFont->getDimensionustring(utext);
+			p2size.UpperLeftCorner.X = basecorner - cld.Width;
+			if (i++ == dInfo.current_player[1])
+				textFont->drawustring(utext, p2size, 0xffffffff, false, false, 0);
+			else
+				textFont->drawustring(utext, p2size, 0xff808080, false, false, 0);
+			p2size += irr::core::vector2di{ 0, p2size.getHeight() + ResizeY(4) };
+		}
 	}
 	/*driver->draw2DRectangle(Resize(632, 10, 688, 30), 0x00000000, 0x00000000, 0xffffffff, 0xffffffff);
 	driver->draw2DRectangle(Resize(632, 30, 688, 50), 0xffffffff, 0xffffffff, 0x00000000, 0x00000000);*/
@@ -622,21 +623,21 @@ void Game::DrawMisc() {
 #undef SKCOLOR
 
 	ClientCard* pcard;
-	int seq = (dInfo.duel_field != 4) ? 6 : (dInfo.duel_params & DUEL_3_COLUMNS_FIELD) ? 1 : 0;
-	int increase = (dInfo.duel_field != 4) ? 1 : (dInfo.duel_params & DUEL_3_COLUMNS_FIELD) ? 2 : 4;
-	for (int p = 0, seq2 = seq; p < 2; ++p, seq2 = seq) {
-		for (int i = 0; i < 7; ++i) {
+	const size_t pzones[]{ dInfo.GetPzoneIndex(0), dInfo.GetPzoneIndex(1) };
+	for (size_t p = 0; p < 2; ++p) {
+		for (size_t i = 0; i < 7; ++i) {
 			pcard = dField.mzone[p][i];
 			if (pcard && pcard->code != 0 && (p == 0 || (pcard->position & POS_FACEUP)))
 				DrawStatus(pcard);
 		}
-		for (int i = 0; i < 2; i++, seq2 += increase) {
-			pcard = dField.szone[p][seq2];
+		// Draw pendulum scales
+		for (const auto pzone : pzones) {
+			pcard = dField.szone[p][pzone];
 			if (pcard && (pcard->type & TYPE_PENDULUM) && !pcard->equipTarget)
 				DrawPendScale(pcard);
 		}
 		if (dField.extra[p].size()) {
-			const auto str = (dField.extra_p_count[p]) ? fmt::format(L"{}({})", dField.extra[p].size(), dField.extra_p_count[p]) : fmt::format(L"{}", dField.extra[p].size());
+			const auto str = (dField.extra_p_count[p]) ? epro::format(L"{}({})", dField.extra[p].size(), dField.extra_p_count[p]) : epro::format(L"{}", dField.extra[p].size());
 			DrawStackIndicator(str, matManager.getExtra()[p], (p == 1));
 		}
 		if (dField.deck[p].size())
@@ -1177,7 +1178,7 @@ void Game::PopupElement(irr::gui::IGUIElement * element, int hideframe) {
 		ShowElement(element);
 	else ShowElement(element, hideframe);
 }
-void Game::WaitFrameSignal(int frame, std::unique_lock<std::mutex>& _lck) {
+void Game::WaitFrameSignal(int frame, std::unique_lock<epro::mutex>& _lck) {
 	signalFrame = (gGameConfig->quick_animation && frame >= 12) ? 12 * 1000 / 60 : frame * 1000 / 60;
 	frameSignal.Wait(_lck);
 }
@@ -1215,6 +1216,11 @@ void Game::DrawThumb(const CardDataC* cp, irr::core::position2di pos, LFList* lf
 			case 2:
 				imageManager.draw2DImageFilterScaled(imageManager.tLim, limitloc, irr::core::recti(0, 64, 64, 128), cliprect, 0, true);
 				break;
+			default:
+				if(cp->ot & SCOPE_LEGEND) {
+					imageManager.draw2DImageFilterScaled(imageManager.tLim, limitloc, irr::core::recti(64, 64, 128, 128), cliprect, 0, true);
+				}
+				break;
 		}
 #define IDX(scope,idx) case SCOPE_##scope:\
 							index = idx;\
@@ -1248,7 +1254,7 @@ void Game::DrawThumb(const CardDataC* cp, irr::core::position2di pos, LFList* lf
 void Game::DrawDeckBd() {
 	const auto GetDeckSizeStr = [&](const Deck::Vector& deck, const Deck::Vector& pre_deck)->std::wstring {
 		if(is_siding)
-			return fmt::format(L"{} ({})", deck.size(), pre_deck.size());
+			return epro::format(L"{} ({})", deck.size(), pre_deck.size());
 		return fmt::to_wstring(deck.size());
 	};
 	const auto& current_deck = deckBuilder.GetCurrentDeck();
@@ -1263,7 +1269,7 @@ void Game::DrawDeckBd() {
 		const auto main_deck_size_str = GetDeckSizeStr(current_deck.main, gdeckManager->pre_deck.main);
 		DrawShadowText(numFont, main_deck_size_str, Resize(379, 137, 439, 157), Resize(1, 1, 1, 1), 0xffffffff, 0xff000000, false, true);
 
-		const auto main_types_count_str = fmt::format(L"{} {} {} {} {} {}",
+		const auto main_types_count_str = epro::format(L"{} {} {} {} {} {}",
 													  gDataManager->GetSysString(1312), deckBuilder.main_monster_count,
 													  gDataManager->GetSysString(1313), deckBuilder.main_spell_count,
 													  gDataManager->GetSysString(1314), deckBuilder.main_trap_count);
@@ -1278,12 +1284,12 @@ void Game::DrawDeckBd() {
 		DRAWRECT(MAIN, 310, 160, 797, 436);
 		DRAWOUTLINE(MAIN, 309, 159, 797, 436);
 
-		const int lx = (current_deck.main.size() > 40) ? ((current_deck.main.size() - 41) / 4 + 11) : 10;
+		const int lx = (current_deck.main.size() > 40) ? static_cast<int>((current_deck.main.size() - 41) / 4 + 11) : 10;
 		const float dx = 436.0f / (lx - 1);
 
-		for(size_t i = 0; i < current_deck.main.size(); ++i) {
+		for(int i = 0; i < static_cast<int>(current_deck.main.size()); ++i) {
 			DrawThumb(current_deck.main[i], irr::core::vector2di(314 + (i % lx) * dx, 164 + (i / lx) * 68), deckBuilder.filterList);
-			if(deckBuilder.hovered_pos == 1 && deckBuilder.hovered_seq == (int)i)
+			if(deckBuilder.hovered_pos == 1 && deckBuilder.hovered_seq == i)
 				driver->draw2DRectangleOutline(Resize(313 + (i % lx) * dx, 163 + (i / lx) * 68, 359 + (i % lx) * dx, 228 + (i / lx) * 68), skin::DECK_WINDOW_HOVERED_CARD_OUTLINE_VAL);
 		}
 	}
@@ -1297,7 +1303,7 @@ void Game::DrawDeckBd() {
 		const auto extra_deck_size_str = GetDeckSizeStr(current_deck.extra, gdeckManager->pre_deck.extra);
 		DrawShadowText(numFont, extra_deck_size_str, Resize(379, 440, 439, 460), Resize(1, 1, 1, 1), 0xffffffff, 0xff000000, false, true);
 
-		const auto extra_types_count_str = fmt::format(L"{} {} {} {} {} {} {} {}",
+		const auto extra_types_count_str = epro::format(L"{} {} {} {} {} {} {} {}",
 													   gDataManager->GetSysString(1056), deckBuilder.extra_fusion_count,
 													   gDataManager->GetSysString(1073), deckBuilder.extra_xyz_count,
 													   gDataManager->GetSysString(1063), deckBuilder.extra_synchro_count,
@@ -1331,7 +1337,7 @@ void Game::DrawDeckBd() {
 		const auto side_deck_size_str = GetDeckSizeStr(current_deck.side, gdeckManager->pre_deck.side);
 		DrawShadowText(numFont, side_deck_size_str, Resize(379, 536, 439, 556), Resize(1, 1, 1, 1), 0xffffffff, 0xff000000, false, true);
 
-		const auto side_types_count_str = fmt::format(L"{} {} {} {} {} {}",
+		const auto side_types_count_str = epro::format(L"{} {} {} {} {} {}",
 													  gDataManager->GetSysString(1312), deckBuilder.side_monster_count,
 													  gDataManager->GetSysString(1313), deckBuilder.side_spell_count,
 													  gDataManager->GetSysString(1314), deckBuilder.side_trap_count);
@@ -1387,13 +1393,13 @@ void Game::DrawDeckBd() {
 				DrawShadowTextPos(textFont, gDataManager->GetName(ptr->code), Resize(859, height_offset + 164 + i * 66, 955, height_offset + 185 + i * 66),
 								  Resize(860, height_offset + 165 + i * 66, 955, height_offset + 185 + i * 66), 0xffffffff, 0xff000000, false, false, &rect);
 				if(ptr->type & TYPE_LINK) {
-					DrawShadowTextPos(textFont, fmt::format(L"{}/{}", gDataManager->FormatAttribute(ptr->attribute), gDataManager->FormatRace(ptr->race)),
+					DrawShadowTextPos(textFont, epro::format(L"{}/{}", gDataManager->FormatAttribute(ptr->attribute), gDataManager->FormatRace(ptr->race)),
 									  Resize(859, height_offset + 186 + i * 66, 955, height_offset + 207 + i * 66),
 									  Resize(860, height_offset + 187 + i * 66, 955, height_offset + 207 + i * 66), 0xffffffff, 0xff000000, false, false, &rect);
 				} else {
 					const wchar_t* form = L"\u2605";
 					if(ptr->type & TYPE_XYZ) form = L"\u2606";
-					DrawShadowTextPos(textFont, fmt::format(L"{}/{} {}{}", gDataManager->FormatAttribute(ptr->attribute), gDataManager->FormatRace(ptr->race), form, ptr->level),
+					DrawShadowTextPos(textFont, epro::format(L"{}/{} {}{}", gDataManager->FormatAttribute(ptr->attribute), gDataManager->FormatRace(ptr->race), form, ptr->level),
 									  Resize(859, height_offset + 186 + i * 66, 955, height_offset + 207 + i * 66),
 									  Resize(860, height_offset + 187 + i * 66, 955, height_offset + 207 + i * 66), 0xffffffff, 0xff000000, false, false, &rect);
 				}
@@ -1409,27 +1415,27 @@ void Game::DrawDeckBd() {
 					std::wstring buffer;
 					if(ptr->type & TYPE_LINK) {
 						if(ptr->attack < 0)
-							buffer = fmt::format(L"?/Link {}\t", ptr->level);
+							buffer = epro::format(L"?/Link {}\t", ptr->level);
 						else
-							buffer = fmt::format(L"{}/Link {}\t", ptr->attack, ptr->level);
+							buffer = epro::format(L"{}/Link {}\t", ptr->attack, ptr->level);
 					} else {
 						if(ptr->attack < 0 && ptr->defense < 0)
 							buffer = L"?/?";
 						else if(ptr->attack < 0)
-							buffer = fmt::format(L"?/{}", ptr->defense);
+							buffer = epro::format(L"?/{}", ptr->defense);
 						else if(ptr->defense < 0)
-							buffer = fmt::format(L"{}/?", ptr->attack);
+							buffer = epro::format(L"{}/?", ptr->attack);
 						else
-							buffer = fmt::format(L"{}/{}", ptr->attack, ptr->defense);
+							buffer = epro::format(L"{}/{}", ptr->attack, ptr->defense);
 					}
 					if(ptr->type & TYPE_PENDULUM)
-						buffer.append(fmt::format(L" {}/{}", ptr->lscale, ptr->rscale));
+						buffer.append(epro::format(L" {}/{}", ptr->lscale, ptr->rscale));
 					if(!scope.empty())
-						return fmt::format(L"{} [{}]", buffer, scope);
+						return epro::format(L"{} [{}]", buffer, scope);
 					return buffer;
 				}
 				if(!scope.empty())
-					return fmt::format(L"[{}]", scope);
+					return epro::format(L"[{}]", scope);
 				return L"";
 			};
 			DrawShadowTextPos(textFont, GetScopeString(), Resize(859, height_offset + 208 + i * 66, 955, height_offset + 229 + i * 66),

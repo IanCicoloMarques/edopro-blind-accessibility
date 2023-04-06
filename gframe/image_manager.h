@@ -8,9 +8,9 @@
 #include <map>
 #include <atomic>
 #include <queue>
-#include <mutex>
-#include <condition_variable>
-#include <thread>
+#include "epro_mutex.h"
+#include "epro_condition_variable.h"
+#include "epro_thread.h"
 
 namespace irr {
 class IrrlichtDevice;
@@ -87,7 +87,7 @@ public:
 	void ClearTexture(bool resize = false);
 	void RefreshCachedTextures();
 	void ClearCachedTextures();
-	bool imageScaleNNAA(irr::video::IImage* src, irr::video::IImage* dest, irr::s32 width, irr::s32 height, chrono_time timestamp_id, const std::atomic<chrono_time>& source_timestamp_id);
+	static bool imageScaleNNAA(irr::video::IImage* src, irr::video::IImage* dest, chrono_time timestamp_id, const std::atomic<chrono_time>& source_timestamp_id);
 	irr::video::IImage* GetScaledImage(irr::video::IImage* srcimg, int width, int height, chrono_time timestamp_id, const std::atomic<chrono_time>& source_timestamp_id);
 	irr::video::IImage* GetScaledImageFromFile(const irr::io::path& file, int width, int height);
 	irr::video::ITexture* GetTextureFromFile(const irr::io::path& file, int width, int height);
@@ -108,13 +108,13 @@ private:
 	irr::IrrlichtDevice* device;
 	irr::video::IVideoDriver* driver;
 public:
+	irr::video::ITexture* tCover[2];
+	irr::video::ITexture* tUnknown;
 #define A(what) \
 		public: \
 		irr::video::ITexture* what;\
 		private: \
 		irr::video::ITexture* def_##what;
-	A(tCover[2])
-	A(tUnknown)
 	A(tAct)
 	A(tAttack)
 	A(tNegated)
@@ -132,6 +132,7 @@ public:
 	A(tBackGround)
 	A(tBackGround_menu)
 	A(tBackGround_deck)
+	A(tBackGround_duel_topdown)
 	A(tField[2][4])
 	A(tFieldTransparent[2][4])
 	A(tSettings)
@@ -141,23 +142,27 @@ private:
 	void ClearFutureObjects();
 	void RefreshCovers();
 	void LoadPic();
+	irr::video::ITexture* loadTextureFixedSize(epro::path_stringview texture_name, int width, int height);
+	irr::video::ITexture* loadTextureAnySize(epro::path_stringview texture_name);
+	void replaceTextureLoadingFixedSize(irr::video::ITexture*& texture, irr::video::ITexture* fallback, epro::path_stringview texture_name, int width, int height);
+	void replaceTextureLoadingAnySize(irr::video::ITexture*& texture, irr::video::ITexture* fallback, epro::path_stringview texture_name);
 	load_return LoadCardTexture(uint32_t code, imgType type, const std::atomic<irr::s32>& width, const std::atomic<irr::s32>& height, chrono_time timestamp_id, const std::atomic<chrono_time>& source_timestamp_id);
 	epro::path_string textures_path;
 	std::pair<std::atomic<irr::s32>, std::atomic<irr::s32>> sizes[3];
 	std::atomic<chrono_time> timestamp_id;
 	std::map<epro::path_string, irr::video::ITexture*> g_txrCache;
 	std::map<irr::io::path, irr::video::IImage*> g_imgCache; //ITexture->getName returns a io::path
-	std::mutex obj_clear_lock;
-	std::thread obj_clear_thread;
-	std::condition_variable cv_clear;
+	epro::mutex obj_clear_lock;
+	epro::thread obj_clear_thread;
+	epro::condition_variable cv_clear;
 	std::deque<load_return> to_clear;
 	std::atomic<bool> stop_threads;
-	std::condition_variable cv_load;
+	epro::condition_variable cv_load;
 	std::deque<load_parameter> to_load;
 	std::deque<load_return> loaded_pics[4];
-	std::mutex pic_load;
+	epro::mutex pic_load;
 	//bool stop_threads;
-	std::vector<std::thread> load_threads;
+	std::vector<epro::thread> load_threads;
 };
 
 #define CARD_IMG_WIDTH		177

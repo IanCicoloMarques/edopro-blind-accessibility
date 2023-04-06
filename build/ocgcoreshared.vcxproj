@@ -102,7 +102,6 @@
       <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
       <AdditionalOptions>-wd4996 %(AdditionalOptions)</AdditionalOptions>
       <LanguageStandard>stdcpp14</LanguageStandard>
-      <WholeProgramOptimization>false</WholeProgramOptimization>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -117,6 +116,7 @@
     <ClInclude Include="..\ocgcore\containers_fwd.h" />
     <ClInclude Include="..\ocgcore\duel.h" />
     <ClInclude Include="..\ocgcore\effect.h" />
+    <ClInclude Include="..\ocgcore\effect_constants.h" />
     <ClInclude Include="..\ocgcore\effectset.h" />
     <ClInclude Include="..\ocgcore\field.h" />
     <ClInclude Include="..\ocgcore\function_array_helper.h" />

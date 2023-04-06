@@ -1,7 +1,7 @@
 #ifndef SINGLE_MODE_H
 #define SINGLE_MODE_H
 
-#include <thread>
+#include "epro_thread.h"
 #include "dllinterface.h"
 #include "replay.h"
 #include "mysignal.h"
@@ -16,7 +16,7 @@ private:
 	static bool is_closing;
 	static bool is_continuing;
 	static bool is_restarting;
-	static std::thread single_mode_thread;
+	static epro::thread single_mode_thread;
 
 public:
 	struct DuelOptions {
@@ -33,7 +33,7 @@ public:
 	static bool StartPlay(DuelOptions&& duelOptions);
 	static void StopPlay(bool is_exiting = false);
 	static void Restart();
-	static void SetResponse(void* resp, uint32_t len);
+	static void SetResponse(void* resp, size_t len);
 	static int SinglePlayThread(DuelOptions&& duelOptions);
 	static bool SinglePlayAnalyze(CoreUtils::Packet& packet);
 	

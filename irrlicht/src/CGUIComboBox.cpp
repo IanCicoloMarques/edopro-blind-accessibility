@@ -204,10 +204,10 @@ bool CGUIComboBox::OnEvent(const SEvent& event)
 			else
 			if (event.KeyInput.Key == KEY_RETURN || event.KeyInput.Key == KEY_SPACE)
 			{
-				//if (!event.KeyInput.PressedDown)
-				//{
-				//	openCloseMenu();
-				//}
+				if (!event.KeyInput.PressedDown)
+				{
+					openCloseMenu();
+				}
 
 				ListButton->setPressed(ListBox == 0);
 

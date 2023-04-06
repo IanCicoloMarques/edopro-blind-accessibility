@@ -82,7 +82,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>opengl32.lib;ws2_32.lib;winmm.lib;gdi32.lib;kernel32.lib;user32.lib;imm32.lib;wldap32.lib;crypt32.lib;advapi32.lib;rpcrt4.lib;ole32.lib;uuid.lib;winhttp.lib;Iphlpapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>wbemuuid.lib;opengl32.lib;ws2_32.lib;winmm.lib;gdi32.lib;kernel32.lib;user32.lib;imm32.lib;wldap32.lib;crypt32.lib;advapi32.lib;rpcrt4.lib;ole32.lib;uuid.lib;winhttp.lib;Iphlpapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <Manifest>
       <AdditionalManifestFiles>../gframe/ygopro.exe.manifest;%(AdditionalManifestFiles)</AdditionalManifestFiles>
@@ -104,7 +104,6 @@
       <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
       <AdditionalOptions>-wd4996 %(AdditionalOptions)</AdditionalOptions>
       <LanguageStandard>stdcpp14</LanguageStandard>
-      <WholeProgramOptimization>false</WholeProgramOptimization>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>WIN32;_WIN32;NOMINMAX;_CRT_SECURE_NO_WARNINGS;YGOPRO_BUILD_DLL;CURL_STATICLIB;YGOPRO_USE_SFML;_IRR_STATIC_LIB_;IRRLICHT_FAST_MATH;NO_IRR_COMPILE_WITH_CONSOLE_DEVICE_;NO_IRR_COMPILE_WITH_DIRECT3D_8_;NO_IRR_COMPILE_WITH_DIRECTINPUT_JOYSTICK_;NO_IRR_COMPILE_WITH_JOYSTICK_EVENTS_;NO_IRR_COMPILE_WITH_SOFTWARE_;NO_IRR_COMPILE_WITH_BURNINGSVIDEO_;NO_IRR_COMPILE_WITH_IRR_SCENE_LOADER_;NO_IRR_COMPILE_WITH_SKINNED_MESH_SUPPORT_;NO_IRR_COMPILE_WITH_IRR_MESH_LOADER_;NO_IRR_COMPILE_WITH_HALFLIFE_LOADER_;NO_IRR_COMPILE_WITH_MD2_LOADER_;NO_IRR_COMPILE_WITH_MD3_LOADER_;NO_IRR_COMPILE_WITH_3DS_LOADER_;NO_IRR_COMPILE_WITH_COLLADA_LOADER_;NO_IRR_COMPILE_WITH_CSM_LOADER_;NO_IRR_COMPILE_WITH_BSP_LOADER_;NO_IRR_COMPILE_WITH_DMF_LOADER_;NO_IRR_COMPILE_WITH_LMTS_LOADER_;NO_IRR_COMPILE_WITH_MY3D_LOADER_;NO_IRR_COMPILE_WITH_OBJ_LOADER_;NO_IRR_COMPILE_WITH_OCT_LOADER_;NO_IRR_COMPILE_WITH_LWO_LOADER_;NO_IRR_COMPILE_WITH_STL_LOADER_;NO_IRR_COMPILE_WITH_PLY_LOADER_;NO_IRR_COMPILE_WITH_SMF_LOADER_;NO_IRR_COMPILE_WITH_IRR_WRITER_;NO_IRR_COMPILE_WITH_COLLADA_WRITER_;NO_IRR_COMPILE_WITH_STL_WRITER_;NO_IRR_COMPILE_WITH_OBJ_WRITER_;NO_IRR_COMPILE_WITH_PLY_WRITER_;NO_IRR_COMPILE_WITH_PCX_LOADER_;NO_IRR_COMPILE_WITH_PPM_LOADER_;NO_IRR_COMPILE_WITH_PSD_LOADER_;NO_IRR_COMPILE_WITH_TGA_LOADER_;NO_IRR_COMPILE_WITH_WAL_LOADER_;NO_IRR_COMPILE_WITH_LMP_LOADER_;NO_IRR_COMPILE_WITH_RGB_LOADER_;NO_IRR_COMPILE_WITH_PCX_WRITER_;NO_IRR_COMPILE_WITH_PPM_WRITER_;NO_IRR_COMPILE_WITH_PSD_WRITER_;NO_IRR_COMPILE_WITH_TGA_WRITER_;NO__IRR_COMPILE_WITH_PAK_ARCHIVE_LOADER_;NO__IRR_COMPILE_WITH_NPK_ARCHIVE_LOADER_;NO__IRR_COMPILE_WITH_WAD_ARCHIVE_LOADER_;NO_IRR_USE_NON_SYSTEM_ZLIB_;NO_IRR_USE_NON_SYSTEM_BZLIB_;NO_IRR_USE_NON_SYSTEM_LIB_PNG_;NO_IRR_USE_NON_SYSTEM_JPEG_LIB_;_IRR_COMPILE_WITH_OGLES1_;IRR_COMPILE_WITH_DX9_DEV_PACK;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -114,7 +113,7 @@
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>opengl32.lib;ws2_32.lib;winmm.lib;gdi32.lib;kernel32.lib;user32.lib;imm32.lib;wldap32.lib;crypt32.lib;advapi32.lib;rpcrt4.lib;ole32.lib;uuid.lib;winhttp.lib;Iphlpapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>wbemuuid.lib;opengl32.lib;ws2_32.lib;winmm.lib;gdi32.lib;kernel32.lib;user32.lib;imm32.lib;wldap32.lib;crypt32.lib;advapi32.lib;rpcrt4.lib;ole32.lib;uuid.lib;winhttp.lib;Iphlpapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <Manifest>
       <AdditionalManifestFiles>../gframe/ygopro.exe.manifest;%(AdditionalManifestFiles)</AdditionalManifestFiles>
@@ -155,6 +154,7 @@
     <ClInclude Include="..\gframe\IrrlichtCommonIncludes1.9\CGUIScrollBar.h" />
     <ClInclude Include="..\gframe\IrrlichtCommonIncludes1.9\CGUITabControl.h" />
     <ClInclude Include="..\gframe\IrrlichtCommonIncludes1.9\os.h" />
+    <ClInclude Include="..\gframe\MD5\md5.h" />
     <ClInclude Include="..\gframe\RNG\SplitMix64.hpp" />
     <ClInclude Include="..\gframe\RNG\Xoshiro256.hpp" />
     <ClInclude Include="..\gframe\RNG\mt19937.h" />
@@ -177,6 +177,9 @@
     <ClInclude Include="..\gframe\discord_wrapper.h" />
     <ClInclude Include="..\gframe\dllinterface.h" />
     <ClInclude Include="..\gframe\duelclient.h" />
+    <ClInclude Include="..\gframe\epro_condition_variable.h" />
+    <ClInclude Include="..\gframe\epro_mutex.h" />
+    <ClInclude Include="..\gframe\epro_thread.h" />
     <ClInclude Include="..\gframe\file_stream.h" />
     <ClInclude Include="..\gframe\game.h" />
     <ClInclude Include="..\gframe\game_config.h" />
@@ -235,6 +238,7 @@
     <ClCompile Include="..\gframe\CProgressBar\CProgressBar.cpp" />
     <ClCompile Include="..\gframe\CXMLRegistry\CXMLNode.cpp" />
     <ClCompile Include="..\gframe\CXMLRegistry\CXMLRegistry.cpp" />
+    <ClCompile Include="..\gframe\MD5\md5.c" />
     <ClCompile Include="..\gframe\ResizeablePanel\ResizeablePanel.cpp" />
     <ClCompile Include="..\gframe\client_card.cpp" />
     <ClCompile Include="..\gframe\client_field.cpp" />

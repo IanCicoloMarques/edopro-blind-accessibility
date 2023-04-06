@@ -46,6 +46,10 @@ public:
 		pstr[l] = 0;
 		return static_cast<int>(l);
 	}
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable : 4127) //conditional expression is constant
+#endif
 private:
 	template<bool check = false>
 	static int EncodeUTF8internal(const wchar_t* wsrc, char* out, size_t size = 0) {
@@ -95,7 +99,7 @@ private:
 			wsrc++;
 		}
 		*out = 0;
-		return out - pstr;
+		return static_cast<int>(out - pstr);
 	}
 	template<bool check = false>
 	static int DecodeUTF8internal(const char* src, wchar_t* out, size_t size = 0) {
@@ -133,13 +137,13 @@ private:
 			out++;
 		}
 		*out = 0;
-		return out - pstr;
+		return static_cast<int>(out - pstr);
 	}
 	template<bool check = false>
 	static int EncodeUTF16internal(const wchar_t* source, uint16_t* out, size_t size = 0) {
 		auto* pstr = out;
 		while(*source) {
-			const auto cur = *source++;
+			const auto cur = static_cast<uint32_t>(*source++);
 			if(check && size != 0) {
 				const size_t len = out - pstr;
 				if(len >= (size - 1))
@@ -148,15 +152,15 @@ private:
 					break;
 			}
 			if(cur < 0x10000) {
-				*out++ = cur;
+				*out++ = static_cast<uint16_t>(cur);
 			} else {
-				unsigned int unicode = cur - 0x10000;
-				*out++ = static_cast<wchar_t>((unicode >> 10) | 0xd800);
-				*out = static_cast<wchar_t>((unicode & 0x3ff) | 0xdc00);
+				uint32_t unicode = cur - 0x10000u;
+				*out++ = static_cast<uint16_t>((unicode >> 10) | 0xd800);
+				*out++ = static_cast<uint16_t>((unicode & 0x3ff) | 0xdc00);
 			}
 		}
 		*out = 0;
-		return out - pstr;
+		return static_cast<int>(out - pstr);
 	}
 	template<bool check = false>
 	static int DecodeUTF16internal(const uint16_t* source, wchar_t* out, size_t size = 0) {
@@ -170,12 +174,12 @@ private:
 			auto cur = *source++;
 			if((cur - 0xd800u) >= 0x800u) {
 				*out++ = static_cast<wchar_t>(cur);
-			} else if((cur & 0xfffffc00) == 0xd800u && (*source & 0xfffffc00u) == 0xdc00u) {
-				*out++ = (cur << 10) + (*source++) - 0x35fdc00u;
+			} else if((cur & 0xfffffc00u) == 0xd800u && (*source & 0xfffffc00u) == 0xdc00u) {
+				*out++ = static_cast<wchar_t>((static_cast<uint32_t>(cur) << 10) + static_cast<uint32_t>(*source++) - 0x35fdc00u);
 			}
 		}
 		*out = 0;
-		return out - pstr;
+		return static_cast<int>(out - pstr);
 	}
 public:
 	// UTF-16/UTF-32 to UTF-8
@@ -205,17 +209,17 @@ public:
 	// UTF-16 to UTF-16/UTF-32
 	static inline int DecodeUTF16(const uint16_t* source, wchar_t* out, size_t size) {
 		if(sizeof(wchar_t) == sizeof(uint16_t)) {
-			wcsncpy(out, (const wchar_t*)source, size - 1);
+			wcsncpy(out, reinterpret_cast<const wchar_t*>(source), size - 1);
 			out[size - 1] = L'\0';
-			return wcslen(out) + 1;
+			return static_cast<int>(wcslen(out) + 1);
 		} else {
 			return DecodeUTF16internal<true>(source, out, size) + 1;
 		}
 	}
 	static inline int DecodeUTF16(const uint16_t* source, wchar_t* out) {
 		if(sizeof(wchar_t) == sizeof(uint16_t)) {
-			wcscpy(out, (const wchar_t*)source);
-			return wcslen(out) + 1;
+			wcscpy(out, reinterpret_cast<const wchar_t*>(source));
+			return static_cast<int>(wcslen(out) + 1);
 		} else {
 			return DecodeUTF16internal<false>(source, out) + 1;
 		}
@@ -223,21 +227,24 @@ public:
 	// UTF-16/UTF-32 to UTF-16
 	static inline int EncodeUTF16(const wchar_t* source, uint16_t* out, size_t size) {
 		if(sizeof(wchar_t) == sizeof(uint16_t)) {
-			wcsncpy((wchar_t*)out, source, size - 1);
+			wcsncpy(reinterpret_cast<wchar_t*>(out), source, size - 1);
 			out[size - 1] = L'\0';
-			return wcslen((wchar_t*)out) + 1;
+			return static_cast<int>(wcslen(reinterpret_cast<const wchar_t*>(out)) + 1);
 		} else {
 			return EncodeUTF16internal<true>(source, out, size) + 1;
 		}
 	}
 	static inline int EncodeUTF16(const wchar_t* source, uint16_t* out) {
 		if(sizeof(wchar_t) == sizeof(uint16_t)) {
-			wcscpy((wchar_t*)out, source);
-			return wcslen((wchar_t*)out) + 1;
+			wcscpy(reinterpret_cast<wchar_t*>(out), source);
+			return static_cast<int>(wcslen(reinterpret_cast<const wchar_t*>(out)) + 1);
 		} else {
 			return EncodeUTF16internal<false>(source, out) + 1;
 		}
 	}
+#ifdef _MSC_VER
+#pragma warning(pop) //conditional expression is constant
+#endif
 	static uint32_t GetVal(const wchar_t* pstr) {
 		uint32_t ret = 0;
 		while(*pstr >= L'0' && *pstr <= L'9') {
@@ -252,7 +259,7 @@ public:
 	template<typename T>
 	static T getStruct(const void* data, size_t len) {
 		T pkt{};
-		memcpy(&pkt, data, std::min<size_t>(sizeof(T), len));
+		memcpy(&pkt, data, std::min(sizeof(T), len));
 		return pkt;
 	}
 };

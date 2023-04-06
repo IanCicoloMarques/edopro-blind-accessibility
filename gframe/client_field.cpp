@@ -21,8 +21,6 @@
 #include "CGUIImageButton/CGUIImageButton.h"
 #include "CGUITTFont/CGUITTFont.h"
 #include "custom_skin_enum.h"
-#include "../accessibility/ScreenReader/ScreenReader.h"
-#include "../accessibility/Control/EventHandler.h"
 
 namespace ygo {
 
@@ -159,7 +157,7 @@ std::vector<ClientCard*>* ClientField::GetList(uint8_t location, uint8_t control
 	}
 	return nullptr;
 }
-ClientCard* ClientField::GetCard(uint8_t controler, uint8_t location, uint32_t sequence, uint32_t sub_seq) {
+ClientCard* ClientField::GetCard(uint8_t controler, uint8_t location, size_t sequence, size_t sub_seq) {
 	bool is_xyz = (location & LOCATION_OVERLAY) != 0;
 	auto lst = GetList(location & (~LOCATION_OVERLAY), controler);
 	if(!lst)
@@ -184,12 +182,12 @@ void ClientField::AddCard(ClientCard* pcard, uint8_t controler, uint8_t location
 	pcard->sequence = sequence;
 	switch(location) {
 	case LOCATION_DECK: {
-		if (sequence != 0 || deck[controler].size() == 0) {
+		if (sequence != 0 || deck[controler].empty()) {
 			deck[controler].push_back(pcard);
-			pcard->sequence = deck[controler].size() - 1;
+			pcard->sequence = static_cast<uint32_t>(deck[controler].size() - 1);
 		} else {
 			deck[controler].push_back(0);
-			for(int i = deck[controler].size() - 1; i > 0; --i) {
+			for(auto i = deck[controler].size() - 1; i > 0; --i) {
 				deck[controler][i] = deck[controler][i - 1];
 				deck[controler][i]->sequence++;
 				deck[controler][i]->curPos.Z += 0.01f;
@@ -203,7 +201,7 @@ void ClientField::AddCard(ClientCard* pcard, uint8_t controler, uint8_t location
 	}
 	case LOCATION_HAND: {
 		hand[controler].push_back(pcard);
-		pcard->sequence = hand[controler].size() - 1;
+		pcard->sequence = static_cast<uint32_t>(hand[controler].size() - 1);
 		break;
 	}
 	case LOCATION_MZONE: {
@@ -216,29 +214,29 @@ void ClientField::AddCard(ClientCard* pcard, uint8_t controler, uint8_t location
 	}
 	case LOCATION_GRAVE: {
 		grave[controler].push_back(pcard);
-		pcard->sequence = grave[controler].size() - 1;
+		pcard->sequence = static_cast<uint32_t>(grave[controler].size() - 1);
 		break;
 	}
 	case LOCATION_REMOVED: {
 		remove[controler].push_back(pcard);
-		pcard->sequence = remove[controler].size() - 1;
+		pcard->sequence = static_cast<uint32_t>(remove[controler].size() - 1);
 		break;
 	}
 	case LOCATION_EXTRA: {
 		if(extra_p_count[controler] == 0 || (pcard->position & POS_FACEUP)) {
 			extra[controler].push_back(pcard);
-			pcard->sequence = extra[controler].size() - 1;
+			pcard->sequence = static_cast<uint32_t>(extra[controler].size() - 1);
 		} else {
 			extra[controler].push_back(0);
-			int p = extra[controler].size() - extra_p_count[controler] - 1;
-			for(int i = extra[controler].size() - 1; i > p; --i) {
+			auto p = extra[controler].size() - extra_p_count[controler] - 1;
+			for(auto i = extra[controler].size() - 1; i > p; --i) {
 				extra[controler][i] = extra[controler][i - 1];
 				extra[controler][i]->sequence++;
 				extra[controler][i]->curPos.Z += 0.01f;
 				extra[controler][i]->mTransform.setTranslation(extra[controler][i]->curPos);
 			}
 			extra[controler][p] = pcard;
-			pcard->sequence = p;
+			pcard->sequence = static_cast<uint32_t>(p);
 		}
 		if (pcard->position & POS_FACEUP)
 			extra_p_count[controler]++;
@@ -378,7 +376,7 @@ void ClientField::ClearChainSelect() {
 }
 // needs to be synchronized with EGET_SCROLL_BAR_CHANGED
 void ClientField::ShowSelectCard(bool buttonok, bool chain) {
-	int startpos;
+	size_t startpos;
 	size_t ct;
 	if(selectable_cards.size() <= 5) {
 		startpos = 30 + 125 * (5 - selectable_cards.size()) / 2;
@@ -398,19 +396,20 @@ void ClientField::ShowSelectCard(bool buttonok, bool chain) {
 			mainGame->imageLoading[mainGame->btnCardSelect[i]] = curcard->chain_code;
 		else
 			mainGame->btnCardSelect[i]->setImage(mainGame->imageManager.tCover[curcard->controler]);
-		mainGame->btnCardSelect[i]->setRelativePosition(mainGame->Scale<irr::s32>(startpos + i * 125, 55, startpos + 120 + i * 125, 225));
+		mainGame->btnCardSelect[i]->setRelativePosition(mainGame->Scale<irr::s32>(static_cast<irr::s32>(startpos + i * 125), 55, static_cast<irr::s32>(startpos + 120 + i * 125), 225));
 		mainGame->btnCardSelect[i]->setPressed(false);
 		mainGame->btnCardSelect[i]->setVisible(true);
 		if(mainGame->dInfo.curMsg != MSG_SORT_CHAIN && mainGame->dInfo.curMsg != MSG_SORT_CARD) {
+			sort_list.clear();
 			// text
 			std::wstring text = L"";
 			if(conti_selecting)
 				text = std::wstring{ DataManager::unknown_string };
 			else if(curcard->location == LOCATION_OVERLAY) {
-				text = fmt::format(L"{}[{}]({})", gDataManager->FormatLocation(curcard->overlayTarget->location, curcard->overlayTarget->sequence),
+				text = epro::format(L"{}[{}]({})", gDataManager->FormatLocation(curcard->overlayTarget->location, curcard->overlayTarget->sequence),
 					curcard->overlayTarget->sequence + 1, curcard->sequence + 1);
 			} else if(curcard->location) {
-				text = fmt::format(L"{}[{}]", gDataManager->FormatLocation(curcard->location, curcard->sequence),
+				text = epro::format(L"{}[{}]", gDataManager->FormatLocation(curcard->location, curcard->sequence),
 					curcard->sequence + 1);
 			}
 			curstring->setText(text.data());
@@ -449,10 +448,10 @@ void ClientField::ShowSelectCard(bool buttonok, bool chain) {
 			curstring->setBackgroundColor(skin::DUELFIELD_CARD_SELF_WINDOW_BACKGROUND_VAL);
 		}
 		curstring->setVisible(true);
-		curstring->setRelativePosition(mainGame->Scale<irr::s32>(startpos + i * 125, 30, startpos + 120 + i * 125, 50));
+		curstring->setRelativePosition(mainGame->Scale<irr::s32>(static_cast<irr::s32>(startpos + i * 125), 30, static_cast<irr::s32>(startpos + 120 + i * 125), 50));
 	}
 	if(selectable_cards.size() <= 5) {
-		for(int i = selectable_cards.size(); i < 5; ++i) {
+		for(auto i = selectable_cards.size(); i < 5; ++i) {
 			mainGame->btnCardSelect[i]->setVisible(false);
 			mainGame->stCardPos[i]->setVisible(false);
 		}
@@ -461,20 +460,15 @@ void ClientField::ShowSelectCard(bool buttonok, bool chain) {
 	} else {
 		mainGame->scrCardList->setVisible(true);
 		mainGame->scrCardList->setMin(0);
-		mainGame->scrCardList->setMax((selectable_cards.size() - 5) * 10 + 9);
+		mainGame->scrCardList->setMax(static_cast<irr::s32>(selectable_cards.size() - 5) * 10 + 9);
 		mainGame->scrCardList->setPos(0);
 	}
-	display_cards.clear();
-	for (int i = 0; i < 5; ++i) {
-		if (selectable_cards.size() > i)
-			display_cards.push_back(selectable_cards[i]);
-	}
-	EventHandler::indexLookedUpCard = 0;
 	mainGame->btnSelectOK->setVisible(buttonok);
 	mainGame->PopupElement(mainGame->wCardSelect);
 }
 void ClientField::ShowChainCard() {
-	int startpos;
+	sort_list.clear();
+	size_t startpos;
 	size_t ct;
 	if(selectable_cards.size() <= 5) {
 		startpos = 30 + 125 * (5 - selectable_cards.size()) / 2;
@@ -490,10 +484,10 @@ void ClientField::ShowChainCard() {
 			mainGame->imageLoading[mainGame->btnCardSelect[i]] = curcard->code;
 		else
 			mainGame->btnCardSelect[i]->setImage(mainGame->imageManager.tCover[curcard->controler]);
-		mainGame->btnCardSelect[i]->setRelativePosition(mainGame->Scale<irr::s32>(startpos + i * 125, 55, startpos + 120 + i * 125, 225));
+		mainGame->btnCardSelect[i]->setRelativePosition(mainGame->Scale<irr::s32>(static_cast<irr::s32>(startpos + i * 125), 55, static_cast<irr::s32>(startpos + 120 + i * 125), 225));
 		mainGame->btnCardSelect[i]->setPressed(false);
 		mainGame->btnCardSelect[i]->setVisible(true);
-		curstring->setText(fmt::format(L"{}[{}]", gDataManager->FormatLocation(curcard->location, curcard->sequence),
+		curstring->setText(epro::format(L"{}[{}]", gDataManager->FormatLocation(curcard->location, curcard->sequence),
 			curcard->sequence + 1).data());
 		if(curcard->location == LOCATION_OVERLAY) {
 			if(curcard->owner != curcard->overlayTarget->controler)
@@ -509,10 +503,10 @@ void ClientField::ShowChainCard() {
 				curstring->setBackgroundColor(skin::DUELFIELD_CARD_SELF_WINDOW_BACKGROUND_VAL);
 		}
 		curstring->setVisible(true);
-		curstring->setRelativePosition(mainGame->Scale<irr::s32>(startpos + i * 125, 30, startpos + 120 + i * 125, 50));
+		curstring->setRelativePosition(mainGame->Scale<irr::s32>(static_cast<irr::s32>(startpos + i * 125), 30, static_cast<irr::s32>(startpos + 120 + i * 125), 50));
 	} 
 	if(selectable_cards.size() <= 5) {
-		for(int i = selectable_cards.size(); i < 5; ++i) {
+		for(auto i = selectable_cards.size(); i < 5; ++i) {
 			mainGame->btnCardSelect[i]->setVisible(false);
 			mainGame->stCardPos[i]->setVisible(false);
 		}
@@ -521,7 +515,7 @@ void ClientField::ShowChainCard() {
 	} else {
 		mainGame->scrCardList->setVisible(true);
 		mainGame->scrCardList->setMin(0);
-		mainGame->scrCardList->setMax((selectable_cards.size() - 5) * 10 + 9);
+		mainGame->scrCardList->setMax(static_cast<irr::s32>(selectable_cards.size() - 5) * 10 + 9);
 		mainGame->scrCardList->setPos(0);
 	}
 	if(!chain_forced)
@@ -530,7 +524,7 @@ void ClientField::ShowChainCard() {
 	mainGame->PopupElement(mainGame->wCardSelect);
 }
 void ClientField::ShowLocationCard() {
-	int startpos;
+	size_t startpos;
 	size_t ct;
 	if(display_cards.size() <= 5) {
 		startpos = 30 + 125 * (5 - display_cards.size()) / 2;
@@ -547,15 +541,15 @@ void ClientField::ShowLocationCard() {
 			mainGame->imageLoading[mainGame->btnCardDisplay[i]] = curcard->code;
 		else
 			mainGame->btnCardDisplay[i]->setImage(mainGame->imageManager.tCover[curcard->controler]);
-		mainGame->btnCardDisplay[i]->setRelativePosition(mainGame->Scale<irr::s32>(startpos + i * 125, 55, startpos + 120 + i * 125, 225));
+		mainGame->btnCardDisplay[i]->setRelativePosition(mainGame->Scale<irr::s32>(static_cast<irr::s32>(startpos + i * 125), 55, static_cast<irr::s32>(startpos + 120 + i * 125), 225));
 		mainGame->btnCardDisplay[i]->setPressed(false);
 		mainGame->btnCardDisplay[i]->setVisible(true);
 		std::wstring text;
 		if(curcard->location == LOCATION_OVERLAY) {
-			text = fmt::format(L"{}[{}]({})", gDataManager->FormatLocation(curcard->overlayTarget->location, curcard->overlayTarget->sequence),
+			text = epro::format(L"{}[{}]({})", gDataManager->FormatLocation(curcard->overlayTarget->location, curcard->overlayTarget->sequence),
 				curcard->overlayTarget->sequence + 1, curcard->sequence + 1);
 		} else if(curcard->location) {
-			text = fmt::format(L"{}[{}]", gDataManager->FormatLocation(curcard->location, curcard->sequence),
+			text = epro::format(L"{}[{}]", gDataManager->FormatLocation(curcard->location, curcard->sequence),
 				curcard->sequence + 1);
 		}
 		curstring->setText(text.data());
@@ -580,10 +574,10 @@ void ClientField::ShowLocationCard() {
 				curstring->setBackgroundColor(skin::DUELFIELD_CARD_SELF_WINDOW_BACKGROUND_VAL);
 		}
 		curstring->setVisible(true);
-		curstring->setRelativePosition(mainGame->Scale<irr::s32>(startpos + i * 125, 30, startpos + 120 + i * 125, 50));
+		curstring->setRelativePosition(mainGame->Scale<irr::s32>(static_cast<irr::s32>(startpos + i * 125), 30, static_cast<irr::s32>(startpos + 120 + i * 125), 50));
 	}
 	if(display_cards.size() <= 5) {
-		for(int i = display_cards.size(); i < 5; ++i) {
+		for(auto i = display_cards.size(); i < 5; ++i) {
 			mainGame->btnCardDisplay[i]->setVisible(false);
 			mainGame->stDisplayPos[i]->setVisible(false);
 		}
@@ -592,16 +586,16 @@ void ClientField::ShowLocationCard() {
 	} else {
 		mainGame->scrDisplayList->setVisible(true);
 		mainGame->scrDisplayList->setMin(0);
-		mainGame->scrDisplayList->setMax((display_cards.size() - 5) * 10 + 9);
+		mainGame->scrDisplayList->setMax(static_cast<irr::s32>(display_cards.size() - 5) * 10 + 9);
 		mainGame->scrDisplayList->setPos(0);
 	}
 	mainGame->btnDisplayOK->setVisible(true);
 	mainGame->PopupElement(mainGame->wCardDisplay);
 }
 void ClientField::ShowSelectOption(uint64_t select_hint, bool should_lock) {
-	std::unique_lock<std::mutex> lock = (should_lock ? std::unique_lock<std::mutex>(mainGame->gMutex) : std::unique_lock<std::mutex>());
+	std::unique_lock<epro::mutex> lock = (should_lock ? std::unique_lock<epro::mutex>(mainGame->gMutex) : std::unique_lock<epro::mutex>());
 	selected_option = 0;
-	int count = select_options.size();
+	auto count = select_options.size();
 	bool quickmode = true;// (count <= 5);
 	for(auto option : select_options) {
 		if(mainGame->guiFont->getDimensionustring(gDataManager->GetDesc(option, mainGame->dInfo.compat_mode)).Width > 310) {
@@ -609,12 +603,7 @@ void ClientField::ShowSelectOption(uint64_t select_hint, bool should_lock) {
 			break;
 		}
 	}
-	if (count > 1) {
-		ScreenReader::getReader()->readScreen(gDataManager->GetAccessibilityString(253).data());
-		ScreenReader::getReader()->cleanBuiltMessage();
-		ScreenReader::getReader()->buildMessage(gDataManager->GetAccessibilityString(253).data());
-	}
-	for(int i = 0; (i < count) && (i < 5) && quickmode; i++)
+	for(size_t i = 0; (i < count) && (i < 5) && quickmode; i++)
 		mainGame->btnOption[i]->setText(gDataManager->GetDesc(select_options[i], mainGame->dInfo.compat_mode).data());
 	irr::core::recti pos = mainGame->wOptions->getRelativePosition();
 	if(count > 5 && quickmode)
@@ -623,16 +612,16 @@ void ClientField::ShowSelectOption(uint64_t select_hint, bool should_lock) {
 		pos.LowerRightCorner.X = pos.UpperLeftCorner.X + mainGame->Scale(350);
 	if(quickmode) {
 		mainGame->scrOption->setVisible(count > 5);
-		mainGame->scrOption->setMax(count - 5);
+		mainGame->scrOption->setMax(static_cast<irr::s32>(count - 5));
 		mainGame->scrOption->setMin(0);
 		mainGame->scrOption->setPos(0);
 		mainGame->stOptions->setVisible(false);
 		mainGame->btnOptionp->setVisible(false);
 		mainGame->btnOptionn->setVisible(false);
 		mainGame->btnOptionOK->setVisible(false);
-		for(int i = 0; i < 5; i++)
+		for(size_t i = 0; i < 5; i++)
 			mainGame->btnOption[i]->setVisible(i < count);
-		int newheight = mainGame->Scale(30 + 40 * ((count > 5) ? 5 : count));
+		int newheight = mainGame->Scale(30 + 40 * static_cast<uint8_t>((count > 5) ? 5 : count));
 		int oldheight = pos.LowerRightCorner.Y - pos.UpperLeftCorner.Y;
 		pos.UpperLeftCorner.Y = pos.UpperLeftCorner.Y + (oldheight - newheight) / 2;
 		pos.LowerRightCorner.Y = pos.UpperLeftCorner.Y + newheight;
@@ -649,7 +638,6 @@ void ClientField::ShowSelectOption(uint64_t select_hint, bool should_lock) {
 		mainGame->wOptions->setRelativePosition(pos);
 	}
 	mainGame->wOptions->setText(gDataManager->GetDesc(select_hint ? select_hint : 555, mainGame->dInfo.compat_mode).data());
-	ScreenReader::getReader()->readScreen(gDataManager->GetDesc(select_options[0], mainGame->dInfo.compat_mode).data(), false);
 	mainGame->PopupElement(mainGame->wOptions);
 }
 void ClientField::ReplaySwap() {
@@ -702,6 +690,7 @@ void ClientField::RefreshAllCards() {
 		if(pcard) {
 			pcard->UpdateDrawCoordinates(true);
 			pcard->is_moving = false;
+			pcard->refresh_on_stop = false;
 			pcard->aniFrame = 0;
 		}
 	};
@@ -804,7 +793,7 @@ void ClientField::RefreshHandHitboxes() {
 			getCardScreenCoordinates(pcard);
 }
 void ClientField::GetCardDrawCoordinates(ClientCard* pcard, irr::core::vector3df* t, irr::core::vector3df* r, bool setTrans) {
-	int speed = (mainGame->dInfo.duel_params & DUEL_3_COLUMNS_FIELD) ? 1 : 0;
+	const int three_columns = mainGame->dInfo.HasFieldFlag(DUEL_3_COLUMNS_FIELD);
 	static const irr::core::vector3df selfATK{ 0.0f, 0.0f, 0.0f };
 	static const irr::core::vector3df selfDEF{ 0.0f, 0.0f, -irr::core::HALF_PI };
 	static const irr::core::vector3df oppoATK{ 0.0f, 0.0f, irr::core::PI };
@@ -812,10 +801,10 @@ void ClientField::GetCardDrawCoordinates(ClientCard* pcard, irr::core::vector3df
 	static const irr::core::vector3df facedown{ 0.0f, irr::core::PI, 0.0f };
 	static const irr::core::vector3df handfaceup{ -FIELD_ANGLE, 0.0f, 0.0f };
 	static const irr::core::vector3df handfacedown{ FIELD_ANGLE, irr::core::PI, 0.0f };
-	auto GetMiddleX = [](const irr::video::S3DVertex pos[4])->float {
+	auto GetMiddleX = [](const Materials::QuadVertex pos)->float {
 		return (pos[0].Pos.X + pos[1].Pos.X) / 2.0f;
 	};
-	auto GetMiddleY = [](const irr::video::S3DVertex pos[4])->float {
+	auto GetMiddleY = [](const Materials::QuadVertex pos)->float {
 		return (pos[0].Pos.Y + pos[2].Pos.Y) / 2.0f;
 	};
 	if(!pcard->location) return;
@@ -838,6 +827,7 @@ void ClientField::GetCardDrawCoordinates(ClientCard* pcard, irr::core::vector3df
 				return matManager.vFieldMzone[controler][pcard->overlayTarget->sequence];
 			if(pcard->overlayTarget->location == LOCATION_SZONE)
 				return matManager.getSzone()[controler][pcard->overlayTarget->sequence];
+			/*fallthrough*/
 		default: return nullptr;
 		}
 	};
@@ -899,14 +889,14 @@ void ClientField::GetCardDrawCoordinates(ClientCard* pcard, irr::core::vector3df
 			t->Y -= 0.16f;
 			t->Z += 0.656f - 0.5f;
 		};
-		const int count = hand[controler].size();
-		const int max = (6 - gGameConfig->topdown_view - speed * 2);
+		const auto count = hand[controler].size();
+		const size_t max = (6 - gGameConfig->topdown_view - three_columns * 2);
 		const float xoff1 = (5.5f - 0.8f * count) / 2.0f + sequence * (gGameConfig->topdown_view ? 0.73f : 0.8f);
-		float val = speed ? 2.4f : 4.0f;
+		float val = three_columns ? 2.4f : 4.0f;
 		if(gGameConfig->topdown_view)
 			val -= 0.35f;
 		float xoff2 = (sequence * val) / (count - 1);
-		if(speed) xoff2 += 0.8f;
+		if(three_columns) xoff2 += 0.8f;
 		auto SetXCoord = [&] {
 			if(controler == 0) {
 				if(count <= max)
@@ -1179,18 +1169,18 @@ bool ClientField::check_min(const std::set<ClientCard*>& left, std::set<ClientCa
 	return (min > m && check_min(left, index, min - m, max - m))
 	        || check_min(left, index, min, max);
 }
-bool ClientField::check_sel_sum_s(const std::set<ClientCard*>& left, int index, int acc) {
+bool ClientField::check_sel_sum_s(const std::set<ClientCard*>& left, size_t index, int acc) {
 	if (acc < 0)
 		return false;
-	if (index == (int)selected_cards.size()) {
+	if (index == selected_cards.size()) {
 		if (acc == 0) {
-			uint32_t count = selected_cards.size() - must_select_count;
+			uint32_t count = static_cast<uint32_t>(selected_cards.size()) - must_select_count;
 			return count >= select_min && count <= select_max;
 		}
 		check_sel_sum_t(left, acc);
 		return false;
 	}
-	int l = selected_cards[index]->opParam;
+	auto l = selected_cards[index]->opParam;
 	int l1 = l & 0xffff;
 	int l2 = l >> 16;
 	bool res1 = false, res2 = false;
@@ -1200,13 +1190,13 @@ bool ClientField::check_sel_sum_s(const std::set<ClientCard*>& left, int index, 
 	return res1 || res2;
 }
 void ClientField::check_sel_sum_t(const std::set<ClientCard*>& left, int acc) {
-	int count = selected_cards.size() + 1 - must_select_count;
+	uint32_t count = static_cast<uint32_t>(selected_cards.size()) + 1 - must_select_count;
 	for (auto sit = left.begin(); sit != left.end(); ++sit) {
 		if (selectsum_cards.find(*sit) != selectsum_cards.end())
 			continue;
 		std::set<ClientCard*> testlist(left);
 		testlist.erase(*sit);
-		int l = (*sit)->opParam;
+		auto l = (*sit)->opParam;
 		int l1 = l & 0xffff;
 		int l2 = l >> 16;
 		if (check_sum(testlist.begin(), testlist.end(), acc - l1, count)

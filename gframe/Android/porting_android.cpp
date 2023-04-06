@@ -14,6 +14,7 @@
 #include "../sound_manager.h"
 #include "../game_config.h"
 #include "../game.h"
+#include "../epro_mutex.h"
 
 #define JPARAMS(...)  "(" __VA_ARGS__ ")"
 #define JARRAY(...) "[" __VA_ARGS__
@@ -76,10 +77,10 @@ jstring NewJavaString(JNIEnv* env, epro::stringview string) {
 	return ret;
 }
 
-std::mutex* queued_messages_mutex = nullptr;
+epro::mutex* queued_messages_mutex = nullptr;
 std::atomic_bool error_dialog_returned{ true };
 std::deque<std::function<void()>>* events = nullptr;
-std::unique_ptr<std::unique_lock<std::mutex>> mainGameMutex = nullptr;
+std::unique_ptr<std::unique_lock<epro::mutex>> mainGameMutex = nullptr;
 }
 
 extern "C" {
@@ -332,7 +333,7 @@ void showComboBox(const std::vector<std::string>& parameters, int selected) {
 	jsize len = parameters.size();
 	jobjectArray jlist = jnienv->NewObjectArray(len, jnienv->FindClass("java/lang/String"), 0);
 
-	for(int i = 0; i < parameters.size(); i++) {
+	for(size_t i = 0; i < parameters.size(); i++) {
 		auto jstring = NewJavaString(jnienv, parameters[i]);
 		jnienv->SetObjectArrayElement(jlist, i, jstring);
 		jnienv->DeleteLocalRef(jstring);
@@ -379,7 +380,11 @@ bool transformEvent(const irr::SEvent & event, bool& stopPropagation) {
 					ygo::mainGame->SaveConfig();
 					ygo::gSoundManager->PauseMusic(true);
 					if(mainGameMutex == nullptr)
-						mainGameMutex = std::unique_ptr<std::unique_lock<std::mutex>>(new std::unique_lock<std::mutex>(ygo::mainGame->gMutex));
+						mainGameMutex = std::unique_ptr<std::unique_lock<epro::mutex>>(new std::unique_lock<epro::mutex>(ygo::mainGame->gMutex));
+					break;
+				}
+				case APP_CMD_STOP: {
+					mainGameMutex = nullptr;
 					break;
 				}
 				case APP_CMD_GAINED_FOCUS:
@@ -401,13 +406,28 @@ bool transformEvent(const irr::SEvent & event, bool& stopPropagation) {
 	return false;
 }
 
-int getLocalIP() {
-	jmethodID getIP = jnienv->GetMethodID(nativeActivity, "getLocalIpAddress", JPARAMS()JINT);
+std::vector<uint32_t> getLocalIP() {
+	std::vector<uint32_t> ret;
+	jmethodID getIP = jnienv->GetMethodID(nativeActivity, "getLocalIpAddresses", JPARAMS()JARRAY(JARRAY(JBYTE)));
 	if(getIP == 0) {
 		assert("porting::getLocalIP unable to find java getLocalIpAddress method" == 0);
 	}
-	int value = jnienv->CallIntMethod(app_global->activity->clazz, getIP);
-	return value;
+	jobjectArray ipArray = (jobjectArray)jnienv->CallObjectMethod(app_global->activity->clazz, getIP);
+	int size = jnienv->GetArrayLength(ipArray);
+
+	for(int i = 0; i < size; ++i) {
+		jbyteArray ipBuffer = static_cast<jbyteArray>(jnienv->GetObjectArrayElement(ipArray, i));
+		uint32_t ip;
+		int ipBufferSize = jnienv->GetArrayLength(ipBuffer);
+		jbyte* ipJava = jnienv->GetByteArrayElements(ipBuffer, nullptr);
+		memcpy(&ip, ipJava, sizeof(ip));
+		ret.push_back(ip);
+		jnienv->ReleaseByteArrayElements(ipBuffer, ipJava, JNI_ABORT);
+		jnienv->DeleteLocalRef(ipBuffer);
+	}
+
+	jnienv->DeleteLocalRef(ipArray);
+	return ret;
 }
 
 #define JAVAVOIDSTRINGMETHOD(name)\
@@ -477,7 +497,7 @@ const wchar_t* getTextFromClipboard() {
 
 void dispatchQueuedMessages() {
 	auto& _events = *events;
-	std::unique_lock<std::mutex> lock(*queued_messages_mutex);
+	std::unique_lock<epro::mutex> lock(*queued_messages_mutex);
 	while(!_events.empty()) {
 		const auto event = _events.front();
 		_events.pop_front();
@@ -496,7 +516,7 @@ void android_main(android_app *app) {
 	porting::app_global = app;
 	porting::initAndroid();
 	porting::internal_storage = app->activity->internalDataPath;
-	std::mutex _queued_messages_mutex;
+	epro::mutex _queued_messages_mutex;
 	queued_messages_mutex = &_queued_messages_mutex;
 	std::deque<std::function<void()>> _events;
 	events=&_events;
@@ -512,5 +532,5 @@ void android_main(android_app *app) {
 	retval = main(params.size(), (char**)params.data());
 
 	porting::cleanupAndroid();
-	exit(retval);
+	_exit(retval);
 }

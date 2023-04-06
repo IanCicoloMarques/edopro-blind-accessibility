@@ -1,5 +1,5 @@
-#include "client_updater.h"
 #ifdef UPDATE_URL
+#include "client_updater.h"
 #ifdef _WIN32
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
@@ -12,10 +12,10 @@
 #include "file_stream.h"
 #include <curl/curl.h>
 #include <nlohmann/json.hpp>
-#include <thread>
 #include <atomic>
-#include <openssl/md5.h>
+#include "MD5/md5.h"
 #include "logging.h"
+#include "epro_thread.h"
 #include "config.h"
 #include "utils.h"
 #include "porting.h"
@@ -43,6 +43,8 @@ struct Payload {
 };
 
 static int progress_callback(void* ptr, curl_off_t TotalToDownload, curl_off_t NowDownloaded, curl_off_t TotalToUpload, curl_off_t NowUploaded) {
+	(void)TotalToUpload;
+	(void)NowUploaded;
 	Payload* payload = static_cast<Payload*>(ptr);
 	if(payload && payload->callback) {
 		int percentage = 0;
@@ -101,7 +103,7 @@ static CURLcode curlPerform(const char* url, void* payload, void* payload2 = nul
 	CURLcode res = curl_easy_perform(curl_handle);
 	curl_easy_cleanup(curl_handle);
 	if(res != CURLE_OK && ygo::gGameConfig->logDownloadErrors)
-		ygo::ErrorLog("Curl error: ({}) {} ({})", res, curl_easy_strerror(res), curl_error_buffer);
+		ygo::ErrorLog("Curl error: ({}) {} ({})", static_cast<std::underlying_type_t<CURLcode>>(res), curl_easy_strerror(res), curl_error_buffer);
 	return res;
 }
 
@@ -122,32 +124,32 @@ namespace ygo {
 
 void ClientUpdater::StartUnzipper(unzip_callback callback, void* payload) {
 #ifdef __ANDROID__
-	porting::installUpdate(fmt::format("{}" UPDATES_FOLDER ".apk", Utils::GetWorkingDirectory(), update_urls.front().name));
+	porting::installUpdate(epro::format("{}" UPDATES_FOLDER ".apk", Utils::GetWorkingDirectory(), update_urls.front().name));
 #else
 	if(Lock.acquired())
-		std::thread(&ClientUpdater::Unzip, this, payload, callback).detach();
+		epro::thread(&ClientUpdater::Unzip, this, payload, callback).detach();
 #endif
 }
 
 void ClientUpdater::CheckUpdates() {
 	if(Lock.acquired())
-		std::thread(&ClientUpdater::CheckUpdate, this).detach();
+		epro::thread(&ClientUpdater::CheckUpdate, this).detach();
 }
 
 bool ClientUpdater::StartUpdate(update_callback callback, void* payload) {
 	if(!Lock.acquired() || !has_update || downloading)
 		return false;
-	std::thread(&ClientUpdater::DownloadUpdate, this, payload, callback).detach();
+	epro::thread(&ClientUpdater::DownloadUpdate, this, payload, callback).detach();
 	return true;
 }
 void ClientUpdater::Unzip(void* payload, unzip_callback callback) {
 	Utils::SetThreadName("Unzip");
 #if defined(_WIN32) || (defined(__linux__) && !defined(__ANDROID__))
 	const auto& path = ygo::Utils::GetExePath();
-	ygo::Utils::FileMove(path, fmt::format(EPRO_TEXT("{}.old"), path));
+	ygo::Utils::FileMove(path, epro::format(EPRO_TEXT("{}.old"), path));
 #if !defined(__linux__)
 	const auto& corepath = ygo::Utils::GetCorePath();
-	ygo::Utils::FileMove(corepath, fmt::format(EPRO_TEXT("{}.old"), corepath));
+	ygo::Utils::FileMove(corepath, epro::format(EPRO_TEXT("{}.old"), corepath));
 #endif
 #endif
 	unzip_payload cbpayload{};
@@ -159,7 +161,7 @@ void ClientUpdater::Unzip(void* payload, unzip_callback callback) {
 	int i = 1;
 	for(auto& file : update_urls) {
 		uzpl.cur = i++;
-		auto name = fmt::format(UPDATES_FOLDER, ygo::Utils::ToPathString(file.name));
+		auto name = epro::format(UPDATES_FOLDER, ygo::Utils::ToPathString(file.name));
 		uzpl.filename = name.data();
 		ygo::Utils::UnzipArchive(name, callback, &cbpayload);
 	}
@@ -179,10 +181,10 @@ void ClientUpdater::DownloadUpdate(void* payload, update_callback callback) {
 	cbpayload.callback = callback;
 	cbpayload.total = static_cast<int>(update_urls.size());
 	cbpayload.payload = payload;
-	int i = 1;
+	int cur_file = 1;
 	for(auto& file : update_urls) {
-		auto name = fmt::format(formatstr, ygo::Utils::ToPathString(file.name));
-		cbpayload.current = i++;
+		auto name = epro::format(formatstr, ygo::Utils::ToPathString(file.name));
+		cbpayload.current = cur_file++;
 		cbpayload.filename = file.name.data();
 		cbpayload.is_new = true;
 		cbpayload.previous_percent = -1;
@@ -261,9 +263,9 @@ void ClientUpdater::CheckUpdate() {
 
 static inline void DeleteOld() {
 #if defined(_WIN32) || (defined(__linux__) && !defined(__ANDROID__))
-	ygo::Utils::FileDelete(fmt::format(EPRO_TEXT("{}.old"), ygo::Utils::GetExePath()));
+	ygo::Utils::FileDelete(epro::format(EPRO_TEXT("{}.old"), ygo::Utils::GetExePath()));
 #if !defined(__linux__)
-	ygo::Utils::FileDelete(fmt::format(EPRO_TEXT("{}.old"), ygo::Utils::GetCorePath()));
+	ygo::Utils::FileDelete(epro::format(EPRO_TEXT("{}.old"), ygo::Utils::GetCorePath()));
 #endif
 #endif
 	(void)0;

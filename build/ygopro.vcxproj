@@ -1,318 +1,318 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <ItemGroup Label="ProjectConfigurations">
-    <ProjectConfiguration Include="Debug|Win32">
-      <Configuration>Debug</Configuration>
-      <Platform>Win32</Platform>
-    </ProjectConfiguration>
-    <ProjectConfiguration Include="Release|Win32">
-      <Configuration>Release</Configuration>
-      <Platform>Win32</Platform>
-    </ProjectConfiguration>
-  </ItemGroup>
-  <PropertyGroup Label="Globals">
-    <ProjectGuid>{65DEA529-5180-D0FF-3A3B-E453267C5750}</ProjectGuid>
-    <IgnoreWarnCompileDuplicatedFilename>true</IgnoreWarnCompileDuplicatedFilename>
-    <Keyword>Win32Proj</Keyword>
-    <RootNamespace>ygopro</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
-    <VcpkgTriplet Condition="'$(Platform)'=='Win32'">x86-windows-static</VcpkgTriplet>
-    <VcpkgTriplet Condition="'$(Platform)'=='x64'">x64-windows-static</VcpkgTriplet>
-    <XPDeprecationWarning>false</XPDeprecationWarning>
-    <VcpkgEnabled>true</VcpkgEnabled>
-    <VcpkgUseStatic>true</VcpkgUseStatic>
-    <VcpkgAutoLink>true</VcpkgAutoLink>
-  </PropertyGroup>
-  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
-    <UseDebugLibraries>true</UseDebugLibraries>
-    <CharacterSet>Unicode</CharacterSet>
-    <PlatformToolset>v143</PlatformToolset>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
-    <UseDebugLibraries>false</UseDebugLibraries>
-    <CharacterSet>Unicode</CharacterSet>
-    <PlatformToolset>v143</PlatformToolset>
-    <WholeProgramOptimization>true</WholeProgramOptimization>
-  </PropertyGroup>
-  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
-  <ImportGroup Label="ExtensionSettings">
-  </ImportGroup>
-  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-  </ImportGroup>
-  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-  </ImportGroup>
-  <PropertyGroup Label="UserMacros" />
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <LinkIncremental>true</LinkIncremental>
-    <OutDir>..\bin\debug\</OutDir>
-    <IntDir>..\obj\Debug\ygopro\</IntDir>
-    <TargetName>ygopro</TargetName>
-    <TargetExt>.exe</TargetExt>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <LinkIncremental>false</LinkIncremental>
-    <OutDir>..\bin\release\</OutDir>
-    <IntDir>..\obj\Release\ygopro\</IntDir>
-    <TargetName>ygopro</TargetName>
-    <TargetExt>.exe</TargetExt>
-  </PropertyGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <ClCompile>
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <WarningLevel>Level3</WarningLevel>
-      <PreprocessorDefinitions>WIN32;_WIN32;NOMINMAX;_CRT_SECURE_NO_WARNINGS;_DEBUG;CURL_STATICLIB;YGOPRO_USE_SFML;_IRR_STATIC_LIB_;IRRLICHT_FAST_MATH;NO_IRR_COMPILE_WITH_CONSOLE_DEVICE_;NO_IRR_COMPILE_WITH_DIRECT3D_8_;NO_IRR_COMPILE_WITH_DIRECTINPUT_JOYSTICK_;NO_IRR_COMPILE_WITH_JOYSTICK_EVENTS_;NO_IRR_COMPILE_WITH_SOFTWARE_;NO_IRR_COMPILE_WITH_BURNINGSVIDEO_;NO_IRR_COMPILE_WITH_IRR_SCENE_LOADER_;NO_IRR_COMPILE_WITH_SKINNED_MESH_SUPPORT_;NO_IRR_COMPILE_WITH_IRR_MESH_LOADER_;NO_IRR_COMPILE_WITH_HALFLIFE_LOADER_;NO_IRR_COMPILE_WITH_MD2_LOADER_;NO_IRR_COMPILE_WITH_MD3_LOADER_;NO_IRR_COMPILE_WITH_3DS_LOADER_;NO_IRR_COMPILE_WITH_COLLADA_LOADER_;NO_IRR_COMPILE_WITH_CSM_LOADER_;NO_IRR_COMPILE_WITH_BSP_LOADER_;NO_IRR_COMPILE_WITH_DMF_LOADER_;NO_IRR_COMPILE_WITH_LMTS_LOADER_;NO_IRR_COMPILE_WITH_MY3D_LOADER_;NO_IRR_COMPILE_WITH_OBJ_LOADER_;NO_IRR_COMPILE_WITH_OCT_LOADER_;NO_IRR_COMPILE_WITH_LWO_LOADER_;NO_IRR_COMPILE_WITH_STL_LOADER_;NO_IRR_COMPILE_WITH_PLY_LOADER_;NO_IRR_COMPILE_WITH_SMF_LOADER_;NO_IRR_COMPILE_WITH_IRR_WRITER_;NO_IRR_COMPILE_WITH_COLLADA_WRITER_;NO_IRR_COMPILE_WITH_STL_WRITER_;NO_IRR_COMPILE_WITH_OBJ_WRITER_;NO_IRR_COMPILE_WITH_PLY_WRITER_;NO_IRR_COMPILE_WITH_PCX_LOADER_;NO_IRR_COMPILE_WITH_PPM_LOADER_;NO_IRR_COMPILE_WITH_PSD_LOADER_;NO_IRR_COMPILE_WITH_TGA_LOADER_;NO_IRR_COMPILE_WITH_WAL_LOADER_;NO_IRR_COMPILE_WITH_LMP_LOADER_;NO_IRR_COMPILE_WITH_RGB_LOADER_;NO_IRR_COMPILE_WITH_PCX_WRITER_;NO_IRR_COMPILE_WITH_PPM_WRITER_;NO_IRR_COMPILE_WITH_PSD_WRITER_;NO_IRR_COMPILE_WITH_TGA_WRITER_;NO__IRR_COMPILE_WITH_PAK_ARCHIVE_LOADER_;NO__IRR_COMPILE_WITH_NPK_ARCHIVE_LOADER_;NO__IRR_COMPILE_WITH_WAD_ARCHIVE_LOADER_;NO_IRR_USE_NON_SYSTEM_ZLIB_;NO_IRR_USE_NON_SYSTEM_BZLIB_;NO_IRR_USE_NON_SYSTEM_LIB_PNG_;NO_IRR_USE_NON_SYSTEM_JPEG_LIB_;_IRR_COMPILE_WITH_OGLES1_;IRR_COMPILE_WITH_DX9_DEV_PACK;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\accessibility;..\ocgcore;..\sfAudio\include;..\irrlicht\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
-      <Optimization>Disabled</Optimization>
-      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
-      <RuntimeTypeInfo>false</RuntimeTypeInfo>
-      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
-      <AdditionalOptions>-wd4996 %(AdditionalOptions)</AdditionalOptions>
-      <LanguageStandard>stdcpp14</LanguageStandard>
-    </ClCompile>
-    <ResourceCompile>
-      <PreprocessorDefinitions>WIN32;_WIN32;NOMINMAX;_CRT_SECURE_NO_WARNINGS;_DEBUG;CURL_STATICLIB;YGOPRO_USE_SFML;_IRR_STATIC_LIB_;IRRLICHT_FAST_MATH;NO_IRR_COMPILE_WITH_CONSOLE_DEVICE_;NO_IRR_COMPILE_WITH_DIRECT3D_8_;NO_IRR_COMPILE_WITH_DIRECTINPUT_JOYSTICK_;NO_IRR_COMPILE_WITH_JOYSTICK_EVENTS_;NO_IRR_COMPILE_WITH_SOFTWARE_;NO_IRR_COMPILE_WITH_BURNINGSVIDEO_;NO_IRR_COMPILE_WITH_IRR_SCENE_LOADER_;NO_IRR_COMPILE_WITH_SKINNED_MESH_SUPPORT_;NO_IRR_COMPILE_WITH_IRR_MESH_LOADER_;NO_IRR_COMPILE_WITH_HALFLIFE_LOADER_;NO_IRR_COMPILE_WITH_MD2_LOADER_;NO_IRR_COMPILE_WITH_MD3_LOADER_;NO_IRR_COMPILE_WITH_3DS_LOADER_;NO_IRR_COMPILE_WITH_COLLADA_LOADER_;NO_IRR_COMPILE_WITH_CSM_LOADER_;NO_IRR_COMPILE_WITH_BSP_LOADER_;NO_IRR_COMPILE_WITH_DMF_LOADER_;NO_IRR_COMPILE_WITH_LMTS_LOADER_;NO_IRR_COMPILE_WITH_MY3D_LOADER_;NO_IRR_COMPILE_WITH_OBJ_LOADER_;NO_IRR_COMPILE_WITH_OCT_LOADER_;NO_IRR_COMPILE_WITH_LWO_LOADER_;NO_IRR_COMPILE_WITH_STL_LOADER_;NO_IRR_COMPILE_WITH_PLY_LOADER_;NO_IRR_COMPILE_WITH_SMF_LOADER_;NO_IRR_COMPILE_WITH_IRR_WRITER_;NO_IRR_COMPILE_WITH_COLLADA_WRITER_;NO_IRR_COMPILE_WITH_STL_WRITER_;NO_IRR_COMPILE_WITH_OBJ_WRITER_;NO_IRR_COMPILE_WITH_PLY_WRITER_;NO_IRR_COMPILE_WITH_PCX_LOADER_;NO_IRR_COMPILE_WITH_PPM_LOADER_;NO_IRR_COMPILE_WITH_PSD_LOADER_;NO_IRR_COMPILE_WITH_TGA_LOADER_;NO_IRR_COMPILE_WITH_WAL_LOADER_;NO_IRR_COMPILE_WITH_LMP_LOADER_;NO_IRR_COMPILE_WITH_RGB_LOADER_;NO_IRR_COMPILE_WITH_PCX_WRITER_;NO_IRR_COMPILE_WITH_PPM_WRITER_;NO_IRR_COMPILE_WITH_PSD_WRITER_;NO_IRR_COMPILE_WITH_TGA_WRITER_;NO__IRR_COMPILE_WITH_PAK_ARCHIVE_LOADER_;NO__IRR_COMPILE_WITH_NPK_ARCHIVE_LOADER_;NO__IRR_COMPILE_WITH_WAD_ARCHIVE_LOADER_;NO_IRR_USE_NON_SYSTEM_ZLIB_;NO_IRR_USE_NON_SYSTEM_BZLIB_;NO_IRR_USE_NON_SYSTEM_LIB_PNG_;NO_IRR_USE_NON_SYSTEM_JPEG_LIB_;_IRR_COMPILE_WITH_OGLES1_;IRR_COMPILE_WITH_DX9_DEV_PACK;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\ocgcore;..\sfAudio\include;..\irrlicht\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-    </ResourceCompile>
-    <Link>
-      <SubSystem>Console</SubSystem>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>tolk.lib;nvdaControllerClient32.lib;opengl32.lib;ws2_32.lib;winmm.lib;gdi32.lib;kernel32.lib;user32.lib;imm32.lib;wldap32.lib;crypt32.lib;advapi32.lib;rpcrt4.lib;ole32.lib;uuid.lib;winhttp.lib;Iphlpapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>..\Accessibility\Readers\libs\nvda-lib;.\Accessibility\Readers\libs\x64;..\Accessibility\Readers\libs\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-    </Link>
-    <Manifest>
-      <AdditionalManifestFiles>../gframe/ygopro.exe.manifest;%(AdditionalManifestFiles)</AdditionalManifestFiles>
-    </Manifest>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <ClCompile>
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <WarningLevel>Level3</WarningLevel>
-      <PreprocessorDefinitions>WIN32;_WIN32;NOMINMAX;_CRT_SECURE_NO_WARNINGS;CURL_STATICLIB;YGOPRO_USE_SFML;_IRR_STATIC_LIB_;IRRLICHT_FAST_MATH;NO_IRR_COMPILE_WITH_CONSOLE_DEVICE_;NO_IRR_COMPILE_WITH_DIRECT3D_8_;NO_IRR_COMPILE_WITH_DIRECTINPUT_JOYSTICK_;NO_IRR_COMPILE_WITH_JOYSTICK_EVENTS_;NO_IRR_COMPILE_WITH_SOFTWARE_;NO_IRR_COMPILE_WITH_BURNINGSVIDEO_;NO_IRR_COMPILE_WITH_IRR_SCENE_LOADER_;NO_IRR_COMPILE_WITH_SKINNED_MESH_SUPPORT_;NO_IRR_COMPILE_WITH_IRR_MESH_LOADER_;NO_IRR_COMPILE_WITH_HALFLIFE_LOADER_;NO_IRR_COMPILE_WITH_MD2_LOADER_;NO_IRR_COMPILE_WITH_MD3_LOADER_;NO_IRR_COMPILE_WITH_3DS_LOADER_;NO_IRR_COMPILE_WITH_COLLADA_LOADER_;NO_IRR_COMPILE_WITH_CSM_LOADER_;NO_IRR_COMPILE_WITH_BSP_LOADER_;NO_IRR_COMPILE_WITH_DMF_LOADER_;NO_IRR_COMPILE_WITH_LMTS_LOADER_;NO_IRR_COMPILE_WITH_MY3D_LOADER_;NO_IRR_COMPILE_WITH_OBJ_LOADER_;NO_IRR_COMPILE_WITH_OCT_LOADER_;NO_IRR_COMPILE_WITH_LWO_LOADER_;NO_IRR_COMPILE_WITH_STL_LOADER_;NO_IRR_COMPILE_WITH_PLY_LOADER_;NO_IRR_COMPILE_WITH_SMF_LOADER_;NO_IRR_COMPILE_WITH_IRR_WRITER_;NO_IRR_COMPILE_WITH_COLLADA_WRITER_;NO_IRR_COMPILE_WITH_STL_WRITER_;NO_IRR_COMPILE_WITH_OBJ_WRITER_;NO_IRR_COMPILE_WITH_PLY_WRITER_;NO_IRR_COMPILE_WITH_PCX_LOADER_;NO_IRR_COMPILE_WITH_PPM_LOADER_;NO_IRR_COMPILE_WITH_PSD_LOADER_;NO_IRR_COMPILE_WITH_TGA_LOADER_;NO_IRR_COMPILE_WITH_WAL_LOADER_;NO_IRR_COMPILE_WITH_LMP_LOADER_;NO_IRR_COMPILE_WITH_RGB_LOADER_;NO_IRR_COMPILE_WITH_PCX_WRITER_;NO_IRR_COMPILE_WITH_PPM_WRITER_;NO_IRR_COMPILE_WITH_PSD_WRITER_;NO_IRR_COMPILE_WITH_TGA_WRITER_;NO__IRR_COMPILE_WITH_PAK_ARCHIVE_LOADER_;NO__IRR_COMPILE_WITH_NPK_ARCHIVE_LOADER_;NO__IRR_COMPILE_WITH_WAD_ARCHIVE_LOADER_;NO_IRR_USE_NON_SYSTEM_ZLIB_;NO_IRR_USE_NON_SYSTEM_BZLIB_;NO_IRR_USE_NON_SYSTEM_LIB_PNG_;NO_IRR_USE_NON_SYSTEM_JPEG_LIB_;_IRR_COMPILE_WITH_OGLES1_;IRR_COMPILE_WITH_DX9_DEV_PACK;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\accessibility;..\ocgcore;..\sfAudio\include;..\irrlicht\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <Optimization>MinSpace</Optimization>
-      <FunctionLevelLinking>true</FunctionLevelLinking>
-      <IntrinsicFunctions>true</IntrinsicFunctions>
-      <MinimalRebuild>false</MinimalRebuild>
-      <StringPooling>true</StringPooling>
-      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <RuntimeTypeInfo>false</RuntimeTypeInfo>
-      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
-      <AdditionalOptions>-wd4996 %(AdditionalOptions)</AdditionalOptions>
-      <LanguageStandard>stdcpp14</LanguageStandard>
-    </ClCompile>
-    <ResourceCompile>
-      <PreprocessorDefinitions>WIN32;_WIN32;NOMINMAX;_CRT_SECURE_NO_WARNINGS;CURL_STATICLIB;YGOPRO_USE_SFML;_IRR_STATIC_LIB_;IRRLICHT_FAST_MATH;NO_IRR_COMPILE_WITH_CONSOLE_DEVICE_;NO_IRR_COMPILE_WITH_DIRECT3D_8_;NO_IRR_COMPILE_WITH_DIRECTINPUT_JOYSTICK_;NO_IRR_COMPILE_WITH_JOYSTICK_EVENTS_;NO_IRR_COMPILE_WITH_SOFTWARE_;NO_IRR_COMPILE_WITH_BURNINGSVIDEO_;NO_IRR_COMPILE_WITH_IRR_SCENE_LOADER_;NO_IRR_COMPILE_WITH_SKINNED_MESH_SUPPORT_;NO_IRR_COMPILE_WITH_IRR_MESH_LOADER_;NO_IRR_COMPILE_WITH_HALFLIFE_LOADER_;NO_IRR_COMPILE_WITH_MD2_LOADER_;NO_IRR_COMPILE_WITH_MD3_LOADER_;NO_IRR_COMPILE_WITH_3DS_LOADER_;NO_IRR_COMPILE_WITH_COLLADA_LOADER_;NO_IRR_COMPILE_WITH_CSM_LOADER_;NO_IRR_COMPILE_WITH_BSP_LOADER_;NO_IRR_COMPILE_WITH_DMF_LOADER_;NO_IRR_COMPILE_WITH_LMTS_LOADER_;NO_IRR_COMPILE_WITH_MY3D_LOADER_;NO_IRR_COMPILE_WITH_OBJ_LOADER_;NO_IRR_COMPILE_WITH_OCT_LOADER_;NO_IRR_COMPILE_WITH_LWO_LOADER_;NO_IRR_COMPILE_WITH_STL_LOADER_;NO_IRR_COMPILE_WITH_PLY_LOADER_;NO_IRR_COMPILE_WITH_SMF_LOADER_;NO_IRR_COMPILE_WITH_IRR_WRITER_;NO_IRR_COMPILE_WITH_COLLADA_WRITER_;NO_IRR_COMPILE_WITH_STL_WRITER_;NO_IRR_COMPILE_WITH_OBJ_WRITER_;NO_IRR_COMPILE_WITH_PLY_WRITER_;NO_IRR_COMPILE_WITH_PCX_LOADER_;NO_IRR_COMPILE_WITH_PPM_LOADER_;NO_IRR_COMPILE_WITH_PSD_LOADER_;NO_IRR_COMPILE_WITH_TGA_LOADER_;NO_IRR_COMPILE_WITH_WAL_LOADER_;NO_IRR_COMPILE_WITH_LMP_LOADER_;NO_IRR_COMPILE_WITH_RGB_LOADER_;NO_IRR_COMPILE_WITH_PCX_WRITER_;NO_IRR_COMPILE_WITH_PPM_WRITER_;NO_IRR_COMPILE_WITH_PSD_WRITER_;NO_IRR_COMPILE_WITH_TGA_WRITER_;NO__IRR_COMPILE_WITH_PAK_ARCHIVE_LOADER_;NO__IRR_COMPILE_WITH_NPK_ARCHIVE_LOADER_;NO__IRR_COMPILE_WITH_WAD_ARCHIVE_LOADER_;NO_IRR_USE_NON_SYSTEM_ZLIB_;NO_IRR_USE_NON_SYSTEM_BZLIB_;NO_IRR_USE_NON_SYSTEM_LIB_PNG_;NO_IRR_USE_NON_SYSTEM_JPEG_LIB_;_IRR_COMPILE_WITH_OGLES1_;IRR_COMPILE_WITH_DX9_DEV_PACK;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\ocgcore;..\sfAudio\include;..\irrlicht\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-    </ResourceCompile>
-    <Link>
-      <SubSystem>Console</SubSystem>
-      <EnableCOMDATFolding>true</EnableCOMDATFolding>
-      <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>tolk.lib;nvdaControllerClient32.lib;wbemuuid.lib;opengl32.lib;ws2_32.lib;winmm.lib;gdi32.lib;kernel32.lib;user32.lib;imm32.lib;wldap32.lib;crypt32.lib;advapi32.lib;rpcrt4.lib;ole32.lib;uuid.lib;winhttp.lib;Iphlpapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>..\Accessibility\Readers\libs\nvda-lib;.\Accessibility\Readers\libs\x64;..\Accessibility\Readers\libs\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-    </Link>
-    <Manifest>
-      <AdditionalManifestFiles>../gframe/ygopro.exe.manifest;%(AdditionalManifestFiles)</AdditionalManifestFiles>
-    </Manifest>
-  </ItemDefinitionGroup>
-  <ItemGroup>
-    <ClInclude Include="..\accessibility\Control\DeckHandler.h" />
-    <ClInclude Include="..\accessibility\Control\EventHandler.h" />
-    <ClInclude Include="..\accessibility\Menus\AccessibilityMenu.h" />
-    <ClInclude Include="..\gframe\Base64.h" />
-    <ClInclude Include="..\gframe\CGUICustomCheckBox\CGUICustomCheckBox.h" />
-    <ClInclude Include="..\gframe\CGUICustomComboBox\CGUICustomComboBox.h" />
-    <ClInclude Include="..\gframe\CGUICustomContextMenu\CGUICustomContextMenu.h" />
-    <ClInclude Include="..\gframe\CGUICustomContextMenu\CGUICustomMenu.h" />
-    <ClInclude Include="..\gframe\CGUICustomTabControl\CGUICustomTabControl.h" />
-    <ClInclude Include="..\gframe\CGUICustomTable\CGUICustomTable.h" />
-    <ClInclude Include="..\gframe\CGUICustomText\CGUICustomText.h" />
-    <ClInclude Include="..\gframe\CGUIEnvironmentLinker.h" />
-    <ClInclude Include="..\gframe\CGUIFileSelectListBox\CGUIFileSelectListBox.h" />
-    <ClInclude Include="..\gframe\CGUIImageButton\CGUIImageButton.h" />
-    <ClInclude Include="..\gframe\CGUISkinSystem\CConfigMap.h" />
-    <ClInclude Include="..\gframe\CGUISkinSystem\CGUIProgressBar.h" />
-    <ClInclude Include="..\gframe\CGUISkinSystem\CGUISkinSystem.h" />
-    <ClInclude Include="..\gframe\CGUISkinSystem\CImageGUISkin.h" />
-    <ClInclude Include="..\gframe\CGUISkinSystem\clipRects.h" />
-    <ClInclude Include="..\gframe\CGUITTFont\CGUITTFont.h" />
-    <ClInclude Include="..\gframe\CGUITTFont\irrUString.h" />
-    <ClInclude Include="..\gframe\CGUIWindowedTabControl\CGUIWindowedTabControl.h" />
-    <ClInclude Include="..\gframe\CProgressBar\CProgressBar.h" />
-    <ClInclude Include="..\gframe\CXMLRegistry\CXMLNode.h" />
-    <ClInclude Include="..\gframe\CXMLRegistry\CXMLRegistry.h" />
-    <ClInclude Include="..\gframe\IrrlichtCommonIncludes\CCursorControl.h" />
-    <ClInclude Include="..\gframe\IrrlichtCommonIncludes\CFileSystem.h" />
-    <ClInclude Include="..\gframe\IrrlichtCommonIncludes\CGUIButton.h" />
-    <ClInclude Include="..\gframe\IrrlichtCommonIncludes\CGUIScrollBar.h" />
-    <ClInclude Include="..\gframe\IrrlichtCommonIncludes\CGUITabControl.h" />
-    <ClInclude Include="..\gframe\IrrlichtCommonIncludes\os.h" />
-    <ClInclude Include="..\gframe\IrrlichtCommonIncludes1.9\CFileSystem.h" />
-    <ClInclude Include="..\gframe\IrrlichtCommonIncludes1.9\CGUIButton.h" />
-    <ClInclude Include="..\gframe\IrrlichtCommonIncludes1.9\CGUIListBox.h" />
-    <ClInclude Include="..\gframe\IrrlichtCommonIncludes1.9\CGUIScrollBar.h" />
-    <ClInclude Include="..\gframe\IrrlichtCommonIncludes1.9\CGUITabControl.h" />
-    <ClInclude Include="..\gframe\IrrlichtCommonIncludes1.9\os.h" />
-    <ClInclude Include="..\gframe\MD5\md5.h" />
-    <ClInclude Include="..\gframe\RNG\SplitMix64.hpp" />
-    <ClInclude Include="..\gframe\RNG\Xoshiro256.hpp" />
-    <ClInclude Include="..\gframe\RNG\mt19937.h" />
-    <ClInclude Include="..\gframe\ResizeablePanel\ResizeablePanel.h" />
-    <ClInclude Include="..\gframe\bufferio.h" />
-    <ClInclude Include="..\gframe\client_card.h" />
-    <ClInclude Include="..\gframe\client_field.h" />
-    <ClInclude Include="..\gframe\client_updater.h" />
-    <ClInclude Include="..\gframe\common.h" />
-    <ClInclude Include="..\gframe\config.h" />
-    <ClInclude Include="..\gframe\core_utils.h" />
-    <ClInclude Include="..\gframe\custom_skin_enum.h" />
-    <ClInclude Include="..\gframe\data_handler.h" />
-    <ClInclude Include="..\gframe\data_manager.h" />
-    <ClInclude Include="..\gframe\deck.h" />
-    <ClInclude Include="..\gframe\deck_con.h" />
-    <ClInclude Include="..\gframe\deck_manager.h" />
-    <ClInclude Include="..\gframe\discord_register.h" />
-    <ClInclude Include="..\gframe\discord_rpc.h" />
-    <ClInclude Include="..\gframe\discord_wrapper.h" />
-    <ClInclude Include="..\gframe\dllinterface.h" />
-    <ClInclude Include="..\gframe\duelclient.h" />
-    <ClInclude Include="..\gframe\epro_condition_variable.h" />
-    <ClInclude Include="..\gframe\epro_mutex.h" />
-    <ClInclude Include="..\gframe\epro_thread.h" />
-    <ClInclude Include="..\gframe\file_stream.h" />
-    <ClInclude Include="..\gframe\game.h" />
-    <ClInclude Include="..\gframe\game_config.h" />
-    <ClInclude Include="..\gframe\generic_duel.h" />
-    <ClInclude Include="..\gframe\iOS\COSiOSOperator.h" />
-    <ClInclude Include="..\gframe\iOS\porting_ios.h" />
-    <ClInclude Include="..\gframe\image_downloader.h" />
-    <ClInclude Include="..\gframe\image_manager.h" />
-    <ClInclude Include="..\gframe\ireadfile_sqlite.h" />
-    <ClInclude Include="..\gframe\joystick_wrapper.h" />
-    <ClInclude Include="..\gframe\libgit2.hpp" />
-    <ClInclude Include="..\gframe\log.h" />
-    <ClInclude Include="..\gframe\logging.h" />
-    <ClInclude Include="..\gframe\materials.h" />
-    <ClInclude Include="..\gframe\menu_handler.h" />
-    <ClInclude Include="..\gframe\mysignal.h" />
-    <ClInclude Include="..\gframe\netserver.h" />
-    <ClInclude Include="..\gframe\network.h" />
-    <ClInclude Include="..\gframe\nonstd\string_view.hpp" />
-    <ClInclude Include="..\gframe\ocgapi_types.h" />
-    <ClInclude Include="..\gframe\osx_menu.h" />
-    <ClInclude Include="..\gframe\porting.h" />
-    <ClInclude Include="..\gframe\progressivebuffer.h" />
-    <ClInclude Include="..\gframe\replay.h" />
-    <ClInclude Include="..\gframe\replay_mode.h" />
-    <ClInclude Include="..\gframe\repo_manager.h" />
-    <ClInclude Include="..\gframe\server_lobby.h" />
-    <ClInclude Include="..\gframe\settings_window.h" />
-    <ClInclude Include="..\gframe\single_mode.h" />
-    <ClInclude Include="..\gframe\sound_backend.h" />
-    <ClInclude Include="..\gframe\sound_manager.h" />
-    <ClInclude Include="..\gframe\sound_sfml.h" />
-    <ClInclude Include="..\gframe\sound_threaded_backend.h" />
-    <ClInclude Include="..\gframe\text_types.h" />
-    <ClInclude Include="..\gframe\utils.h" />
-    <ClInclude Include="..\gframe\utils_gui.h" />
-    <ClInclude Include="..\gframe\windbot.h" />
-    <ClInclude Include="..\gframe\windbot_panel.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="..\accessibility\Control\DeckHandler.cpp" />
-    <ClCompile Include="..\accessibility\Control\EventHandler.cpp" />
-    <ClCompile Include="..\accessibility\Menus\AccessibilityMenu.cpp" />
-    <ClCompile Include="..\gframe\CGUICustomCheckBox\CGUICustomCheckBox.cpp" />
-    <ClCompile Include="..\gframe\CGUICustomComboBox\CGUICustomComboBox.cpp" />
-    <ClCompile Include="..\gframe\CGUICustomContextMenu\CGUICustomContextMenu.cpp" />
-    <ClCompile Include="..\gframe\CGUICustomContextMenu\CGUICustomMenu.cpp" />
-    <ClCompile Include="..\gframe\CGUICustomTabControl\CGUICustomTabControl.cpp" />
-    <ClCompile Include="..\gframe\CGUICustomTable\CGUICustomTable.cpp" />
-    <ClCompile Include="..\gframe\CGUICustomText\CGUICustomText.cpp" />
-    <ClCompile Include="..\gframe\CGUIFileSelectListBox\CGUIFileSelectListBox.cpp" />
-    <ClCompile Include="..\gframe\CGUIImageButton\CGUIImageButton.cpp" />
-    <ClCompile Include="..\gframe\CGUISkinSystem\CConfigMap.cpp" />
-    <ClCompile Include="..\gframe\CGUISkinSystem\CGUIProgressBar.cpp" />
-    <ClCompile Include="..\gframe\CGUISkinSystem\CGUISkinSystem.cpp" />
-    <ClCompile Include="..\gframe\CGUISkinSystem\CImageGUISkin.cpp" />
-    <ClCompile Include="..\gframe\CGUITTFont\CGUITTFont.cpp" />
-    <ClCompile Include="..\gframe\CGUIWindowedTabControl\CGUIWindowedTabControl.cpp" />
-    <ClCompile Include="..\gframe\CProgressBar\CProgressBar.cpp" />
-    <ClCompile Include="..\gframe\CXMLRegistry\CXMLNode.cpp" />
-    <ClCompile Include="..\gframe\CXMLRegistry\CXMLRegistry.cpp" />
-    <ClCompile Include="..\gframe\MD5\md5.c" />
-    <ClCompile Include="..\gframe\ResizeablePanel\ResizeablePanel.cpp" />
-    <ClCompile Include="..\gframe\client_card.cpp" />
-    <ClCompile Include="..\gframe\client_field.cpp" />
-    <ClCompile Include="..\gframe\client_updater.cpp" />
-    <ClCompile Include="..\gframe\core_utils.cpp" />
-    <ClCompile Include="..\gframe\custom_skin_enum.cpp" />
-    <ClCompile Include="..\gframe\data_handler.cpp" />
-    <ClCompile Include="..\gframe\data_manager.cpp" />
-    <ClCompile Include="..\gframe\deck_con.cpp" />
-    <ClCompile Include="..\gframe\deck_manager.cpp" />
-    <ClCompile Include="..\gframe\discord_wrapper.cpp" />
-    <ClCompile Include="..\gframe\dllinterface.cpp" />
-    <ClCompile Include="..\gframe\drawing.cpp" />
-    <ClCompile Include="..\gframe\duelclient.cpp" />
-    <ClCompile Include="..\gframe\event_handler.cpp" />
-    <ClCompile Include="..\gframe\game.cpp" />
-    <ClCompile Include="..\gframe\game_config.cpp" />
-    <ClCompile Include="..\gframe\generic_duel.cpp" />
-    <ClCompile Include="..\gframe\gframe.cpp" />
-    <ClCompile Include="..\gframe\image_downloader.cpp" />
-    <ClCompile Include="..\gframe\image_manager.cpp" />
-    <ClCompile Include="..\gframe\ireadfile_sqlite.cpp" />
-    <ClCompile Include="..\gframe\joystick_wrapper.cpp" />
-    <ClCompile Include="..\gframe\logging.cpp" />
-    <ClCompile Include="..\gframe\materials.cpp" />
-    <ClCompile Include="..\gframe\menu_handler.cpp" />
-    <ClCompile Include="..\gframe\netserver.cpp" />
-    <ClCompile Include="..\gframe\old_replay_mode.cpp" />
-    <ClCompile Include="..\gframe\replay.cpp" />
-    <ClCompile Include="..\gframe\replay_mode.cpp" />
-    <ClCompile Include="..\gframe\repo_manager.cpp" />
-    <ClCompile Include="..\gframe\server_lobby.cpp" />
-    <ClCompile Include="..\gframe\settings_window.cpp" />
-    <ClCompile Include="..\gframe\single_mode.cpp" />
-    <ClCompile Include="..\gframe\sound_manager.cpp" />
-    <ClCompile Include="..\gframe\sound_sfml.cpp" />
-    <ClCompile Include="..\gframe\sound_threaded_backend.cpp" />
-    <ClCompile Include="..\gframe\utils.cpp" />
-    <ClCompile Include="..\gframe\utils_gui.cpp" />
-    <ClCompile Include="..\gframe\windbot.cpp" />
-    <ClCompile Include="..\gframe\windbot_panel.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="..\gframe\ygopro.exe.manifest" />
-  </ItemGroup>
-  <ItemGroup>
-    <ResourceCompile Include="..\gframe\ygopro.rc" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\accessibility\accessibility.vcxproj">
-      <Project>{89541d4f-647d-4e19-8bcd-dd305f3fb95a}</Project>
-    </ProjectReference>
-    <ProjectReference Include="ocgcore.vcxproj">
-      <Project>{07B8AE52-7397-2DEE-7CAF-B8C4E80D944F}</Project>
-    </ProjectReference>
-    <ProjectReference Include="clzma.vcxproj">
-      <Project>{5CC83B0F-C8DC-63C0-915E-0720FD3160F1}</Project>
-    </ProjectReference>
-    <ProjectReference Include="Irrlicht.vcxproj">
-      <Project>{06C1B133-F28D-0C3F-1BA7-FAE607D341CD}</Project>
-    </ProjectReference>
-    <ProjectReference Include="sfAudio.vcxproj">
-      <Project>{B030F18A-1C10-7026-2528-FBFC9186D687}</Project>
-    </ProjectReference>
-  </ItemGroup>
-  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
-  <ImportGroup Label="ExtensionTargets">
-  </ImportGroup>
+	<ItemGroup Label="ProjectConfigurations">
+		<ProjectConfiguration Include="Debug|Win32">
+			<Configuration>Debug</Configuration>
+			<Platform>Win32</Platform>
+		</ProjectConfiguration>
+		<ProjectConfiguration Include="Release|Win32">
+			<Configuration>Release</Configuration>
+			<Platform>Win32</Platform>
+		</ProjectConfiguration>
+	</ItemGroup>
+	<PropertyGroup Label="Globals">
+		<ProjectGuid>{65DEA529-5180-D0FF-3A3B-E453267C5750}</ProjectGuid>
+		<IgnoreWarnCompileDuplicatedFilename>true</IgnoreWarnCompileDuplicatedFilename>
+		<Keyword>Win32Proj</Keyword>
+		<RootNamespace>ygopro</RootNamespace>
+		<WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+		<VcpkgTriplet Condition="'$(Platform)'=='Win32'">x86-windows-static</VcpkgTriplet>
+		<VcpkgTriplet Condition="'$(Platform)'=='x64'">x64-windows-static</VcpkgTriplet>
+		<XPDeprecationWarning>false</XPDeprecationWarning>
+		<VcpkgEnabled>true</VcpkgEnabled>
+		<VcpkgUseStatic>true</VcpkgUseStatic>
+		<VcpkgAutoLink>true</VcpkgAutoLink>
+	</PropertyGroup>
+	<Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+		<ConfigurationType>Application</ConfigurationType>
+		<UseDebugLibraries>true</UseDebugLibraries>
+		<CharacterSet>Unicode</CharacterSet>
+		<PlatformToolset>v143</PlatformToolset>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+		<ConfigurationType>Application</ConfigurationType>
+		<UseDebugLibraries>false</UseDebugLibraries>
+		<CharacterSet>Unicode</CharacterSet>
+		<PlatformToolset>v143</PlatformToolset>
+		<WholeProgramOptimization>true</WholeProgramOptimization>
+	</PropertyGroup>
+	<Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+	<ImportGroup Label="ExtensionSettings">
+	</ImportGroup>
+	<ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+		<Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+	</ImportGroup>
+	<ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+		<Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+	</ImportGroup>
+	<PropertyGroup Label="UserMacros" />
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+		<LinkIncremental>true</LinkIncremental>
+		<OutDir>..\bin\debug\</OutDir>
+		<IntDir>..\obj\Debug\ygopro\</IntDir>
+		<TargetName>ygopro</TargetName>
+		<TargetExt>.exe</TargetExt>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+		<LinkIncremental>false</LinkIncremental>
+		<OutDir>..\bin\release\</OutDir>
+		<IntDir>..\obj\Release\ygopro\</IntDir>
+		<TargetName>ygopro</TargetName>
+		<TargetExt>.exe</TargetExt>
+	</PropertyGroup>
+	<ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+		<ClCompile>
+			<PrecompiledHeader>NotUsing</PrecompiledHeader>
+			<WarningLevel>Level3</WarningLevel>
+			<PreprocessorDefinitions>WIN32;_WIN32;NOMINMAX;_CRT_SECURE_NO_WARNINGS;_DEBUG;CURL_STATICLIB;YGOPRO_USE_SFML;_IRR_STATIC_LIB_;IRRLICHT_FAST_MATH;NO_IRR_COMPILE_WITH_CONSOLE_DEVICE_;NO_IRR_COMPILE_WITH_DIRECT3D_8_;NO_IRR_COMPILE_WITH_DIRECTINPUT_JOYSTICK_;NO_IRR_COMPILE_WITH_JOYSTICK_EVENTS_;NO_IRR_COMPILE_WITH_SOFTWARE_;NO_IRR_COMPILE_WITH_BURNINGSVIDEO_;NO_IRR_COMPILE_WITH_IRR_SCENE_LOADER_;NO_IRR_COMPILE_WITH_SKINNED_MESH_SUPPORT_;NO_IRR_COMPILE_WITH_IRR_MESH_LOADER_;NO_IRR_COMPILE_WITH_HALFLIFE_LOADER_;NO_IRR_COMPILE_WITH_MD2_LOADER_;NO_IRR_COMPILE_WITH_MD3_LOADER_;NO_IRR_COMPILE_WITH_3DS_LOADER_;NO_IRR_COMPILE_WITH_COLLADA_LOADER_;NO_IRR_COMPILE_WITH_CSM_LOADER_;NO_IRR_COMPILE_WITH_BSP_LOADER_;NO_IRR_COMPILE_WITH_DMF_LOADER_;NO_IRR_COMPILE_WITH_LMTS_LOADER_;NO_IRR_COMPILE_WITH_MY3D_LOADER_;NO_IRR_COMPILE_WITH_OBJ_LOADER_;NO_IRR_COMPILE_WITH_OCT_LOADER_;NO_IRR_COMPILE_WITH_LWO_LOADER_;NO_IRR_COMPILE_WITH_STL_LOADER_;NO_IRR_COMPILE_WITH_PLY_LOADER_;NO_IRR_COMPILE_WITH_SMF_LOADER_;NO_IRR_COMPILE_WITH_IRR_WRITER_;NO_IRR_COMPILE_WITH_COLLADA_WRITER_;NO_IRR_COMPILE_WITH_STL_WRITER_;NO_IRR_COMPILE_WITH_OBJ_WRITER_;NO_IRR_COMPILE_WITH_PLY_WRITER_;NO_IRR_COMPILE_WITH_PCX_LOADER_;NO_IRR_COMPILE_WITH_PPM_LOADER_;NO_IRR_COMPILE_WITH_PSD_LOADER_;NO_IRR_COMPILE_WITH_TGA_LOADER_;NO_IRR_COMPILE_WITH_WAL_LOADER_;NO_IRR_COMPILE_WITH_LMP_LOADER_;NO_IRR_COMPILE_WITH_RGB_LOADER_;NO_IRR_COMPILE_WITH_PCX_WRITER_;NO_IRR_COMPILE_WITH_PPM_WRITER_;NO_IRR_COMPILE_WITH_PSD_WRITER_;NO_IRR_COMPILE_WITH_TGA_WRITER_;NO__IRR_COMPILE_WITH_PAK_ARCHIVE_LOADER_;NO__IRR_COMPILE_WITH_NPK_ARCHIVE_LOADER_;NO__IRR_COMPILE_WITH_WAD_ARCHIVE_LOADER_;NO_IRR_USE_NON_SYSTEM_ZLIB_;NO_IRR_USE_NON_SYSTEM_BZLIB_;NO_IRR_USE_NON_SYSTEM_LIB_PNG_;NO_IRR_USE_NON_SYSTEM_JPEG_LIB_;_IRR_COMPILE_WITH_OGLES1_;IRR_COMPILE_WITH_DX9_DEV_PACK;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+			<AdditionalIncludeDirectories>..\accessibility;..\ocgcore;..\sfAudio\include;..\irrlicht\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+			<DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+			<Optimization>Disabled</Optimization>
+			<RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+			<RuntimeTypeInfo>false</RuntimeTypeInfo>
+			<EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+			<AdditionalOptions>-wd4996 %(AdditionalOptions)</AdditionalOptions>
+			<LanguageStandard>stdcpp14</LanguageStandard>
+		</ClCompile>
+		<ResourceCompile>
+			<PreprocessorDefinitions>WIN32;_WIN32;NOMINMAX;_CRT_SECURE_NO_WARNINGS;_DEBUG;CURL_STATICLIB;YGOPRO_USE_SFML;_IRR_STATIC_LIB_;IRRLICHT_FAST_MATH;NO_IRR_COMPILE_WITH_CONSOLE_DEVICE_;NO_IRR_COMPILE_WITH_DIRECT3D_8_;NO_IRR_COMPILE_WITH_DIRECTINPUT_JOYSTICK_;NO_IRR_COMPILE_WITH_JOYSTICK_EVENTS_;NO_IRR_COMPILE_WITH_SOFTWARE_;NO_IRR_COMPILE_WITH_BURNINGSVIDEO_;NO_IRR_COMPILE_WITH_IRR_SCENE_LOADER_;NO_IRR_COMPILE_WITH_SKINNED_MESH_SUPPORT_;NO_IRR_COMPILE_WITH_IRR_MESH_LOADER_;NO_IRR_COMPILE_WITH_HALFLIFE_LOADER_;NO_IRR_COMPILE_WITH_MD2_LOADER_;NO_IRR_COMPILE_WITH_MD3_LOADER_;NO_IRR_COMPILE_WITH_3DS_LOADER_;NO_IRR_COMPILE_WITH_COLLADA_LOADER_;NO_IRR_COMPILE_WITH_CSM_LOADER_;NO_IRR_COMPILE_WITH_BSP_LOADER_;NO_IRR_COMPILE_WITH_DMF_LOADER_;NO_IRR_COMPILE_WITH_LMTS_LOADER_;NO_IRR_COMPILE_WITH_MY3D_LOADER_;NO_IRR_COMPILE_WITH_OBJ_LOADER_;NO_IRR_COMPILE_WITH_OCT_LOADER_;NO_IRR_COMPILE_WITH_LWO_LOADER_;NO_IRR_COMPILE_WITH_STL_LOADER_;NO_IRR_COMPILE_WITH_PLY_LOADER_;NO_IRR_COMPILE_WITH_SMF_LOADER_;NO_IRR_COMPILE_WITH_IRR_WRITER_;NO_IRR_COMPILE_WITH_COLLADA_WRITER_;NO_IRR_COMPILE_WITH_STL_WRITER_;NO_IRR_COMPILE_WITH_OBJ_WRITER_;NO_IRR_COMPILE_WITH_PLY_WRITER_;NO_IRR_COMPILE_WITH_PCX_LOADER_;NO_IRR_COMPILE_WITH_PPM_LOADER_;NO_IRR_COMPILE_WITH_PSD_LOADER_;NO_IRR_COMPILE_WITH_TGA_LOADER_;NO_IRR_COMPILE_WITH_WAL_LOADER_;NO_IRR_COMPILE_WITH_LMP_LOADER_;NO_IRR_COMPILE_WITH_RGB_LOADER_;NO_IRR_COMPILE_WITH_PCX_WRITER_;NO_IRR_COMPILE_WITH_PPM_WRITER_;NO_IRR_COMPILE_WITH_PSD_WRITER_;NO_IRR_COMPILE_WITH_TGA_WRITER_;NO__IRR_COMPILE_WITH_PAK_ARCHIVE_LOADER_;NO__IRR_COMPILE_WITH_NPK_ARCHIVE_LOADER_;NO__IRR_COMPILE_WITH_WAD_ARCHIVE_LOADER_;NO_IRR_USE_NON_SYSTEM_ZLIB_;NO_IRR_USE_NON_SYSTEM_BZLIB_;NO_IRR_USE_NON_SYSTEM_LIB_PNG_;NO_IRR_USE_NON_SYSTEM_JPEG_LIB_;_IRR_COMPILE_WITH_OGLES1_;IRR_COMPILE_WITH_DX9_DEV_PACK;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+			<AdditionalIncludeDirectories>..\ocgcore;..\sfAudio\include;..\irrlicht\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+		</ResourceCompile>
+		<Link>
+			<SubSystem>Console</SubSystem>
+			<GenerateDebugInformation>true</GenerateDebugInformation>
+			<AdditionalDependencies>tolk.lib;nvdaControllerClient32.lib;wbemuuid.lib;opengl32.lib;ws2_32.lib;winmm.lib;gdi32.lib;kernel32.lib;user32.lib;imm32.lib;wldap32.lib;crypt32.lib;advapi32.lib;rpcrt4.lib;ole32.lib;uuid.lib;winhttp.lib;Iphlpapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+			<AdditionalLibraryDirectories>..\Accessibility\Readers\libs\nvda-lib;.\Accessibility\Readers\libs\x64;..\Accessibility\Readers\libs\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+		</Link>
+		<Manifest>
+			<AdditionalManifestFiles>../gframe/ygopro.exe.manifest;%(AdditionalManifestFiles)</AdditionalManifestFiles>
+		</Manifest>
+	</ItemDefinitionGroup>
+	<ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+		<ClCompile>
+			<PrecompiledHeader>NotUsing</PrecompiledHeader>
+			<WarningLevel>Level3</WarningLevel>
+			<PreprocessorDefinitions>WIN32;_WIN32;NOMINMAX;_CRT_SECURE_NO_WARNINGS;CURL_STATICLIB;YGOPRO_USE_SFML;_IRR_STATIC_LIB_;IRRLICHT_FAST_MATH;NO_IRR_COMPILE_WITH_CONSOLE_DEVICE_;NO_IRR_COMPILE_WITH_DIRECT3D_8_;NO_IRR_COMPILE_WITH_DIRECTINPUT_JOYSTICK_;NO_IRR_COMPILE_WITH_JOYSTICK_EVENTS_;NO_IRR_COMPILE_WITH_SOFTWARE_;NO_IRR_COMPILE_WITH_BURNINGSVIDEO_;NO_IRR_COMPILE_WITH_IRR_SCENE_LOADER_;NO_IRR_COMPILE_WITH_SKINNED_MESH_SUPPORT_;NO_IRR_COMPILE_WITH_IRR_MESH_LOADER_;NO_IRR_COMPILE_WITH_HALFLIFE_LOADER_;NO_IRR_COMPILE_WITH_MD2_LOADER_;NO_IRR_COMPILE_WITH_MD3_LOADER_;NO_IRR_COMPILE_WITH_3DS_LOADER_;NO_IRR_COMPILE_WITH_COLLADA_LOADER_;NO_IRR_COMPILE_WITH_CSM_LOADER_;NO_IRR_COMPILE_WITH_BSP_LOADER_;NO_IRR_COMPILE_WITH_DMF_LOADER_;NO_IRR_COMPILE_WITH_LMTS_LOADER_;NO_IRR_COMPILE_WITH_MY3D_LOADER_;NO_IRR_COMPILE_WITH_OBJ_LOADER_;NO_IRR_COMPILE_WITH_OCT_LOADER_;NO_IRR_COMPILE_WITH_LWO_LOADER_;NO_IRR_COMPILE_WITH_STL_LOADER_;NO_IRR_COMPILE_WITH_PLY_LOADER_;NO_IRR_COMPILE_WITH_SMF_LOADER_;NO_IRR_COMPILE_WITH_IRR_WRITER_;NO_IRR_COMPILE_WITH_COLLADA_WRITER_;NO_IRR_COMPILE_WITH_STL_WRITER_;NO_IRR_COMPILE_WITH_OBJ_WRITER_;NO_IRR_COMPILE_WITH_PLY_WRITER_;NO_IRR_COMPILE_WITH_PCX_LOADER_;NO_IRR_COMPILE_WITH_PPM_LOADER_;NO_IRR_COMPILE_WITH_PSD_LOADER_;NO_IRR_COMPILE_WITH_TGA_LOADER_;NO_IRR_COMPILE_WITH_WAL_LOADER_;NO_IRR_COMPILE_WITH_LMP_LOADER_;NO_IRR_COMPILE_WITH_RGB_LOADER_;NO_IRR_COMPILE_WITH_PCX_WRITER_;NO_IRR_COMPILE_WITH_PPM_WRITER_;NO_IRR_COMPILE_WITH_PSD_WRITER_;NO_IRR_COMPILE_WITH_TGA_WRITER_;NO__IRR_COMPILE_WITH_PAK_ARCHIVE_LOADER_;NO__IRR_COMPILE_WITH_NPK_ARCHIVE_LOADER_;NO__IRR_COMPILE_WITH_WAD_ARCHIVE_LOADER_;NO_IRR_USE_NON_SYSTEM_ZLIB_;NO_IRR_USE_NON_SYSTEM_BZLIB_;NO_IRR_USE_NON_SYSTEM_LIB_PNG_;NO_IRR_USE_NON_SYSTEM_JPEG_LIB_;_IRR_COMPILE_WITH_OGLES1_;IRR_COMPILE_WITH_DX9_DEV_PACK;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+			<AdditionalIncludeDirectories>..\accessibility;..\ocgcore;..\sfAudio\include;..\irrlicht\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+			<Optimization>MinSpace</Optimization>
+			<FunctionLevelLinking>true</FunctionLevelLinking>
+			<IntrinsicFunctions>true</IntrinsicFunctions>
+			<MinimalRebuild>false</MinimalRebuild>
+			<StringPooling>true</StringPooling>
+			<RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+			<RuntimeTypeInfo>false</RuntimeTypeInfo>
+			<EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+			<AdditionalOptions>-wd4996 %(AdditionalOptions)</AdditionalOptions>
+			<LanguageStandard>stdcpp14</LanguageStandard>
+		</ClCompile>
+		<ResourceCompile>
+			<PreprocessorDefinitions>WIN32;_WIN32;NOMINMAX;_CRT_SECURE_NO_WARNINGS;CURL_STATICLIB;YGOPRO_USE_SFML;_IRR_STATIC_LIB_;IRRLICHT_FAST_MATH;NO_IRR_COMPILE_WITH_CONSOLE_DEVICE_;NO_IRR_COMPILE_WITH_DIRECT3D_8_;NO_IRR_COMPILE_WITH_DIRECTINPUT_JOYSTICK_;NO_IRR_COMPILE_WITH_JOYSTICK_EVENTS_;NO_IRR_COMPILE_WITH_SOFTWARE_;NO_IRR_COMPILE_WITH_BURNINGSVIDEO_;NO_IRR_COMPILE_WITH_IRR_SCENE_LOADER_;NO_IRR_COMPILE_WITH_SKINNED_MESH_SUPPORT_;NO_IRR_COMPILE_WITH_IRR_MESH_LOADER_;NO_IRR_COMPILE_WITH_HALFLIFE_LOADER_;NO_IRR_COMPILE_WITH_MD2_LOADER_;NO_IRR_COMPILE_WITH_MD3_LOADER_;NO_IRR_COMPILE_WITH_3DS_LOADER_;NO_IRR_COMPILE_WITH_COLLADA_LOADER_;NO_IRR_COMPILE_WITH_CSM_LOADER_;NO_IRR_COMPILE_WITH_BSP_LOADER_;NO_IRR_COMPILE_WITH_DMF_LOADER_;NO_IRR_COMPILE_WITH_LMTS_LOADER_;NO_IRR_COMPILE_WITH_MY3D_LOADER_;NO_IRR_COMPILE_WITH_OBJ_LOADER_;NO_IRR_COMPILE_WITH_OCT_LOADER_;NO_IRR_COMPILE_WITH_LWO_LOADER_;NO_IRR_COMPILE_WITH_STL_LOADER_;NO_IRR_COMPILE_WITH_PLY_LOADER_;NO_IRR_COMPILE_WITH_SMF_LOADER_;NO_IRR_COMPILE_WITH_IRR_WRITER_;NO_IRR_COMPILE_WITH_COLLADA_WRITER_;NO_IRR_COMPILE_WITH_STL_WRITER_;NO_IRR_COMPILE_WITH_OBJ_WRITER_;NO_IRR_COMPILE_WITH_PLY_WRITER_;NO_IRR_COMPILE_WITH_PCX_LOADER_;NO_IRR_COMPILE_WITH_PPM_LOADER_;NO_IRR_COMPILE_WITH_PSD_LOADER_;NO_IRR_COMPILE_WITH_TGA_LOADER_;NO_IRR_COMPILE_WITH_WAL_LOADER_;NO_IRR_COMPILE_WITH_LMP_LOADER_;NO_IRR_COMPILE_WITH_RGB_LOADER_;NO_IRR_COMPILE_WITH_PCX_WRITER_;NO_IRR_COMPILE_WITH_PPM_WRITER_;NO_IRR_COMPILE_WITH_PSD_WRITER_;NO_IRR_COMPILE_WITH_TGA_WRITER_;NO__IRR_COMPILE_WITH_PAK_ARCHIVE_LOADER_;NO__IRR_COMPILE_WITH_NPK_ARCHIVE_LOADER_;NO__IRR_COMPILE_WITH_WAD_ARCHIVE_LOADER_;NO_IRR_USE_NON_SYSTEM_ZLIB_;NO_IRR_USE_NON_SYSTEM_BZLIB_;NO_IRR_USE_NON_SYSTEM_LIB_PNG_;NO_IRR_USE_NON_SYSTEM_JPEG_LIB_;_IRR_COMPILE_WITH_OGLES1_;IRR_COMPILE_WITH_DX9_DEV_PACK;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+			<AdditionalIncludeDirectories>..\ocgcore;..\sfAudio\include;..\irrlicht\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+		</ResourceCompile>
+		<Link>
+			<SubSystem>Console</SubSystem>
+			<EnableCOMDATFolding>true</EnableCOMDATFolding>
+			<OptimizeReferences>true</OptimizeReferences>
+			<AdditionalDependencies>tolk.lib;nvdaControllerClient32.lib;wbemuuid.lib;opengl32.lib;ws2_32.lib;winmm.lib;gdi32.lib;kernel32.lib;user32.lib;imm32.lib;wldap32.lib;crypt32.lib;advapi32.lib;rpcrt4.lib;ole32.lib;uuid.lib;winhttp.lib;Iphlpapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+			<AdditionalLibraryDirectories>..\Accessibility\Readers\libs\nvda-lib;.\Accessibility\Readers\libs\x64;..\Accessibility\Readers\libs\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+		</Link>
+		<Manifest>
+			<AdditionalManifestFiles>../gframe/ygopro.exe.manifest;%(AdditionalManifestFiles)</AdditionalManifestFiles>
+		</Manifest>
+	</ItemDefinitionGroup>
+	<ItemGroup>
+		<ClInclude Include="..\accessibility\Control\DeckHandler.h" />
+		<ClInclude Include="..\accessibility\Control\EventHandler.h" />
+		<ClInclude Include="..\accessibility\Menus\AccessibilityMenu.h" />
+		<ClInclude Include="..\gframe\Base64.h" />
+		<ClInclude Include="..\gframe\CGUICustomCheckBox\CGUICustomCheckBox.h" />
+		<ClInclude Include="..\gframe\CGUICustomComboBox\CGUICustomComboBox.h" />
+		<ClInclude Include="..\gframe\CGUICustomContextMenu\CGUICustomContextMenu.h" />
+		<ClInclude Include="..\gframe\CGUICustomContextMenu\CGUICustomMenu.h" />
+		<ClInclude Include="..\gframe\CGUICustomTabControl\CGUICustomTabControl.h" />
+		<ClInclude Include="..\gframe\CGUICustomTable\CGUICustomTable.h" />
+		<ClInclude Include="..\gframe\CGUICustomText\CGUICustomText.h" />
+		<ClInclude Include="..\gframe\CGUIEnvironmentLinker.h" />
+		<ClInclude Include="..\gframe\CGUIFileSelectListBox\CGUIFileSelectListBox.h" />
+		<ClInclude Include="..\gframe\CGUIImageButton\CGUIImageButton.h" />
+		<ClInclude Include="..\gframe\CGUISkinSystem\CConfigMap.h" />
+		<ClInclude Include="..\gframe\CGUISkinSystem\CGUIProgressBar.h" />
+		<ClInclude Include="..\gframe\CGUISkinSystem\CGUISkinSystem.h" />
+		<ClInclude Include="..\gframe\CGUISkinSystem\CImageGUISkin.h" />
+		<ClInclude Include="..\gframe\CGUISkinSystem\clipRects.h" />
+		<ClInclude Include="..\gframe\CGUITTFont\CGUITTFont.h" />
+		<ClInclude Include="..\gframe\CGUITTFont\irrUString.h" />
+		<ClInclude Include="..\gframe\CGUIWindowedTabControl\CGUIWindowedTabControl.h" />
+		<ClInclude Include="..\gframe\CProgressBar\CProgressBar.h" />
+		<ClInclude Include="..\gframe\CXMLRegistry\CXMLNode.h" />
+		<ClInclude Include="..\gframe\CXMLRegistry\CXMLRegistry.h" />
+		<ClInclude Include="..\gframe\IrrlichtCommonIncludes\CCursorControl.h" />
+		<ClInclude Include="..\gframe\IrrlichtCommonIncludes\CFileSystem.h" />
+		<ClInclude Include="..\gframe\IrrlichtCommonIncludes\CGUIButton.h" />
+		<ClInclude Include="..\gframe\IrrlichtCommonIncludes\CGUIScrollBar.h" />
+		<ClInclude Include="..\gframe\IrrlichtCommonIncludes\CGUITabControl.h" />
+		<ClInclude Include="..\gframe\IrrlichtCommonIncludes\os.h" />
+		<ClInclude Include="..\gframe\IrrlichtCommonIncludes1.9\CFileSystem.h" />
+		<ClInclude Include="..\gframe\IrrlichtCommonIncludes1.9\CGUIButton.h" />
+		<ClInclude Include="..\gframe\IrrlichtCommonIncludes1.9\CGUIListBox.h" />
+		<ClInclude Include="..\gframe\IrrlichtCommonIncludes1.9\CGUIScrollBar.h" />
+		<ClInclude Include="..\gframe\IrrlichtCommonIncludes1.9\CGUITabControl.h" />
+		<ClInclude Include="..\gframe\IrrlichtCommonIncludes1.9\os.h" />
+		<ClInclude Include="..\gframe\MD5\md5.h" />
+		<ClInclude Include="..\gframe\RNG\SplitMix64.hpp" />
+		<ClInclude Include="..\gframe\RNG\Xoshiro256.hpp" />
+		<ClInclude Include="..\gframe\RNG\mt19937.h" />
+		<ClInclude Include="..\gframe\ResizeablePanel\ResizeablePanel.h" />
+		<ClInclude Include="..\gframe\bufferio.h" />
+		<ClInclude Include="..\gframe\client_card.h" />
+		<ClInclude Include="..\gframe\client_field.h" />
+		<ClInclude Include="..\gframe\client_updater.h" />
+		<ClInclude Include="..\gframe\common.h" />
+		<ClInclude Include="..\gframe\config.h" />
+		<ClInclude Include="..\gframe\core_utils.h" />
+		<ClInclude Include="..\gframe\custom_skin_enum.h" />
+		<ClInclude Include="..\gframe\data_handler.h" />
+		<ClInclude Include="..\gframe\data_manager.h" />
+		<ClInclude Include="..\gframe\deck.h" />
+		<ClInclude Include="..\gframe\deck_con.h" />
+		<ClInclude Include="..\gframe\deck_manager.h" />
+		<ClInclude Include="..\gframe\discord_register.h" />
+		<ClInclude Include="..\gframe\discord_rpc.h" />
+		<ClInclude Include="..\gframe\discord_wrapper.h" />
+		<ClInclude Include="..\gframe\dllinterface.h" />
+		<ClInclude Include="..\gframe\duelclient.h" />
+		<ClInclude Include="..\gframe\epro_condition_variable.h" />
+		<ClInclude Include="..\gframe\epro_mutex.h" />
+		<ClInclude Include="..\gframe\epro_thread.h" />
+		<ClInclude Include="..\gframe\file_stream.h" />
+		<ClInclude Include="..\gframe\game.h" />
+		<ClInclude Include="..\gframe\game_config.h" />
+		<ClInclude Include="..\gframe\generic_duel.h" />
+		<ClInclude Include="..\gframe\iOS\COSiOSOperator.h" />
+		<ClInclude Include="..\gframe\iOS\porting_ios.h" />
+		<ClInclude Include="..\gframe\image_downloader.h" />
+		<ClInclude Include="..\gframe\image_manager.h" />
+		<ClInclude Include="..\gframe\ireadfile_sqlite.h" />
+		<ClInclude Include="..\gframe\joystick_wrapper.h" />
+		<ClInclude Include="..\gframe\libgit2.hpp" />
+		<ClInclude Include="..\gframe\log.h" />
+		<ClInclude Include="..\gframe\logging.h" />
+		<ClInclude Include="..\gframe\materials.h" />
+		<ClInclude Include="..\gframe\menu_handler.h" />
+		<ClInclude Include="..\gframe\mysignal.h" />
+		<ClInclude Include="..\gframe\netserver.h" />
+		<ClInclude Include="..\gframe\network.h" />
+		<ClInclude Include="..\gframe\nonstd\string_view.hpp" />
+		<ClInclude Include="..\gframe\ocgapi_types.h" />
+		<ClInclude Include="..\gframe\osx_menu.h" />
+		<ClInclude Include="..\gframe\porting.h" />
+		<ClInclude Include="..\gframe\progressivebuffer.h" />
+		<ClInclude Include="..\gframe\replay.h" />
+		<ClInclude Include="..\gframe\replay_mode.h" />
+		<ClInclude Include="..\gframe\repo_manager.h" />
+		<ClInclude Include="..\gframe\server_lobby.h" />
+		<ClInclude Include="..\gframe\settings_window.h" />
+		<ClInclude Include="..\gframe\single_mode.h" />
+		<ClInclude Include="..\gframe\sound_backend.h" />
+		<ClInclude Include="..\gframe\sound_manager.h" />
+		<ClInclude Include="..\gframe\sound_sfml.h" />
+		<ClInclude Include="..\gframe\sound_threaded_backend.h" />
+		<ClInclude Include="..\gframe\text_types.h" />
+		<ClInclude Include="..\gframe\utils.h" />
+		<ClInclude Include="..\gframe\utils_gui.h" />
+		<ClInclude Include="..\gframe\windbot.h" />
+		<ClInclude Include="..\gframe\windbot_panel.h" />
+	</ItemGroup>
+	<ItemGroup>
+		<ClCompile Include="..\accessibility\Control\DeckHandler.cpp" />
+		<ClCompile Include="..\accessibility\Control\EventHandler.cpp" />
+		<ClCompile Include="..\accessibility\Menus\AccessibilityMenu.cpp" />
+		<ClCompile Include="..\gframe\CGUICustomCheckBox\CGUICustomCheckBox.cpp" />
+		<ClCompile Include="..\gframe\CGUICustomComboBox\CGUICustomComboBox.cpp" />
+		<ClCompile Include="..\gframe\CGUICustomContextMenu\CGUICustomContextMenu.cpp" />
+		<ClCompile Include="..\gframe\CGUICustomContextMenu\CGUICustomMenu.cpp" />
+		<ClCompile Include="..\gframe\CGUICustomTabControl\CGUICustomTabControl.cpp" />
+		<ClCompile Include="..\gframe\CGUICustomTable\CGUICustomTable.cpp" />
+		<ClCompile Include="..\gframe\CGUICustomText\CGUICustomText.cpp" />
+		<ClCompile Include="..\gframe\CGUIFileSelectListBox\CGUIFileSelectListBox.cpp" />
+		<ClCompile Include="..\gframe\CGUIImageButton\CGUIImageButton.cpp" />
+		<ClCompile Include="..\gframe\CGUISkinSystem\CConfigMap.cpp" />
+		<ClCompile Include="..\gframe\CGUISkinSystem\CGUIProgressBar.cpp" />
+		<ClCompile Include="..\gframe\CGUISkinSystem\CGUISkinSystem.cpp" />
+		<ClCompile Include="..\gframe\CGUISkinSystem\CImageGUISkin.cpp" />
+		<ClCompile Include="..\gframe\CGUITTFont\CGUITTFont.cpp" />
+		<ClCompile Include="..\gframe\CGUIWindowedTabControl\CGUIWindowedTabControl.cpp" />
+		<ClCompile Include="..\gframe\CProgressBar\CProgressBar.cpp" />
+		<ClCompile Include="..\gframe\CXMLRegistry\CXMLNode.cpp" />
+		<ClCompile Include="..\gframe\CXMLRegistry\CXMLRegistry.cpp" />
+		<ClCompile Include="..\gframe\MD5\md5.c" />
+		<ClCompile Include="..\gframe\ResizeablePanel\ResizeablePanel.cpp" />
+		<ClCompile Include="..\gframe\client_card.cpp" />
+		<ClCompile Include="..\gframe\client_field.cpp" />
+		<ClCompile Include="..\gframe\client_updater.cpp" />
+		<ClCompile Include="..\gframe\core_utils.cpp" />
+		<ClCompile Include="..\gframe\custom_skin_enum.cpp" />
+		<ClCompile Include="..\gframe\data_handler.cpp" />
+		<ClCompile Include="..\gframe\data_manager.cpp" />
+		<ClCompile Include="..\gframe\deck_con.cpp" />
+		<ClCompile Include="..\gframe\deck_manager.cpp" />
+		<ClCompile Include="..\gframe\discord_wrapper.cpp" />
+		<ClCompile Include="..\gframe\dllinterface.cpp" />
+		<ClCompile Include="..\gframe\drawing.cpp" />
+		<ClCompile Include="..\gframe\duelclient.cpp" />
+		<ClCompile Include="..\gframe\event_handler.cpp" />
+		<ClCompile Include="..\gframe\game.cpp" />
+		<ClCompile Include="..\gframe\game_config.cpp" />
+		<ClCompile Include="..\gframe\generic_duel.cpp" />
+		<ClCompile Include="..\gframe\gframe.cpp" />
+		<ClCompile Include="..\gframe\image_downloader.cpp" />
+		<ClCompile Include="..\gframe\image_manager.cpp" />
+		<ClCompile Include="..\gframe\ireadfile_sqlite.cpp" />
+		<ClCompile Include="..\gframe\joystick_wrapper.cpp" />
+		<ClCompile Include="..\gframe\logging.cpp" />
+		<ClCompile Include="..\gframe\materials.cpp" />
+		<ClCompile Include="..\gframe\menu_handler.cpp" />
+		<ClCompile Include="..\gframe\netserver.cpp" />
+		<ClCompile Include="..\gframe\old_replay_mode.cpp" />
+		<ClCompile Include="..\gframe\replay.cpp" />
+		<ClCompile Include="..\gframe\replay_mode.cpp" />
+		<ClCompile Include="..\gframe\repo_manager.cpp" />
+		<ClCompile Include="..\gframe\server_lobby.cpp" />
+		<ClCompile Include="..\gframe\settings_window.cpp" />
+		<ClCompile Include="..\gframe\single_mode.cpp" />
+		<ClCompile Include="..\gframe\sound_manager.cpp" />
+		<ClCompile Include="..\gframe\sound_sfml.cpp" />
+		<ClCompile Include="..\gframe\sound_threaded_backend.cpp" />
+		<ClCompile Include="..\gframe\utils.cpp" />
+		<ClCompile Include="..\gframe\utils_gui.cpp" />
+		<ClCompile Include="..\gframe\windbot.cpp" />
+		<ClCompile Include="..\gframe\windbot_panel.cpp" />
+	</ItemGroup>
+	<ItemGroup>
+		<None Include="..\gframe\ygopro.exe.manifest" />
+	</ItemGroup>
+	<ItemGroup>
+		<ResourceCompile Include="..\gframe\ygopro.rc" />
+	</ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\accessibility\accessibility.vcxproj">
+			<Project>{89541d4f-647d-4e19-8bcd-dd305f3fb95a}</Project>
+		</ProjectReference>
+		<ProjectReference Include="ocgcore.vcxproj">
+			<Project>{07B8AE52-7397-2DEE-7CAF-B8C4E80D944F}</Project>
+		</ProjectReference>
+		<ProjectReference Include="clzma.vcxproj">
+			<Project>{5CC83B0F-C8DC-63C0-915E-0720FD3160F1}</Project>
+		</ProjectReference>
+		<ProjectReference Include="Irrlicht.vcxproj">
+			<Project>{06C1B133-F28D-0C3F-1BA7-FAE607D341CD}</Project>
+		</ProjectReference>
+		<ProjectReference Include="sfAudio.vcxproj">
+			<Project>{B030F18A-1C10-7026-2528-FBFC9186D687}</Project>
+		</ProjectReference>
+	</ItemGroup>
+	<Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+	<ImportGroup Label="ExtensionTargets">
+	</ImportGroup>
 </Project>

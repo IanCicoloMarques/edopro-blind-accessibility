@@ -75,7 +75,7 @@ namespace ygo {
 		void SelectCard(const std::vector<ClientCard*>& field, const std::wstring& text);
 		void DisplayCards(const std::vector<ChainInfo>& field, const std::wstring& text);
 		void CloseDialog();
-		bool UseCard(const AccessibilityFieldFocus::UseType& useType, irr::SEvent event, ClientCard* card);
+		bool UseCard(const AccessibilityFieldFocus::UseType& useType, irr::SEvent event, ClientCard* card = mainGame->dField.clicked_card);
 		void SetLookUpField();
 		void ShowSelectCard();
 		void ShowMenu(int flag, int x, int y);

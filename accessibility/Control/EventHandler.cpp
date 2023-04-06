@@ -1586,7 +1586,7 @@ namespace ygo {
 		mainGame->wCmdMenu->setRelativePosition(irr::core::recti(x - mainGame->Scale(20), y - mainGame->Scale(20) - height, x + mainGame->Scale(80), y - mainGame->Scale(20)));
 	}
 
-	bool EventHandler::UseCard(const AccessibilityFieldFocus::UseType& useType, irr::SEvent event, ClientCard* card = mainGame->dField.clicked_card) {
+	bool EventHandler::UseCard(const AccessibilityFieldFocus::UseType& useType, irr::SEvent event, ClientCard* card) {
 		bool canUse = false;
 		std::wstring command;
 		SetLookUpField();

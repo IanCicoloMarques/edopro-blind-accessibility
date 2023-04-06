@@ -21,7 +21,6 @@
 #include "CGUITTFont/CGUITTFont.h"
 #include "custom_skin_enum.h"
 #include "Base64.h"
-#include <SViewFrustum.h>
 #include <IrrlichtDevice.h>
 #include <ISceneManager.h>
 #include <ICameraSceneNode.h>
@@ -64,9 +63,7 @@ inline bool TransformEvent(const irr::SEvent& event, bool& stopPropagation) {
 	return porting::transformEvent(event, stopPropagation);
 }
 #else
-inline constexpr bool TransformEvent(const irr::SEvent& event, bool& stopPropagation) {
-	(void)event;
-	(void)stopPropagation;
+inline constexpr bool TransformEvent(const irr::SEvent&, bool&) {
 	return false;
 }
 #endif
@@ -396,7 +393,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 								if(id == BUTTON_CMD_RESET) continue;
 							}
 							select_options.push_back(activatable_descs[i].first);
-							if (index == -1) index = i;
+							if (index == -1) index = static_cast<int>(i);
 						}
 					}
 					if (select_options.size() == 1) {
@@ -470,7 +467,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				for(size_t i = 0; i < summonable_cards.size(); ++i) {
 					if(summonable_cards[i] == clicked_card) {
 						ClearCommandFlag();
-						DuelClient::SetResponseI(i << 16);
+						DuelClient::SetResponseI(static_cast<uint32_t>(i) << 16);
 						DuelClient::SendResponse();
 						break;
 					}
@@ -485,7 +482,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					for(size_t i = 0; i < spsummonable_cards.size(); ++i) {
 						if(spsummonable_cards[i] == clicked_card) {
 							ClearCommandFlag();
-							DuelClient::SetResponseI((i << 16) + 1);
+							DuelClient::SetResponseI((static_cast<uint32_t>(i) << 16) + 1);
 							DuelClient::SendResponse();
 							break;
 						}
@@ -532,7 +529,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					break;
 				for(size_t i = 0; i < msetable_cards.size(); ++i) {
 					if(msetable_cards[i] == clicked_card) {
-						DuelClient::SetResponseI((i << 16) + 3);
+						DuelClient::SetResponseI((static_cast<uint32_t>(i) << 16) + 3);
 						DuelClient::SendResponse();
 						break;
 					}
@@ -545,7 +542,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					break;
 				for(size_t i = 0; i < ssetable_cards.size(); ++i) {
 					if(ssetable_cards[i] == clicked_card) {
-						DuelClient::SetResponseI((i << 16) + 4);
+						DuelClient::SetResponseI((static_cast<uint32_t>(i) << 16) + 4);
 						DuelClient::SendResponse();
 						break;
 					}
@@ -571,7 +568,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					break;
 				for(size_t i = 0; i < attackable_cards.size(); ++i) {
 					if(attackable_cards[i] == clicked_card) {
-						DuelClient::SetResponseI((i << 16) + 1);
+						DuelClient::SetResponseI((static_cast<uint32_t>(i) << 16) + 1);
 						DuelClient::SendResponse();
 						break;
 					}
@@ -585,39 +582,39 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				case LOCATION_DECK: {
 					for(int32_t i = (int32_t)deck[command_controler].size() - 1; i >= 0 ; --i)
 						selectable_cards.push_back(deck[command_controler][i]);
-					mainGame->wCardSelect->setText(fmt::format(L"{}({})", gDataManager->GetSysString(1000), deck[command_controler].size()).data());
+					mainGame->wCardSelect->setText(epro::format(L"{}({})", gDataManager->GetSysString(1000), deck[command_controler].size()).data());
 					break;
 				}
 				case LOCATION_MZONE: {
 					ClientCard* pcard = mzone[command_controler][command_sequence];
 					for(auto& _pcard : pcard->overlayed)
 						selectable_cards.push_back(_pcard);
-					mainGame->wCardSelect->setText(fmt::format(L"{}({})", gDataManager->GetSysString(1007), pcard->overlayed.size()).data());
+					mainGame->wCardSelect->setText(epro::format(L"{}({})", gDataManager->GetSysString(1007), pcard->overlayed.size()).data());
 					break;
 				}
 				case LOCATION_SZONE: {
 					ClientCard* pcard = szone[command_controler][command_sequence];
 					for (auto& _pcard : pcard->overlayed)
 						selectable_cards.push_back(_pcard);
-					mainGame->wCardSelect->setText(fmt::format(L"{}({})", gDataManager->GetSysString(1007), pcard->overlayed.size()).data());
+					mainGame->wCardSelect->setText(epro::format(L"{}({})", gDataManager->GetSysString(1007), pcard->overlayed.size()).data());
 					break;
 				}
 				case LOCATION_GRAVE: {
 					for(int32_t i = (int32_t)grave[command_controler].size() - 1; i >= 0 ; --i)
 						selectable_cards.push_back(grave[command_controler][i]);
-					mainGame->wCardSelect->setText(fmt::format(L"{}({})", gDataManager->GetSysString(1004), grave[command_controler].size()).data());
+					mainGame->wCardSelect->setText(epro::format(L"{}({})", gDataManager->GetSysString(1004), grave[command_controler].size()).data());
 					break;
 				}
 				case LOCATION_REMOVED: {
 					for(int32_t i = (int32_t)remove[command_controler].size() - 1; i >= 0 ; --i)
 						selectable_cards.push_back(remove[command_controler][i]);
-					mainGame->wCardSelect->setText(fmt::format(L"{}({})", gDataManager->GetSysString(1005), remove[command_controler].size()).data());
+					mainGame->wCardSelect->setText(epro::format(L"{}({})", gDataManager->GetSysString(1005), remove[command_controler].size()).data());
 					break;
 				}
 				case LOCATION_EXTRA: {
 					for(int32_t i = (int32_t)extra[command_controler].size() - 1; i >= 0 ; --i)
 						selectable_cards.push_back(extra[command_controler][i]);
-					mainGame->wCardSelect->setText(fmt::format(L"{}({})", gDataManager->GetSysString(1006), extra[command_controler].size()).data());
+					mainGame->wCardSelect->setText(epro::format(L"{}({})", gDataManager->GetSysString(1006), extra[command_controler].size()).data());
 					break;
 				}
 				}
@@ -688,7 +685,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 									if(list_command == COMMAND_OPERATION) continue;
 								}
 								select_options.push_back(activatable_descs[i].first);
-								if (index == -1) index = i;
+								if (index == -1) index = static_cast<int>(i);
 							}
 						}
 						if (select_options.size() == 1) {
@@ -873,7 +870,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case CHECK_RACE: {
-				int rac = 0, filter = 0x1, count = 0;
+				uint64_t rac = 0, filter = 0x1, count = 0;
 				for(int i = 0; i < 25; ++i, filter <<= 1) {
 					if(mainGame->chkRace[i]->isChecked()) {
 						rac |= filter;
@@ -951,10 +948,10 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 						if(conti_selecting)
 							text = std::wstring{ DataManager::unknown_string };
 						else if(curcard->location == LOCATION_OVERLAY) {
-							text = fmt::format(L"{}[{}]({})", gDataManager->FormatLocation(curcard->overlayTarget->location, curcard->overlayTarget->sequence),
+							text = epro::format(L"{}[{}]({})", gDataManager->FormatLocation(curcard->overlayTarget->location, curcard->overlayTarget->sequence),
 								curcard->overlayTarget->sequence + 1, curcard->sequence + 1);
 						} else if(curcard->location != 0) {
-							text = fmt::format(L"{}[{}]", gDataManager->FormatLocation(curcard->location, curcard->sequence),
+							text = epro::format(L"{}[{}]", gDataManager->FormatLocation(curcard->location, curcard->sequence),
 								curcard->sequence + 1);
 						}
 					}
@@ -1005,10 +1002,10 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					mainGame->btnCardDisplay[i]->setRelativePosition(mainGame->Scale(30 + i * 125, 55, 30 + 120 + i * 125, 225));
 					std::wstring text;
 					if(curcard->location == LOCATION_OVERLAY) {
-						text = fmt::format(L"{}[{}]({})", gDataManager->FormatLocation(curcard->overlayTarget->location, curcard->overlayTarget->sequence),
+						text = epro::format(L"{}[{}]({})", gDataManager->FormatLocation(curcard->overlayTarget->location, curcard->overlayTarget->sequence),
 							curcard->overlayTarget->sequence + 1, curcard->sequence + 1);
 					} else {
-						text = fmt::format(L"{}[{}]", gDataManager->FormatLocation(curcard->location, curcard->sequence),
+						text = epro::format(L"{}[{}]", gDataManager->FormatLocation(curcard->location, curcard->sequence),
 							curcard->sequence + 1);
 					}
 					curstring->setText(text.data());
@@ -1147,8 +1144,11 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				break;
 			if(mainGame->wCardDisplay->isVisible())
 				break;
-			irr::core::vector2di pos = mainGame->Resize(event.MouseInput.X, event.MouseInput.Y, true);
 			irr::core::vector2di mousepos(event.MouseInput.X, event.MouseInput.Y);
+			irr::gui::IGUIElement* root = mainGame->env->getRootGUIElement();
+			if(root->getElementFromPoint(mousepos) != root)
+				break;
+			irr::core::vector2di pos = mainGame->Resize(event.MouseInput.X, event.MouseInput.Y, true);
 			if(pos.X < 300)
 				break;
 			GetHoverField(mousepos);
@@ -1193,7 +1193,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 						break;
 					for(int32_t i = (int32_t)deck[hovered_controler].size() - 1; i >= 0 ; --i)
 						selectable_cards.push_back(deck[hovered_controler][i]);
-					mainGame->wCardSelect->setText(fmt::format(L"{}({})", gDataManager->GetSysString(1000), deck[hovered_controler].size()).data());
+					mainGame->wCardSelect->setText(epro::format(L"{}({})", gDataManager->GetSysString(1000), deck[hovered_controler].size()).data());
 					break;
 				}
 				case LOCATION_MZONE: {
@@ -1201,7 +1201,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 						break;
 					for(auto& pcard : clicked_card->overlayed)
 						selectable_cards.push_back(pcard);
-					mainGame->wCardSelect->setText(fmt::format(L"{}({})", gDataManager->GetSysString(1007), clicked_card->overlayed.size()).data());
+					mainGame->wCardSelect->setText(epro::format(L"{}({})", gDataManager->GetSysString(1007), clicked_card->overlayed.size()).data());
 					break;
 				}
 				case LOCATION_GRAVE: {
@@ -1209,7 +1209,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 						break;
 					for(int32_t i = (int32_t)grave[hovered_controler].size() - 1; i >= 0 ; --i)
 						selectable_cards.push_back(grave[hovered_controler][i]);
-					mainGame->wCardSelect->setText(fmt::format(L"{}({})", gDataManager->GetSysString(1004), grave[hovered_controler].size()).data());
+					mainGame->wCardSelect->setText(epro::format(L"{}({})", gDataManager->GetSysString(1004), grave[hovered_controler].size()).data());
 					break;
 				}
 				case LOCATION_REMOVED: {
@@ -1217,7 +1217,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 						break;
 					for(int32_t i = (int32_t)remove[hovered_controler].size() - 1; i >= 0 ; --i)
 						selectable_cards.push_back(remove[hovered_controler][i]);
-					mainGame->wCardSelect->setText(fmt::format(L"{}({})", gDataManager->GetSysString(1005), remove[hovered_controler].size()).data());
+					mainGame->wCardSelect->setText(epro::format(L"{}({})", gDataManager->GetSysString(1005), remove[hovered_controler].size()).data());
 					break;
 				}
 				case LOCATION_EXTRA: {
@@ -1225,7 +1225,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 						break;
 					for(int32_t i = (int32_t)extra[hovered_controler].size() - 1; i >= 0 ; --i)
 						selectable_cards.push_back(extra[hovered_controler][i]);
-					mainGame->wCardSelect->setText(fmt::format(L"{}({})", gDataManager->GetSysString(1006), extra[hovered_controler].size()).data());
+					mainGame->wCardSelect->setText(epro::format(L"{}({})", gDataManager->GetSysString(1006), extra[hovered_controler].size()).data());
 					break;
 				}
 				}
@@ -1243,7 +1243,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 						break;
 					for(int32_t i = 0; i < (int32_t)clicked_card->overlayed.size(); ++i)
 						selectable_cards.push_back(clicked_card->overlayed[i]);
-					mainGame->wCardSelect->setText(fmt::format(L"{}({})", gDataManager->GetSysString(1007), clicked_card->overlayed.size()).data());
+					mainGame->wCardSelect->setText(epro::format(L"{}({})", gDataManager->GetSysString(1007), clicked_card->overlayed.size()).data());
 					break;
 				}
 				case LOCATION_GRAVE: {
@@ -1251,7 +1251,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 						break;
 					for(int32_t i = (int32_t)grave[hovered_controler].size() - 1; i >= 0 ; --i)
 						selectable_cards.push_back(grave[hovered_controler][i]);
-					mainGame->wCardSelect->setText(fmt::format(L"{}({})", gDataManager->GetSysString(1004), grave[hovered_controler].size()).data());
+					mainGame->wCardSelect->setText(epro::format(L"{}({})", gDataManager->GetSysString(1004), grave[hovered_controler].size()).data());
 					break;
 				}
 				case LOCATION_REMOVED: {
@@ -1259,7 +1259,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 						break;
 					for (int32_t i = (int32_t)remove[hovered_controler].size() - 1; i >= 0; --i)
 						selectable_cards.push_back(remove[hovered_controler][i]);
-					mainGame->wCardSelect->setText(fmt::format(L"{}({})", gDataManager->GetSysString(1005), remove[hovered_controler].size()).data());
+					mainGame->wCardSelect->setText(epro::format(L"{}({})", gDataManager->GetSysString(1005), remove[hovered_controler].size()).data());
 					break;
 				}
 				case LOCATION_EXTRA: {
@@ -1466,9 +1466,9 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					ScreenReader::getReader()->readScreen(fmt::format(gDataManager->GetAccessibilityString(261).data(), gDataManager->GetName(clicked_card->code)));
 					gSoundManager->PlaySoundEffect(SoundManager::SFX::CONFIRM);
 				}
-				uint32_t min = selected_cards.size(), max = 0;
+				uint32_t min = static_cast<uint32_t>(selected_cards.size()), max = 0;
 				if (mainGame->dInfo.curMsg == MSG_SELECT_CARD) {
-					max = selected_cards.size();
+					max = static_cast<uint32_t>(selected_cards.size());
 				} else {
 					for(size_t i = 0; i < selected_cards.size(); ++i)
 						max += selected_cards[i]->opParam;
@@ -1535,7 +1535,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					DuelClient::SetResponseB(respbuf, selectable_cards.size() * 2);
 					DuelClient::SendResponse();
 				} else {
-					mainGame->stHintMsg->setText(fmt::sprintf(gDataManager->GetSysString(204), select_counter_count, gDataManager->GetCounterName(select_counter_type)).data());
+					mainGame->stHintMsg->setText(epro::sprintf(gDataManager->GetSysString(204), select_counter_count, gDataManager->GetCounterName(select_counter_type)).data());
 				}
 				break;
 			}
@@ -1611,9 +1611,9 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				} else {
 					const auto& self = mainGame->dInfo.isTeam1 ? mainGame->dInfo.selfnames : mainGame->dInfo.opponames;
 					const auto& oppo = mainGame->dInfo.isTeam1 ? mainGame->dInfo.opponames : mainGame->dInfo.selfnames;
-					if(mainGame->Resize(327, 8, 630, 51 + (23 * (self.size() - 1))).isPointInside(mousepos))
+					if(mainGame->Resize(327, 8, 630, 51 + static_cast<irr::s32>(23 * (self.size() - 1))).isPointInside(mousepos))
 						mplayer = 0;
-					else if(mainGame->Resize(689, 8, 991, 51 + (23 * (oppo.size() - 1))).isPointInside(mousepos))
+					else if(mainGame->Resize(689, 8, 991, 51 + static_cast<irr::s32>(23 * (oppo.size() - 1))).isPointInside(mousepos))
 						mplayer = 1;
 				}
 			}
@@ -1655,47 +1655,47 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 							if(mcard->type & TYPE_MONSTER) {
 								if(mcard->alias && (mcard->alias < mcard->code - 10 || mcard->alias > mcard->code + 10)
 										&& wcscmp(gDataManager->GetName(mcard->code).data(), gDataManager->GetName(mcard->alias).data())) {
-									str.append(fmt::format(L"\n({})",gDataManager->GetName(mcard->alias)));
+									str.append(epro::format(L"\n({})",gDataManager->GetName(mcard->alias)));
 								}
 								if (mcard->type & TYPE_LINK) {
-									str.append(fmt::format(L"\n{}/Link {}\n{}/{}", mcard->atkstring, mcard->link, gDataManager->FormatRace(mcard->race),
+									str.append(epro::format(L"\n{}/Link {}\n{}/{}", mcard->atkstring, mcard->link, gDataManager->FormatRace(mcard->race),
 										gDataManager->FormatAttribute(mcard->attribute)));
 								} else {
-									str.append(fmt::format(L"\n{}/{}", mcard->atkstring, mcard->defstring));
+									str.append(epro::format(L"\n{}/{}", mcard->atkstring, mcard->defstring));
 									if(mcard->rank && mcard->level)
-										str.append(fmt::format(L"\n\u2606{}/\u2605{} {}/{}", mcard->level, mcard->rank, gDataManager->FormatRace(mcard->race), gDataManager->FormatAttribute(mcard->attribute)));
+										str.append(epro::format(L"\n\u2606{}/\u2605{} {}/{}", mcard->level, mcard->rank, gDataManager->FormatRace(mcard->race), gDataManager->FormatAttribute(mcard->attribute)));
 									else {
-										str.append(fmt::format(L"\n{}{} {}/{}", (mcard->level ? L"\u2605" : L"\u2606"), (mcard->level ? mcard->level : mcard->rank), gDataManager->FormatRace(mcard->race), gDataManager->FormatAttribute(mcard->attribute)));
+										str.append(epro::format(L"\n{}{} {}/{}", (mcard->level ? L"\u2605" : L"\u2606"), (mcard->level ? mcard->level : mcard->rank), gDataManager->FormatRace(mcard->race), gDataManager->FormatAttribute(mcard->attribute)));
 									}
 								}
 								if(mcard->location == LOCATION_HAND && (mcard->type & TYPE_PENDULUM)) {
-									str.append(fmt::format(L"\n{}/{}", mcard->lscale, mcard->rscale));
+									str.append(epro::format(L"\n{}/{}", mcard->lscale, mcard->rscale));
 								}
 							} else {
 								if(mcard->alias && (mcard->alias < mcard->code - 10 || mcard->alias > mcard->code + 10)) {
-									str.append(fmt::format(L"\n({})", gDataManager->GetName(mcard->alias)));
+									str.append(epro::format(L"\n({})", gDataManager->GetName(mcard->alias)));
 								}
 								if(mcard->location == LOCATION_SZONE && (mcard->type & TYPE_PENDULUM)) {
-									str.append(fmt::format(L"\n{}/{}", mcard->lscale, mcard->rscale));
+									str.append(epro::format(L"\n{}/{}", mcard->lscale, mcard->rscale));
 								}
 							}
 							for(auto ctit = mcard->counters.begin(); ctit != mcard->counters.end(); ++ctit) {
-								str.append(fmt::format(L"\n[{}]: {}", gDataManager->GetCounterName(ctit->first), ctit->second));
+								str.append(epro::format(L"\n[{}]: {}", gDataManager->GetCounterName(ctit->first), ctit->second));
 							}
 							if(mcard->cHint && mcard->chValue && (mcard->location & LOCATION_ONFIELD)) {
 								if(mcard->cHint == CHINT_TURN)
-									str.append(fmt::format(L"\n{}{}", gDataManager->GetSysString(211), mcard->chValue));
+									str.append(epro::format(L"\n{}{}", gDataManager->GetSysString(211), mcard->chValue));
 								else if(mcard->cHint == CHINT_CARD)
-									str.append(fmt::format(L"\n{}{}", gDataManager->GetSysString(212), gDataManager->GetName(mcard->chValue)));
+									str.append(epro::format(L"\n{}{}", gDataManager->GetSysString(212), gDataManager->GetName(mcard->chValue)));
 								else if(mcard->cHint == CHINT_RACE)
-									str.append(fmt::format(L"\n{}{}", gDataManager->GetSysString(213), gDataManager->FormatRace(mcard->chValue)));
+									str.append(epro::format(L"\n{}{}", gDataManager->GetSysString(213), gDataManager->FormatRace(mcard->chValue)));
 								else if(mcard->cHint == CHINT_ATTRIBUTE)
-									str.append(fmt::format(L"\n{}{}", gDataManager->GetSysString(214), gDataManager->FormatAttribute(mcard->chValue)));
+									str.append(epro::format(L"\n{}{}", gDataManager->GetSysString(214), gDataManager->FormatAttribute(mcard->chValue)));
 								else if(mcard->cHint == CHINT_NUMBER)
-									str.append(fmt::format(L"\n{}{}", gDataManager->GetSysString(215), mcard->chValue));
+									str.append(epro::format(L"\n{}{}", gDataManager->GetSysString(215), mcard->chValue));
 							}
 							for(auto iter = mcard->desc_hints.begin(); iter != mcard->desc_hints.end(); ++iter) {
-								str.append(fmt::format(L"\n*{}", gDataManager->GetDesc(iter->first, mainGame->dInfo.compat_mode)));
+								str.append(epro::format(L"\n*{}", gDataManager->GetDesc(iter->first, mainGame->dInfo.compat_mode)));
 							}
 							should_show_tip = true;
 							auto dtip = mainGame->textFont->getDimensionustring(str) + mainGame->Scale(irr::core::dimension2d<uint32_t>(10, 10));
@@ -1721,9 +1721,8 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 						player_name = self[mainGame->dInfo.current_player[mplayer]];
 					else
 						player_name = oppo[mainGame->dInfo.current_player[mplayer]];
-					const auto& player_desc_hints = mainGame->dField.player_desc_hints[mplayer];
-					for(const auto& hint : player_desc_hints) {
-						player_name.append(fmt::format(L"\n*{}", gDataManager->GetDesc(hint.first, mainGame->dInfo.compat_mode)));
+					for(const auto& hint : player_desc_hints[mplayer]) {
+						player_name.append(epro::format(L"\n*{}", gDataManager->GetDesc(hint.first, mainGame->dInfo.compat_mode)));
 					}
 					should_show_tip = true;
 					auto dtip = mainGame->textFont->getDimensionustring(player_name) + mainGame->Scale(irr::core::dimension2d<uint32_t>(10, 10));
@@ -2042,9 +2041,8 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event, bool& stopPropagation)
 				gGameConfig->showScopeLabel = mainGame->gSettings.chkShowScopeLabel->isChecked();
 				return true;
 			}
-			case CHECKBOX_VSYNC: {
-				gGameConfig->vsync = mainGame->gSettings.chkVSync->isChecked();
-				mainGame->driver->setVsync(gGameConfig->vsync);
+			case CHECKBOX_IGNORE_DECK_CONTENTS: {
+				gGameConfig->ignoreDeckContents = mainGame->gSettings.chkIgnoreDeckContents->isChecked();
 				return true;
 			}
 			case CHECKBOX_SHOW_FPS: {
@@ -2197,6 +2195,11 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event, bool& stopPropagation)
 		}
 		case irr::gui::EGET_COMBO_BOX_CHANGED: {
 			switch(id) {
+			case COMBOBOX_VSYNC: {
+				gGameConfig->vsync = mainGame->gSettings.cbVSync->getSelected();
+				GUIUtils::ToggleSwapInterval(mainGame->driver, gGameConfig->vsync);
+				return true;
+			}
 			case COMBOBOX_CURRENT_SKIN: {
 				auto newskin = Utils::ToPathString(mainGame->gSettings.cbCurrentSkin->getItem(mainGame->gSettings.cbCurrentSkin->getSelected()));
 				mainGame->should_reload_skin = newskin != gGameConfig->skin;
@@ -2372,16 +2375,16 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event, bool& stopPropagation)
 			irr::gui::IGUIElement* root = mainGame->env->getRootGUIElement();
 			irr::gui::IGUIElement* elem = root->getElementFromPoint({ event.MouseInput.X, event.MouseInput.Y });
 			if(elem == mainGame->stName) {
-				auto path = mainGame->FindScript(fmt::format(EPRO_TEXT("c{}.lua"), mainGame->showingcard));
+				auto path = mainGame->FindScript(epro::format(EPRO_TEXT("c{}.lua"), mainGame->showingcard));
 				if(path.empty()) {
 					auto cd = gDataManager->GetCardData(mainGame->showingcard);
 					if(cd && cd->IsInArtworkOffsetRange())
-						path = mainGame->FindScript(fmt::format(EPRO_TEXT("c{}.lua"), cd->alias));
+						path = mainGame->FindScript(epro::format(EPRO_TEXT("c{}.lua"), cd->alias));
 				}
 				if(path.size() && path != EPRO_TEXT("archives"))
 					Utils::SystemOpen(path, Utils::OPEN_FILE);
 			} else if(elem == mainGame->stPasscodeScope) {
-				Utils::OSOperator->copyToClipboard(fmt::format(L"{}", mainGame->showingcard).data());
+				Utils::OSOperator->copyToClipboard(epro::format(L"{}", mainGame->showingcard).data());
 			}
 		}
 		break;
@@ -2517,8 +2520,8 @@ bool CheckHand(const irr::core::vector2d<irr::s32>& mouse, std::vector<ClientCar
 }
 
 void ClientField::GetHoverField(irr::core::vector2d<irr::s32> mouse) {
-	const int speed = (mainGame->dInfo.duel_params & DUEL_3_COLUMNS_FIELD) ? 1 : 0;
-	const int field = (mainGame->dInfo.duel_field == 3 || mainGame->dInfo.duel_field == 5) ? 0 : 1;
+	const int three_columns = mainGame->dInfo.HasFieldFlag(DUEL_3_COLUMNS_FIELD);
+	const int not_separate_pzones = !mainGame->dInfo.HasFieldFlag(DUEL_SEPARATE_PZONE);
 	if(CheckHand(mouse, hand[0])) {
 		hovered_controler = 0;
 		hovered_location = LOCATION_HAND;
@@ -2552,14 +2555,14 @@ void ClientField::GetHoverField(irr::core::vector2d<irr::s32> mouse) {
 				hovered_controler = 0;
 				hovered_location = LOCATION_SZONE;
 				hovered_sequence = 5;
-			} else if(field == 0 && boardy >= matManager.getSzone()[0][6][0].Pos.Y && boardy <= matManager.getSzone()[0][6][2].Pos.Y) {
+			} else if(!not_separate_pzones && boardy >= matManager.getSzone()[0][6][0].Pos.Y && boardy <= matManager.getSzone()[0][6][2].Pos.Y) {
 				hovered_controler = 0;
 				hovered_location = LOCATION_SZONE;
 				hovered_sequence = 6;
-			} else if(field == 1 && boardy >= matManager.getRemove()[1][2].Pos.Y && boardy <= matManager.getRemove()[1][0].Pos.Y) {
+			} else if(not_separate_pzones && boardy >= matManager.getRemove()[1][2].Pos.Y && boardy <= matManager.getRemove()[1][0].Pos.Y) {
 				hovered_controler = 1;
 				hovered_location = LOCATION_REMOVED;
-			} else if(field == 0 && boardy >= matManager.getSzone()[1][7][2].Pos.Y && boardy <= matManager.getSzone()[1][7][0].Pos.Y) {
+			} else if(!not_separate_pzones && boardy >= matManager.getSzone()[1][7][2].Pos.Y && boardy <= matManager.getSzone()[1][7][0].Pos.Y) {
 				hovered_controler = 1;
 				hovered_location = LOCATION_SZONE;
 				hovered_sequence = 7;
@@ -2569,31 +2572,31 @@ void ClientField::GetHoverField(irr::core::vector2d<irr::s32> mouse) {
 			} else if(boardy >= matManager.getDeck()[1][2].Pos.Y && boardy <= matManager.getDeck()[1][0].Pos.Y) {
 				hovered_controler = 1;
 				hovered_location = LOCATION_DECK;
-			} else if(field == 1 && boardy >= matManager.getSkill()[0][0].Pos.Y && boardy <= matManager.getSkill()[0][2].Pos.Y) {
+			} else if(not_separate_pzones && boardy >= matManager.getSkill()[0][0].Pos.Y && boardy <= matManager.getSkill()[0][2].Pos.Y) {
 				hovered_controler = 0;
 				hovered_location = LOCATION_SKILL;
 			}
-		} else if(field == 0 && boardx >= matManager.getRemove()[1][1].Pos.X && boardx <= matManager.getRemove()[1][0].Pos.X) {
+		} else if(!not_separate_pzones && boardx >= matManager.getRemove()[1][1].Pos.X && boardx <= matManager.getRemove()[1][0].Pos.X) {
 			if(boardy >= matManager.getRemove()[1][2].Pos.Y && boardy <= matManager.getRemove()[1][0].Pos.Y) {
 				hovered_controler = 1;
 				hovered_location = LOCATION_REMOVED;
-			} else if(boardy >= matManager.vFieldContiAct[speed][0].Y && boardy <= matManager.vFieldContiAct[speed][2].Y) {
+			} else if(boardy >= matManager.vFieldContiAct[three_columns][0].Y && boardy <= matManager.vFieldContiAct[three_columns][2].Y) {
 				hovered_controler = 0;
 				hovered_location = POSITION_HINT;
 			} else if(boardy >= matManager.getSkill()[0][0].Pos.Y && boardy <= matManager.getSkill()[0][2].Pos.Y) {
 				hovered_controler = 0;
 				hovered_location = LOCATION_SKILL;
 			}
-		} else if(speed == 1 && boardx >= matManager.getSkill()[0][1].Pos.X && boardx <= matManager.getSkill()[0][2].Pos.X &&
+		} else if(three_columns && boardx >= matManager.getSkill()[0][1].Pos.X && boardx <= matManager.getSkill()[0][2].Pos.X &&
 				  boardy >= matManager.getSkill()[0][0].Pos.Y && boardy <= matManager.getSkill()[0][2].Pos.Y) {
 			hovered_controler = 0;
 			hovered_location = LOCATION_SKILL;
-		} else if(field == 1 && boardx >= matManager.getSzone()[1][7][1].Pos.X && boardx <= matManager.getSzone()[1][7][2].Pos.X) {
+		} else if(not_separate_pzones && boardx >= matManager.getSzone()[1][7][1].Pos.X && boardx <= matManager.getSzone()[1][7][2].Pos.X) {
 			if(boardy >= matManager.getSzone()[1][7][2].Pos.Y && boardy <= matManager.getSzone()[1][7][0].Pos.Y) {
 				hovered_controler = 1;
 				hovered_location = LOCATION_SZONE;
 				hovered_sequence = 7;
-			} else if(boardy >= matManager.vFieldContiAct[speed][0].Y && boardy <= matManager.vFieldContiAct[speed][2].Y) {
+			} else if(boardy >= matManager.vFieldContiAct[three_columns][0].Y && boardy <= matManager.vFieldContiAct[three_columns][2].Y) {
 				hovered_controler = 0;
 				hovered_location = POSITION_HINT;
 			}
@@ -2604,15 +2607,15 @@ void ClientField::GetHoverField(irr::core::vector2d<irr::s32> mouse) {
 			} else if(boardy >= matManager.getGrave()[0][0].Pos.Y && boardy <= matManager.getGrave()[0][2].Pos.Y) {
 				hovered_controler = 0;
 				hovered_location = LOCATION_GRAVE;
-			} else if(field == 0 && boardy >= matManager.getSzone()[1][6][2].Pos.Y && boardy <= matManager.getSzone()[1][6][0].Pos.Y) {
+			} else if(!not_separate_pzones && boardy >= matManager.getSzone()[1][6][2].Pos.Y && boardy <= matManager.getSzone()[1][6][0].Pos.Y) {
 				hovered_controler = 1;
 				hovered_location = LOCATION_SZONE;
 				hovered_sequence = 6;
-			} else if(field == 0 && boardy >= matManager.getSzone()[0][7][0].Pos.Y && boardy <= matManager.getSzone()[0][7][2].Pos.Y) {
+			} else if(!not_separate_pzones && boardy >= matManager.getSzone()[0][7][0].Pos.Y && boardy <= matManager.getSzone()[0][7][2].Pos.Y) {
 				hovered_controler = 0;
 				hovered_location = LOCATION_SZONE;
 				hovered_sequence = 7;
-			} else if(field == 1 && boardy >= matManager.getRemove()[0][0].Pos.Y && boardy <= matManager.getRemove()[0][2].Pos.Y) {
+			} else if(not_separate_pzones && boardy >= matManager.getRemove()[0][0].Pos.Y && boardy <= matManager.getRemove()[0][2].Pos.Y) {
 				hovered_controler = 0;
 				hovered_location = LOCATION_REMOVED;
 			} else if(boardy >= matManager.getSzone()[1][5][2].Pos.Y && boardy <= matManager.getSzone()[1][5][0].Pos.Y) {
@@ -2622,25 +2625,25 @@ void ClientField::GetHoverField(irr::core::vector2d<irr::s32> mouse) {
 			} else if(boardy >= matManager.getExtra()[1][2].Pos.Y && boardy <= matManager.getExtra()[1][0].Pos.Y) {
 				hovered_controler = 1;
 				hovered_location = LOCATION_EXTRA;
-			} else if(field == 1 && boardy >= matManager.getSkill()[1][2].Pos.Y && boardy <= matManager.getSkill()[1][0].Pos.Y) {
+			} else if(not_separate_pzones && boardy >= matManager.getSkill()[1][2].Pos.Y && boardy <= matManager.getSkill()[1][0].Pos.Y) {
 				hovered_controler = 1;
 				hovered_location = LOCATION_SKILL;
 			}
-		} else if(speed == 0 && field == 1 && boardx >= matManager.getSzone()[0][7][1].Pos.X && boardx <= matManager.getSzone()[0][7][0].Pos.X) {
+		} else if(!three_columns && not_separate_pzones && boardx >= matManager.getSzone()[0][7][1].Pos.X && boardx <= matManager.getSzone()[0][7][0].Pos.X) {
 			if(boardy >= matManager.getSzone()[0][7][0].Pos.Y && boardy <= matManager.getSzone()[0][7][2].Pos.Y) {
 				hovered_controler = 0;
 				hovered_location = LOCATION_SZONE;
 				hovered_sequence = 7;
 			}
-		} else if(field == 0 && boardx >= matManager.getRemove()[0][0].Pos.X && boardx <= matManager.getRemove()[0][1].Pos.X) {
+		} else if(!not_separate_pzones && boardx >= matManager.getRemove()[0][0].Pos.X && boardx <= matManager.getRemove()[0][1].Pos.X) {
 			if(boardy >= matManager.getRemove()[0][0].Pos.Y && boardy <= matManager.getRemove()[0][2].Pos.Y) {
 				hovered_controler = 0;
 				hovered_location = LOCATION_REMOVED;
-			} else if(field == 0 && boardy >= matManager.getSkill()[1][2].Pos.Y && boardy <= matManager.getSkill()[1][0].Pos.Y) {
+			} else if(!not_separate_pzones && boardy >= matManager.getSkill()[1][2].Pos.Y && boardy <= matManager.getSkill()[1][0].Pos.Y) {
 				hovered_controler = 1;
 				hovered_location = LOCATION_SKILL;
 			}
-		} else if(field == 1 && speed == 1 && boardx >= matManager.getSkill()[1][1].Pos.X && boardx <= matManager.getSkill()[1][0].Pos.X){
+		} else if(not_separate_pzones && three_columns && boardx >= matManager.getSkill()[1][1].Pos.X && boardx <= matManager.getSkill()[1][0].Pos.X){
 			if(boardy >= matManager.getSkill()[1][2].Pos.Y && boardy <= matManager.getSkill()[1][0].Pos.Y) {
 				hovered_controler = 1;
 				hovered_location = LOCATION_SKILL;
@@ -2649,7 +2652,7 @@ void ClientField::GetHoverField(irr::core::vector2d<irr::s32> mouse) {
 			int sequence = (boardx - matManager.vFieldMzone[0][0][0].Pos.X) / (matManager.vFieldMzone[0][0][1].Pos.X - matManager.vFieldMzone[0][0][0].Pos.X);
 			if(sequence > 4)
 				sequence = 4;
-			if((mainGame->dInfo.duel_params & DUEL_3_COLUMNS_FIELD) && (sequence == 0 || sequence== 4))
+			if(three_columns && (sequence == 0 || sequence== 4))
 				hovered_location = 0;
 			else if(boardy > matManager.getSzone()[0][0][0].Pos.Y && boardy <= matManager.getSzone()[0][0][2].Pos.Y) {
 				hovered_controler = 0;
@@ -2839,10 +2842,10 @@ void ClientField::ShowCardInfoInList(ClientCard* pcard, irr::gui::IGUIElement* e
 	for(size_t i = 0; i < chains.size(); ++i) {
 		auto chit = chains[i];
 		if(pcard == chit.chain_card) {
-			str.append(L"\n").append(fmt::sprintf(gDataManager->GetSysString(216), i + 1));
+			str.append(L"\n").append(epro::sprintf(gDataManager->GetSysString(216), i + 1));
 		}
 		if(chit.target.find(pcard) != chit.target.end()) {
-			str.append(L"\n").append(fmt::sprintf(gDataManager->GetSysString(217), i + 1, gDataManager->GetName(chit.chain_card->code)));
+			str.append(L"\n").append(epro::sprintf(gDataManager->GetSysString(217), i + 1, gDataManager->GetName(chit.chain_card->code)));
 		}
 	}
 	if(str.length() > 0) {
@@ -2939,7 +2942,7 @@ void ClientField::SetResponseSelectedCards() const {
 }
 void ClientField::SetResponseSelectedOption() const {
 	if(mainGame->dInfo.curMsg == MSG_SELECT_OPTION) {
-		DuelClient::SetResponseI(selected_option);
+		DuelClient::SetResponseI(static_cast<uint32_t>(selected_option));
 	} else {
 		int index = 0;
 		while(activatable_cards[index] != command_card || activatable_descs[index].first != select_options[selected_option]) index++;
@@ -3115,7 +3118,7 @@ void ClientField::ShowPileDisplayCards(int location, int player) {
 		break;
 	}
 	if(display_cards.size()) {
-		mainGame->wCardDisplay->setText(fmt::format(L"{}({})", gDataManager->GetSysString(loc_id), display_cards.size()).data());
+		mainGame->wCardDisplay->setText(epro::format(L"{}({})", gDataManager->GetSysString(loc_id), display_cards.size()).data());
 		ShowLocationCard();
 	}
 }

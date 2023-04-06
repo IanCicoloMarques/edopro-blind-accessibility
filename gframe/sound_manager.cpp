@@ -178,7 +178,11 @@ void SoundManager::PlayBGM(BGM scene, bool loop) {
 		auto bgm = (std::uniform_int_distribution<>(0, count - 1))(rnd);
 		const std::string BGMName = epro::format("{}/./sound/BGM/{}", working_dir, list[bgm]);
 		mixer->PlayMusic(BGMName, loop);
-		ScreenReader::getReader()->readScreen(gDataManager->GetAccessibilityString(Accessibility::Dict::WELCOME).data());
+		if(!alreadySaidWelcome)
+		{
+			alreadySaidWelcome = true;
+			ScreenReader::getReader()->readScreen(gDataManager->GetAccessibilityString(Accessibility::Dict::WELCOME).data());
+		}
 	}
 #endif
 }

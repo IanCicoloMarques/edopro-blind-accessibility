@@ -87,6 +87,7 @@ private:
 	bool musicEnabled = false;
 	std::string working_dir;
 	bool succesfully_initied = false;
+	bool alreadySaidWelcome = false;
 };
 
 extern SoundManager* gSoundManager;

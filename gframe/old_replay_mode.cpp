@@ -106,76 +106,76 @@ namespace ygo {
 		return 0;
 	}
 	bool ReplayMode::StartDuel() {
-		// const auto& replay_header = cur_yrp->pheader;
-		// const auto& seed = replay_header.seed;
-		// const auto& names = cur_yrp->GetPlayerNames();
-		// const auto first_oppo_player = names.begin() + cur_yrp->GetPlayersCount(0);
-		// mainGame->dInfo.selfnames.assign(names.begin(), first_oppo_player);
-		// mainGame->dInfo.opponames.assign(first_oppo_player, names.end());
-		// uint32_t start_lp = cur_yrp->params.start_lp;
-		// uint32_t start_hand = cur_yrp->params.start_hand;
-		// uint32_t draw_count = cur_yrp->params.draw_count;
-		// OCG_Player team = { start_lp, start_hand, draw_count };
-		// pduel = mainGame->SetupDuel({ { seed[0], seed[1], seed[2], seed[3] }, cur_yrp->params.duel_flags, team, team });
-		// mainGame->dInfo.duel_params = cur_yrp->params.duel_flags;
-		// mainGame->dInfo.duel_field = mainGame->GetMasterRule(mainGame->dInfo.duel_params);
-		// matManager.SetActiveVertices(mainGame->dInfo.HasFieldFlag(DUEL_3_COLUMNS_FIELD),
-		// 							 !mainGame->dInfo.HasFieldFlag(DUEL_SEPARATE_PZONE));
-		// mainGame->SetPhaseButtons();
-		// mainGame->dInfo.lp[0] = start_lp;
-		// mainGame->dInfo.lp[1] = start_lp;
-		// mainGame->dInfo.startlp = start_lp;
-		// mainGame->dInfo.strLP[0] = fmt::to_wstring(start_lp);
-		// mainGame->dInfo.strLP[1] = mainGame->dInfo.strLP[0];
-		// mainGame->dInfo.turn = 0;
-		// if (!mainGame->dInfo.isSingleMode || (replay_header.base.flag & REPLAY_HAND_TEST)) {
-		// 	auto rule_cards = cur_yrp->GetRuleCards();
-		// 	OCG_NewCardInfo card_info = { 0, 0, 0, 0, 0, 0, POS_FACEDOWN_DEFENSE };
-		// 	for(auto card : rule_cards) {
-		// 		card_info.code = card;
-		// 		OCG_DuelNewCard(pduel, card_info);
-		// 	}
-		// 	auto decks = cur_yrp->GetPlayerDecks();
-		// 	for(int i = 0; i < mainGame->dInfo.team1; i++) {
-		// 		card_info.duelist = i;
-		// 		card_info.loc = LOCATION_DECK;
-		// 		for(auto card : decks[i].main_deck) {
-		// 			card_info.code = card;
-		// 			OCG_DuelNewCard(pduel, card_info);
-		// 		}
-		// 		card_info.loc = LOCATION_EXTRA;
-		// 		for(auto card : decks[i].extra_deck) {
-		// 			card_info.code = card;
-		// 			OCG_DuelNewCard(pduel, card_info);
-		// 		}
-		// 	}
-		// 	card_info.team = 1;
-		// 	card_info.con = 1;
-		// 	for(int i = 0; i < mainGame->dInfo.team2; i++) {
-		// 		card_info.duelist = i;
-		// 		card_info.loc = LOCATION_DECK;
-		// 		for(auto card : decks[i + mainGame->dInfo.team1].main_deck) {
-		// 			card_info.code = card;
-		// 			OCG_DuelNewCard(pduel, card_info);
-		// 		}
-		// 		card_info.loc = LOCATION_EXTRA;
-		// 		for(auto card : decks[i + mainGame->dInfo.team1].extra_deck) {
-		// 			card_info.code = card;
-		// 			OCG_DuelNewCard(pduel, card_info);
-		// 		}
-		// 	}
-		// 	if(replay_header.base.flag & REPLAY_HAND_TEST) {
-		// 		const char cmd[] = "Debug.ReloadFieldEnd()";
-		// 		OCG_LoadScript(pduel, cmd, sizeof(cmd) - 1, " ");
-		// 	} else {
-		// 		mainGame->dField.Initial(0, static_cast<uint32_t>(decks[0].main_deck.size()), static_cast<uint32_t>(decks[0].extra_deck.size()));
-		// 		mainGame->dField.Initial(1, static_cast<uint32_t>(decks[mainGame->dInfo.team1].main_deck.size()), static_cast<uint32_t>(decks[mainGame->dInfo.team1].extra_deck.size()));
-		// 	}
-		// } else {
-		// 	if(!mainGame->LoadScript(pduel, cur_yrp->scriptname))
-		// 		return false;
-		// }
-		// OCG_StartDuel(pduel);
+		const auto& replay_header = cur_yrp->pheader;
+		const auto& seed = replay_header.seed;
+		const auto& names = cur_yrp->GetPlayerNames();
+		const auto first_oppo_player = names.begin() + cur_yrp->GetPlayersCount(0);
+		mainGame->dInfo.selfnames.assign(names.begin(), first_oppo_player);
+		mainGame->dInfo.opponames.assign(first_oppo_player, names.end());
+		uint32_t start_lp = cur_yrp->params.start_lp;
+		uint32_t start_hand = cur_yrp->params.start_hand;
+		uint32_t draw_count = cur_yrp->params.draw_count;
+		OCG_Player team = { start_lp, start_hand, draw_count };
+		pduel = mainGame->SetupDuel({ { seed[0], seed[1], seed[2], seed[3] }, cur_yrp->params.duel_flags, team, team });
+		mainGame->dInfo.duel_params = cur_yrp->params.duel_flags;
+		mainGame->dInfo.duel_field = mainGame->GetMasterRule(mainGame->dInfo.duel_params);
+		matManager.SetActiveVertices(mainGame->dInfo.HasFieldFlag(DUEL_3_COLUMNS_FIELD),
+									 !mainGame->dInfo.HasFieldFlag(DUEL_SEPARATE_PZONE));
+		mainGame->SetPhaseButtons();
+		mainGame->dInfo.lp[0] = start_lp;
+		mainGame->dInfo.lp[1] = start_lp;
+		mainGame->dInfo.startlp = start_lp;
+		mainGame->dInfo.strLP[0] = fmt::to_wstring(start_lp);
+		mainGame->dInfo.strLP[1] = mainGame->dInfo.strLP[0];
+		mainGame->dInfo.turn = 0;
+		if (!mainGame->dInfo.isSingleMode || (replay_header.base.flag & REPLAY_HAND_TEST)) {
+			auto rule_cards = cur_yrp->GetRuleCards();
+			OCG_NewCardInfo card_info = { 0, 0, 0, 0, 0, 0, POS_FACEDOWN_DEFENSE };
+			for(auto card : rule_cards) {
+				card_info.code = card;
+				OCG_DuelNewCard(pduel, card_info);
+			}
+			auto decks = cur_yrp->GetPlayerDecks();
+			for(int i = 0; i < mainGame->dInfo.team1; i++) {
+				card_info.duelist = i;
+				card_info.loc = LOCATION_DECK;
+				for(auto card : decks[i].main_deck) {
+					card_info.code = card;
+					OCG_DuelNewCard(pduel, card_info);
+				}
+				card_info.loc = LOCATION_EXTRA;
+				for(auto card : decks[i].extra_deck) {
+					card_info.code = card;
+					OCG_DuelNewCard(pduel, card_info);
+				}
+			}
+			card_info.team = 1;
+			card_info.con = 1;
+			for(int i = 0; i < mainGame->dInfo.team2; i++) {
+				card_info.duelist = i;
+				card_info.loc = LOCATION_DECK;
+				for(auto card : decks[i + mainGame->dInfo.team1].main_deck) {
+					card_info.code = card;
+					OCG_DuelNewCard(pduel, card_info);
+				}
+				card_info.loc = LOCATION_EXTRA;
+				for(auto card : decks[i + mainGame->dInfo.team1].extra_deck) {
+					card_info.code = card;
+					OCG_DuelNewCard(pduel, card_info);
+				}
+			}
+			if(replay_header.base.flag & REPLAY_HAND_TEST) {
+				const char cmd[] = "Debug.ReloadFieldEnd()";
+				OCG_LoadScript(pduel, cmd, sizeof(cmd) - 1, " ");
+			} else {
+				mainGame->dField.Initial(0, static_cast<uint32_t>(decks[0].main_deck.size()), static_cast<uint32_t>(decks[0].extra_deck.size()));
+				mainGame->dField.Initial(1, static_cast<uint32_t>(decks[mainGame->dInfo.team1].main_deck.size()), static_cast<uint32_t>(decks[mainGame->dInfo.team1].extra_deck.size()));
+			}
+		} else {
+			if(!mainGame->LoadScript(pduel, cur_yrp->scriptname))
+				return false;
+		}
+		OCG_StartDuel(pduel);
 		return true;
 	}
 

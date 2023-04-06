@@ -512,10 +512,6 @@ void CGUICustomComboBox::deserializeAttributes(io::IAttributes* in, io::SAttribu
 	setSelected(in->getAttributeAsInt("Selected"));
 }
 
-void CGUICustomComboBox::close() {
-	openCloseMenu();
-}
-
 } // end namespace gui
 } // end namespace irr
 

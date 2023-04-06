@@ -2,6 +2,7 @@
 #include "sound_manager.h"
 #include "utils.h"
 #include "config.h"
+#include "data_manager.h"
 #if defined(YGOPRO_USE_IRRKLANG)
 #include "sound_irrklang.h"
 #define BACKEND SoundIrrklang
@@ -12,6 +13,8 @@
 #include "sound_sfml.h"
 #define BACKEND SoundSFML
 #endif
+#include "../accessibility/ScreenReader/ScreenReader.h"
+#include "../accessibility/ScreenReader/Messages/AccessibilityStringDictionary.h"
 
 namespace ygo {
 SoundManager::SoundManager(double sounds_volume, double music_volume, bool sounds_enabled, bool music_enabled) {
@@ -175,6 +178,7 @@ void SoundManager::PlayBGM(BGM scene, bool loop) {
 		auto bgm = (std::uniform_int_distribution<>(0, count - 1))(rnd);
 		const std::string BGMName = epro::format("{}/./sound/BGM/{}", working_dir, list[bgm]);
 		mixer->PlayMusic(BGMName, loop);
+		ScreenReader::getReader()->readScreen(gDataManager->GetAccessibilityString(Accessibility::Dict::WELCOME).data());
 	}
 #endif
 }

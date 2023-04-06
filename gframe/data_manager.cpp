@@ -238,7 +238,13 @@ bool DataManager::LoadStrings(const epro::path_string& file) {
 		try {
 			if(type == "system") {
 				_sysStrings.SetMain(std::stoi(value), BufferIO::DecodeUTF8(str));
-			} else {
+			}
+			else if (type == "accessibility") {
+				_accessibilityStrings.SetMain(std::stoi(value), BufferIO::DecodeUTF8(str));
+			}
+			else if (type == "accessibilitytips") {
+				_accessibilityTipsStrings.SetMain(std::stoi(value), BufferIO::DecodeUTF8(str));
+			}else {
 				LocaleStringHelper* obj;
 				if(type == "victory")
 					obj = &_victoryStrings;
@@ -276,7 +282,13 @@ bool DataManager::LoadLocaleStrings(const epro::path_string& file) {
 		try {
 			if(type == "system") {
 				_sysStrings.SetLocale(std::stoi(value), BufferIO::DecodeUTF8(str));
-			} else {
+			}
+			else if (type == "accessibility") {
+				_accessibilityStrings.SetMain(std::stoi(value), BufferIO::DecodeUTF8(str));
+			}
+			else if (type == "accessibilitytips") {
+				_accessibilityTipsStrings.SetMain(std::stoi(value), BufferIO::DecodeUTF8(str));
+			}else {
 				LocaleStringHelper* obj;
 				if(type == "victory")
 					obj = &_victoryStrings;

@@ -2126,7 +2126,6 @@ int DuelClient::ClientAnalyze(const uint8_t* msg, uint32_t len) {
 		std::sort(mainGame->dField.selectable_cards.begin(), mainGame->dField.selectable_cards.end(), ClientCard::client_card_sort);
 		std::wstring text = epro::format(L"{}({}-{})", gDataManager->GetDesc(select_hint ? select_hint : 560, mainGame->dInfo.compat_mode),
 			mainGame->dField.select_min, mainGame->dField.select_max);
-		std::lock_guard<std::mutex> lock(mainGame->gMutex);
 		ScreenReader::getReader()->readScreen(fmt::format(L"{}", gDataManager->GetName(mainGame->dField.display_cards[EventHandler::indexLookedUpCard]->code)));
 		ScreenReader::getReader()->cleanBuiltMessage();
 		ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
@@ -2281,6 +2280,12 @@ int DuelClient::ClientAnalyze(const uint8_t* msg, uint32_t len) {
 					ScreenReader::getReader()->buildMessage(gDataManager->GetAccessibilityString(265).data());
 					ScreenReader::getReader()->buildMessage(gDataManager->GetAccessibilityString(266).data());
 				}
+				if(count == 0)
+					mainGame->stQMessage->setText(epro::format(L"{}\n{}", gDataManager->GetSysString(201), gDataManager->GetSysString(202)).data());
+				else if(select_trigger)
+					mainGame->stQMessage->setText(epro::format(L"{}\n{}\n{}", event_string, gDataManager->GetSysString(222), gDataManager->GetSysString(223)).data());
+				else
+					mainGame->stQMessage->setText(epro::format(L"{}\n{}", event_string, gDataManager->GetSysString(203)).data());
 				mainGame->PopupElement(mainGame->wQuery);
 			}
 		}
@@ -2455,6 +2460,7 @@ int DuelClient::ClientAnalyze(const uint8_t* msg, uint32_t len) {
 		ScreenReader::getReader()->buildMessage(gDataManager->GetAccessibilityString(271).data());
 		ScreenReader::getReader()->buildMessage(gDataManager->GetAccessibilityString(272).data());
 		ScreenReader::getReader()->buildMessage(gDataManager->GetAccessibilityString(273).data());
+		std::lock_guard<epro::mutex> lock(mainGame->gMutex);
 		mainGame->stHintMsg->setText(epro::format(L"{}({}-{})", gDataManager->GetDesc(select_hint ? select_hint : 531, mainGame->dInfo.compat_mode), mainGame->dField.select_min, mainGame->dField.select_max).data());
 		mainGame->stHintMsg->setVisible(true);
 		if (mainGame->dField.select_cancelable) {

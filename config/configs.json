@@ -1,20 +1,31 @@
 {
-	"urls": [
-		{
-			"url": "https://images.ygoprodeck.com/images/cards/{}.jpg",
-			"type": "pic"
-		},
     "repos": [
         {
-            "url": "default",
-            "should_update": false,
-            "should_read": false
-        },
-        {
-            "url": "default_anime",
-            "should_update": false,
-            "should_read": false
-        },
+			"url": "https://github.com/ProjectIgnis/DeltaPuppetOfStrings",
+			"repo_name": "Project Ignis updates",
+			"repo_path": "./repositories/delta-puppet",
+			"has_core": true,
+			"core_path": "bin",
+			"data_path": "",
+			"script_path": "script",
+			"should_update": true,
+			"should_read": true
+		},
+		{
+			"url": "https://github.com/ProjectIgnis/LFLists",
+			"repo_name": "Forbidden & Limited Card Lists",
+			"repo_path": "./repositories/lflists",
+			"lflist_path": ".",
+			"should_update": true,
+			"should_read": true
+		},
+		{
+			"url": "https://github.com/ProjectIgnis/Puzzles",
+			"repo_name": "Project Ignis puzzles",
+			"repo_path": "./puzzles/Canon collection",
+			"should_update": true,
+			"should_read": true
+		},
         {
             "url": "https://github.com/Gideon9212/Livecustom",
             "repo_path": "./expansions/Livecustom",
@@ -27,10 +38,6 @@
     ],
     "urls": [
         {
-            "url": "default",
-            "type": "field"
-        },
-        {
             "url": "https://raw.githubusercontent.com/Gideon9212/Livecustom/master/pics/{}.png",
             "type": "pic"
         },
@@ -41,11 +48,36 @@
     ],
     "servers": [
         {
-            "name": "localhost",
-            "address": "127.0.0.1",
-            "roomaddress": "127.0.0.1",
-            "roomlistport": 7922,
-            "duelport": 7911
-        }
+			"name": "EU Central (Casual)",
+			"address": "eu.projectignis.org",
+			"duelport": 7912,
+			"roomaddress": "eu.projectignis.org",
+			"roomlistprotocol": "http",
+			"roomlistport": 7923
+		},
+		{
+			"name": "EU Central (Competitive)",
+			"address": "eu.projectignis.org",
+			"duelport": 7911,
+			"roomaddress": "eu.projectignis.org",
+			"roomlistprotocol": "http",
+			"roomlistport": 7922
+		},
+		{
+			"name": "US West (Casual)",
+			"address": "us.projectignis.org",
+			"duelport": 7911,
+			"roomaddress": "us.projectignis.org",
+			"roomlistprotocol": "http",
+			"roomlistport": 7922
+		},
+		{
+			"name": "US West (Competitive)",
+			"address": "us.projectignis.org",
+			"duelport": 7912,
+			"roomaddress": "us.projectignis.org",
+			"roomlistprotocol": "http",
+			"roomlistport": 7923
+		}
     ]
 }

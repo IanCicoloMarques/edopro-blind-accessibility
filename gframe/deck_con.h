@@ -4,7 +4,7 @@
 #include "config.h"
 #include <position2d.h>
 #include <IEventReceiver.h>
-#include <unordered_map>
+#include <map>
 #include <vector>
 #include "deck.h"
 
@@ -54,14 +54,6 @@ public:
 	}
 	void StartFilter(bool force_refresh = false);
 	void RefreshCurrentDeck();
-
-	bool push_main(const CardDataC* pointer, int seq = -1, bool forced = false);
-	bool push_extra(const CardDataC* pointer, int seq = -1, bool forced = false);
-	bool push_side(const CardDataC* pointer, int seq = -1, bool forced = false);
-	void pop_main(int seq);
-	void pop_extra(int seq);
-	void pop_side(int seq);
-	bool check_limit(const CardDataC* pointer);
 private:
 	void GetHoveredCard();
 	bool FiltersChanged();
@@ -83,6 +75,14 @@ private:
 
 	void ImportDeck();
 	void ExportDeckToClipboard(bool plain_text);
+
+	bool push_main(const CardDataC* pointer, int seq = -1, bool forced = false);
+	bool push_extra(const CardDataC* pointer, int seq = -1, bool forced = false);
+	bool push_side(const CardDataC* pointer, int seq = -1, bool forced = false);
+	void pop_main(int seq);
+	void pop_extra(int seq);
+	void pop_side(int seq);
+	bool check_limit(const CardDataC* pointer);
 #define DECLARE_WITH_CACHE(type, name) type name;\
 										type prev_##name;
 	DECLARE_WITH_CACHE(uint64_t, filter_effect)
@@ -104,7 +104,9 @@ private:
 
 	irr::core::position2di mouse_pos;
 
-	uint16_t main_and_extra_legend_count;
+	uint16_t main_and_extra_legend_count_monster;
+	uint16_t main_legend_count_spell;
+	uint16_t main_legend_count_trap;
 	uint16_t main_skill_count;
 	Deck current_deck;
 public:
@@ -120,7 +122,6 @@ public:
 	const CardDataC* dragging_pointer;
 	int prev_deck;
 	int prev_operation;
-
 
 	uint16_t main_monster_count;
 	uint16_t main_spell_count;

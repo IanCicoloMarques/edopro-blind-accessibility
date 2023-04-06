@@ -94,7 +94,7 @@ irr::IrrlichtDevice* GUIUtils::CreateDevice(GameConfig* configs) {
 	}
 	// This correspond to the program's class name, used by window managers and
 	// desktop environments to group multiple instances with their desktop file
-	char class_name[] = "EDOPro";
+	char class_name[] = "edopro";
 	params.PrivateData = class_name;
 #endif
 	params.Vsync = configs->vsync;
@@ -110,13 +110,13 @@ irr::IrrlichtDevice* GUIUtils::CreateDevice(GameConfig* configs) {
 #endif
 #endif
 #ifndef __ANDROID__
-	params.WindowSize = irr::core::dimension2d<irr::u32>((irr::u32)(1024 * configs->dpi_scale), (irr::u32)(640 * configs->dpi_scale));
+	params.WindowSize = { (irr::u32)(1024 * configs->dpi_scale), (irr::u32)(640 * configs->dpi_scale) };
 #else
 	params.PrivateData = porting::app_global;
 	params.Bits = 24;
 	params.ZBufferBits = 16;
 	params.AntiAlias = 0;
-	params.WindowSize = irr::core::dimension2du(0, 0);
+	params.WindowSize = {};
 #endif
 	irr::IrrlichtDevice* device = irr::createDeviceEx(params);
 	if(!device)
@@ -129,7 +129,7 @@ irr::IrrlichtDevice* GUIUtils::CreateDevice(GameConfig* configs) {
 	// The Android assets file-system does not know which sub-directories it has (blame google).
 	// So we have to add all sub-directories in assets manually. Otherwise we could still open the files,
 	// but existFile checks will fail (which are for example needed by getFont).
-	for(int i = 0; i < filesystem->getFileArchiveCount(); ++i) {
+	for(irr::u32 i = 0; i < filesystem->getFileArchiveCount(); ++i) {
 		auto archive = filesystem->getFileArchive(i);
 		if(archive->getType() == irr::io::EFAT_ANDROID_ASSET) {
 			archive->addDirectoryToFileList("media/");
@@ -144,14 +144,14 @@ irr::IrrlichtDevice* GUIUtils::CreateDevice(GameConfig* configs) {
 #endif
 	driver->setTextureCreationFlag(irr::video::ETCF_CREATE_MIP_MAPS, false);
 	driver->setTextureCreationFlag(irr::video::ETCF_OPTIMIZED_FOR_QUALITY, true);
-	device->setWindowCaption(L"Yugioh Accessibility Version");
+	device->setWindowCaption(L"Project Ignis: EDOPro");
 #if !(IRRLICHT_VERSION_MAJOR==1 && IRRLICHT_VERSION_MINOR==9)
 	device->setResizable(true);
 #endif
 #ifdef _WIN32
 	auto hInstance = static_cast<HINSTANCE>(GetModuleHandle(nullptr));
-	auto hSmallIcon = static_cast<HICON>(LoadImage(hInstance, MAKEINTRESOURCE(1), IMAGE_ICON, 16, 16, LR_DEFAULTCOLOR));
-	auto hBigIcon = static_cast<HICON>(LoadImage(hInstance, MAKEINTRESOURCE(1), IMAGE_ICON, 32, 32, LR_DEFAULTCOLOR));
+	auto hSmallIcon = static_cast<HICON>(LoadImage(hInstance, MAKEINTRESOURCE(1), IMAGE_ICON, GetSystemMetrics(SM_CXSMICON), GetSystemMetrics(SM_CXSMICON), LR_DEFAULTCOLOR));
+	auto hBigIcon = static_cast<HICON>(LoadImage(hInstance, MAKEINTRESOURCE(1), IMAGE_ICON, GetSystemMetrics(SM_CXICON), GetSystemMetrics(SM_CYICON), LR_DEFAULTCOLOR));
 	auto hWnd = GetWindowHandle(driver);
 	SendMessage(hWnd, WM_SETICON, ICON_SMALL, reinterpret_cast<LPARAM>(hSmallIcon));
 	SendMessage(hWnd, WM_SETICON, ICON_BIG, reinterpret_cast<LPARAM>(hBigIcon));
@@ -188,14 +188,24 @@ bool GUIUtils::TakeScreenshot(irr::IrrlichtDevice* device) {
 	if(!image)
 		return false;
 	const auto now = std::time(nullptr);
-	const auto filename = fmt::format(EPRO_TEXT("screenshots/EDOPro {:%Y-%m-%d %H-%M-%S}.png"), *std::localtime(&now));
+	const auto filename = epro::format(EPRO_TEXT("screenshots/EDOPro {:%Y-%m-%d %H-%M-%S}.png"), fmt::localtime(now));
 	auto written = driver->writeImageToFile(image, { filename.data(), static_cast<irr::u32>(filename.size()) });
 	if(!written)
 		device->getLogger()->log(L"Failed to take screenshot.", irr::ELL_WARNING);
 	image->drop();
 	return written;
 }
+#if (IRRLICHT_VERSION_MAJOR==1 && IRRLICHT_VERSION_MINOR==9)
+void GUIUtils::ToggleFullscreen(irr::IrrlichtDevice* device, bool& fullscreen) {
+	(void)fullscreen;
+#ifdef EDOPRO_MACOS
+	EDOPRO_ToggleFullScreen();
+#elif defined(_WIN32) || (defined(__linux__) && !defined(__ANDROID__))
+	device->toggleFullscreen(!std::exchange(fullscreen, !fullscreen));
+#endif
+}
 
+#else
 #ifdef _WIN32
 //gcc on mingw can't convert lambda to __stdcall function
 static BOOL CALLBACK callback(HMONITOR hMon, HDC hdc, LPRECT lprcMonitor, LPARAM pData) {
@@ -204,15 +214,11 @@ static BOOL CALLBACK callback(HMONITOR hMon, HDC hdc, LPRECT lprcMonitor, LPARAM
 	return TRUE;
 }
 #endif
-
 void GUIUtils::ToggleFullscreen(irr::IrrlichtDevice* device, bool& fullscreen) {
 	(void)fullscreen;
 #ifdef EDOPRO_MACOS
 	EDOPRO_ToggleFullScreen();
 #elif defined(_WIN32) || (defined(__linux__) && !defined(__ANDROID__))
-#if IRRLICHT_VERSION_MAJOR==1 && IRRLICHT_VERSION_MINOR==9
-	device->toggleFullscreen(!std::exchange(fullscreen, !fullscreen));
-#else
 #ifdef _WIN32
 	static WINDOWPLACEMENT nonFullscreenSize;
 	static LONG_PTR nonFullscreenStyle;
@@ -319,9 +325,9 @@ void GUIUtils::ToggleFullscreen(irr::IrrlichtDevice* device, bool& fullscreen) {
 	XMapWindow(display, window);
 	XFlush(display);
 #endif
-#endif
 #endif //EDOPRO_MACOS
 }
+#endif
 
 void GUIUtils::ShowErrorWindow(epro::stringview context, epro::stringview message) {
 #ifdef _WIN32
@@ -353,14 +359,27 @@ void GUIUtils::ShowErrorWindow(epro::stringview context, epro::stringview messag
 #elif defined(__ANDROID__) || defined(EDOPRO_IOS)
 	porting::showErrorDialog(context, message);
 #elif defined(__linux__)
+	const auto* context_cstr = context.data();
+	const auto* message_cstr = message.data();
 	auto pid = vfork();
 	if(pid == 0) {
-		execl("/usr/bin/kdialog", "kdialog", "--title", context.data(), "--error", message.data());
-		execl("/usr/bin/zenity", "zenity", "--title", context.data(), "--error", message.data());
+		execl("/usr/bin/kdialog", "kdialog", "--title", context_cstr, "--error", message_cstr);
+		execl("/usr/bin/zenity", "zenity", "--title", context_cstr, "--error", message_cstr);
 		_exit(EXIT_FAILURE);
 	} else if(pid > 0)
 		(void)waitpid(pid, nullptr, 0);
 #endif
+}
+template<typename T>
+inline auto SetSwapInterval(T* driver, int interval) -> decltype(driver->setSwapInterval(interval)) {
+	driver->setSwapInterval(interval);
+}
+template<typename T>
+inline auto SetSwapInterval(T* driver, int interval) -> decltype(driver->setVsync(!!interval)) {
+	driver->setVsync(!!interval);
+}
+void GUIUtils::ToggleSwapInterval(irr::video::IVideoDriver* driver, int interval) {
+	SetSwapInterval(driver, interval);
 }
 
 std::string GUIUtils::SerializeWindowPosition(irr::IrrlichtDevice* device) {

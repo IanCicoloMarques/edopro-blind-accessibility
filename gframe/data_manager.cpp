@@ -56,7 +56,7 @@ sqlite3* DataManager::OpenDb(epro::path_stringview file) {
 
 sqlite3* DataManager::OpenDb(irr::io::IReadFile* reader) {
 	const auto& filename = reader->getFileName();
-	cur_database = fmt::format("{}", Utils::ToUTF8IfNeeded({ filename.data(), filename.size() }));
+	cur_database = epro::format("{}", Utils::ToUTF8IfNeeded({ filename.data(), filename.size() }));
 	sqlite3* pDB{ nullptr };
 	if(irrdb_open(reader, &pDB, SQLITE_OPEN_READONLY) != SQLITE_OK) {
 		Error(pDB);
@@ -67,33 +67,30 @@ sqlite3* DataManager::OpenDb(irr::io::IReadFile* reader) {
 
 static inline bool GetWstring(std::wstring& out, sqlite3_stmt* stmt, int iCol) {
 #if WCHAR_MAX == UINT16_MAX
-	auto* text = (const wchar_t*)sqlite3_column_text16(stmt, iCol);
-	if(text != nullptr) {
-		auto len = static_cast<size_t>(sqlite3_column_bytes16(stmt, iCol)) / sizeof(wchar_t);
-		if(len != 0) {
-			out.assign(text, len);
-			return true;
-		}
+	auto* text = static_cast<const wchar_t*>(sqlite3_column_text16(stmt, iCol));
+	if(text == nullptr || *text == L'\0') {
+		out.clear();
+		return false;
 	}
+	auto len = static_cast<size_t>(sqlite3_column_bytes16(stmt, iCol)) / sizeof(wchar_t);
+	out.assign(text, len);
 #else
-	auto* text = (const char*)sqlite3_column_text(stmt, iCol);
-	if(text != nullptr) {
-		auto len = static_cast<size_t>(sqlite3_column_bytes(stmt, iCol));
-		if(len != 0) {
-			out = BufferIO::DecodeUTF8({ text, len });
-			return true;
-		}
+	auto* text = reinterpret_cast<const char*>(sqlite3_column_text(stmt, iCol));
+	if(text == nullptr || *text == '\0') {
+		out.clear();
+		return false;
 	}
+	auto len = static_cast<size_t>(sqlite3_column_bytes(stmt, iCol));
+	out = BufferIO::DecodeUTF8({ text, len });
 #endif
-	out.clear();
-	return false;
+	return true;
 }
 
 bool DataManager::ParseDB(sqlite3* pDB) {
 	if(pDB == nullptr)
 		return false;
 	sqlite3_stmt* pStmt;
-	if(sqlite3_prepare_v2(pDB, SELECT_STMT.data(), SELECT_STMT.size() + 1, &pStmt, 0) != SQLITE_OK)
+	if(sqlite3_prepare_v2(pDB, SELECT_STMT.data(), static_cast<int>(SELECT_STMT.size() + 1), &pStmt, 0) != SQLITE_OK)
 		return Error(pDB);
 	auto indexesiterator = indexes.begin();
 	for(int step = sqlite3_step(pStmt); step != SQLITE_DONE; step = sqlite3_step(pStmt)) {
@@ -175,7 +172,7 @@ bool DataManager::ParseLocaleDB(sqlite3* pDB) {
 	if(pDB == nullptr)
 		return false;
 	sqlite3_stmt* pStmt;
-	if(sqlite3_prepare_v2(pDB, SELECT_STMT_LOCALE.data(), SELECT_STMT_LOCALE.size() + 1, &pStmt, 0) != SQLITE_OK)
+	if(sqlite3_prepare_v2(pDB, SELECT_STMT_LOCALE.data(), static_cast<int>(SELECT_STMT_LOCALE.size() + 1), &pStmt, 0) != SQLITE_OK)
 		return Error(pDB);
 	auto indexesiterator = indexes.begin();
 	for(int step = sqlite3_step(pStmt); step != SQLITE_DONE; step = sqlite3_step(pStmt)) {
@@ -241,14 +238,7 @@ bool DataManager::LoadStrings(const epro::path_string& file) {
 		try {
 			if(type == "system") {
 				_sysStrings.SetMain(std::stoi(value), BufferIO::DecodeUTF8(str));
-			}
-			else if (type == "accessibility") {
-				_accessibilityStrings.SetMain(std::stoi(value), BufferIO::DecodeUTF8(str));
-			}
-			else if (type == "accessibilitytips") {
-				_accessibilityTipsStrings.SetMain(std::stoi(value), BufferIO::DecodeUTF8(str));
-			}
-			else {
+			} else {
 				LocaleStringHelper* obj;
 				if(type == "victory")
 					obj = &_victoryStrings;
@@ -333,8 +323,6 @@ void DataManager::ClearLocaleStrings() {
 	_victoryStrings.ClearLocales();
 	_counterStrings.ClearLocales();
 	_setnameStrings.ClearLocales();
-	_accessibilityStrings.ClearLocales();
-	_accessibilityTipsStrings.ClearLocales();
 }
 bool DataManager::Error(sqlite3* pDB, sqlite3_stmt* pStmt) const {
 	ErrorLog("Error when loading database ({}): {}", cur_database, sqlite3_errmsg(pDB));
@@ -421,10 +409,10 @@ std::vector<uint16_t> DataManager::GetSetCode(const std::vector<std::wstring>& s
 	}
 	return res;
 }
-std::wstring DataManager::GetNumString(int num, bool bracket) const {
+std::wstring DataManager::GetNumString(size_t num, bool bracket) const {
 	if(!bracket)
 		return fmt::to_wstring(num);
-	return fmt::format(L"({})", num);
+	return epro::format(L"({})", num);
 }
 template<typename T1, typename T2>
 static inline void appendstring(T1& to, const T2& what) {
@@ -558,7 +546,7 @@ std::wstring DataManager::FormatSetName(const std::vector<uint16_t>& setcodes) c
 	return res;
 }
 std::wstring DataManager::FormatLinkMarker(uint32_t link_marker) const {
-	return fmt::format(L"{}{}{}{}{}{}{}{}",
+	return epro::format(L"{}{}{}{}{}{}{}{}",
 					   (link_marker & LINK_MARKER_TOP_LEFT)		? L"[\u2196]" : L"",
 					   (link_marker & LINK_MARKER_TOP)			? L"[\u2191]" : L"",
 					   (link_marker & LINK_MARKER_TOP_RIGHT)	? L"[\u2197]" : L"",

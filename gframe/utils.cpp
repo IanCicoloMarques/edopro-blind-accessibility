@@ -1,11 +1,19 @@
 #include "utils.h"
 #include <cmath> // std::round
-#include <fstream>
 #include "config.h"
 #ifdef _WIN32
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable : 4091)
+#endif
+#include <dbghelp.h>
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
 #include <shellapi.h> // ShellExecute
+#include "utils_gui.h"
 #else
 #ifndef _GNU_SOURCE
 #define _GNU_SOURCE
@@ -37,11 +45,12 @@ using Stat = struct stat;
 #include <IOSOperator.h>
 #include "bufferio.h"
 #include "file_stream.h"
-#if defined(__MINGW32__) && defined(UNICODE)
+#ifdef USE_GLIBC_FILEBUF
 constexpr FileMode FileStream::in;
 constexpr FileMode FileStream::binary;
 constexpr FileMode FileStream::out;
 constexpr FileMode FileStream::trunc;
+constexpr FileMode FileStream::app;
 #endif
 
 #if defined(_WIN32)
@@ -83,6 +92,72 @@ void NameThread(const char* name, const wchar_t* wname) {
 	NameThreadMsvc(name);
 #endif //_MSC_VER
 }
+
+//Dump creation routines taken from Postgres
+//https://github.com/postgres/postgres/blob/27b77ecf9f4d5be211900eda54d8155ada50d696/src/backend/port/win32/crashdump.c
+LONG WINAPI crashDumpHandler(EXCEPTION_POINTERS* pExceptionInfo) {
+	using MiniDumpWriteDump_t = BOOL(WINAPI*) (HANDLE hProcess, DWORD ProcessId, HANDLE hFile, MINIDUMP_TYPE DumpType,
+											   PMINIDUMP_EXCEPTION_INFORMATION ExceptionParam,
+											   PMINIDUMP_USER_STREAM_INFORMATION UserStreamParam,
+											   PMINIDUMP_CALLBACK_INFORMATION CallbackParam
+											   );
+	ygo::GUIUtils::ShowErrorWindow("Crash", "The program crashed, a crash dump will be created");
+
+	if(!ygo::Utils::MakeDirectory(EPRO_TEXT("./crashdumps")))
+		return EXCEPTION_CONTINUE_SEARCH;
+
+	/* 'crashdumps' exists and is a directory. Try to write a dump' */
+	HANDLE selfProcHandle = GetCurrentProcess();
+	DWORD selfPid = GetCurrentProcessId();
+
+	MINIDUMP_EXCEPTION_INFORMATION ExInfo{ GetCurrentThreadId(), pExceptionInfo, FALSE };
+
+	/* Load the dbghelp.dll library and functions */
+	auto* dbgHelpDLL = LoadLibrary(EPRO_TEXT("dbghelp.dll"));
+	if(dbgHelpDLL == nullptr)
+		return EXCEPTION_CONTINUE_SEARCH;
+	
+	auto* miniDumpWriteDumpFn = reinterpret_cast<MiniDumpWriteDump_t>(GetProcAddress(dbgHelpDLL, "MiniDumpWriteDump"));
+
+	if(miniDumpWriteDumpFn == nullptr) {
+		FreeLibrary(dbgHelpDLL);
+		return EXCEPTION_CONTINUE_SEARCH;
+	}
+
+	/*
+	* Dump as much as we can, except shared memory, code segments, and
+	* memory mapped files. Exactly what we can dump depends on the
+	* version of dbghelp.dll, see:
+	* http://msdn.microsoft.com/en-us/library/ms680519(v=VS.85).aspx
+	*/
+	auto dumpType = static_cast<MINIDUMP_TYPE>(MiniDumpNormal | MiniDumpWithHandleData | MiniDumpWithDataSegs);
+
+	if(GetProcAddress(dbgHelpDLL, "EnumDirTree") != nullptr) {
+		/* If this function exists, we have version 5.2 or newer */
+		dumpType = static_cast<MINIDUMP_TYPE>(dumpType | MiniDumpWithIndirectlyReferencedMemory | MiniDumpWithPrivateReadWriteMemory);
+	}
+
+	auto systemTicks = GetTickCount();
+	const auto dumpPath = fmt::sprintf(EPRO_TEXT("./crashdumps/EDOPro-pid%0i-%0i.mdmp"), (int)selfPid, (int)systemTicks);
+	
+	auto dumpFile = CreateFile(dumpPath.data(), GENERIC_WRITE, FILE_SHARE_WRITE,
+							   nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL,
+							   nullptr);
+
+	if(dumpFile == INVALID_HANDLE_VALUE) {
+		FreeLibrary(dbgHelpDLL);
+		return EXCEPTION_CONTINUE_SEARCH;
+	}
+
+	if(miniDumpWriteDumpFn(selfProcHandle, selfPid, dumpFile, dumpType, &ExInfo, nullptr, nullptr))
+		ygo::GUIUtils::ShowErrorWindow("Crash dump", fmt::format("Succesfully wrote crash dump to file \"{}\"\n", ygo::Utils::ToUTF8IfNeeded(dumpPath)));
+
+	CloseHandle(dumpFile);
+	FreeLibrary(dbgHelpDLL);
+
+	return EXCEPTION_CONTINUE_SEARCH;
+}
+
 }
 #endif
 
@@ -102,6 +177,12 @@ namespace ygo {
 #elif defined(__APPLE__)
 		pthread_setname_np(name);
 #endif //_WIN32
+	}
+
+	void Utils::SetupCrashDumpLogging() {
+#ifdef _WIN32
+		SetUnhandledExceptionFilter(crashDumpHandler);
+#endif
 	}
 
 	thread_local std::string last_error_string;
@@ -191,10 +272,10 @@ namespace ygo {
 #elif defined(__APPLE__)
 		return SetLastErrorStringIfFailed(copyfile(source.data(), destination.data(), 0, COPYFILE_ALL) == 0);
 #else
-		std::ifstream src(source.data(), std::ios::binary);
+		FileStream src(source.data(), FileStream::in | FileStream::binary);
 		if(!src.is_open())
 			return false;
-		std::ofstream dst(destination.data(), std::ios::binary);
+		FileStream dst(destination.data(), FileStream::out | FileStream::binary);
 		if(!dst.is_open())
 			return false;
 		dst << src.rdbuf();
@@ -247,7 +328,7 @@ namespace ygo {
 		const auto path = Utils::NormalizePath(_path);
 #ifdef _WIN32
 		WIN32_FIND_DATA fdata;
-		auto fh = FindFirstFile(fmt::format(EPRO_TEXT("{}*.*"), path).data(), &fdata);
+		auto fh = FindFirstFile(epro::format(EPRO_TEXT("{}*.*"), path).data(), &fdata);
 		if(fh != INVALID_HANDLE_VALUE) {
 			do {
 				cb(fdata.cFileName, !!(fdata.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY));
@@ -256,6 +337,13 @@ namespace ygo {
 		}
 #else
 		if(auto dir = opendir(path.data())) {
+#ifdef __ANDROID__
+			// workaround, on android 11 (and probably higher) the folders "." and ".." aren't
+			// returned by readdir, assuming the parsed path will never be root, manually
+			// pass those 2 folders if they aren't returned by readdir
+			bool found_curdir = false;
+			bool found_topdir = false;
+#endif //__ANDROID__
 			while(auto dirp = readdir(dir)) {
 				bool isdir = false;
 #ifdef _DIRENT_HAVE_D_TYPE //avoid call to format and stat
@@ -267,13 +355,25 @@ namespace ygo {
 #endif
 				{
 					Stat fileStat;
-					stat(fmt::format("{}{}", path, dirp->d_name).data(), &fileStat);
+					stat(epro::format("{}{}", path, dirp->d_name).data(), &fileStat);
 					isdir = !!S_ISDIR(fileStat.st_mode);
 					if(!isdir && !S_ISREG(fileStat.st_mode)) //not a folder or file, skip
 						continue;
 				}
+#ifdef __ANDROID__
+				if(dirp->d_name == EPRO_TEXT("."_sv))
+					found_curdir = true;
+				if(dirp->d_name == EPRO_TEXT(".."_sv))
+					found_topdir = true;
+#endif //__ANDROID__
 				cb(dirp->d_name, isdir);
 			}
+#ifdef __ANDROID__
+			if(!found_curdir)
+				cb(EPRO_TEXT("."), true);
+			if(!found_topdir)
+				cb(EPRO_TEXT(".."), true);
+#endif //__ANDROID__
 			closedir(dir);
 		}
 #endif
@@ -284,9 +384,9 @@ namespace ygo {
 		FindFiles(path, [&path](epro::path_stringview name, bool isdir) {
 			if(isdir) {
 				if(!ROOT_OR_CUR(name))
-					DeleteDirectory(fmt::format(EPRO_TEXT("{}{}/"), path, name));
+					DeleteDirectory(epro::format(EPRO_TEXT("{}{}/"), path, name));
 			} else
-				FileDelete(fmt::format(EPRO_TEXT("{}{}"), path, name));
+				FileDelete(epro::format(EPRO_TEXT("{}{}"), path, name));
 		});
 		return true;
 	}
@@ -317,9 +417,9 @@ namespace ygo {
 		FindFiles(path, [&res, extensions, path, subdirectorylayers](epro::path_stringview name, bool isdir) {
 			if(isdir) {
 				if(subdirectorylayers && !ROOT_OR_CUR(name)) {
-					auto res2 = FindFiles(fmt::format(EPRO_TEXT("{}{}/"), path, name), extensions, subdirectorylayers - 1);
+					auto res2 = FindFiles(epro::format(EPRO_TEXT("{}{}/"), path, name), extensions, subdirectorylayers - 1);
 					for(auto& file : res2)
-						file = fmt::format(EPRO_TEXT("{}/{}"), name, file);
+						file = epro::format(EPRO_TEXT("{}/{}"), name, file);
 					res.insert(res.end(), std::make_move_iterator(res2.begin()), std::make_move_iterator(res2.end()));
 				}
 			} else {
@@ -335,7 +435,7 @@ namespace ygo {
 		FindFiles(path, [&results, path, subdirectorylayers, addparentpath](epro::path_stringview name, bool isdir) {
 			if (!isdir || ROOT_OR_CUR(name))
 				return;
-			epro::path_string fullpath = fmt::format(EPRO_TEXT("{}{}/"), path, name);
+			epro::path_string fullpath = epro::format(EPRO_TEXT("{}{}/"), path, name);
 			epro::path_stringview cur = name;
 			if(addparentpath)
 				cur = fullpath;
@@ -343,7 +443,7 @@ namespace ygo {
 			if(subdirectorylayers > 1) {
 				auto subresults = FindSubfolders(fullpath, subdirectorylayers - 1, false);
 				for(auto& folder : subresults) {
-					folder = fmt::format(EPRO_TEXT("{}{}/"), fullpath, folder);
+					folder = epro::format(EPRO_TEXT("{}{}/"), fullpath, folder);
 				}
 				results.insert(results.end(), std::make_move_iterator(subresults.begin()), std::make_move_iterator(subresults.end()));
 			}
@@ -351,8 +451,8 @@ namespace ygo {
 		std::sort(results.begin(), results.end(), CompareIgnoreCase<epro::path_string>);
 		return results;
 	}
-	std::vector<int> Utils::FindFiles(irr::io::IFileArchive* archive, epro::path_stringview path, const std::vector<epro::path_stringview>& extensions, int subdirectorylayers) {
-		std::vector<int> res;
+	std::vector<uint32_t> Utils::FindFiles(irr::io::IFileArchive* archive, epro::path_stringview path, const std::vector<epro::path_stringview>& extensions, int subdirectorylayers) {
+		std::vector<uint32_t> res;
 		auto list = archive->getFileList();
 		for(irr::u32 i = 0; i < list->getFileCount(); i++) {
 			if(list->isDirectory(i))
@@ -368,9 +468,9 @@ namespace ygo {
 	irr::io::IReadFile* Utils::FindFileInArchives(epro::path_stringview path, epro::path_stringview name) {
 		for(auto& archive : archives) {
 			auto list = archive.archive->getFileList();
-			int res = list->findFile(fmt::format(EPRO_TEXT("{}{}"), path, name).data());
+			int res = list->findFile(epro::format(EPRO_TEXT("{}{}"), path, name).data());
 			if(res != -1) {
-				std::lock_guard<std::mutex> lk(*archive.mutex);
+				std::lock_guard<epro::mutex> lk(*archive.mutex);
 				auto reader = archive.archive->createAndOpenFile(res);
 				return reader;
 			}
@@ -378,8 +478,26 @@ namespace ygo {
 		return nullptr;
 	}
 	const std::string& Utils::GetUserAgent() {
-		static const std::string agent = fmt::format("EDOPro-" OSSTRING "-" STR(EDOPRO_VERSION_MAJOR) "." STR(EDOPRO_VERSION_MINOR) "." STR(EDOPRO_VERSION_PATCH)" {}",
-											   ygo::Utils::OSOperator->getOperatingSystemVersion());
+		auto EscapeUTF8 = [](auto& to_escape) {
+			auto IsNonANSI = [](char c) {
+				return (static_cast<unsigned>(c) & ~0x7Fu) != 0;
+			};
+			const epro::stringview view{ to_escape.data(), to_escape.size() };
+			const auto total_unicode = std::count_if(view.begin(), view.end(), IsNonANSI);
+			std::string ret;
+			ret.reserve(view.size() + (total_unicode * 4));
+			for(auto c : view) {
+				if(IsNonANSI(c)) {
+					static constexpr std::array<char, 16> map{ {'0', '1','2','3','4','5','6','7','8','9','A','B','C','D','E','F'} };
+					auto int_char = static_cast<unsigned>(c);
+					ret.append(R"(\x)").append(1, map[(int_char >> 4) & 0xf]).append(1, map[int_char & 0xf]);
+				} else
+					ret.append(1, c);
+			}
+			return ret;
+		};
+		static const std::string agent = epro::format("EDOPro-" OSSTRING "-" STR(EDOPRO_VERSION_MAJOR) "." STR(EDOPRO_VERSION_MINOR) "." STR(EDOPRO_VERSION_PATCH)" {}",
+													  EscapeUTF8(Utils::OSOperator->getOperatingSystemVersion()));
 		return agent;
 	}
 	epro::path_string Utils::GetAbsolutePath(epro::path_stringview path) {
@@ -446,7 +564,7 @@ namespace ygo {
 		/*
 		#ifdef MAC_OS_DISCORD_LAUNCHER
 			//launches discord launcher so that it's registered as bundle to launch by discord
-			system(fmt::format("open {}/Contents/MacOS/discord-launcher.app --args random", CFStringGetCStringPtr(bundle_path, kCFStringEncodingUTF8)).data());
+			system(epro::format("open {}/Contents/MacOS/discord-launcher.app --args random", CFStringGetCStringPtr(bundle_path, kCFStringEncodingUTF8)).data());
 		#endif
 		*/
 		epro::path_string res = epro::path_string(CFStringGetCStringPtr(path, kCFStringEncodingUTF8)) + "/";
@@ -468,7 +586,7 @@ namespace ygo {
 
 	static const epro::path_string core_path = [] {
 #ifdef _WIN32
-		return fmt::format(EPRO_TEXT("{}/ocgcore.dll"), Utils::GetExeFolder());
+		return epro::format(EPRO_TEXT("{}/ocgcore.dll"), Utils::GetExeFolder());
 #else
 		return EPRO_TEXT(""); // Unused on POSIX
 #endif
@@ -504,15 +622,13 @@ namespace ygo {
 			auto filename = filelist->getFullFileName(i);
 			bool isdir = filelist->isDirectory(i);
 			if(isdir)
-				CreatePath(fmt::format(EPRO_TEXT("{}/"), filename), { dest.data(), dest.size() });
+				CreatePath(epro::format(EPRO_TEXT("{}/"), filename), { dest.data(), dest.size() });
 			else
 				CreatePath({ filename.data(), filename.size() }, { dest.data(), dest.size() });
 			if(!isdir) {
 				int percentage = 0;
 				auto reader = archive->createAndOpenFile(i);
 				if(reader) {
-					FileStream out{ fmt::format(EPRO_TEXT("{}/{}"), dest, filename), FileStream::out | FileStream::binary };
-					int r, rx = reader->getSize();
 					if(payload) {
 						payload->is_new = true;
 						payload->cur = i;
@@ -521,8 +637,10 @@ namespace ygo {
 						callback(payload);
 						payload->is_new = false;
 					}
+					FileStream out{ epro::format(EPRO_TEXT("{}/{}"), dest, filename), FileStream::out | FileStream::binary };
+					size_t r, rx = reader->getSize();
 					for(r = 0; r < rx; /**/) {
-						int wx = reader->read(buff, buff_size);
+						int wx = static_cast<int>(reader->read(buff, buff_size));
 						out.write(buff, wx);
 						r += wx;
 						cur_fullsize += wx;
@@ -547,15 +665,15 @@ namespace ygo {
 #ifdef _WIN32
 		if(type == SHARE_FILE)
 			return;
-		ShellExecute(nullptr, EPRO_TEXT("open"), (type == OPEN_FILE) ? fmt::format(EPRO_TEXT("{}/{}"), GetWorkingDirectory(), arg).data() : arg.data(), nullptr, nullptr, SW_SHOWNORMAL);
+		ShellExecute(nullptr, EPRO_TEXT("open"), (type == OPEN_FILE) ? epro::format(EPRO_TEXT("{}/{}"), GetWorkingDirectory(), arg).data() : arg.data(), nullptr, nullptr, SW_SHOWNORMAL);
 #elif defined(__ANDROID__)
 		switch(type) {
 		case OPEN_FILE:
-			return porting::openFile(fmt::format("{}/{}", GetWorkingDirectory(), arg));
+			return porting::openFile(epro::format("{}/{}", GetWorkingDirectory(), arg));
 		case OPEN_URL:
 			return porting::openUrl(arg);
 		case SHARE_FILE:
-			return porting::shareFile(fmt::format("{}/{}", GetWorkingDirectory(), arg));
+			return porting::shareFile(epro::format("{}/{}", GetWorkingDirectory(), arg));
 		}
 #elif defined(EDOPRO_MACOS) || defined(__linux__)
 		if(type == SHARE_FILE)
@@ -565,9 +683,10 @@ namespace ygo {
 #else
 #define OPEN "xdg-open"
 #endif
+		const auto* arg_cstr = arg.data();
 		auto pid = vfork();
 		if(pid == 0) {
-			execl("/usr/bin/" OPEN, OPEN, arg.data(), nullptr);
+			execl("/usr/bin/" OPEN, OPEN, arg_cstr, nullptr);
 			_exit(EXIT_FAILURE);
 		} else if(pid < 0)
 			perror("Failed to fork:");
@@ -582,7 +701,7 @@ namespace ygo {
 #ifdef _WIN32
 		STARTUPINFO si{ sizeof(si) };
 		PROCESS_INFORMATION pi{};
-		auto command = fmt::format(EPRO_TEXT("{} -C \"{}\" -l"), GetFileName(path, true), GetWorkingDirectory());
+		auto command = epro::format(EPRO_TEXT("{} -C \"{}\" -l"), GetFileName(path, true), GetWorkingDirectory());
 		if(!CreateProcess(path.data(), &command[0], nullptr, nullptr, false, 0, nullptr, nullptr, &si, &pi))
 			return;
 		CloseHandle(pi.hProcess);
@@ -593,20 +712,58 @@ namespace ygo {
 		stat(path.data(), &fileStat);
 		chmod(path.data(), fileStat.st_mode | S_IXUSR | S_IXGRP | S_IXOTH);
 #endif
-		auto pid = vfork();
-		if(pid == 0) {
+		{
+			const auto* path_cstr = path.data();
+			const auto& workdir = GetWorkingDirectory();
+			const auto* workdir_cstr = workdir.data();
+			auto pid = vfork();
+			if(pid == 0) {
 #ifdef __linux__
-			execl(path.data(), path.data(), "-C", GetWorkingDirectory().data(), "-l", nullptr);
+				execl(path_cstr, path_cstr, "-C", workdir_cstr, "-l", nullptr);
 #else
-			execlp("open", "open", "-b", "io.github.edo9300.ygoprodll", "--args", "-C", GetWorkingDirectory().data(), "-l", nullptr);
+				(void)path_cstr;
+				execlp("open", "open", "-b", "io.github.edo9300.ygoprodll", "--args", "-C", workdir_cstr, "-l", nullptr);
 #endif
-			_exit(EXIT_FAILURE);
+				_exit(EXIT_FAILURE);
+			}
+			if(pid < 0 || waitpid(pid, nullptr, WNOHANG) != 0)
+				return;
 		}
-		if(pid < 0 || waitpid(pid, nullptr, WNOHANG) != 0)
-			return;
 #endif
 		exit(0);
 #endif
 	}
-}
 
+	std::wstring Utils::ReadPuzzleMessage(epro::wstringview script_name) {
+		FileStream infile{ Utils::ToPathString(script_name), FileStream::in };
+		if(infile.fail())
+			return {};
+		std::string str;
+		std::string res = "";
+		size_t start = std::string::npos;
+		bool stop = false;
+		while(!stop && std::getline(infile, str)) {
+			auto pos = str.find('\r');
+			if(str.size() && pos != std::string::npos)
+				str.erase(pos);
+			bool was_empty = str.empty();
+			if(start == std::string::npos) {
+				start = str.find("--[[message");
+				if(start == std::string::npos)
+					continue;
+				str.erase(0, start + 11);
+			}
+			size_t end = str.find("]]");
+			if(end != std::string::npos) {
+				str.erase(end);
+				stop = true;
+			}
+			if(str.empty() && !was_empty)
+				continue;
+			if(!res.empty() || was_empty)
+				res += "\n";
+			res += str;
+		}
+		return BufferIO::DecodeUTF8(res);
+	}
+}

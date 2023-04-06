@@ -17,8 +17,8 @@ extern bool show_changelog;
 #endif
 
 #define EDOPRO_VERSION_MAJOR 40
-#define EDOPRO_VERSION_MINOR 0
-#define EDOPRO_VERSION_PATCH 0
+#define EDOPRO_VERSION_MINOR 1
+#define EDOPRO_VERSION_PATCH 2
 #define EDOPRO_VERSION_CODENAME "Puppet of Strings"
 #define EDOPRO_VERSION_STRING_DEBUG "EDOPro version " STR(EDOPRO_VERSION_MAJOR) "." STR(EDOPRO_VERSION_MINOR) "." STR(EDOPRO_VERSION_PATCH)
 #define EDOPRO_VERSION_STRING L"Yugioh Accessibility Version | EDOPro version: " STR(EDOPRO_VERSION_MAJOR) "." STR(EDOPRO_VERSION_MINOR) "." STR(EDOPRO_VERSION_PATCH) " \"" EDOPRO_VERSION_CODENAME "\""
@@ -28,6 +28,7 @@ extern bool show_changelog;
 #define GET_CLIENT_VERSION_MINOR(ver) ((ver >> 8) & 0xff)
 #define GET_CORE_VERSION_MAJOR(ver) ((ver >> 16) & 0xff)
 #define GET_CORE_VERSION_MINOR(ver) ((ver >> 24) & 0xff)
+#define EXPAND_VERSION(ver) GET_CLIENT_VERSION_MAJOR(ver), GET_CLIENT_VERSION_MINOR(ver), GET_CORE_VERSION_MAJOR(ver), GET_CORE_VERSION_MINOR(ver)
 
 #if defined(__APPLE__)
 #include <TargetConditionals.h>

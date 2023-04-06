@@ -108,7 +108,7 @@ void SoundManager::RefreshSoundsList() {
 	const auto extensions = mixer->GetSupportedSoundExtensions();
 	for(const auto& sound : fx) {
 		for(const auto& ext : extensions) {
-			const auto filename = fmt::format(epro::to_fmtstring_view(sound.second), ext);
+			const auto filename = epro::format(sound.second, ext);
 			if(Utils::FileExists(filename)) {
 				SFXList[sound.first] = Utils::ToUTF8IfNeeded(filename);
 				break;
@@ -119,8 +119,8 @@ void SoundManager::RefreshSoundsList() {
 }
 void SoundManager::RefreshBGMDir(epro::path_stringview path, BGM scene) {
 #ifdef BACKEND
-	for(auto& file : Utils::FindFiles(fmt::format(EPRO_TEXT("./sound/BGM/{}"), path), mixer->GetSupportedMusicExtensions())) {
-		auto conv = Utils::ToUTF8IfNeeded(fmt::format(EPRO_TEXT("{}/{}"), path, file));
+	for(auto& file : Utils::FindFiles(epro::format(EPRO_TEXT("./sound/BGM/{}"), path), mixer->GetSupportedMusicExtensions())) {
+		auto conv = Utils::ToUTF8IfNeeded(epro::format(EPRO_TEXT("{}/{}"), path, file));
 		BGMList[BGM::ALL].push_back(conv);
 		BGMList[scene].push_back(std::move(conv));
 	}
@@ -135,7 +135,7 @@ void SoundManager::RefreshChantsList() {
 	};
 	ChantsList.clear();
 	for (const auto& chantType : types) {
-		const epro::path_string searchPath = fmt::format(EPRO_TEXT("./sound/{}"), chantType.second);
+		const epro::path_string searchPath = epro::format(EPRO_TEXT("./sound/{}"), chantType.second);
 		Utils::MakeDirectory(searchPath);
 		for (auto& file : Utils::FindFiles(searchPath, mixer->GetSupportedSoundExtensions())) {
 			auto scode = Utils::GetFileName(file);
@@ -143,7 +143,7 @@ void SoundManager::RefreshChantsList() {
 				uint32_t code = static_cast<uint32_t>(std::stoul(scode));
 				auto key = std::make_pair(chantType.first, code);
 				if (code && !ChantsList.count(key))
-					ChantsList[key] = fmt::format("{}/{}", working_dir, Utils::ToUTF8IfNeeded(fmt::format(EPRO_TEXT("{}/{}"), searchPath, file)));
+					ChantsList[key] = epro::format("{}/{}", working_dir, Utils::ToUTF8IfNeeded(epro::format(EPRO_TEXT("{}/{}"), searchPath, file)));
 			}
 			catch (...) {
 				continue;
@@ -166,13 +166,13 @@ void SoundManager::PlayBGM(BGM scene, bool loop) {
 	if(!musicEnabled)
 		return;
 	const auto& list = BGMList[scene];
-	int count = list.size();
+	auto count = static_cast<int>(list.size());
 	if(count == 0)
 		return;
 	if(scene != bgm_scene || !mixer->MusicPlaying()) {
 		bgm_scene = scene;
 		auto bgm = (std::uniform_int_distribution<>(0, count - 1))(rnd);
-		const std::string BGMName = fmt::format("{}/./sound/BGM/{}", working_dir, list[bgm]);
+		const std::string BGMName = epro::format("{}/./sound/BGM/{}", working_dir, list[bgm]);
 		mixer->PlayMusic(BGMName, loop);
 	}
 #endif
@@ -184,8 +184,7 @@ bool SoundManager::PlayChant(CHANT chant, uint32_t code) {
 	auto chant_it = ChantsList.find(key);
 	if(chant_it == ChantsList.end())
 		return false;
-	mixer->PlaySound(chant_it->second);
-	return true;
+	return mixer->PlaySound(chant_it->second);
 #else
 	return false;
 #endif

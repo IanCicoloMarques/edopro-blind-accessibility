@@ -1,4 +1,4 @@
-#include <thread>
+#include "epro_thread.h"
 #ifndef _WIN32
 #include <arpa/inet.h>
 #endif
@@ -55,16 +55,16 @@ bool NetServer::StartServer(uint16_t port) {
 		return false;
 	}
 	evconnlistener_set_error_cb(listener, ServerAcceptError);
-	std::thread(ServerThread).detach();
+	epro::thread(ServerThread).detach();
 	return true;
 }
 bool NetServer::StartBroadcast() {
 	if(!net_evbase)
 		return false;
 	evutil_socket_t udp = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
-	ev_socklen_t opt = true;
-	setsockopt(udp, SOL_SOCKET, SO_BROADCAST, (const char*)&opt, sizeof(ev_socklen_t));
-	setsockopt(udp, SOL_SOCKET, SO_REUSEADDR, (const char*)&opt, sizeof(ev_socklen_t));
+	int opt = 1;
+	setsockopt(udp, SOL_SOCKET, SO_BROADCAST, (const char*)&opt, (ev_socklen_t)sizeof(opt));
+	setsockopt(udp, SOL_SOCKET, SO_REUSEADDR, (const char*)&opt, (ev_socklen_t)sizeof(opt));
 	sockaddr_in addr;
 	memset(&addr, 0, sizeof(addr));
 	addr.sin_family = AF_INET;
@@ -101,6 +101,8 @@ void NetServer::StopListen() {
 	StopBroadcast();
 }
 void NetServer::BroadcastEvent(evutil_socket_t fd, short events, void* arg) {
+	(void)events;
+	(void)arg;
 	sockaddr_in bc_addr;
 	ev_socklen_t sz = sizeof(sockaddr_in);
 	char buf[256];
@@ -122,7 +124,11 @@ void NetServer::BroadcastEvent(evutil_socket_t fd, short events, void* arg) {
 		sendto(fd, (const char*)&hp, sizeof(HostPacket), 0, (sockaddr*)&sockTo, sizeof(sockTo));
 	}
 }
-void NetServer::ServerAccept(evconnlistener* listener, evutil_socket_t fd, sockaddr* address, int socklen, void* ctx) {
+void NetServer::ServerAccept(evconnlistener* bev_listener, evutil_socket_t fd, sockaddr* address, int socklen, void* ctx) {
+	(void)bev_listener;
+	(void)address;
+	(void)socklen;
+	(void)ctx;
 	bufferevent* bev = bufferevent_socket_new(net_evbase, fd, BEV_OPT_CLOSE_ON_FREE);
 	DuelPlayer dp;
 	dp.name[0] = 0;
@@ -132,10 +138,13 @@ void NetServer::ServerAccept(evconnlistener* listener, evutil_socket_t fd, socka
 	bufferevent_setcb(bev, ServerEchoRead, nullptr, ServerEchoEvent, nullptr);
 	bufferevent_enable(bev, EV_READ);
 }
-void NetServer::ServerAcceptError(evconnlistener* listener, void* ctx) {
+void NetServer::ServerAcceptError(evconnlistener* bev_listener, void* ctx) {
+	(void)bev_listener;
+	(void)ctx;
 	event_base_loopexit(net_evbase, 0);
 }
 void NetServer::ServerEchoRead(bufferevent *bev, void *ctx) {
+	(void)ctx;
 	evbuffer* input = bufferevent_get_input(bev);
 	size_t len = evbuffer_get_length(input);
 	uint16_t packet_len = 0;
@@ -152,6 +161,7 @@ void NetServer::ServerEchoRead(bufferevent *bev, void *ctx) {
 	}
 }
 void NetServer::ServerEchoEvent(bufferevent* bev, short events, void* ctx) {
+	(void)ctx;
 	if (events & (BEV_EVENT_EOF | BEV_EVENT_ERROR)) {
 		DuelPlayer* dp = &users[bev];
 		DuelMode* dm = dp->game;

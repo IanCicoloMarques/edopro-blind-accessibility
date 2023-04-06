@@ -4,6 +4,7 @@
 #include <sys/utsname.h>
 #include <fmt/format.h>
 #include "../bufferio.h"
+#include "../text_types.h"
 #include "COSiOSOperator.h"
 
 namespace irr {
@@ -16,7 +17,7 @@ COSiOSOperator::COSiOSOperator() {
 	auto version = [[NSProcessInfo processInfo] operatingSystemVersion];
 	struct utsname name;
 	uname(&name);
-	const auto verstring = fmt::format("iOS version: {}.{}.{} {}",
+	const auto verstring = epro::format("iOS version: {}.{}.{} {}",
 									   version.majorVersion, version.minorVersion, version.patchVersion, name.version);
 	OperatingSystem = { verstring.data(), (u32)verstring.size() };
 	fmt::print("{}\n", OperatingSystem);

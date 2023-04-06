@@ -54,10 +54,6 @@ inline void TriggerEvent(irr::gui::IGUIElement* target, irr::gui::EGUI_EVENT_TYP
 	ygo::mainGame->device->postEventFromUser(event);
 }
 
-inline void ClickButton(irr::gui::IGUIElement* btn) {
-	TriggerEvent(btn, irr::gui::EGET_BUTTON_CLICKED);
-}
-
 inline void SetCheckbox(irr::gui::IGUICheckBox* chk, bool state) {
 	chk->setChecked(state);
 	TriggerEvent(chk, irr::gui::EGET_CHECKBOX_CHANGED);
@@ -108,10 +104,11 @@ args_t ParseArguments(int argc, epro::path_char* argv[]) {
 					i++;
 				}
 			}
-			res[launch_param] = { true, argument };
+			res[launch_param].enabled = true;
+			res[launch_param].argument = argument;
 			continue;
 		} else if(parameter == EPRO_TEXT("show_changelog"))
-			res[LAUNCH_PARAM::CHANGELOG] = { true };
+			res[LAUNCH_PARAM::CHANGELOG].enabled = true;
 	}
 	return res;
 }
@@ -127,12 +124,18 @@ inline void ThreadsStartup() {
 #ifdef _WIN32
 	const WORD wVersionRequested = MAKEWORD(2, 2);
 	WSADATA wsaData;
-	WSAStartup(wVersionRequested, &wsaData);
-	evthread_use_windows_threads();
+	auto wsaret = WSAStartup(wVersionRequested, &wsaData);
+	if(wsaret != 0)
+		throw std::runtime_error(epro::format("Failed to initialize WinSock ({})!", wsaret));
+	if(evthread_use_windows_threads() < 0)
+		throw std::runtime_error("Failed initialize libevent!");
 #else
-	evthread_use_pthreads();
+	if(evthread_use_pthreads() < 0)
+		throw std::runtime_error("Failed initialize libevent!");
 #endif
-	curl_global_init(CURL_GLOBAL_SSL);
+	auto res = curl_global_init(CURL_GLOBAL_SSL);
+	if(res != CURLE_OK)
+		throw std::runtime_error(epro::format("Curl error: ({}) {}", static_cast<std::underlying_type_t<CURLcode>>(res), curl_easy_strerror(res)));
 }
 inline void ThreadsCleanup() {
 	curl_global_cleanup();
@@ -168,7 +171,7 @@ int _tmain(int argc, epro::path_char* argv[]) {
 		const auto& workdir = args[LAUNCH_PARAM::WORK_DIR];
 		const epro::path_stringview dest = workdir.enabled ? workdir.argument : ygo::Utils::GetExeFolder();
 		if(!ygo::Utils::SetWorkingDirectory(dest)) {
-			const auto err = fmt::format("failed to change directory to: {} ({})",
+			const auto err = epro::format("failed to change directory to: {} ({})",
 										 ygo::Utils::ToUTF8IfNeeded(dest), ygo::Utils::GetLastErrorString());
 			ygo::ErrorLog(err);
 			fmt::print("{}\n", err);
@@ -176,16 +179,25 @@ int _tmain(int argc, epro::path_char* argv[]) {
 			return EXIT_FAILURE;
 		}
 	}
+	ygo::Utils::SetupCrashDumpLogging();
+	try {
+		ThreadsStartup();
+	} catch(const std::exception& e) {
+		epro::stringview text(e.what());
+		ygo::ErrorLog(text);
+		fmt::print("{}\n", text);
+		ygo::GUIUtils::ShowErrorWindow("Initialization fail", text);
+		return EXIT_FAILURE;
+	}
 	show_changelog = args[LAUNCH_PARAM::CHANGELOG].enabled;
-	ThreadsStartup();
 #ifndef _WIN32
 	setlocale(LC_CTYPE, "UTF-8");
 #endif //_WIN32
 	ygo::ClientUpdater updater(args[LAUNCH_PARAM::OVERRIDE_UPDATE_URL].argument);
 	ygo::gClientUpdater = &updater;
-	std::shared_ptr<ygo::DataHandler> data{ nullptr };
+	std::unique_ptr<ygo::DataHandler> data{ nullptr };
 	try {
-		data = std::make_shared<ygo::DataHandler>();
+		data = std::make_unique<ygo::DataHandler>();
 		ygo::gImageDownloader = data->imageDownloader.get();
 		ygo::gDataManager = data->dataManager.get();
 		ygo::gSoundManager = data->sounds.get();
@@ -220,10 +232,7 @@ int _tmain(int argc, epro::path_char* argv[]) {
 	do {
 		Game _game{};
 		ygo::mainGame = &_game;
-		if(data->tmp_device) {
-			ygo::mainGame->device = data->tmp_device;
-			data->tmp_device = nullptr;
-		}
+		ygo::mainGame->device = std::exchange(data->tmp_device, nullptr);
 		try {
 			ygo::mainGame->Initialize();
 		}

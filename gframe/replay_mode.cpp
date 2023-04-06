@@ -23,7 +23,7 @@ bool ReplayMode::exit_pending = false;
 int ReplayMode::skip_turn = 0;
 int ReplayMode::current_step = 0;
 int ReplayMode::skip_step = 0;
-std::thread ReplayMode::replay_thread;
+epro::thread ReplayMode::replay_thread;
 
 bool ReplayMode::StartReplay(int skipturn, bool is_yrp) {
 	if(mainGame->dInfo.isReplay)
@@ -45,9 +45,9 @@ bool ReplayMode::StartReplay(int skipturn, bool is_yrp) {
 			cur_yrp = cur_replay.yrp.get();
 		if(!cur_yrp)
 			return false;
-		replay_thread = std::thread(OldReplayThread);
+		replay_thread = epro::thread(OldReplayThread);
 	} else
-		replay_thread = std::thread(ReplayThread);
+		replay_thread = epro::thread(ReplayThread);
 	return true;
 }
 void ReplayMode::StopReplay(bool is_exiting) {
@@ -85,21 +85,20 @@ int ReplayMode::ReplayThread() {
 	mainGame->dInfo.isHandTest = !!(replay_header.base.flag & REPLAY_HAND_TEST);
 	mainGame->dInfo.compat_mode = !(replay_header.base.flag & REPLAY_LUA64);
 	mainGame->dInfo.legacy_race_size = GET_CORE_VERSION_MAJOR(replay_header.base.version) < 10;
-	mainGame->dInfo.team1 = ReplayMode::cur_replay.GetPlayersCount(0);
-	mainGame->dInfo.team2 = ReplayMode::cur_replay.GetPlayersCount(1);
+	mainGame->dInfo.team1 = cur_replay.GetPlayersCount(0);
+	mainGame->dInfo.team2 = cur_replay.GetPlayersCount(1);
 	mainGame->dInfo.current_player[0] = 0;
 	mainGame->dInfo.current_player[1] = 0;
 	if(!mainGame->dInfo.isRelay)
 		mainGame->dInfo.current_player[1] = mainGame->dInfo.team2 - 1;
-	const auto& names = ReplayMode::cur_replay.GetPlayerNames();
-	mainGame->dInfo.selfnames.clear();
-	mainGame->dInfo.opponames.clear();
-	mainGame->dInfo.selfnames.insert(mainGame->dInfo.selfnames.end(), names.begin(), names.begin() + mainGame->dInfo.team1);
-	mainGame->dInfo.opponames.insert(mainGame->dInfo.opponames.end(), names.begin() + mainGame->dInfo.team1, names.end());
+	const auto& names = cur_replay.GetPlayerNames();
+	const auto first_oppo_player = names.begin() + mainGame->dInfo.team1;
+	mainGame->dInfo.selfnames.assign(names.begin(), first_oppo_player);
+	mainGame->dInfo.opponames.assign(first_oppo_player, names.end());
 	mainGame->dInfo.duel_params = cur_replay.params.duel_flags;
 	mainGame->dInfo.duel_field = mainGame->GetMasterRule(mainGame->dInfo.duel_params);
-	matManager.SetActiveVertices((mainGame->dInfo.duel_params & DUEL_3_COLUMNS_FIELD) ? 1 : 0,
-								 (mainGame->dInfo.duel_field == 3 || mainGame->dInfo.duel_field == 5) ? 0 : 1);
+	matManager.SetActiveVertices(mainGame->dInfo.HasFieldFlag(DUEL_3_COLUMNS_FIELD),
+								 !mainGame->dInfo.HasFieldFlag(DUEL_SEPARATE_PZONE));
 	mainGame->SetPhaseButtons();
 	auto& current_stream = cur_replay.packets_stream;
 	if(!current_stream.size()) {
@@ -155,7 +154,7 @@ void ReplayMode::EndDuel() {
 		pduel = nullptr;
 	}
 	if(!is_closing) {
-		std::unique_lock<std::mutex> lock(mainGame->gMutex);
+		std::unique_lock<epro::mutex> lock(mainGame->gMutex);
 		mainGame->stMessage->setText(gDataManager->GetSysString(1501).data());
 		if(mainGame->wCardSelect->isVisible())
 			mainGame->HideElement(mainGame->wCardSelect);
@@ -221,7 +220,7 @@ bool ReplayMode::ReplayAnalyze(const CoreUtils::Packet& p) {
 		if(is_restarting)
 			return true;
 		if(is_swapping) {
-			std::lock_guard<std::mutex> lock(mainGame->gMutex);
+			std::lock_guard<epro::mutex> lock(mainGame->gMutex);
 			mainGame->dField.ReplaySwap();
 			is_swapping = false;
 		}
@@ -234,7 +233,7 @@ bool ReplayMode::ReplayAnalyze(const CoreUtils::Packet& p) {
 				mainGame->dField.RefreshAllCards();
 				mainGame->gMutex.unlock();
 			}
-			std::unique_lock<std::mutex> lock(mainGame->gMutex);
+			std::unique_lock<epro::mutex> lock(mainGame->gMutex);
 			mainGame->stMessage->setText(gDataManager->GetSysString(1434).data());
 			mainGame->PopupElement(mainGame->wMessage);
 			mainGame->actionSignal.Wait(lock);
@@ -292,7 +291,7 @@ bool ReplayMode::ReplayAnalyze(const CoreUtils::Packet& p) {
 		case MSG_AI_NAME: {
 			const auto* pbuf = p.data();
 			auto len = BufferIO::Read<uint16_t>(pbuf);
-			if((len + 1) != p.buff_size() - (sizeof(uint16_t)))
+			if((len + 1u) != p.buff_size() - (sizeof(uint16_t)))
 				break;
 			mainGame->dInfo.opponames[0] = BufferIO::DecodeUTF8({ reinterpret_cast<const char*>(pbuf), len });
 			return true;
@@ -316,7 +315,7 @@ bool ReplayMode::ReplayAnalyze(const CoreUtils::Packet& p) {
 			}
 			if(is_pausing) {
 				is_paused = true;
-				std::unique_lock<std::mutex> lock(mainGame->gMutex);
+				std::unique_lock<epro::mutex> lock(mainGame->gMutex);
 				mainGame->actionSignal.Wait(lock);
 				is_paused = false;
 			}

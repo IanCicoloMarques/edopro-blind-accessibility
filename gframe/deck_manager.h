@@ -37,7 +37,7 @@ enum class DuelAllowedCards {
 };
 class DeckManager {
 private:
-	int null_lflist_index = -1;
+	size_t null_lflist_index = ~size_t();
 	mutable std::unordered_map<uint32_t, CardDataC*> dummy_entries;
 	const CardDataC* GetDummyOrMappedCardData(uint32_t code) const;
 	bool load_dummies{ true };
@@ -62,7 +62,7 @@ public:
 	static DeckError CheckDeckContent(const Deck& deck, LFList const* lflist, DuelAllowedCards allowedCards, uint32_t forbiddentypes = 0);
 	static DeckError CheckDeckSize(const Deck& deck, const DeckSizes& sizes);
 	static int TypeCount(const Deck::Vector& cards, uint32_t type);
-	static int OTCount(const Deck::Vector& cards, uint32_t ot);
+	static int CountLegends(const Deck::Vector& cards, uint32_t type);
 	static uint32_t LoadDeckFromBuffer(Deck& deck, uint32_t* dbuf, uint32_t mainc, uint32_t sidec);
 	static uint32_t LoadDeck(Deck& deck, const cardlist_type& mainlist, const cardlist_type& sidelist, const cardlist_type* extralist = nullptr);
 	static bool LoadSide(Deck& deck, uint32_t* dbuf, uint32_t mainc, uint32_t sidec);

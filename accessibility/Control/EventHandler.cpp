@@ -26,7 +26,7 @@ namespace ygo {
 		event.GUIEvent.Caller = target;
 		event.GUIEvent.Caller->setVisible(true);
 		mainGame->fadingList.clear();
-		ygo::mainGame->device->postEventFromUser(event);
+		mainGame->device->postEventFromUser(event);
 	}
 
 	static inline void FocusAndReadCheckBox(irr::gui::IGUICheckBox* chkbox) {
@@ -359,7 +359,6 @@ namespace ygo {
 
 	void EventHandler::KeyInputEvent(const irr::SEvent& event)
 	{
-		IScreenReader* screenReader = ScreenReader::getReader();
 		switch (event.KeyInput.Key) {
 			case irr::KEY_KEY_A: {
 				if (!event.KeyInput.PressedDown && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX) && mainGame->dInfo.isReplay) {
@@ -640,7 +639,7 @@ namespace ygo {
 						ScreenReader::getReader()->readScreen(StringBuilder::getBuiltMessage(), false);
 					}
 					else if (!event.KeyInput.PressedDown && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
-						DisplayMonsterField(event, displayedField);
+						DisplayHand(event);
 					}
 					break;
 			}
@@ -1234,7 +1233,7 @@ namespace ygo {
 
 	void EventHandler::ScrollCardList() {
 		if (mainGame->btnCardSelect[0]->isTrulyVisible()) {
-			irr::SEvent newEvent;
+			irr::SEvent newEvent{};
 			newEvent.EventType = irr::EEVENT_TYPE::EET_GUI_EVENT;
 			newEvent.GUIEvent.Caller = mainGame->scrCardList;
 			newEvent.GUIEvent.Element = 0;
@@ -1275,9 +1274,9 @@ namespace ygo {
 	}
 
 	void EventHandler::EffectResolver(irr::SEvent event) {
-		float effectResolverXPosition = 0.36f;
-		float effectResolverYPosition = 0.6f;
-		auto cursor = mainGame->device->getCursorControl();
+		constexpr float effectResolverXPosition = 0.36f;
+		constexpr float effectResolverYPosition = 0.6f;
+		const auto cursor = mainGame->device->getCursorControl();
 		auto pos = cursor->getRelativePosition();
 		pos.X = effectResolverXPosition;
 		pos.Y = effectResolverYPosition;
@@ -1349,7 +1348,7 @@ namespace ygo {
 		}
 		else
 		{
-			std::wstring nvdaString = fmt::format(gDataManager->GetAccessibilityString(128).data());
+			const std::wstring nvdaString = fmt::format(gDataManager->GetAccessibilityString(128).data());
 			ScreenReader::getReader()->readScreen(nvdaString, false);
 			CloseDialog();
 		}
@@ -1600,6 +1599,7 @@ namespace ygo {
 				if (mainGame->btnSummon->isVisible()) {
 					TriggerEvent(mainGame->btnSummon, irr::gui::EGET_BUTTON_CLICKED);
 					canUse = true;
+					CheckFreeSlots(AccessibilityFieldFocus::DisplayedField::PLAYER, AccessibilityFieldFocus::CardType::MONSTER);
 				}
 				else
 					command = CommandMessages::NORMAL_SUMMON;
@@ -1609,10 +1609,12 @@ namespace ygo {
 				if (mainGame->btnMSet->isVisible()) {
 					TriggerEvent(mainGame->btnMSet, irr::gui::EGET_BUTTON_CLICKED);
 					canUse = true;
+					CheckFreeSlots(AccessibilityFieldFocus::DisplayedField::PLAYER, AccessibilityFieldFocus::CardType::MONSTER);
 				}
 				else if (mainGame->btnSSet->isVisible()) {
 					TriggerEvent(mainGame->btnSSet, irr::gui::EGET_BUTTON_CLICKED);
 					canUse = true;
+					CheckFreeSlots(AccessibilityFieldFocus::DisplayedField::PLAYER, AccessibilityFieldFocus::CardType::SPELL);
 				}
 				else
 					command = CommandMessages::SET_CARD;
@@ -1622,6 +1624,7 @@ namespace ygo {
 				if (mainGame->btnSPSummon->isTrulyVisible()) {
 					TriggerEvent(mainGame->btnSPSummon, irr::gui::EGET_BUTTON_CLICKED);
 					canUse = true;
+					CheckFreeSlots(AccessibilityFieldFocus::DisplayedField::PLAYER, AccessibilityFieldFocus::CardType::MONSTER, Card::IsLink(card));
 				}
 				else
 					command = CommandMessages::SPECIAL_SUMMON;
@@ -1688,6 +1691,8 @@ namespace ygo {
 		}
 		if (!canUse)
 			ScreenReader::getReader()->readScreen(AccessibilityMessages::getCommandNotAvaliableMessage(command));
+		ShowOptions();
+		indexLookedUpCard = 0;
 		return canUse;
 	}
 
@@ -1811,18 +1816,9 @@ namespace ygo {
 			posX = 0.40 + (2 * fieldSlotSize);
 			break;
 		}
-		case 2: {
-			posX = 0.40 + (4 * fieldSlotSize);
-			break;
-		}
-		case 4: {
-			posX = 0.40 + (4 * fieldSlotSize);
-			break;
-		}
-		case 5: {
-			posX = 0.40 + (2 * fieldSlotSize);
-			break;
-		}
+		case 2:
+		case 4:
+		case 5:
 		case 6: {
 			posX = 0.40 + (4 * fieldSlotSize);
 			break;
@@ -1970,23 +1966,40 @@ namespace ygo {
 		return fieldSlot;
 	}
 
-	//bool EventHandler::CheckIfFieldSlotIsFree(const int& slot, const AccessibilityFieldFocus::DisplayedField& player, const int& cardType) {
-	//	ClientCard* x;
-	//	bool free = false;
-	//	switch (cardType)
-	//	{
-	//	case AccessibilityFieldFocus::CardType::MONSTER:
-	//		if (mzone[player][slot] == NULL)
-	//			free = true;
-	//		break;
-	//	case AccessibilityFieldFocus::CardType::SPELL:
-	//		x = szone[player][slot];
-	//		break;
-	//	default:
-	//		break;
-	//	}
-	//	return free;
-	//}
+	void EventHandler::CheckFreeSlots(const AccessibilityFieldFocus::DisplayedField& player, const int& cardType, bool isLink) {
+		constexpr int maxCommonSlots = 5;
+		constexpr int maxMonsterSlots = 7;
+		std::wstring freeSlots = gDataManager->GetAccessibilityString(Accessibility::Dict::Duel::FREE_SLOTS).data();
+		if(cardType == AccessibilityFieldFocus::CardType::MONSTER)
+		{
+			int slot = 1;
+
+			for (const auto clientCard : mainGame->dField.mzone[player])
+			{
+				if(clientCard == nullptr && slot <= maxCommonSlots)
+					freeSlots += fmt::format(L"{},", slot);
+				else if(clientCard == nullptr && slot > maxCommonSlots && isLink)
+					freeSlots += fmt::format(L"Link {},", slot - maxCommonSlots);
+				slot++;
+				if(slot > maxMonsterSlots)
+					break;
+			}
+		}
+		else if (cardType == AccessibilityFieldFocus::CardType::SPELL)
+		{
+			int slot = 1;
+			for (const auto clientCard : mainGame->dField.szone[player])
+			{
+				if (clientCard == nullptr)
+					freeSlots += fmt::format(L"{},", slot);
+				slot++;
+				if(slot > maxCommonSlots)
+					break;
+			}
+		}
+		if(!freeSlots.empty())
+			ScreenReader::getReader()->readScreen(freeSlots, false);
+	}
 
 	void EventHandler::SetLookUpField() {
 		//if (mainGame->dField.clicked_card && mainGame->dField.clicked_card->location == AccessibilityFieldFocus::PLAYER_DECK) {
@@ -2109,6 +2122,25 @@ namespace ygo {
 			fieldSlot = SearchFieldSlot(newDisplayedField, selectedCard, true);
 		}
 		return fieldSlot;
+	}
+
+	void EventHandler::ShowOptions()
+	{
+		std::wstring options = std::wstring();
+		if(mainGame->btnSummon->isTrulyVisible())
+			options += fmt::format(L"{},",gDataManager->GetAccessibilityString(Accessibility::Dict::CardUses::SUMMON).data());
+		if(mainGame->btnMSet->isTrulyVisible() || mainGame->btnSSet->isTrulyVisible())
+			options += fmt::format(L"{},",gDataManager->GetAccessibilityString(Accessibility::Dict::CardUses::SET).data());
+		if(mainGame->btnSPSummon->isTrulyVisible())
+			options += fmt::format(L"{},",gDataManager->GetAccessibilityString(Accessibility::Dict::CardUses::SPECIAL_SUMMON).data());
+		if(mainGame->btnActivate->isTrulyVisible() || mainGame->btnOperation->isTrulyVisible())
+			options += fmt::format(L"{},",gDataManager->GetAccessibilityString(Accessibility::Dict::CardUses::ACTIVATE).data());
+		if(mainGame->btnAttack->isTrulyVisible())
+			options += fmt::format(L"{},",gDataManager->GetAccessibilityString(Accessibility::Dict::CardUses::ATTACK).data());
+		if(mainGame->btnRepos->isTrulyVisible())
+			options += gDataManager->GetAccessibilityString(Accessibility::Dict::CardUses::CHANGE_MODE).data();
+		if(!options.empty())
+			ScreenReader::getReader()->readScreen(options, false);
 	}
 
 	void EventHandler::ChangeField(const AccessibilityFieldFocus::CardType& cardField) {

@@ -19,6 +19,16 @@ namespace Accessibility {
 			SECOND_TURN = 107,
 			DEFENSE_UP = 108,
 			DEFENSE_DOWN = 109,
+			FREE_SLOTS = 376
+		};
+		enum CardUses
+		{
+			SUMMON = 370,
+			SET = 371,
+			SPECIAL_SUMMON = 372,
+			ACTIVATE = 373,
+			ATTACK = 374,
+			CHANGE_MODE = 375,
 		};
 	};
 }

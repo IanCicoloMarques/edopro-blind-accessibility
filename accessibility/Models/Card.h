@@ -20,6 +20,7 @@ public:
 	std::wstring overlayedCards;
 	std::wstring location;
 	uint8_t selectedPosition;
+	bool isLink = false;
 
 	Card(ygo::ClientCard* selectedCard)
 	{
@@ -36,6 +37,13 @@ public:
 		linkMarks = GetLinkMarks(selectedCard);
 		overlayedCards = GetOverlayedCards(selectedCard);
 		location = fmt::format(L"{}[{}]", ygo::gDataManager->FormatLocation(selectedCard->location, selectedCard->sequence), selectedCard->sequence + 1);
+		selectedPosition = 0;
+	}
+
+	static bool IsLink(const ygo::ClientCard* selectedCard)
+	{
+		const std::wstring cardType = fmt::format(L"{}", ygo::gDataManager->FormatType(selectedCard->type));
+		return cardType.find(L"Link") != std::wstring::npos;
 	}
 
 	void SetFieldSlot(int slot)
@@ -107,6 +115,8 @@ private:
 		if (mark & LINK_MARKER_TOP_RIGHT) {
 			_linkMark += ygo::gDataManager->GetAccessibilityString(135).data();
 		}
+		if(!_linkMark.empty())
+			isLink = true;
 		return _linkMark;
 	}
 

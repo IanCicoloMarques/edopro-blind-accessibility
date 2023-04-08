@@ -54,6 +54,7 @@ namespace ygo {
 		void KeyInputEvent(const irr::SEvent& event) override;
 		void GuiEvent(const irr::SEvent& event) override;
 		int SearchFieldSlot(const int& displayedField, ClientCard* card = NULL, bool looped = false);
+		void ShowOptions();
 		static IEventHandler* eventHandler;
 		static unsigned int indexLookedUpCard;
 		static int battlePhase;
@@ -111,11 +112,11 @@ namespace ygo {
 		void AttributeSelector(bool up);
 		void RaceSelector(bool up);
 		void SpecialSummon(const irr::SEvent& event);
+		void CheckFreeSlots(const AccessibilityFieldFocus::DisplayedField& player = AccessibilityFieldFocus::DisplayedField::PLAYER, const int& cardType = AccessibilityFieldFocus::CardType::NO_CARD_TYPE, bool link = false);
 		/*
 		void SimulateButton(irr::gui::IGUIElement* caller = nullptr);
 		void SetMouseOnCard();
 		void TriggerOkButton();
-		bool CheckIfFieldSlotIsFree(const int& slot, const AccessibilityFieldFocus::DisplayedField& player = AccessibilityFieldFocus::DisplayedField::PLAYER, const int& cardType = AccessibilityFieldFocus::CardType::NO_CARD_TYPE);
 		*/
 	};
 }

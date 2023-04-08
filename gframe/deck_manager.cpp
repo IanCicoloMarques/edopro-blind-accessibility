@@ -10,7 +10,7 @@
 #include "utils.h"
 #include "client_card.h"
 #include "file_stream.h"
-#include <ScreenReader/ScreenReader.h>
+#include "../accessibility/ScreenReader/ScreenReader.h"
 
 namespace ygo {
 const CardDataC* DeckManager::GetDummyOrMappedCardData(uint32_t code) const {

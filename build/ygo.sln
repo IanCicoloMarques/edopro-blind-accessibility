@@ -15,7 +15,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "sfAudio", "sfAudio.vcxproj"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ygoprodll", "ygoprodll.vcxproj", "{01387A7D-6DA2-2EF4-B6E0-DF99228A0C49}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "accessibility", "..\accessibility\accessibility.vcxproj", "{89541D4F-647D-4E19-8BCD-DD305F3FB95A}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Accessibility", "..\accessibility\Accessibility.vcxproj", "{89541D4F-647D-4E19-8BCD-DD305F3FB95A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -51,6 +51,10 @@ Global
 		{01387A7D-6DA2-2EF4-B6E0-DF99228A0C49}.Debug|Win32.Build.0 = Debug|Win32
 		{01387A7D-6DA2-2EF4-B6E0-DF99228A0C49}.Release|Win32.ActiveCfg = Release|Win32
 		{01387A7D-6DA2-2EF4-B6E0-DF99228A0C49}.Release|Win32.Build.0 = Release|Win32
+		{89541D4F-647D-4E19-8BCD-DD305F3FB95A}.Debug|Win32.ActiveCfg = Debug|Win32
+		{89541D4F-647D-4E19-8BCD-DD305F3FB95A}.Debug|Win32.Build.0 = Debug|Win32
+		{89541D4F-647D-4E19-8BCD-DD305F3FB95A}.Release|Win32.ActiveCfg = Release|Win32
+		{89541D4F-647D-4E19-8BCD-DD305F3FB95A}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -39,6 +39,8 @@
       <Filter>Configuration</Filter>
     </ClInclude>
     <ClInclude Include="FieldFocus\AccessibilityDeckFocus.h" />
+    <ClInclude Include="Models\Card.h" />
+    <ClInclude Include="ScreenReader\Messages\AccessibilityStringDictionary.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ScreenReader\AccessibilityMessages.cpp">

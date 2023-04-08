@@ -1,5 +1,15 @@
 #include "TolkController.h"
 
+TolkController::TolkController()
+{
+	Tolk_Load();
+}
+
+TolkController::~TolkController()
+{
+	Tolk_Unload();
+}
+
 void TolkController::readScreen()
 {
 }

@@ -7,12 +7,9 @@
 class TolkController : public IScreenReader
 {
 public:
-	TolkController() {
-		Tolk_Load();
-	};
-	~TolkController() {
-		Tolk_Unload();
-	};
+	TolkController();
+
+	~TolkController();
 	void readScreen();
 
 private:

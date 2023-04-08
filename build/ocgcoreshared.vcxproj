@@ -51,7 +51,7 @@
     <LinkIncremental>false</LinkIncremental>
     <IgnoreImportLibrary>true</IgnoreImportLibrary>
     <OutDir>..\bin\debug\</OutDir>
-    <IntDir>..\obj\Debug\ocgcoreshared\</IntDir>
+    <IntDir>..\obj\Win32\Debug\ocgcoreshared\</IntDir>
     <TargetName>ocgcore</TargetName>
     <TargetExt>.dll</TargetExt>
   </PropertyGroup>
@@ -59,7 +59,7 @@
     <LinkIncremental>false</LinkIncremental>
     <IgnoreImportLibrary>true</IgnoreImportLibrary>
     <OutDir>..\bin\release\</OutDir>
-    <IntDir>..\obj\Release\ocgcoreshared\</IntDir>
+    <IntDir>..\obj\Win32\Release\ocgcoreshared\</IntDir>
     <TargetName>ocgcore</TargetName>
     <TargetExt>.dll</TargetExt>
   </PropertyGroup>
@@ -67,6 +67,7 @@
     <ClCompile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level4</WarningLevel>
+      <DisableSpecificWarnings>4100;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <PreprocessorDefinitions>WIN32;_WIN32;NOMINMAX;_CRT_SECURE_NO_WARNINGS;_DEBUG;OCGCORE_EXPORT_FUNCTIONS;LUA_COMPAT_5_2;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
@@ -92,6 +93,7 @@
     <ClCompile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level4</WarningLevel>
+      <DisableSpecificWarnings>4100;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <PreprocessorDefinitions>WIN32;_WIN32;NOMINMAX;_CRT_SECURE_NO_WARNINGS;OCGCORE_EXPORT_FUNCTIONS;LUA_COMPAT_5_2;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
@@ -116,7 +118,6 @@
     <ClInclude Include="..\ocgcore\containers_fwd.h" />
     <ClInclude Include="..\ocgcore\duel.h" />
     <ClInclude Include="..\ocgcore\effect.h" />
-    <ClInclude Include="..\ocgcore\effect_constants.h" />
     <ClInclude Include="..\ocgcore\effectset.h" />
     <ClInclude Include="..\ocgcore\field.h" />
     <ClInclude Include="..\ocgcore\function_array_helper.h" />

@@ -49,13 +49,13 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <OutDir>..\bin\debug\</OutDir>
-    <IntDir>..\obj\Debug\ocgcore\</IntDir>
+    <IntDir>..\obj\Win32\Debug\ocgcore\</IntDir>
     <TargetName>ocgcore</TargetName>
     <TargetExt>.lib</TargetExt>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>..\bin\release\</OutDir>
-    <IntDir>..\obj\Release\ocgcore\</IntDir>
+    <IntDir>..\obj\Win32\Release\ocgcore\</IntDir>
     <TargetName>ocgcore</TargetName>
     <TargetExt>.lib</TargetExt>
   </PropertyGroup>
@@ -63,6 +63,7 @@
     <ClCompile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level4</WarningLevel>
+      <DisableSpecificWarnings>4100;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <PreprocessorDefinitions>WIN32;_WIN32;NOMINMAX;_CRT_SECURE_NO_WARNINGS;_DEBUG;LUA_COMPAT_5_2;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
@@ -87,6 +88,7 @@
     <ClCompile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level4</WarningLevel>
+      <DisableSpecificWarnings>4100;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <PreprocessorDefinitions>WIN32;_WIN32;NOMINMAX;_CRT_SECURE_NO_WARNINGS;LUA_COMPAT_5_2;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
@@ -110,7 +112,6 @@
     <ClInclude Include="..\ocgcore\containers_fwd.h" />
     <ClInclude Include="..\ocgcore\duel.h" />
     <ClInclude Include="..\ocgcore\effect.h" />
-    <ClInclude Include="..\ocgcore\effect_constants.h" />
     <ClInclude Include="..\ocgcore\effectset.h" />
     <ClInclude Include="..\ocgcore\field.h" />
     <ClInclude Include="..\ocgcore\function_array_helper.h" />

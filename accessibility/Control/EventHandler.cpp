@@ -1976,7 +1976,8 @@ namespace ygo {
 
 			for (const auto clientCard : mainGame->dField.mzone[player])
 			{
-				if(clientCard == nullptr && slot <= maxCommonSlots)
+				//TODO - FAZER VALIDAÇÃO DE SLOTS QUE PODEM TER LINKS
+				if(clientCard == nullptr && slot <= maxCommonSlots && !isLink)
 					freeSlots += fmt::format(L"{},", slot);
 				else if(clientCard == nullptr && slot > maxCommonSlots && isLink)
 					freeSlots += fmt::format(L"Link {},", slot - maxCommonSlots);

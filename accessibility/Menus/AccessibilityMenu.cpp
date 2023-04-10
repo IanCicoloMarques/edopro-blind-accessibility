@@ -156,7 +156,7 @@ namespace ygo {
 						}
 						ScreenReader::getReader()->textToSpeech(fmt::format(L"{}", mainGame->lstReplayList->getListItem(listItem)));
 					}
-					
+
 				}
 				break;
 			}
@@ -199,6 +199,8 @@ namespace ygo {
 				break;
 			}
 			case irr::KEY_RIGHT: {
+					//TODO - MUDAR PRA LER OS VALORES DOS MENUS, QUANDO HOUVER
+					//CHAMAR UMA FUNÇÃO READMENU que irá ler o menu atual
 				if (!event.KeyInput.PressedDown && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
 					if (!scrollSelected) {
 						CheckMenu();

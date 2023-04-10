@@ -69,6 +69,15 @@ newoption {
 	value = "arch",
 	description = "Architecture for the solution, allowed values are x86, x64, arm64, armv7, comma separated"
 }
+newoption {
+	trigger = "bundled-font",
+	value = "font",
+	description = "Path to a font file that will be bundled in the client and used as fallback font for missing glyphs"
+}
+newoption {
+	trigger = "lua-path",
+	description = "Path where the lua library has been installed"
+}
 
 local function default_arch()
 	if os.istarget("linux") or os.istarget("macosx") then return "x64" end
@@ -124,12 +133,21 @@ workspace "ygo"
 	startproject "ygopro"
 	staticruntime "on"
 
+	warnings "Extra"
+	filter { "action:vs*" }
+		disablewarnings "4100" --'identifier' : unreferenced formal parameter
+	filter { "action:not vs*" }
+		disablewarnings { "unknown-warning-option", "unused-parameter", "unknown-pragmas", "ignored-qualifiers", "missing-field-initializers", "implicit-const-int-float-conversion", "missing-braces" }
+	filter { "action:not vs*", "files:**.cpp" }
+		disablewarnings { "deprecated-copy", "unused-lambda-capture" }
+	filter{}
+
 	configurations { "Debug", "Release" }
 
 	filter "system:windows"
 		systemversion "latest"
 		defines { "WIN32", "_WIN32", "NOMINMAX" }
-		for arch in ipairs(archs) do
+		for _,arch in ipairs(archs) do
 			if arch=="x86" then platforms "Win32" end
 			if arch=="x64" then platforms "x64" end
 		end
@@ -223,13 +241,13 @@ workspace "ygo"
 		defines "_DEBUG"
 		targetdir "bin/debug"
 		runtime "Debug"
-		
+
 	filter { "configurations:Debug", "architecture:x64" }
 		targetdir "bin/x64/debug"
-		
+
 	filter { "configurations:Debug", "architecture:ARM64" }
 		targetdir "bin/arm64/debug"
-		
+
 	filter { "configurations:Release", "architecture:ARM" }
 		targetdir "bin/armv7/debug"
 
@@ -241,22 +259,26 @@ workspace "ygo"
 		optimize "Size"
 		flags "LinkTimeOptimization"
 		targetdir "bin/release"
-		
+
 	filter { "configurations:Release", "architecture:x64" }
 		targetdir "bin/x64/release"
-		
+
 	filter { "configurations:Release", "architecture:ARM64" }
 		targetdir "bin/arm64/release"
-		
+
 	filter { "configurations:Release", "architecture:ARM" }
 		targetdir "bin/armv7/release"
-	
+
 	filter { "system:linux", "configurations:Release" }
 		linkoptions { "-static-libgcc", "-static-libstdc++" }
 
 	subproject = true
 	if not _OPTIONS["prebuilt-core"] and not _OPTIONS["no-core"] then
 		include "ocgcore"
+	end
+	if _OPTIONS["bundled-font"] then
+		local bin2c=require("tools.bin2c")
+		bin2c(_OPTIONS["bundled-font"], "gframe/CGUITTFont/bundled_font.cpp")
 	end
 	include "gframe"
 	if os.istarget("windows") then

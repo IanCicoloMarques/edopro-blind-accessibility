@@ -29,10 +29,9 @@ namespace ygo {
 	static inline void ClickButton(irr::gui::IGUIElement* btn) {
 		TriggerEvent(btn, irr::gui::EGET_BUTTON_CLICKED);
 	}
-	
+
 	IEventHandler* DeckHandler::getDeckHandler()
 	{
-		IScreenReader* screenReader = ScreenReader::getReader();
 		if (deckHandler == nullptr)
 			deckHandler = new DeckHandler();
 		return deckHandler;
@@ -40,7 +39,6 @@ namespace ygo {
 
 	void DeckHandler::KeyInputEvent(const irr::SEvent& event)
 	{
-		IScreenReader* screenReader = ScreenReader::getReader();
 		switch (event.KeyInput.Key) {
 			case irr::KEY_KEY_A: {
 				if (!event.KeyInput.PressedDown && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
@@ -177,7 +175,7 @@ namespace ygo {
 							rightScale = fmt::format(gDataManager->GetAccessibilityString(74).data(), mainGame->deckBuilder.results[indexLookedUpCard]->rscale);
 						}
 					}
-					
+
 					ScreenReader::getReader()->readScreen(cardName.c_str(), false);
 					if(!limit.empty())
 						ScreenReader::getReader()->readScreen(limit.c_str(), false);
@@ -449,7 +447,7 @@ namespace ygo {
 		std::wstring nvdaString;
 		std::wstring cardType = gDataManager->FormatType(deck[indexLookedUpCard]->type);
 		if (deck.size() > indexLookedUpCard && deck[indexLookedUpCard]->code != 0) {
-			if (cardType.find(gDataManager->GetAccessibilityString(76).data()) == std::string::npos && cardType.find(gDataManager->GetAccessibilityString(77).data()) == std::string::npos) 
+			if (cardType.find(gDataManager->GetAccessibilityString(76).data()) == std::string::npos && cardType.find(gDataManager->GetAccessibilityString(77).data()) == std::string::npos)
 				nvdaString = fmt::format(gDataManager->GetAccessibilityString(169).data(), gDataManager->GetName(deck[indexLookedUpCard]->code), gDataManager->FormatType(deck[indexLookedUpCard]->type), deck[indexLookedUpCard]->attack, deck[indexLookedUpCard]->defense);
 			else
 				nvdaString = fmt::format(L"{}, {}", gDataManager->GetName(deck[indexLookedUpCard]->code), gDataManager->FormatType(deck[indexLookedUpCard]->type));

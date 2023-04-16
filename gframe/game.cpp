@@ -590,7 +590,7 @@ void Game::Initialize() {
 	stHandTestSettings->setEnabled(coreloaded);
 	stHandTestSettings->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
 	defaultStrings.emplace_back(stHandTestSettings, 1375);
-	
+
 	wHandTest = env->addWindow(Scale(mainMenuLeftX, 200, mainMenuRightX, 450), false, gDataManager->GetSysString(1297).data());
 	wHandTest->getCloseButton()->setVisible(false);
 	wHandTest->setVisible(false);
@@ -1231,7 +1231,7 @@ void Game::PopulateGameHostWindows() {
 		chkNoCheckDeckSizeSecondary = env->addCheckBox(gGameConfig->noCheckDeckSize, GetNextRect(), tDeckSettings, DONT_CHECK_DECK_SIZE, gDataManager->GetSysString(12113).data());
 		defaultStrings.emplace_back(chkNoCheckDeckSizeSecondary, 12113);
 		menuHandler.MakeElementSynchronized(chkNoCheckDeckSizeSecondary);
-		
+
 #define ADD_DECK_SIZE_CHECKBOXES(deck) do { \
 		eb##deck##Min = env->addEditBox(WStr(gGameConfig->min##deck##DeckSize), GetCurrentRectWithXOffset(310, 360), true, tDeckSettings, EDITBOX_NUMERIC); \
 		defaultStrings.emplace_back(env->addStaticText(gDataManager->GetSysString(12106 + idx).data(), GetCurrentRectWithXOffset(20, 300), false, false, tDeckSettings), 12106 + idx); \
@@ -1568,6 +1568,43 @@ void Game::PopulateSettingsWindow() {
 		const auto x_incr = cur_x - 15;
 		return Scale<irr::s32>(x1 + x_incr, cur_y, x2 + x_incr, cur_y + 25 - (is_scrollbar_text * 5));
 	};
+	{
+		gSettings.accessibility.construct(env, gSettings.tabcontrolwindow, gDataManager->GetAccessibilityString(378).data());
+
+		ResetXandY();
+		auto* sPanel = gSettings.accessibility.panel->getSubpanel();
+		gSettings.chkEnableSound = env->addCheckBox(gGameConfig->enablesound, GetNextRect(), sPanel, CHECKBOX_ENABLE_SOUND, gDataManager->GetSysString(2047).data());
+		menuHandler.MakeElementSynchronized(gSettings.chkEnableSound);
+		{
+			gSettings.stSoundVolume = env->addStaticText(gDataManager->GetSysString(2049).data(), GetCurrentRectWithXOffset(15, 75), false, true, sPanel);
+			defaultStrings.emplace_back(gSettings.stSoundVolume, 2049);
+			gSettings.scrSoundVolume = env->addScrollBar(true, GetCurrentRectWithXOffset(80, 320, true), sPanel, SCROLL_SOUND_VOLUME);
+			menuHandler.MakeElementSynchronized(gSettings.scrSoundVolume);
+			gSettings.scrSoundVolume->setMax(100);
+			gSettings.scrSoundVolume->setMin(0);
+			gSettings.scrSoundVolume->setPos(gGameConfig->soundVolume);
+			gSettings.scrSoundVolume->setLargeStep(1);
+			gSettings.scrSoundVolume->setSmallStep(1);
+			IncrementXorY();
+		}
+		gSettings.chkEnableMusic = env->addCheckBox(gGameConfig->enablemusic, GetNextRect(), sPanel, CHECKBOX_ENABLE_MUSIC, gDataManager->GetSysString(2046).data());
+		menuHandler.MakeElementSynchronized(gSettings.chkEnableMusic);
+		defaultStrings.emplace_back(gSettings.chkEnableMusic, 2046);
+		{
+			gSettings.stMusicVolume = env->addStaticText(gDataManager->GetSysString(2048).data(), GetCurrentRectWithXOffset(15, 75), false, true, sPanel);
+			defaultStrings.emplace_back(gSettings.stMusicVolume, 2048);
+			gSettings.scrMusicVolume = env->addScrollBar(true, GetCurrentRectWithXOffset(80, 320, true), sPanel, SCROLL_MUSIC_VOLUME);
+			menuHandler.MakeElementSynchronized(gSettings.scrMusicVolume);
+			gSettings.scrMusicVolume->setMax(100);
+			gSettings.scrMusicVolume->setMin(0);
+			gSettings.scrMusicVolume->setPos(gGameConfig->musicVolume);
+			gSettings.scrMusicVolume->setLargeStep(1);
+			gSettings.scrMusicVolume->setSmallStep(1);
+			IncrementXorY();
+		}
+		gSettings.chkUseMudKeyboard = env->addCheckBox(gGameConfig->mudKeyboard, GetNextRect(), sPanel, CHECKBOX_MUD_KEYBOARD, gDataManager->GetAccessibilityString(377).data());
+		menuHandler.MakeElementSynchronized(gSettings.chkUseMudKeyboard);
+	}
 	{
 		gSettings.client.construct(env, gSettings.tabcontrolwindow, gDataManager->GetSysString(2088).data());
 		defaultStrings.emplace_back(gSettings.client.tab, 2088);
@@ -2587,6 +2624,7 @@ void Game::SaveConfig() {
 	TrySaveInt(gGameConfig->enablemusic, gSettings.chkEnableMusic);
 	TrySaveInt(gGameConfig->enablesound, gSettings.chkEnableSound);
 	TrySaveInt(gGameConfig->chkIgnore1, gSettings.chkIgnoreOpponents);
+	TrySaveInt(gGameConfig->mudKeyboard, gSettings.chkUseMudKeyboard);
 #ifdef UPDATE_URL
 	gGameConfig->noClientUpdates = gSettings.chkUpdates->isChecked();
 #endif
@@ -3675,7 +3713,7 @@ void Game::OnResize() {
 	repos_with_min_x(tabSettings.scrSoundVolume);
 	repos_with_min_x(tabSettings.scrMusicVolume);
 	repos_with_min_x(btnTabShowSettings);
-	
+
 	SetCentered(gSettings.window);
 
 	ResizePhaseButtons();

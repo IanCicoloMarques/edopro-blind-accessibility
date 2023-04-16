@@ -12,6 +12,8 @@
 #else
 #include "IrrlichtCommonIncludes/CFileSystem.h"
 #endif
+#include <Control/EventHandler.h>
+
 #include "porting.h"
 #ifdef __ANDROID__
 #include "Android/COSAndroidOperator.h"
@@ -143,6 +145,7 @@ DataHandler::DataHandler() {
 	deckManager->LoadLFList();
 	dataManager->LoadIdsMapping(EPRO_TEXT("./config/mappings.json"));
 	WindBotPanel::absolute_deck_path = Utils::ToUnicodeIfNeeded(Utils::GetAbsolutePath(EPRO_TEXT("./deck")));
+	EventHandler::mudConfiguration = configs->mudKeyboard;
 }
 DataHandler::~DataHandler() {
 	if(filesystem)

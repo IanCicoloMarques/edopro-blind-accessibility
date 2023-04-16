@@ -234,7 +234,6 @@ namespace ygo {
 
 	void MenuEventHandler::KeyInputEvent(const irr::SEvent& event)
 	{
-		IScreenReader* screenReader = ScreenReader::getReader();
 		switch (event.KeyInput.Key) {
 			case irr::KEY_KEY_D: {
 				if (!event.KeyInput.PressedDown && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {

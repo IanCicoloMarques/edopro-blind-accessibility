@@ -653,7 +653,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 			case BUTTON_CARD_3:
 			case BUTTON_CARD_4: {
 				if (mainGame->dInfo.isReplay) {
-				
+
 					TriggerEvent(mainGame->btnCardSelect[0], irr::gui::EGET_BUTTON_CLICKED);
 					break;
 				}
@@ -2005,6 +2005,11 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event, bool& stopPropagation)
 		}
 		case irr::gui::EGET_CHECKBOX_CHANGED: {
 			switch (id) {
+			case CHECKBOX_MUD_KEYBOARD: {
+				gGameConfig->mudKeyboard = static_cast<irr::gui::IGUICheckBox*>(event.GUIEvent.Caller)->isChecked();
+				EventHandler::mudConfiguration = static_cast<irr::gui::IGUICheckBox*>(event.GUIEvent.Caller)->isChecked();
+				return true;
+			}
 			case CHECKBOX_ENABLE_MUSIC: {
 				gGameConfig->enablemusic = static_cast<irr::gui::IGUICheckBox*>(event.GUIEvent.Caller)->isChecked();
 				gSoundManager->EnableMusic(gGameConfig->enablemusic);

@@ -52,6 +52,11 @@ struct SettingsWindow {
 		irr::gui::Panel* panel{};
 		void construct(irr::gui::IGUIEnvironment* env, irr::gui::CGUIWindowedTabControl* tabControl, const wchar_t* name);
 	};
+
+	SettingsTab accessibility;
+	irr::gui::IGUICheckBox* chkUseMudKeyboard;
+	irr::gui::IGUIStaticText* stUseMudKeyboard;
+
 	SettingsTab client;
 	irr::gui::IGUICheckBox* chkShowFPS;
 	irr::gui::IGUICheckBox* chkHidePasscodeScope;

@@ -41,6 +41,8 @@
     <ClInclude Include="FieldFocus\AccessibilityDeckFocus.h" />
     <ClInclude Include="Models\Card.h" />
     <ClInclude Include="ScreenReader\Messages\AccessibilityStringDictionary.h" />
+    <ClInclude Include="Configuration\Keyboard\KeyboardConfiguration.h" />
+    <ClInclude Include="Configuration\Keyboard\KeyboardConfigurationType.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ScreenReader\AccessibilityMessages.cpp">
@@ -61,5 +63,6 @@
     <ClCompile Include="Configuration\AccessibilityConfiguration.cpp">
       <Filter>Configuration</Filter>
     </ClCompile>
+    <ClCompile Include="Configuration\Keyboard\KeyboardConfiguration.cpp" />
   </ItemGroup>
 </Project>

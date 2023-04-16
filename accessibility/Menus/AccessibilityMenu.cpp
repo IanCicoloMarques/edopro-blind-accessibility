@@ -84,123 +84,123 @@ namespace ygo {
 	void MenuEventHandler::ReadMenuAndValue()
 	{
 		std::wstring menuValue = std::wstring();
-		if(menuEnum == menuMainEnums)
+		if(menu == menuMain)
 		{
-			if(currentMenuEnum == MenuType::MainMenu::MM_ONLINE_DUEL)
+			if(currentMenu == MenuType::MainMenu::MM_ONLINE_DUEL)
 				menuValue = gDataManager->GetAccessibilityString(MenuType::MainMenu::MM_ONLINE_DUEL).data();
-			else if(currentMenuEnum == MenuType::MainMenu::MM_SP_DUEL)
+			else if(currentMenu == MenuType::MainMenu::MM_SP_DUEL)
 				menuValue = gDataManager->GetAccessibilityString(MenuType::MainMenu::MM_SP_DUEL).data();
-			else if(currentMenuEnum == MenuType::MainMenu::MM_PUZZLES)
+			else if(currentMenu == MenuType::MainMenu::MM_PUZZLES)
 				menuValue = gDataManager->GetAccessibilityString(MenuType::MainMenu::MM_PUZZLES).data();
-			else if(currentMenuEnum == MenuType::MainMenu::MM_REPLAY)
+			else if(currentMenu == MenuType::MainMenu::MM_REPLAY)
 				menuValue = gDataManager->GetAccessibilityString(MenuType::MainMenu::MM_REPLAY).data();
-			else if(currentMenuEnum == MenuType::MainMenu::MM_DECK_EDITOR)
+			else if(currentMenu == MenuType::MainMenu::MM_DECK_EDITOR)
 				menuValue = gDataManager->GetAccessibilityString(MenuType::MainMenu::MM_DECK_EDITOR).data();
-			else if(currentMenuEnum == MenuType::MainMenu::MM_GAME_OPTIONS)
+			else if(currentMenu == MenuType::MainMenu::MM_GAME_OPTIONS)
 				menuValue = gDataManager->GetAccessibilityString(MenuType::MainMenu::MM_GAME_OPTIONS).data();
 		}
-		else if(menuEnum == menuSinglePlayerEnums)
+		else if(menu == menuSinglePlayer)
 		{
-			if(currentMenuEnum == MenuType::SinglePlayerMenu::SP_HOST)
+			if(currentMenu == MenuType::SinglePlayerMenu::SP_HOST)
 				menuValue = gDataManager->GetAccessibilityString(MenuType::SinglePlayerMenu::SP_HOST).data();
-			else if(currentMenuEnum == MenuType::SinglePlayerMenu::SP_PLAYER_NAME)
+			else if(currentMenu == MenuType::SinglePlayerMenu::SP_PLAYER_NAME)
 				menuValue = fmt::format(L"{}: {}", gDataManager->GetAccessibilityString(MenuType::SinglePlayerMenu::SP_PLAYER_NAME).data(), mainGame->ebNickName->getText());
 		}
-		else if(menuEnum == menuHostDuelEnums)
+		else if(menu == menuHostDuel)
 		{
-			if(currentMenuEnum == MenuType::HostDuel::RULES_OK)
+			if(currentMenu == MenuType::HostDuel::RULES_OK)
 				menuValue = gDataManager->GetAccessibilityString(MenuType::HostDuel::RULES_OK).data();
-			else if(currentMenuEnum == MenuType::HostDuel::NUM_PLAYERS_T1)
+			else if(currentMenu == MenuType::HostDuel::NUM_PLAYERS_T1)
 				menuValue = fmt::format(L"{}: {}", gDataManager->GetAccessibilityString(MenuType::HostDuel::NUM_PLAYERS_T1).data(), mainGame->ebTeam1->getText());
-			else if(currentMenuEnum == MenuType::HostDuel::NUM_PLAYERS_T2)
+			else if(currentMenu == MenuType::HostDuel::NUM_PLAYERS_T2)
 				menuValue = fmt::format(L"{}: {}", gDataManager->GetAccessibilityString(MenuType::HostDuel::NUM_PLAYERS_T2).data(), mainGame->ebTeam2->getText());
-			else if(currentMenuEnum == MenuType::HostDuel::BEST_OF)
+			else if(currentMenu == MenuType::HostDuel::BEST_OF)
 				menuValue = fmt::format(L"{}: {}", gDataManager->GetAccessibilityString(MenuType::HostDuel::BEST_OF).data(), mainGame->ebBestOf->getText());
-			else if(currentMenuEnum == MenuType::HostDuel::TIME_LIMIT)
+			else if(currentMenu == MenuType::HostDuel::TIME_LIMIT)
 				menuValue = fmt::format(L"{}: {}", gDataManager->GetAccessibilityString(MenuType::HostDuel::TIME_LIMIT).data(), mainGame->ebTimeLimit->getText());
-			else if(currentMenuEnum == MenuType::HostDuel::STARTING_LP)
+			else if(currentMenu == MenuType::HostDuel::STARTING_LP)
 				menuValue = fmt::format(L"{}: {}", gDataManager->GetAccessibilityString(MenuType::HostDuel::STARTING_LP).data(), mainGame->ebStartLP->getText());
-			else if(currentMenuEnum == MenuType::HostDuel::STARTING_HAND)
+			else if(currentMenu == MenuType::HostDuel::STARTING_HAND)
 				menuValue = fmt::format(L"{}: {}", gDataManager->GetAccessibilityString(MenuType::HostDuel::STARTING_HAND).data(), mainGame->ebStartHand->getText());
-			else if(currentMenuEnum == MenuType::HostDuel::CARDS_DRAW)
+			else if(currentMenu == MenuType::HostDuel::CARDS_DRAW)
 				menuValue = fmt::format(L"{}: {}", gDataManager->GetAccessibilityString(MenuType::HostDuel::CARDS_DRAW).data(), mainGame->ebDrawCount->getText());
-			else if(currentMenuEnum == MenuType::HostDuel::CHECK_DECK)
+			else if(currentMenu == MenuType::HostDuel::CHECK_DECK)
 				menuValue = fmt::format(L"{}: {}", gDataManager->GetAccessibilityString(MenuType::HostDuel::CHECK_DECK).data(), mainGame->chkNoCheckDeckContent->isChecked());
-			else if(currentMenuEnum == MenuType::HostDuel::SHUFFLE_DECK)
+			else if(currentMenu == MenuType::HostDuel::SHUFFLE_DECK)
 				menuValue = fmt::format(L"{}: {}", gDataManager->GetAccessibilityString(MenuType::HostDuel::SHUFFLE_DECK).data(), mainGame->chkNoShuffleDeck->isChecked());
-			else if(currentMenuEnum == MenuType::HostDuel::ROOM_NAME)
+			else if(currentMenu == MenuType::HostDuel::ROOM_NAME)
 				menuValue = fmt::format(L"{}: {}", gDataManager->GetAccessibilityString(MenuType::HostDuel::ROOM_NAME).data(), mainGame->ebHostNotes->getText());
-			else if(currentMenuEnum == MenuType::HostDuel::ROOM_PASSWORD)
+			else if(currentMenu == MenuType::HostDuel::ROOM_PASSWORD)
 				menuValue = fmt::format(L"{}: {}", gDataManager->GetAccessibilityString(MenuType::HostDuel::ROOM_PASSWORD).data(), mainGame->ebServerPass->getText());
 		}
-		else if(menuEnum == menuRulesOkEnums)
+		else if(menu == menuRulesOk)
 		{
-			if(currentMenuEnum == MenuType::PlayerDuel::PD_START_DUEL)
+			if(currentMenu == MenuType::PlayerDuel::PD_START_DUEL)
 				menuValue = gDataManager->GetAccessibilityString(MenuType::PlayerDuel::PD_START_DUEL).data();
-			else if(currentMenuEnum == MenuType::PlayerDuel::PD_SELECT_DECK)
+			else if(currentMenu == MenuType::PlayerDuel::PD_SELECT_DECK)
 				menuValue = fmt::format(L"{}: {}", gDataManager->GetAccessibilityString(MenuType::PlayerDuel::PD_SELECT_DECK).data(), mainGame->cbDeckSelect->getItem(mainGame->cbDeckSelect->getSelected()));
-			else if(currentMenuEnum == MenuType::PlayerDuel::PD_SELECT_DECK)
+			else if(currentMenu == MenuType::PlayerDuel::PD_SELECT_DECK)
 				menuValue = gDataManager->GetAccessibilityString(MenuType::PlayerDuel::PD_SELECT_DECK).data();
-			else if(currentMenuEnum == MenuType::PlayerDuel::PD_PLAYER_READY)
+			else if(currentMenu == MenuType::PlayerDuel::PD_PLAYER_READY)
 					menuValue = gDataManager->GetAccessibilityString(MenuType::PlayerDuel::PD_PLAYER_READY).data();
-			else if(currentMenuEnum == MenuType::SinglePlayerDuel::SP_AI_MENU)
+			else if(currentMenu == MenuType::SinglePlayerDuel::SP_AI_MENU)
 					menuValue = gDataManager->GetAccessibilityString(MenuType::SinglePlayerDuel::SP_AI_MENU).data();
 		}
-		else if(menuEnum == menuSelectAIEnums)
+		else if(menu == menuSelectAI)
 		{
-			if(currentMenuEnum == MenuType::AIConfigMenu::AIC_OK)
+			if(currentMenu == MenuType::AIConfigMenu::AIC_OK)
 				menuValue = gDataManager->GetAccessibilityString(MenuType::AIConfigMenu::AIC_OK).data();
-			else if(currentMenuEnum == MenuType::AIConfigMenu::AIC_SELECT_DECK)
+			else if(currentMenu == MenuType::AIConfigMenu::AIC_SELECT_DECK)
 				menuValue = fmt::format(L"{}: {}", gDataManager->GetAccessibilityString(MenuType::AIConfigMenu::AIC_SELECT_DECK).data(), mainGame->gBot.cbBotDeck->getItem(mainGame->gBot.cbBotDeck->getSelected()));
-			else if(currentMenuEnum == MenuType::AIConfigMenu::AIC_ATR)
+			else if(currentMenu == MenuType::AIConfigMenu::AIC_ATR)
 				menuValue = fmt::format(L"{}: {}", gDataManager->GetAccessibilityString(MenuType::AIConfigMenu::AIC_ATR).data(), mainGame->gBot.chkThrowRock->isChecked());
 		}
-		else if(menuEnum == menuOnlineEnums)
+		else if(menu == menuOnline)
 		{
-			if(currentMenuEnum == MenuType::OnlineMenu::HOST)
+			if(currentMenu == MenuType::OnlineMenu::HOST)
 				menuValue = gDataManager->GetAccessibilityString(MenuType::OnlineMenu::HOST).data();
-			else if(currentMenuEnum == MenuType::OnlineMenu::REFRESH)
+			else if(currentMenu == MenuType::OnlineMenu::REFRESH)
 				menuValue = gDataManager->GetAccessibilityString(MenuType::OnlineMenu::REFRESH).data();
-			else if(currentMenuEnum == MenuType::OnlineMenu::ROOMS)
+			else if(currentMenu == MenuType::OnlineMenu::ROOMS)
 				menuValue = fmt::format(L"{}: {}", gDataManager->GetAccessibilityString(MenuType::OnlineMenu::ROOMS_LIST).data(), mainGame->roomListTable->getRowCount());
-			else if(currentMenuEnum == MenuType::OnlineMenu::SERVER)
+			else if(currentMenu == MenuType::OnlineMenu::SERVER)
 				menuValue = fmt::format(L"{}: {}", gDataManager->GetAccessibilityString(MenuType::OnlineMenu::SERVER).data(), mainGame->serverChoice->getItem(mainGame->serverChoice->getSelected()));
-			else if(currentMenuEnum == MenuType::OnlineMenu::PLAYER_NAME)
+			else if(currentMenu == MenuType::OnlineMenu::PLAYER_NAME)
 				menuValue = fmt::format(L"{}: {}", gDataManager->GetAccessibilityString(MenuType::OnlineMenu::PLAYER_NAME).data(), mainGame->ebNickNameOnline->getText());
-			else if(currentMenuEnum == MenuType::OnlineMenu::ALLOWED_CARDS)
+			else if(currentMenu == MenuType::OnlineMenu::ALLOWED_CARDS)
 				menuValue = fmt::format(L"{}: {}", gDataManager->GetAccessibilityString(MenuType::OnlineMenu::ALLOWED_CARDS).data(), mainGame->cbFilterRule->getItem(mainGame->cbFilterRule->getSelected()));
-			else if(currentMenuEnum == MenuType::OnlineMenu::FORBIDDEN_LIST)
+			else if(currentMenu == MenuType::OnlineMenu::FORBIDDEN_LIST)
 				menuValue = fmt::format(L"{}: {}", gDataManager->GetAccessibilityString(MenuType::OnlineMenu::FORBIDDEN_LIST).data(), mainGame->cbFilterBanlist->getItem(mainGame->cbFilterRule->getSelected()));
-			else if(currentMenuEnum == MenuType::OnlineMenu::LOCKED_ROOMS)
+			else if(currentMenu == MenuType::OnlineMenu::LOCKED_ROOMS)
 				menuValue = fmt::format(L"{}: {}", gDataManager->GetAccessibilityString(MenuType::OnlineMenu::LOCKED_ROOMS).data(), mainGame->chkShowPassword->isChecked());
-			else if(currentMenuEnum == MenuType::OnlineMenu::STARTED_ROOMS)
+			else if(currentMenu == MenuType::OnlineMenu::STARTED_ROOMS)
 				menuValue = fmt::format(L"{}: {}", gDataManager->GetAccessibilityString(MenuType::OnlineMenu::STARTED_ROOMS).data(), mainGame->chkShowActiveRooms->isChecked());
 		}
-		else if(menuEnum == menuPasswordEnums)
+		else if(menu == menuPassword)
 		{
-			if(currentMenuEnum == MenuType::PasswordMenu::PASS_SET_PASSWORD)
+			if(currentMenu == MenuType::PasswordMenu::PASS_SET_PASSWORD)
 				menuValue = fmt::format(L"{}: {}", gDataManager->GetAccessibilityString(MenuType::PasswordMenu::PASS_SET_PASSWORD).data(), mainGame->ebRPName->getText());
-			else if(currentMenuEnum == MenuType::PasswordMenu::PASS_OK)
+			else if(currentMenu == MenuType::PasswordMenu::PASS_OK)
 				menuValue = gDataManager->GetAccessibilityString(MenuType::PasswordMenu::PASS_OK).data();
-			else if(currentMenuEnum == MenuType::PasswordMenu::PASS_CANCEL)
+			else if(currentMenu == MenuType::PasswordMenu::PASS_CANCEL)
 				menuValue = gDataManager->GetAccessibilityString(MenuType::PasswordMenu::PASS_CANCEL).data();
 		}
-		else if(menuEnum == menuDeckEditorEnums)
+		else if(menu == menuDeckEditor)
 		{
-			if(currentMenuEnum == Accessibility::Dict::Menu::OK)
+			if(currentMenu == Accessibility::Dict::Menu::OK)
 				menuValue = gDataManager->GetAccessibilityString(Accessibility::Dict::Menu::OK).data();
-			else if(currentMenuEnum == Accessibility::Dict::Menu::CANCEL)
+			else if(currentMenu == Accessibility::Dict::Menu::CANCEL)
 				menuValue = gDataManager->GetAccessibilityString(Accessibility::Dict::Menu::CANCEL).data();
 		}
-		else if(menuEnum == menuGameOptionsEnums)
+		else if(menu == menuGameOptions)
 		{
-			if(currentMenuEnum == MenuType::GameOptionsMenu::GAMEOP_ENABLE_SOUND_EFFECTS)
+			if(currentMenu == MenuType::GameOptionsMenu::GAMEOP_ENABLE_SOUND_EFFECTS)
 				menuValue = fmt::format(L"{}: {}", gDataManager->GetAccessibilityString(MenuType::GameOptionsMenu::GAMEOP_ENABLE_SOUND_EFFECTS).data(), mainGame->gSettings.chkEnableSound->isChecked());
-			else if(currentMenuEnum == MenuType::GameOptionsMenu::GAMEOP_SOUND_EFFECTS_VOLUME)
+			else if(currentMenu == MenuType::GameOptionsMenu::GAMEOP_SOUND_EFFECTS_VOLUME)
 				menuValue = fmt::format(L"{}: {}", gDataManager->GetAccessibilityString(MenuType::GameOptionsMenu::GAMEOP_SOUND_EFFECTS_VOLUME).data(), gGameConfig->soundVolume);
-			else if(currentMenuEnum == MenuType::GameOptionsMenu::GAMEOP_ENABLE_MUSIC)
+			else if(currentMenu == MenuType::GameOptionsMenu::GAMEOP_ENABLE_MUSIC)
 				menuValue = fmt::format(L"{}: {}", gDataManager->GetAccessibilityString(MenuType::GameOptionsMenu::GAMEOP_ENABLE_MUSIC).data(), mainGame->gSettings.chkEnableMusic->isChecked());
-			else if(currentMenuEnum == MenuType::GameOptionsMenu::GAMEOP_MUSIC_VOLUME)
+			else if(currentMenu == MenuType::GameOptionsMenu::GAMEOP_MUSIC_VOLUME)
 				menuValue = fmt::format(L"{}: {}", gDataManager->GetAccessibilityString(MenuType::GameOptionsMenu::GAMEOP_MUSIC_VOLUME).data(), gGameConfig->musicVolume);
 
 		}
@@ -321,7 +321,7 @@ namespace ygo {
 						std::wstring nvdaString = fmt::format(gDataManager->GetAccessibilityString(192).data(), mainGame->cbDeckSelect->getItem(mainGame->cbDeckSelect->getSelected()));
 						ScreenReader::getReader()->readScreen(nvdaString.c_str());
 					}
-					else if (mainGame->roomListTable->isTrulyVisible() && currentMenu == gDataManager->GetAccessibilityString(194).data())
+					else if (mainGame->roomListTable->isTrulyVisible() && currentMenu == MenuType::OnlineMenu::ROOMS)
 						ReadOnlineRoomFromList(irr::KEY_DOWN);
 					else if (mainGame->lstSinglePlayList->isTrulyVisible())
 						ReadSinglePlayerList();
@@ -336,7 +336,7 @@ namespace ygo {
 						std::wstring nvdaString = fmt::format(gDataManager->GetAccessibilityString(192).data(), mainGame->cbDeckSelect->getItem(mainGame->cbDeckSelect->getSelected()));
 						ScreenReader::getReader()->readScreen(nvdaString.c_str());
 					}
-					else if (mainGame->roomListTable->isTrulyVisible() && currentMenu == gDataManager->GetAccessibilityString(194).data()) {
+					else if (mainGame->roomListTable->isTrulyVisible() && currentMenu == MenuType::OnlineMenu::ROOMS) {
 						ReadOnlineRoomFromList(irr::KEY_UP);
 					}
 					else if (mainGame->lstSinglePlayList->isTrulyVisible())
@@ -349,30 +349,13 @@ namespace ygo {
 			case irr::KEY_RIGHT: {
 					//TODO - MUDAR PRA LER OS VALORES DOS MENUS, QUANDO HOUVER
 					//CHAMAR UMA FUNÇÃO READMENU que irá ler o menu atual
-				if (!event.KeyInput.PressedDown && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
+				if (!event.KeyInput.PressedDown && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX))
 					ReadMenu(irr::KEY_RIGHT);
-
-				}
 				break;
 			}
 			case irr::KEY_LEFT: {
-				if (!event.KeyInput.PressedDown && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
+				if (!event.KeyInput.PressedDown && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX))
 					ReadMenu(irr::KEY_LEFT);
-					if (!scrollSelected) {
-						CheckMenu();
-						typing = false;
-						mainGame->env->removeFocus(mainGame->env->getFocus());
-						if (menu.empty())
-							menu = menuMain;
-						menuSelectCounter--;
-						if (menuSelectCounter < 0)
-							menuSelectCounter = menu.size() - 1;
-						currentMenu = menu.at(menuSelectCounter);
-						ScreenReader::getReader()->readScreen(menu.at(menuSelectCounter).c_str());
-						if (menu.at(menuSelectCounter) == gDataManager->GetAccessibilityString(194).data())
-							ScreenReader::getReader()->textToSpeech(fmt::format(gDataManager->GetAccessibilityString(197).data(), mainGame->roomListTable->getRowCount()));
-					}
-				}
 				break;
 			}
 			case irr::KEY_RETURN: {
@@ -381,28 +364,28 @@ namespace ygo {
 				if (!event.KeyInput.PressedDown) {
 					if (menu.empty())
 						menu = menuMain;
-					if (menu.at(0) == gDataManager->GetAccessibilityString(198).data()) {
+					if (menu.at(0) == MenuType::MainMenu::MM_ONLINE_DUEL) {
 						MainMenu();
 					}
-					else if (menu.at(0) == gDataManager->GetAccessibilityString(199).data()) {
+					else if (menu.at(0) == MenuType::SinglePlayerMenu::SP_HOST) {
 						SPDuel();
 					}
-					else if (menu.at(0) == gDataManager->GetAccessibilityString(200).data()) {
+					else if (menu.at(0) == MenuType::HostDuel::RULES_OK) {
 						HostDuel();
 					}
-					else if (menu.at(0) == gDataManager->GetAccessibilityString(201).data()) {
+					else if (menu.at(0) == MenuType::PlayerDuel::PD_START_DUEL) {
 						DuelMenu();
 					}
-					else if (menu.at(0) == gDataManager->GetAccessibilityString(202).data()) {
+					else if (menu.at(0) == MenuType::AIConfigMenu::AIC_OK) {
 						AIConfigMenu();
 					}
-					else if (menu.at(0) == gDataManager->GetAccessibilityString(203).data()) {
+					else if (menu.at(0) == MenuType::OnlineMenu::HOST) {
 						OnlineDuel();
 					}
-					else if (menu.at(0) == gDataManager->GetAccessibilityString(204).data()) {
+					else if (menu.at(0) == MenuType::PasswordMenu::PASS_SET_PASSWORD) {
 						PasswordMenu();
 					}
-					else if (menu.at(0) == gDataManager->GetAccessibilityString(205).data()) {
+					else if (menu.at(0) == MenuType::GameOptionsMenu::GAMEOP_ENABLE_SOUND_EFFECTS) {
 						GameOptions();
 					}
 				}
@@ -636,7 +619,7 @@ namespace ygo {
 
 		if (mainGame->gSettings.window->isTrulyVisible())
 			menu = menuGameOptions;
-		else if (mainGame->btnOnlineMode->isEnabled() && mainGame->btnOnlineMode->isTrulyVisible())
+		else if ((mainGame->btnOnlineMode->isEnabled() && mainGame->btnOnlineMode->isTrulyVisible()) || (mainGame->btnReplayCancel->isEnabled() && mainGame->btnReplayCancel->isTrulyVisible()))
 			menu = menuMain;
 		else if (mainGame->ebRPName->isEnabled() && mainGame->ebRPName->isTrulyVisible())
 			menu = menuPassword;
@@ -650,40 +633,38 @@ namespace ygo {
 			menu = menuOnline;
 		else if (mainGame->btnSinglePlayCancel->isEnabled() && mainGame->btnSinglePlayCancel->isTrulyVisible())
 			menu = menuPuzzles;
-		else if (mainGame->btnReplayCancel->isEnabled() && mainGame->btnReplayCancel->isTrulyVisible())
-			menu = menuPuzzles;
 		else if ((mainGame->btnHostPrepDuelist->isEnabled() && mainGame->btnHostPrepDuelist->isTrulyVisible()) ||
 			mainGame->btnHostPrepOB->isEnabled() && mainGame->btnHostPrepOB->isTrulyVisible())
 			menu = menuRulesOkOnline;
 	}
 
 	void MenuEventHandler::MainMenu() {
-		if (menuSelectCounter == MenuType::MainMenu::MM_ONLINE_DUEL && mainGame->btnOnlineMode->isEnabled()) {
+		if (currentMenu == MenuType::MainMenu::MM_ONLINE_DUEL && mainGame->btnOnlineMode->isEnabled()) {
 			ClickButton(mainGame->btnOnlineMode);
 		}
-		else if (menuSelectCounter == MenuType::MainMenu::MM_SP_DUEL && mainGame->btnLanMode->isEnabled()) {
+		else if (currentMenu == MenuType::MainMenu::MM_SP_DUEL && mainGame->btnLanMode->isEnabled()) {
 			ClickButton(mainGame->btnLanMode);
 		}
-		else if (menuSelectCounter == MenuType::MainMenu::MM_PUZZLES && mainGame->btnSingleMode->isEnabled()) {
+		else if (currentMenu == MenuType::MainMenu::MM_PUZZLES && mainGame->btnSingleMode->isEnabled()) {
 			ClickButton(mainGame->btnSingleMode);
 		}
-		else if (menuSelectCounter == MenuType::MainMenu::MM_REPLAY && mainGame->btnReplayMode->isEnabled()) {
+		else if (currentMenu == MenuType::MainMenu::MM_REPLAY && mainGame->btnReplayMode->isEnabled()) {
 			ClickButton(mainGame->btnReplayMode);
 		}
-		else if (menuSelectCounter == MenuType::MainMenu::MM_DECK_EDITOR && mainGame->btnDeckEdit->isEnabled()) {
+		else if (currentMenu == MenuType::MainMenu::MM_DECK_EDITOR && mainGame->btnDeckEdit->isEnabled()) {
 			ClickButton(mainGame->btnDeckEdit);
 		}
-		else if (menuSelectCounter == MenuType::MainMenu::MM_GAME_OPTIONS && mainGame->wBtnSettings->isEnabled()) {
+		else if (currentMenu == MenuType::MainMenu::MM_GAME_OPTIONS && mainGame->wBtnSettings->isEnabled()) {
 			ClickButton(mainGame->btnSettings);
 			menu = menuGameOptions;
 		}
-		else if (menuSelectCounter == MenuType::MainMenu::MM_ACCESSIBILITY_KEYS) {
+		else if (currentMenu == MenuType::MainMenu::MM_ACCESSIBILITY_KEYS) {
 			ScreenReader::getReader()->readScreen(StringBuilder::getBuiltMessage());
 		}
 	}
 
 	void MenuEventHandler::PasswordMenu() {
-		if (menuSelectCounter == MenuType::PasswordMenu::PASS_SET_PASSWORD && mainGame->ebRPName->isTrulyVisible()) {
+		if (currentMenu == MenuType::PasswordMenu::PASS_SET_PASSWORD && mainGame->ebRPName->isTrulyVisible()) {
 			if (!typing) {
 				ScreenReader::getReader()->readScreen(std::wstring(gDataManager->GetAccessibilityString(223).data()).c_str());
 				FocusTextBox(mainGame->ebRPName);
@@ -695,33 +676,33 @@ namespace ygo {
 				ScreenReader::getReader()->readScreen(fmt::format(gDataManager->GetAccessibilityString(224).data(), mainGame->ebRPName->getText()));
 			}
 		}
-		else if (menuSelectCounter == MenuType::PasswordMenu::PASS_OK && mainGame->btnRPYes->isEnabled()) {
+		else if (currentMenu == MenuType::PasswordMenu::PASS_OK && mainGame->btnRPYes->isEnabled()) {
 			ClickButton(mainGame->btnRPYes);
 		}
-		else if (menuSelectCounter == MenuType::PasswordMenu::PASS_CANCEL && mainGame->btnRPNo->isEnabled()) {
+		else if (currentMenu == MenuType::PasswordMenu::PASS_CANCEL && mainGame->btnRPNo->isEnabled()) {
 			ClickButton(mainGame->btnRPNo);
 		}
 	}
 
 	void MenuEventHandler::AIConfigMenu() {
-		if (menuSelectCounter == MenuType::AIConfigMenu::AIC_OK && mainGame->gBot.btnAdd->isTrulyVisible() && mainGame->gBot.btnAdd->isEnabled()) {
+		if (currentMenu == MenuType::AIConfigMenu::AIC_OK && mainGame->gBot.btnAdd->isTrulyVisible() && mainGame->gBot.btnAdd->isEnabled()) {
 			ClickButton(mainGame->gBot.btnAdd);
 		}
-		else if (menuSelectCounter == MenuType::AIConfigMenu::AIC_SELECT_DECK && mainGame->gBot.cbBotDeck->isTrulyVisible()) {
+		else if (currentMenu == MenuType::AIConfigMenu::AIC_SELECT_DECK && mainGame->gBot.cbBotDeck->isTrulyVisible()) {
 			mainGame->env->setFocus(mainGame->gBot.cbBotDeck);
 			std::wstring nvdaString = fmt::format(gDataManager->GetAccessibilityString(192).data(), mainGame->gBot.cbBotDeck->getItem(mainGame->gBot.cbBotDeck->getSelected()));
 			ScreenReader::getReader()->readScreen(nvdaString.c_str());
 		}
-		else if (menuSelectCounter == MenuType::AIConfigMenu::AIC_ATR && mainGame->gBot.chkThrowRock->isTrulyVisible()) {
+		else if (currentMenu == MenuType::AIConfigMenu::AIC_ATR && mainGame->gBot.chkThrowRock->isTrulyVisible()) {
 			CheckBox(mainGame->gBot.chkThrowRock);
 		}
 	}
 
 	void MenuEventHandler::SPDuel() {
-		if (menuSelectCounter == MenuType::SinglePlayerMenu::SP_HOST && mainGame->btnCreateHost->isEnabled()) {
+		if (currentMenu == MenuType::SinglePlayerMenu::SP_HOST && mainGame->btnCreateHost->isEnabled()) {
 			ClickButton(mainGame->btnCreateHost);
 		}
-		else if (menuSelectCounter == MenuType::SinglePlayerMenu::SP_PLAYER_NAME && mainGame->ebNickName->isTrulyVisible()) {
+		else if (currentMenu == MenuType::SinglePlayerMenu::SP_PLAYER_NAME && mainGame->ebNickName->isTrulyVisible()) {
 			if (!typing) {
 				ScreenReader::getReader()->readScreen(std::wstring(gDataManager->GetAccessibilityString(225).data()).c_str());
 				FocusTextBox(mainGame->ebNickName);
@@ -736,10 +717,10 @@ namespace ygo {
 	}
 
 	void MenuEventHandler::DuelMenu() {
-		if (menuSelectCounter == MenuType::PlayerDuel::PD_START_DUEL && mainGame->btnHostPrepStart->isEnabled()) {
+		if (currentMenu == MenuType::PlayerDuel::PD_START_DUEL && mainGame->btnHostPrepStart->isEnabled()) {
 			ClickButton(mainGame->btnHostPrepStart);
 		}
-		else if (menuSelectCounter == MenuType::PlayerDuel::PD_START_DUEL && !mainGame->btnHostPrepStart->isEnabled() && mainGame->btnHostPrepStart->isTrulyVisible()) {
+		else if (currentMenu == MenuType::PlayerDuel::PD_START_DUEL && !mainGame->btnHostPrepStart->isEnabled() && mainGame->btnHostPrepStart->isTrulyVisible()) {
 			std::wstring nvdaString;
 			if (oldMenu == L"SinglePlayer")
 				nvdaString = gDataManager->GetAccessibilityString(227).data();
@@ -747,39 +728,39 @@ namespace ygo {
 				nvdaString = gDataManager->GetAccessibilityString(228).data();
 			ScreenReader::getReader()->readScreen(nvdaString);
 		}
-		else if (menuSelectCounter == MenuType::PlayerDuel::PD_PLAYER_READY && mainGame->btnHostPrepReady->isTrulyVisible() && mainGame->btnHostPrepReady->isEnabled()) {
+		else if (currentMenu == MenuType::PlayerDuel::PD_PLAYER_READY && mainGame->btnHostPrepReady->isTrulyVisible() && mainGame->btnHostPrepReady->isEnabled()) {
 			ClickButton(mainGame->btnHostPrepReady);
 		}
-		else if (menuSelectCounter == MenuType::PlayerDuel::PD_PLAYER_READY && mainGame->btnHostPrepNotReady->isEnabled()) {
+		else if (currentMenu == MenuType::PlayerDuel::PD_PLAYER_READY && mainGame->btnHostPrepNotReady->isEnabled()) {
 			ClickButton(mainGame->btnHostPrepNotReady);
 		}
-		else if (menuSelectCounter == MenuType::PlayerDuel::PD_SELECT_DECK && mainGame->cbDeckSelect->isTrulyVisible()) {
+		else if (currentMenu == MenuType::PlayerDuel::PD_SELECT_DECK && mainGame->cbDeckSelect->isTrulyVisible()) {
 			mainGame->env->setFocus(mainGame->cbDeckSelect);
 			std::wstring nvdaString = fmt::format(gDataManager->GetAccessibilityString(192).data(), mainGame->cbDeckSelect->getItem(mainGame->cbDeckSelect->getSelected()));
 			ScreenReader::getReader()->readScreen(nvdaString.c_str());
 		}
-		else if (menuSelectCounter == MenuType::SinglePlayerDuel::SP_AI_MENU && mainGame->btnHostPrepWindBot->isTrulyVisible() && mainGame->btnHostPrepWindBot->isEnabled()) {
+		else if (currentMenu == MenuType::SinglePlayerDuel::SP_AI_MENU && mainGame->btnHostPrepWindBot->isTrulyVisible() && mainGame->btnHostPrepWindBot->isEnabled()) {
 			ClickButton(mainGame->btnHostPrepWindBot);
 		}
-		else if (menuSelectCounter == MenuType::OnlineDuel::OD_DUEL_MODE && mainGame->btnHostPrepDuelist->isTrulyVisible() && mainGame->btnHostPrepDuelist->isEnabled()) {
+		else if (currentMenu == MenuType::OnlineDuel::OD_DUEL_MODE && mainGame->btnHostPrepDuelist->isTrulyVisible() && mainGame->btnHostPrepDuelist->isEnabled()) {
 			ClickButton(mainGame->btnHostPrepDuelist);
 		}
-		else if (menuSelectCounter == MenuType::OnlineDuel::OD_DUEL_MODE && mainGame->btnHostPrepDuelist->isTrulyVisible() && !mainGame->btnHostPrepDuelist->isEnabled()) {
+		else if (currentMenu == MenuType::OnlineDuel::OD_DUEL_MODE && mainGame->btnHostPrepDuelist->isTrulyVisible() && !mainGame->btnHostPrepDuelist->isEnabled()) {
 			ScreenReader::getReader()->readScreen(gDataManager->GetAccessibilityString(229).data());
 		}
-		else if (menuSelectCounter == MenuType::OnlineDuel::OD_SPECTATE_MODE && mainGame->btnHostPrepOB->isTrulyVisible() && mainGame->btnHostPrepOB->isEnabled()) {
+		else if (currentMenu == MenuType::OnlineDuel::OD_SPECTATE_MODE && mainGame->btnHostPrepOB->isTrulyVisible() && mainGame->btnHostPrepOB->isEnabled()) {
 			ClickButton(mainGame->btnHostPrepOB);
 		}
-		else if (menuSelectCounter == MenuType::OnlineDuel::OD_SPECTATE_MODE && mainGame->btnHostPrepOB->isTrulyVisible() && !mainGame->btnHostPrepOB->isEnabled()) {
+		else if (currentMenu == MenuType::OnlineDuel::OD_SPECTATE_MODE && mainGame->btnHostPrepOB->isTrulyVisible() && !mainGame->btnHostPrepOB->isEnabled()) {
 			ScreenReader::getReader()->readScreen(gDataManager->GetAccessibilityString(230).data());
 		}
 	}
 
 	void MenuEventHandler::HostDuel() {
-		if (menuSelectCounter == MenuType::HostDuel::RULES_OK && mainGame->btnHostConfirm->isEnabled()) {
+		if (currentMenu == MenuType::HostDuel::RULES_OK && mainGame->btnHostConfirm->isEnabled()) {
 			ClickButton(mainGame->btnHostConfirm);
 		}
-		else if (menuSelectCounter == MenuType::HostDuel::NUM_PLAYERS_T1 && mainGame->ebTeam1->isTrulyVisible()) {
+		else if (currentMenu == MenuType::HostDuel::NUM_PLAYERS_T1 && mainGame->ebTeam1->isTrulyVisible()) {
 			if (!typing) {
 				ScreenReader::getReader()->readScreen(std::wstring(gDataManager->GetAccessibilityString(231).data()).c_str());
 				FocusTextBox(mainGame->ebTeam1);
@@ -791,7 +772,7 @@ namespace ygo {
 				ScreenReader::getReader()->readScreen(fmt::format(gDataManager->GetAccessibilityString(232).data(), mainGame->ebTeam1->getText()));
 			}
 		}
-		else if (menuSelectCounter == MenuType::HostDuel::NUM_PLAYERS_T2 && mainGame->ebTeam2->isTrulyVisible()) {
+		else if (currentMenu == MenuType::HostDuel::NUM_PLAYERS_T2 && mainGame->ebTeam2->isTrulyVisible()) {
 			if (!typing) {
 				ScreenReader::getReader()->readScreen(std::wstring(gDataManager->GetAccessibilityString(233).data()).c_str());
 				FocusTextBox(mainGame->ebTeam2);
@@ -803,7 +784,7 @@ namespace ygo {
 				ScreenReader::getReader()->readScreen(fmt::format(gDataManager->GetAccessibilityString(234).data(), mainGame->ebTeam2->getText()));
 			}
 		}
-		else if (menuSelectCounter == MenuType::HostDuel::BEST_OF && mainGame->ebBestOf->isTrulyVisible()) {
+		else if (currentMenu == MenuType::HostDuel::BEST_OF && mainGame->ebBestOf->isTrulyVisible()) {
 			if (!typing) {
 				ScreenReader::getReader()->readScreen(std::wstring(gDataManager->GetAccessibilityString(235).data()).c_str());
 				FocusTextBox(mainGame->ebBestOf);
@@ -815,7 +796,7 @@ namespace ygo {
 				ScreenReader::getReader()->readScreen(fmt::format(gDataManager->GetAccessibilityString(236).data(), mainGame->ebBestOf->getText()));
 			}
 		}
-		else if (menuSelectCounter == MenuType::HostDuel::TIME_LIMIT && mainGame->ebTimeLimit->isTrulyVisible()) {
+		else if (currentMenu == MenuType::HostDuel::TIME_LIMIT && mainGame->ebTimeLimit->isTrulyVisible()) {
 			if (!typing) {
 				ScreenReader::getReader()->readScreen(std::wstring(gDataManager->GetAccessibilityString(237).data()).c_str());
 				FocusTextBox(mainGame->ebTimeLimit);
@@ -827,7 +808,7 @@ namespace ygo {
 				ScreenReader::getReader()->readScreen(fmt::format(gDataManager->GetAccessibilityString(238).data(), mainGame->ebTimeLimit->getText()));
 			}
 		}
-		else if (menuSelectCounter == MenuType::HostDuel::STARTING_LP && mainGame->ebStartLP->isTrulyVisible()) {
+		else if (currentMenu == MenuType::HostDuel::STARTING_LP && mainGame->ebStartLP->isTrulyVisible()) {
 			if (!typing) {
 				ScreenReader::getReader()->readScreen(gDataManager->GetAccessibilityString(239).data());
 				FocusTextBox(mainGame->ebStartLP);
@@ -839,7 +820,7 @@ namespace ygo {
 				ScreenReader::getReader()->readScreen(fmt::format(gDataManager->GetAccessibilityString(240).data(), mainGame->ebStartLP->getText()));
 			}
 		}
-		else if (menuSelectCounter == MenuType::HostDuel::STARTING_HAND && mainGame->ebStartHand->isTrulyVisible()) {
+		else if (currentMenu == MenuType::HostDuel::STARTING_HAND && mainGame->ebStartHand->isTrulyVisible()) {
 			if (!typing) {
 				ScreenReader::getReader()->readScreen(gDataManager->GetAccessibilityString(241).data());
 				FocusTextBox(mainGame->ebStartHand);
@@ -851,7 +832,7 @@ namespace ygo {
 				ScreenReader::getReader()->readScreen(fmt::format(gDataManager->GetAccessibilityString(242).data(), mainGame->ebStartHand->getText()));
 			}
 		}
-		else if (menuSelectCounter == MenuType::HostDuel::CARDS_DRAW && mainGame->ebDrawCount->isTrulyVisible()) {
+		else if (currentMenu == MenuType::HostDuel::CARDS_DRAW && mainGame->ebDrawCount->isTrulyVisible()) {
 			if (!typing) {
 				ScreenReader::getReader()->readScreen(gDataManager->GetAccessibilityString(243).data());
 				FocusTextBox(mainGame->ebDrawCount);
@@ -863,14 +844,14 @@ namespace ygo {
 				ScreenReader::getReader()->readScreen(fmt::format(gDataManager->GetAccessibilityString(244).data(), mainGame->ebDrawCount->getText()));
 			}
 		}
-		else if (menuSelectCounter == MenuType::HostDuel::CHECK_DECK && mainGame->chkNoCheckDeckContent->isTrulyVisible()) {
+		else if (currentMenu == MenuType::HostDuel::CHECK_DECK && mainGame->chkNoCheckDeckContent->isTrulyVisible()) {
 			CheckBox(mainGame->chkNoCheckDeckContent);
 			CheckBox(mainGame->chkNoCheckDeckSize);
 		}
-		else if (menuSelectCounter == MenuType::HostDuel::SHUFFLE_DECK && mainGame->chkNoShuffleDeck->isTrulyVisible()) {
+		else if (currentMenu == MenuType::HostDuel::SHUFFLE_DECK && mainGame->chkNoShuffleDeck->isTrulyVisible()) {
 			CheckBox(mainGame->chkNoShuffleDeck);
 		}
-		else if (menuSelectCounter == MenuType::HostDuel::ROOM_NAME && mainGame->ebHostNotes->isTrulyVisible()) {
+		else if (currentMenu == MenuType::HostDuel::ROOM_NAME && mainGame->ebHostNotes->isTrulyVisible()) {
 			if (!typing) {
 				ScreenReader::getReader()->readScreen(gDataManager->GetAccessibilityString(245).data());
 				FocusTextBox(mainGame->ebHostNotes);
@@ -882,7 +863,7 @@ namespace ygo {
 				ScreenReader::getReader()->readScreen(fmt::format(gDataManager->GetAccessibilityString(246).data(), mainGame->ebHostNotes->getText()));
 			}
 		}
-		else if (menuSelectCounter == MenuType::HostDuel::ROOM_PASSWORD && mainGame->ebServerPass->isTrulyVisible()) {
+		else if (currentMenu == MenuType::HostDuel::ROOM_PASSWORD && mainGame->ebServerPass->isTrulyVisible()) {
 			if (!typing) {
 				ScreenReader::getReader()->readScreen(gDataManager->GetAccessibilityString(247).data());
 				FocusTextBox(mainGame->ebServerPass);
@@ -898,21 +879,21 @@ namespace ygo {
 
 	void MenuEventHandler::OnlineDuel() {
 		menu = menuOnline;
-		if (menuSelectCounter == MenuType::OnlineMenu::HOST && mainGame->btnCreateHost2->isEnabled()) {
+		if (currentMenu == MenuType::OnlineMenu::HOST && mainGame->btnCreateHost2->isEnabled()) {
 			ClickButton(mainGame->btnCreateHost2);
 		}
-		else if (menuSelectCounter == MenuType::OnlineMenu::REFRESH && mainGame->btnLanRefresh2->isEnabled()) {
+		else if (currentMenu == MenuType::OnlineMenu::REFRESH && mainGame->btnLanRefresh2->isEnabled()) {
 			onlineMatchCounter = 0;
 			ServerLobby::RefreshRooms();
 		}
-		else if (menuSelectCounter == MenuType::OnlineMenu::JOIN_ONLINE_DUEL && mainGame->btnJoinHost2->isEnabled()) {
+		else if (currentMenu == MenuType::OnlineMenu::JOIN_ONLINE_DUEL && mainGame->btnJoinHost2->isEnabled()) {
 			ClickButton(mainGame->btnJoinHost2);
 		}
-		else if (menuSelectCounter == MenuType::OnlineMenu::SERVER && mainGame->serverChoice->isTrulyVisible()) {
+		else if (currentMenu == MenuType::OnlineMenu::SERVER && mainGame->serverChoice->isTrulyVisible()) {
 			ScreenReader::getReader()->readScreen(fmt::format(gDataManager->GetAccessibilityString(249).data(), mainGame->serverChoice->getItem(mainGame->serverChoice->getSelected())));
 			mainGame->env->setFocus(mainGame->serverChoice);
 		}
-		else if (menuSelectCounter == MenuType::OnlineMenu::PLAYER_NAME && mainGame->ebNickNameOnline->isTrulyVisible()) {
+		else if (currentMenu == MenuType::OnlineMenu::PLAYER_NAME && mainGame->ebNickNameOnline->isTrulyVisible()) {
 			if (!typing) {
 				ScreenReader::getReader()->readScreen(gDataManager->GetAccessibilityString(250).data());
 				FocusTextBox(mainGame->ebNickNameOnline);
@@ -924,30 +905,30 @@ namespace ygo {
 				ScreenReader::getReader()->readScreen(fmt::format(gDataManager->GetAccessibilityString(251).data(), mainGame->ebNickNameOnline->getText()));
 			}
 		}
-		else if (menuSelectCounter == MenuType::OnlineMenu::ALLOWED_CARDS && mainGame->cbFilterRule->isTrulyVisible()) {
+		else if (currentMenu == MenuType::OnlineMenu::ALLOWED_CARDS && mainGame->cbFilterRule->isTrulyVisible()) {
 			ScreenReader::getReader()->readScreen(fmt::format(L"{}", mainGame->cbFilterRule->getItem(mainGame->cbFilterRule->getSelected())));
 			mainGame->env->setFocus(mainGame->cbFilterRule);
 		}
-		else if (menuSelectCounter == MenuType::OnlineMenu::FORBIDDEN_LIST && mainGame->cbFilterBanlist->isTrulyVisible()) {
+		else if (currentMenu == MenuType::OnlineMenu::FORBIDDEN_LIST && mainGame->cbFilterBanlist->isTrulyVisible()) {
 			mainGame->env->setFocus(mainGame->cbFilterBanlist);
 			ScreenReader::getReader()->readScreen(fmt::format(L"{}", mainGame->cbFilterBanlist->getItem(mainGame->cbFilterBanlist->getSelected())));
 		}
-		else if (menuSelectCounter == MenuType::OnlineMenu::LOCKED_ROOMS && mainGame->chkShowPassword->isTrulyVisible()) {
+		else if (currentMenu == MenuType::OnlineMenu::LOCKED_ROOMS && mainGame->chkShowPassword->isTrulyVisible()) {
 			CheckBox(mainGame->chkShowPassword);
 		}
-		else if (menuSelectCounter == MenuType::OnlineMenu::STARTED_ROOMS && mainGame->chkShowActiveRooms->isTrulyVisible()) {
+		else if (currentMenu == MenuType::OnlineMenu::STARTED_ROOMS && mainGame->chkShowActiveRooms->isTrulyVisible()) {
 			CheckBox(mainGame->chkShowActiveRooms);
 		}
 	}
 
 	void MenuEventHandler::GameOptions() {
 		menu = menuGameOptions;
-		if (menuSelectCounter == MenuType::GameOptionsMenu::GAMEOP_ENABLE_SOUND_EFFECTS && mainGame->gSettings.chkEnableSound->isTrulyVisible()) {
+		if (currentMenu == MenuType::GameOptionsMenu::GAMEOP_ENABLE_SOUND_EFFECTS && mainGame->gSettings.chkEnableSound->isTrulyVisible()) {
 			CheckBox(mainGame->gSettings.chkEnableSound);
 			gSoundManager->EnableSounds(mainGame->gSettings.chkEnableSound->isChecked());
 			gGameConfig->enablesound = mainGame->gSettings.chkEnableSound->isChecked();
 		}
-		else if (menuSelectCounter == MenuType::GameOptionsMenu::GAMEOP_SOUND_EFFECTS_VOLUME && mainGame->gSettings.scrSoundVolume->isTrulyVisible()) {
+		else if (currentMenu == MenuType::GameOptionsMenu::GAMEOP_SOUND_EFFECTS_VOLUME && mainGame->gSettings.scrSoundVolume->isTrulyVisible()) {
 			if (!scrollSelected) {
 				ScreenReader::getReader()->readScreen(gDataManager->GetAccessibilityTipsString(11).data());
 				ScreenReader::getReader()->readScreen(gDataManager->GetAccessibilityTipsString(12).data());
@@ -960,12 +941,12 @@ namespace ygo {
 				mainGame->env->removeFocus(mainGame->env->getFocus());
 			}
 		}
-		else if (menuSelectCounter == MenuType::GameOptionsMenu::GAMEOP_ENABLE_MUSIC && mainGame->gSettings.chkEnableMusic->isTrulyVisible()) {
+		else if (currentMenu == MenuType::GameOptionsMenu::GAMEOP_ENABLE_MUSIC && mainGame->gSettings.chkEnableMusic->isTrulyVisible()) {
 			CheckBox(mainGame->gSettings.chkEnableMusic);
 			gSoundManager->EnableMusic(mainGame->gSettings.chkEnableMusic->isChecked());
 			gGameConfig->enablemusic = mainGame->gSettings.chkEnableMusic->isChecked();
 		}
-		else if (menuSelectCounter == MenuType::GameOptionsMenu::GAMEOP_MUSIC_VOLUME && mainGame->gSettings.scrMusicVolume->isTrulyVisible()) {
+		else if (currentMenu == MenuType::GameOptionsMenu::GAMEOP_MUSIC_VOLUME && mainGame->gSettings.scrMusicVolume->isTrulyVisible()) {
 			if (!scrollSelected) {
 				ScreenReader::getReader()->readScreen(gDataManager->GetAccessibilityTipsString(11).data());
 				ScreenReader::getReader()->readScreen(gDataManager->GetAccessibilityTipsString(12).data());

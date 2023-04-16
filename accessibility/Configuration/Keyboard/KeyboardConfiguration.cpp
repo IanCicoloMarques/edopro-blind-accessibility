@@ -1,20 +1,26 @@
 ﻿#include "KeyboardConfiguration.h"
 #include "../../../irrlicht/include/Keycodes.h"
-
-void KeyboardConfiguration::LoadConfiguration(KeyboardConfigurationType::ConfigurationType type)
+namespace ygo
 {
-	if(type == KeyboardConfigurationType::Default)
+	int KeyboardConfiguration::NormalSummon = irr::KEY_KEY_A;
+	int KeyboardConfiguration::SetSummon = irr::KEY_KEY_S;
+	void KeyboardConfiguration::LoadConfiguration(KeyboardConfigurationType::ConfigurationType type)
 	{
-		LoadDefaultConfiguration();
+		if(type == KeyboardConfigurationType::Default)
+		{
+			LoadDefaultConfiguration();
+		}
 	}
-}
 
-void KeyboardConfiguration::LoadDefaultConfiguration()
-{
-	NormalSummon = irr::KEY_KEY_A;
-	SetSummon = irr::KEY_KEY_S;
-}
+	void KeyboardConfiguration::LoadDefaultConfiguration()
+	{
+		NormalSummon = irr::KEY_KEY_A;
+		SetSummon = irr::KEY_KEY_S;
+	}
 
-void KeyboardConfiguration::LoadMudConfiguration()
-{
+	void KeyboardConfiguration::LoadMudConfiguration()
+	{
+		NormalSummon = irr::KEY_KEY_A;
+		SetSummon = irr::KEY_KEY_S;
+	}
 }

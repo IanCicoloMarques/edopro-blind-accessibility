@@ -8,9 +8,9 @@
 #include "ScreenReader/StringBuilder.h"
 
 #include "../gframe/data_manager.h"
-#include "Configuration/Keyboard/KeyboardConfiguration.h"
 #include "Models/Card.h"
 #include "ScreenReader/Messages/AccessibilityStringDictionary.h"
+#include "../Configuration/Keyboard/KeyboardConfiguration.h"
 
 namespace ygo {
 	IEventHandler* EventHandler::eventHandler = nullptr;

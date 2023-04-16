@@ -54,7 +54,7 @@ namespace ygo {
 		std::vector<int> menuOnline = { MenuType::OnlineMenu::HOST, MenuType::OnlineMenu::REFRESH, MenuType::OnlineMenu::ROOMS, MenuType::OnlineMenu::SERVER, MenuType::OnlineMenu::PLAYER_NAME, MenuType::OnlineMenu::ALLOWED_CARDS, MenuType::OnlineMenu::FORBIDDEN_LIST, MenuType::OnlineMenu::LOCKED_ROOMS, MenuType::OnlineMenu::STARTED_ROOMS };
 		std::vector<int> menuPassword = { MenuType::PasswordMenu::PASS_SET_PASSWORD, MenuType::PasswordMenu::PASS_OK, MenuType::PasswordMenu::PASS_CANCEL };
 		std::vector<int> menuDeckEditor = { Accessibility::Dict::Menu::OK, Accessibility::Dict::Menu::CANCEL };
-		std::vector<int> menuGameOptions = { MenuType::GameOptionsMenu::GAMEOP_ENABLE_SOUND_EFFECTS, MenuType::GameOptionsMenu::GAMEOP_SOUND_EFFECTS_VOLUME, MenuType::GameOptionsMenu::GAMEOP_ENABLE_MUSIC, MenuType::GameOptionsMenu::GAMEOP_MUSIC_VOLUME };
+		std::vector<int> menuGameOptions = { MenuType::GameOptionsMenu::GAMEOP_ENABLE_SOUND_EFFECTS, MenuType::GameOptionsMenu::GAMEOP_SOUND_EFFECTS_VOLUME, MenuType::GameOptionsMenu::GAMEOP_ENABLE_MUSIC, MenuType::GameOptionsMenu::GAMEOP_MUSIC_VOLUME, MenuType::GameOptionsMenu::USE_MUD_KEYBOARD };
 		std::vector<int> menuPuzzles = { 0 };
 		void CheckMenu();
 		void MainMenu();

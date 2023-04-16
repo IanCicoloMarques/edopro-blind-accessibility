@@ -1,5 +1,7 @@
 #include "AccessibilityMenu.h"
 
+#include <Control/EventHandler.h>
+
 namespace ygo {
 	IEventHandler* MenuEventHandler::menuHandler = nullptr;
 	static inline void TriggerEvent(irr::gui::IGUIElement* target, irr::gui::EGUI_EVENT_TYPE type) {
@@ -202,6 +204,8 @@ namespace ygo {
 				menuValue = fmt::format(L"{}: {}", gDataManager->GetAccessibilityString(MenuType::GameOptionsMenu::GAMEOP_ENABLE_MUSIC).data(), mainGame->gSettings.chkEnableMusic->isChecked());
 			else if(currentMenu == MenuType::GameOptionsMenu::GAMEOP_MUSIC_VOLUME)
 				menuValue = fmt::format(L"{}: {}", gDataManager->GetAccessibilityString(MenuType::GameOptionsMenu::GAMEOP_MUSIC_VOLUME).data(), gGameConfig->musicVolume);
+			else if(currentMenu == MenuType::GameOptionsMenu::USE_MUD_KEYBOARD)
+				menuValue = fmt::format(L"{}: {}", gDataManager->GetAccessibilityString(MenuType::GameOptionsMenu::USE_MUD_KEYBOARD).data(), mainGame->gSettings.chkUseMudKeyboard->isChecked());
 
 		}
 		ScreenReader::getReader()->readScreen(menuValue);
@@ -346,8 +350,6 @@ namespace ygo {
 				break;
 			}
 			case irr::KEY_RIGHT: {
-					//TODO - MUDAR PRA LER OS VALORES DOS MENUS, QUANDO HOUVER
-					//CHAMAR UMA FUNÇÃO READMENU que irá ler o menu atual
 				if (!event.KeyInput.PressedDown && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX))
 					ReadMenu(irr::KEY_RIGHT);
 				break;
@@ -957,6 +959,11 @@ namespace ygo {
 				scrollSelected = false;
 				mainGame->env->removeFocus(mainGame->env->getFocus());
 			}
+		}
+		else if (currentMenu == MenuType::GameOptionsMenu::USE_MUD_KEYBOARD && mainGame->gSettings.chkUseMudKeyboard->isTrulyVisible()) {
+			CheckBox(mainGame->gSettings.chkUseMudKeyboard);
+			gGameConfig->mudKeyboard = mainGame->gSettings.chkUseMudKeyboard->isChecked();
+			EventHandler::mudConfiguration = mainGame->gSettings.chkUseMudKeyboard->isChecked();
 		}
 	}
 }

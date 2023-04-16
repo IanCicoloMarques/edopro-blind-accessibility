@@ -10,6 +10,8 @@ namespace Accessibility {
 			YES = 102,
 			NO = 106,
 			LEAVE_GAME = 119,
+			OK = 364,
+			CANCEL = 365,
 		};
 		enum Duel
 		{

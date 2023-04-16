@@ -17,11 +17,11 @@ namespace ygo {
 			ONLINE_MENU,
 			ROOM_PASSWORD_MENU,
 			DECK_EDITOR,
-			AI_CONFIGURATION, 
+			AI_CONFIGURATION,
 		};
 
 		enum MainMenu {
-			MM_ONLINE_DUEL,
+			MM_ONLINE_DUEL = 328,
 			MM_SP_DUEL,
 			MM_PUZZLES,
 			MM_REPLAY,
@@ -31,56 +31,57 @@ namespace ygo {
 		};
 
 		enum HostDuel {
-			RULES_OK,
-			NUM_PLAYERS_T1,
-			NUM_PLAYERS_T2,
-			BEST_OF,
-			TIME_LIMIT,
-			STARTING_LP,
-			STARTING_HAND,
-			CARDS_DRAW,
-			CHECK_DECK,
-			SHUFFLE_DECK,
-			ROOM_NAME,
-			ROOM_PASSWORD,
+			RULES_OK = 336,
+			NUM_PLAYERS_T1 = 337,
+			NUM_PLAYERS_T2 = 338,
+			BEST_OF = 339,
+			TIME_LIMIT = 340,
+			STARTING_LP = 341,
+			STARTING_HAND = 342,
+			CARDS_DRAW = 343,
+			CHECK_DECK = 344,
+			SHUFFLE_DECK = 345,
+			ROOM_NAME = 346,
+			ROOM_PASSWORD = 347,
 		};
 
 		enum SinglePlayerMenu {
-			SP_HOST,
-			SP_PLAYER_NAME
+			SP_HOST = 199,
+			SP_PLAYER_NAME = 335
 		};
 
 		enum PlayerDuel {
-			PD_START_DUEL,
-			PD_SELECT_DECK,
-			PD_PLAYER_READY
+			PD_START_DUEL = 348,
+			PD_SELECT_DECK = 349,
+			PD_PLAYER_READY = 350
 		};
 
 		enum SinglePlayerDuel {
-			SP_AI_MENU = 3
+			SP_AI_MENU = 351
 		};
 
 		enum AIConfigMenu {
-			AIC_OK,
-			AIC_SELECT_DECK,
-			AIC_ATR
+			AIC_OK = 354,
+			AIC_SELECT_DECK = 349,
+			AIC_ATR = 355
 		};
 
 		enum OnlineDuel {
-			OD_DUEL_MODE = 3,
-			OD_SPECTATE_MODE = 4,
+			OD_DUEL_MODE = 352,
+			OD_SPECTATE_MODE = 353,
 		};
 
 		enum OnlineMenu{
-			HOST,
-			REFRESH,
-			HOST_ONLINE_DUEL,
-			SERVER,
-			PLAYER_NAME,
-			ALLOWED_CARDS,
-			FORBIDDEN_LIST,
-			LOCKED_ROOMS,
-			STARTED_ROOMS,
+			HOST = 203,
+			REFRESH = 356,
+			ROOMS = 194,
+			JOIN_ONLINE_DUEL,
+			SERVER = 358,
+			PLAYER_NAME = 335,
+			ALLOWED_CARDS = 359,
+			FORBIDDEN_LIST = 360,
+			LOCKED_ROOMS = 361,
+			STARTED_ROOMS = 362,
 		};
 
 		enum DeckEditorMenu {
@@ -88,16 +89,17 @@ namespace ygo {
 		};
 
 		enum PasswordMenu {
-			PASS_SET_PASSWORD,
-			PASS_OK,
-			PASS_CANCEL
+			PASS_SET_PASSWORD = 363,
+			PASS_OK = 364,
+			PASS_CANCEL = 365
 		};
 
 		enum GameOptionsMenu {
-			GAMEOP_ENABLE_SOUND_EFFECTS,
-			GAMEOP_SOUND_EFFECTS_VOLUME,
-			GAMEOP_ENABLE_MUSIC,
-			GAMEOP_MUSIC_VOLUME
+			GAMEOP_ENABLE_SOUND_EFFECTS = 366,
+			GAMEOP_SOUND_EFFECTS_VOLUME = 367,
+			GAMEOP_ENABLE_MUSIC = 368,
+			GAMEOP_MUSIC_VOLUME = 369,
+			USE_MUD_KEYBOARD = 377
 		};
 
 		enum DeckOptionsMenu {

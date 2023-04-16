@@ -8,6 +8,7 @@
 #include "ScreenReader/StringBuilder.h"
 
 #include "../gframe/data_manager.h"
+#include "Configuration/Keyboard/KeyboardConfiguration.h"
 #include "Models/Card.h"
 #include "ScreenReader/Messages/AccessibilityStringDictionary.h"
 
@@ -53,6 +54,14 @@ namespace ygo {
 		if (eventHandler == nullptr)
 			eventHandler = new EventHandler();
 		return eventHandler;
+	}
+
+	void EventHandler::SetKeyboardConfiguration()
+	{
+		if(mudConfiguration)
+			KeyboardConfiguration::LoadConfiguration(KeyboardConfigurationType::ConfigurationType::Mud);
+		else
+			KeyboardConfiguration::LoadConfiguration(KeyboardConfigurationType::ConfigurationType::Default);
 	}
 
 	void EventHandler::TriggerEndPhase()
@@ -551,16 +560,25 @@ namespace ygo {
 				break;
 			}
 			case irr::KEY_KEY_J: {
-				if (event.KeyInput.Control && !event.KeyInput.PressedDown && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
-					StringBuilder::cleanBuiltMessage();
-					StringBuilder::AddLine(gDataManager->GetAccessibilityString(33).data());
-					ScreenReader::getReader()->readScreen(StringBuilder::getBuiltMessage(), false);
+				if (mudConfiguration) {
+					if (!event.KeyInput.PressedDown && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
+						cardType = AccessibilityFieldFocus::CardType::MONSTER;
+						UseCard(AccessibilityFieldFocus::UseType::CHANGE_MODE, event);
+					}
 				}
-				else if (!event.KeyInput.PressedDown && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
-					if (mainGame->btnEP->isVisible() && mainGame->btnEP->isEnabled() && !mainGame->dInfo.selfnames.empty())
-						ScreenReader::getReader()->readScreen(fmt::format(gDataManager->GetAccessibilityString(83).data(), mainGame->dInfo.selfnames.at(0)), false);
-					else if (!mainGame->dInfo.opponames.empty())
-						ScreenReader::getReader()->readScreen(fmt::format(gDataManager->GetAccessibilityString(84).data(), mainGame->dInfo.opponames.at(0)), false);
+				else
+				{
+					if (event.KeyInput.Control && !event.KeyInput.PressedDown && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
+						StringBuilder::cleanBuiltMessage();
+						StringBuilder::AddLine(gDataManager->GetAccessibilityString(33).data());
+						ScreenReader::getReader()->readScreen(StringBuilder::getBuiltMessage(), false);
+					}
+					else if (!event.KeyInput.PressedDown && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
+						if (mainGame->btnEP->isVisible() && mainGame->btnEP->isEnabled() && !mainGame->dInfo.selfnames.empty())
+							ScreenReader::getReader()->readScreen(fmt::format(gDataManager->GetAccessibilityString(83).data(), mainGame->dInfo.selfnames.at(0)), false);
+						else if (!mainGame->dInfo.opponames.empty())
+							ScreenReader::getReader()->readScreen(fmt::format(gDataManager->GetAccessibilityString(84).data(), mainGame->dInfo.opponames.at(0)), false);
+					}
 				}
 				break;
 			}
@@ -581,8 +599,9 @@ namespace ygo {
 			case irr::KEY_KEY_M: {
 				if (mudConfiguration) {
 					if (!event.KeyInput.PressedDown && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
-						ChangeFieldByCard();
-						UseCard(AccessibilityFieldFocus::UseType::SET_CARD, event);
+						if (mainGame->btnM2->isVisible() && mainGame->btnM2->isEnabled()) {
+							TriggerMainPhase2();
+						}
 					}
 				}
 				else {
@@ -792,16 +811,25 @@ namespace ygo {
 				break;
 			}
 			case irr::KEY_KEY_Z: {
-				if (event.KeyInput.Control && !event.KeyInput.PressedDown && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
-					StringBuilder::cleanBuiltMessage();
-					StringBuilder::AddLine(gDataManager->GetAccessibilityString(34).data());
-					ScreenReader::getReader()->readScreen(StringBuilder::getBuiltMessage(), false);
+				if (mudConfiguration) {
+					if (!event.KeyInput.PressedDown && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
+						ChangeFieldByCard();
+						UseCard(AccessibilityFieldFocus::UseType::SET_CARD, event);
+					}
 				}
-				else if (!event.KeyInput.PressedDown && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
-					if (mainGame->scrCardList->isTrulyVisible())
-						SetSelectableCards();
-					else
-						DisplaySelectableCards(event);
+				else
+				{
+					if (event.KeyInput.Control && !event.KeyInput.PressedDown && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
+						StringBuilder::cleanBuiltMessage();
+						StringBuilder::AddLine(gDataManager->GetAccessibilityString(34).data());
+						ScreenReader::getReader()->readScreen(StringBuilder::getBuiltMessage(), false);
+					}
+					else if (!event.KeyInput.PressedDown && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
+						if (mainGame->scrCardList->isTrulyVisible())
+							SetSelectableCards();
+						else
+							DisplaySelectableCards(event);
+					}
 				}
 				break;
 			}

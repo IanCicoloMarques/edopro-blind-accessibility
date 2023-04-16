@@ -55,6 +55,7 @@ namespace ygo {
 		void GuiEvent(const irr::SEvent& event) override;
 		int SearchFieldSlot(const int& displayedField, ClientCard* card = NULL, bool looped = false);
 		void ShowOptions();
+		static void SetKeyboardConfiguration();
 		static IEventHandler* eventHandler;
 		static unsigned int indexLookedUpCard;
 		static int battlePhase;

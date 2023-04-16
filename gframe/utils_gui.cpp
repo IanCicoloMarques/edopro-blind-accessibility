@@ -144,7 +144,7 @@ irr::IrrlichtDevice* GUIUtils::CreateDevice(GameConfig* configs) {
 #endif
 	driver->setTextureCreationFlag(irr::video::ETCF_CREATE_MIP_MAPS, false);
 	driver->setTextureCreationFlag(irr::video::ETCF_OPTIMIZED_FOR_QUALITY, true);
-	device->setWindowCaption(L"Project Ignis: EDOPro");
+	device->setWindowCaption(L"Yugioh Accessibility Project Client");
 #if !(IRRLICHT_VERSION_MAJOR==1 && IRRLICHT_VERSION_MINOR==9)
 	device->setResizable(true);
 #endif
@@ -345,7 +345,7 @@ void GUIUtils::ShowErrorWindow(epro::stringview context, epro::stringview messag
 		nullptr, //icon url, use default, you can change it depending message_type flags
 		nullptr, //not used
 		nullptr, //localization of strings
-		header_ref, //header text 
+		header_ref, //header text
 		message_ref, //message text
 		nullptr, //default "ok" text in button
 		nullptr, //alternate button title

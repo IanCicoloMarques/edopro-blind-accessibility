@@ -22,12 +22,12 @@ namespace ygo {
 
 		enum MainMenu {
 			MM_ONLINE_DUEL = 328,
-			MM_SP_DUEL,
-			MM_PUZZLES,
-			MM_REPLAY,
-			MM_DECK_EDITOR,
-			MM_GAME_OPTIONS,
-			MM_ACCESSILITY_KEYS
+			MM_SP_DUEL = 329,
+			MM_PUZZLES = 330,
+			MM_REPLAY = 331,
+			MM_DECK_EDITOR = 332,
+			MM_GAME_OPTIONS = 333,
+			MM_ACCESSIBILITY_KEYS
 		};
 
 		enum HostDuel {
@@ -75,6 +75,7 @@ namespace ygo {
 			HOST = 203,
 			REFRESH = 356,
 			ROOMS = 194,
+			ROOMS_LIST = 197,
 			JOIN_ONLINE_DUEL,
 			SERVER = 358,
 			PLAYER_NAME = 335,

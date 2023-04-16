@@ -12,7 +12,7 @@
 #else
 #include "IrrlichtCommonIncludes/CFileSystem.h"
 #endif
-#include <Control/EventHandler.h>
+#include "../accessibility/Control/EventHandler.h"
 
 #include "porting.h"
 #ifdef __ANDROID__

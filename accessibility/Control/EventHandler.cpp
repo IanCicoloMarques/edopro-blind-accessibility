@@ -4,12 +4,12 @@
 #include <fmt/format.h>
 #include <fmt/printf.h>
 
-#include "ScreenReader/ScreenReader.h"
-#include "ScreenReader/StringBuilder.h"
+#include "../accessibility/ScreenReader/ScreenReader.h"
+#include "../accessibility/ScreenReader/StringBuilder.h"
 
 #include "../gframe/data_manager.h"
-#include "Models/Card.h"
-#include "ScreenReader/Messages/AccessibilityStringDictionary.h"
+#include "../accessibility/Models/Card.h"
+#include "../accessibility/ScreenReader/Messages/AccessibilityStringDictionary.h"
 #include "../Configuration/Keyboard/KeyboardConfiguration.h"
 
 namespace ygo {

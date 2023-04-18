@@ -320,7 +320,7 @@ namespace ygo {
 			}
 			case irr::KEY_DOWN: {
 				if (!event.KeyInput.PressedDown && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
-					if (!event.KeyInput.PressedDown && mainGame->cbDeckSelect->isTrulyVisible() && menuSelectCounter == MenuType::PlayerDuel::PD_SELECT_DECK && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
+					if (!event.KeyInput.PressedDown && mainGame->cbDeckSelect->isTrulyVisible() && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
 						std::wstring nvdaString = fmt::format(gDataManager->GetAccessibilityString(192).data(), mainGame->cbDeckSelect->getItem(mainGame->cbDeckSelect->getSelected()));
 						ScreenReader::getReader()->readScreen(nvdaString.c_str());
 					}
@@ -335,7 +335,7 @@ namespace ygo {
 			}
 			case irr::KEY_UP: {
 				if (!event.KeyInput.PressedDown && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
-					if (!event.KeyInput.PressedDown && mainGame->cbDeckSelect->isTrulyVisible() && menuSelectCounter == MenuType::PlayerDuel::PD_SELECT_DECK  && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
+					if (!event.KeyInput.PressedDown && mainGame->cbDeckSelect->isTrulyVisible() && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
 						std::wstring nvdaString = fmt::format(gDataManager->GetAccessibilityString(192).data(), mainGame->cbDeckSelect->getItem(mainGame->cbDeckSelect->getSelected()));
 						ScreenReader::getReader()->readScreen(nvdaString.c_str());
 					}

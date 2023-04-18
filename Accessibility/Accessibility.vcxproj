@@ -173,7 +173,7 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <OutDir>..\bin\debug\</OutDir>
-    <IntDir>..\obj\Debug\accessibility\</IntDir>
+    <IntDir>..\obj\Win32\Debug\accessibility\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>..\bin\release\</OutDir>

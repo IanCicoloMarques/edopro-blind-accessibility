@@ -614,6 +614,7 @@ void DuelClient::HandleSTOCPacketLanAsync(const std::vector<uint8_t>& data) {
 	}
 	case STOC_SELECT_HAND: {
 		mainGame->wHand->setVisible(true);
+		EventHandler::rockPaperScissor = true;
 		break;
 	}
 	case STOC_SELECT_TP: {
@@ -2316,6 +2317,7 @@ int DuelClient::ClientAnalyze(const uint8_t* msg, uint32_t len) {
 		select_hint = 0;
 		mainGame->stHintMsg->setText(text.data());
 		mainGame->stHintMsg->setVisible(true);
+		EventHandler::selectZone = true;
 		ScreenReader::getReader()->readScreen(text.c_str());
 		ScreenReader::getReader()->cleanBuiltMessage();
 		ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());

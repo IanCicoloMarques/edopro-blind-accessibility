@@ -206,9 +206,26 @@ namespace ygo {
 				menuValue = fmt::format(L"{}: {}", gDataManager->GetAccessibilityString(MenuType::GameOptionsMenu::GAMEOP_MUSIC_VOLUME).data(), gGameConfig->musicVolume);
 			else if(currentMenu == MenuType::GameOptionsMenu::USE_MUD_KEYBOARD)
 				menuValue = fmt::format(L"{}: {}", gDataManager->GetAccessibilityString(MenuType::GameOptionsMenu::USE_MUD_KEYBOARD).data(), mainGame->gSettings.chkUseMudKeyboard->isChecked());
-
 		}
-		ScreenReader::getReader()->readScreen(menuValue);
+		else if(menu == menuRulesOkOnline)
+		{
+			if(currentMenu == MenuType::PlayerDuel::PD_START_DUEL)
+				menuValue = gDataManager->GetAccessibilityString(MenuType::PlayerDuel::PD_START_DUEL).data();
+			else if(currentMenu == MenuType::PlayerDuel::PD_SELECT_DECK)
+				menuValue = fmt::format(L"{}: {}", gDataManager->GetAccessibilityString(MenuType::PlayerDuel::PD_SELECT_DECK).data(), mainGame->cbDeckSelect->getItem(mainGame->cbDeckSelect->getSelected()));
+			else if(currentMenu == MenuType::PlayerDuel::PD_SELECT_DECK)
+				menuValue = gDataManager->GetAccessibilityString(MenuType::PlayerDuel::PD_SELECT_DECK).data();
+			else if(currentMenu == MenuType::PlayerDuel::PD_PLAYER_READY)
+				menuValue = gDataManager->GetAccessibilityString(MenuType::PlayerDuel::PD_PLAYER_READY).data();
+			else if(currentMenu == MenuType::SinglePlayerDuel::SP_AI_MENU)
+				menuValue = gDataManager->GetAccessibilityString(MenuType::SinglePlayerDuel::SP_AI_MENU).data();
+			else if(currentMenu == MenuType::OnlineDuel::OD_DUEL_MODE)
+				menuValue = gDataManager->GetAccessibilityString(MenuType::OnlineDuel::OD_DUEL_MODE).data();
+			else if(currentMenu == MenuType::OnlineDuel::OD_SPECTATE_MODE)
+				menuValue = gDataManager->GetAccessibilityString(MenuType::OnlineDuel::OD_SPECTATE_MODE).data();
+		}
+		if(!menuValue.empty())
+			ScreenReader::getReader()->readScreen(menuValue);
 	};
 
 	void MenuEventHandler::ReadMenu(irr::EKEY_CODE ekeyCode)
@@ -617,7 +634,6 @@ namespace ygo {
 	}
 
 	void MenuEventHandler::CheckMenu() {
-
 		if (mainGame->gSettings.window->isTrulyVisible())
 			menu = menuGameOptions;
 		else if ((mainGame->btnOnlineMode->isEnabled() && mainGame->btnOnlineMode->isTrulyVisible()) || (mainGame->btnReplayCancel->isEnabled() && mainGame->btnReplayCancel->isTrulyVisible()))
@@ -637,6 +653,8 @@ namespace ygo {
 		else if ((mainGame->btnHostPrepDuelist->isEnabled() && mainGame->btnHostPrepDuelist->isTrulyVisible()) ||
 			mainGame->btnHostPrepOB->isEnabled() && mainGame->btnHostPrepOB->isTrulyVisible())
 			menu = menuRulesOkOnline;
+		else if (mainGame->ebStartLP->isTrulyVisible())
+			menu = menuHostDuel;
 	}
 
 	void MenuEventHandler::MainMenu() {

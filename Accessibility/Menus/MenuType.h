@@ -1,9 +1,6 @@
 #ifndef MENU_TYPE_H
 #define MENU_TYPE_H
 
-#include <vector>
-#include <string>
-
 namespace ygo {
 	class MenuType {
 	public:

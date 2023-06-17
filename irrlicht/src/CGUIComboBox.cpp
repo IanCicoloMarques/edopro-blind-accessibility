@@ -202,18 +202,18 @@ bool CGUIComboBox::OnEvent(const SEvent& event)
 				return true;
 			}
 			else
-			if (event.KeyInput.Key == KEY_RETURN || event.KeyInput.Key == KEY_SPACE)
-			{
-				if (!event.KeyInput.PressedDown)
-				{
-					openCloseMenu();
-				}
-
-				ListButton->setPressed(ListBox == 0);
-
-				return true;
-			}
-			else
+			// if (event.KeyInput.Key == KEY_RETURN || event.KeyInput.Key == KEY_SPACE)
+			// {
+			// 	if (!event.KeyInput.PressedDown)
+			// 	{
+			// 		openCloseMenu();
+			// 	}
+			//
+			// 	ListButton->setPressed(ListBox == 0);
+			//
+			// 	return true;
+			// }
+			// else
 			if (event.KeyInput.PressedDown)
 			{
 				s32 oldSelected = Selected;

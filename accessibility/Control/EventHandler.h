@@ -33,7 +33,7 @@ namespace ygo {
 		void DisplaySpellField(const irr::SEvent& event, AccessibilityFieldFocus::DisplayedField displayed_field);
 		void ActivateCard(const irr::SEvent& event);
 		void DisplayGraveyard(const irr::SEvent& event, AccessibilityFieldFocus::DisplayedField displayed_field);
-		void DisplayHand(const irr::SEvent& event);
+		void DisplayHand(const irr::SEvent& event, AccessibilityFieldFocus::DisplayedField displayed_field);
 		void StartChat();
 		void DisplayChain(const irr::SEvent& event);
 		void DisplayMonsterField(const irr::SEvent& event, AccessibilityFieldFocus::DisplayedField displayed_field);
@@ -61,10 +61,11 @@ namespace ygo {
 		static int battlePhase;
 		static bool effectResolver;
 		static bool mudConfiguration;
+		static bool selectZone;
+		static bool rockPaperScissor;
 	private:
 		const int selectAttributeMax = 7;
 		const int selectTypeMax = 25;
-		bool selectZone = false;
 		int cardSelectPosition = 0;
 		int selectAttribute = 0;
 		int selectType = 0;
@@ -93,7 +94,7 @@ namespace ygo {
 		float GetXPositionEnemy(int slot);
 		float GetXPositionLink(int slot);
 		AccessibilityFieldFocus::DisplayedCards GetCardField();
-		void SelectFieldSlot(int slot, const AccessibilityFieldFocus::DisplayedField& player = AccessibilityFieldFocus::DisplayedField::PLAYER, const AccessibilityFieldFocus::CardType& cardType = AccessibilityFieldFocus::CardType::NO_CARD_TYPE);
+		void SelectFieldSlot(int slot, const AccessibilityFieldFocus::DisplayedField& player = AccessibilityFieldFocus::DisplayedField::PLAYER);
 		void ChangeFieldByCard();
 		void ChangeField(const AccessibilityFieldFocus::CardType& cardField);
 		int GetFieldSlot(const int& slot, const AccessibilityFieldFocus::DisplayedField& player = AccessibilityFieldFocus::DisplayedField::PLAYER, const AccessibilityFieldFocus::CardType& cardType = AccessibilityFieldFocus::CardType::NO_CARD_TYPE);
@@ -114,6 +115,25 @@ namespace ygo {
 		void RaceSelector(bool up);
 		void SpecialSummon(const irr::SEvent& event);
 		void CheckFreeSlots(const AccessibilityFieldFocus::DisplayedField& player = AccessibilityFieldFocus::DisplayedField::PLAYER, const int& cardType = AccessibilityFieldFocus::CardType::NO_CARD_TYPE, bool link = false);
+		void ReplayCommands(const irr::SEvent& event);
+		void ReadCardInfo();
+		void RotateField();
+		void SetCard(const irr::SEvent& event);
+		void PlayerInformation();
+		void ConfirmCard(const irr::SEvent& event);
+		void ConfirmOnFieldCard(const irr::SEvent& event);
+		void SeeTurn();
+		void SelectableCards(const irr::SEvent& event);
+		void ChangeBattlePosition(const irr::SEvent& event);
+		void DisplayTable(const irr::SEvent& event, AccessibilityFieldFocus::FieldLookerLocId fieldLooker,
+		                  AccessibilityFieldFocus::DisplayedField displayedField);
+		void ChangeBattlePhase(AccessibilityFieldFocus::BattleStep bp);
+		void SelectOption(int i);
+		void NumberKeyEvents(const irr::SEvent& event);
+		void DuelCommands(const irr::SEvent& event);
+		void MenuCommands(const irr::SEvent& event);
+		void FocusOnMenus();
+		void MovementCommands(const irr::SEvent& event);
 		/*
 		void SimulateButton(irr::gui::IGUIElement* caller = nullptr);
 		void SetMouseOnCard();

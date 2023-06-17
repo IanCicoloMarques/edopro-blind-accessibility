@@ -638,7 +638,7 @@ namespace ygo {
 			ChangeBattlePosition(event);
 		else if(event.KeyInput.Key == KeyboardConfiguration::Deck)
 			DisplayTable(event, AccessibilityFieldFocus::FieldLookerLocId::PLAYER_DECK, displayedField);
-		else if (std::find(std::begin(numberKeys), std::end(numberKeys), 1) != std::end(numberKeys))
+		else if (std::find(std::begin(numberKeys), std::end(numberKeys), event.KeyInput.Key) != std::end(numberKeys))
 			NumberKeyEvents(event);
 	};
 

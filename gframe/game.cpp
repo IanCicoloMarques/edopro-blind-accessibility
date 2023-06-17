@@ -2963,6 +2963,7 @@ void Game::AddChatMsg(epro::wstringview name, epro::wstringview msg, int type) {
 		chatMsg[0] = epro::format(L"System: {}", msg);
 	lstChat->addItem(chatMsg[0].data());
 	gSoundManager->PlaySoundEffect(SoundManager::SFX::CHAT);
+	ScreenReader::getReader()->readScreen(fmt::format(L"Chat: {}", chatMsg[0].data()), false);
 }
 void Game::AddLog(epro::wstringview msg, int param) {
 	logParam.push_back(param);

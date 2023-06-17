@@ -2291,6 +2291,8 @@ int DuelClient::ClientAnalyze(const uint8_t* msg, uint32_t len) {
 				mainGame->PopupElement(mainGame->wQuery);
 			}
 		}
+
+		gSoundManager->PlaySoundEffect(SoundManager::SFX::CHAIN);
 		return false;
 	}
 	case MSG_SELECT_PLACE:
@@ -4369,6 +4371,8 @@ int DuelClient::ClientAnalyze(const uint8_t* msg, uint32_t len) {
 				delete pcard;
 			}
 		}
+
+		gSoundManager->PlaySoundEffect(SoundManager::SFX::BANISHED);
 		return true;
 	}
 	case MSG_TAG_SWAP: {

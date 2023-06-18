@@ -31,6 +31,9 @@
 #include "porting.h"
 #include "../accessibility/ScreenReader/ScreenReader.h"
 #include "../accessibility/Control/EventHandler.h"
+#include "Helper/ButtonHelper.h"
+#include "Menus/MenuType.h"
+#include "ScreenReader/Messages/AccessibilityStringDictionary.h"
 
 #define DEFAULT_DUEL_RULE 5
 namespace ygo {
@@ -2269,26 +2272,21 @@ int DuelClient::ClientAnalyze(const uint8_t* msg, uint32_t len) {
 				else if (select_trigger) {
 					mainGame->stQMessage->setText(fmt::format(L"{}\n{}\n{}", event_string, gDataManager->GetSysString(222), gDataManager->GetSysString(223)).data());
 					ScreenReader::getReader()->readScreen(fmt::format(L"{}", gDataManager->GetSysString(222)).data());
-					ScreenReader::getReader()->cleanBuiltMessage();
-					ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
-					ScreenReader::getReader()->buildMessage(gDataManager->GetAccessibilityString(265).data());
-					ScreenReader::getReader()->buildMessage(gDataManager->GetAccessibilityString(266).data());
 				}
 				else {
 					mainGame->stQMessage->setText(fmt::format(L"{}\n{}", event_string, gDataManager->GetSysString(203)).data());
 					ScreenReader::getReader()->readScreen(fmt::format(L"{}", gDataManager->GetSysString(203)).data());
-					ScreenReader::getReader()->cleanBuiltMessage();
-					ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
-					ScreenReader::getReader()->buildMessage(gDataManager->GetAccessibilityString(265).data());
-					ScreenReader::getReader()->buildMessage(gDataManager->GetAccessibilityString(266).data());
 				}
+				ScreenReader::getReader()->readScreen(fmt::format(L"{}", gDataManager->GetAccessibilityString(Accessibility::Dict::Chain::CHAIN_SELECT_CARD).data()));
+				ScreenReader::getReader()->readScreen(fmt::format(L"{}", gDataManager->GetAccessibilityString(Accessibility::Dict::Chain::CHAIN_CANCEL).data()));
 				if(count == 0)
 					mainGame->stQMessage->setText(epro::format(L"{}\n{}", gDataManager->GetSysString(201), gDataManager->GetSysString(202)).data());
 				else if(select_trigger)
 					mainGame->stQMessage->setText(epro::format(L"{}\n{}\n{}", event_string, gDataManager->GetSysString(222), gDataManager->GetSysString(223)).data());
 				else
 					mainGame->stQMessage->setText(epro::format(L"{}\n{}", event_string, gDataManager->GetSysString(203)).data());
-				mainGame->PopupElement(mainGame->wQuery);
+				ButtonHelper::ClickButton(mainGame->btnYes);
+
 			}
 		}
 

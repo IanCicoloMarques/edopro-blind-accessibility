@@ -1,5 +1,4 @@
 ﻿#include "KeyboardConfiguration.h"
-#include "../../../irrlicht/include/Keycodes.h"
 namespace ygo
 {
 	int KeyboardConfiguration::NormalSummon = irr::KEY_KEY_A;
@@ -116,6 +115,7 @@ namespace ygo
 		SelectableCards = irr::KEY_UNKNOWN;
 		SpecialSummonableCards = irr::KEY_UNKNOWN;
 		Deck = irr::KEY_UNKNOWN;
-
 	}
+
+	
 }

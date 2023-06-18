@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include "KeyboardConfigurationType.h"
+#include "../../../irrlicht/include/Keycodes.h"
 
 namespace ygo
 {

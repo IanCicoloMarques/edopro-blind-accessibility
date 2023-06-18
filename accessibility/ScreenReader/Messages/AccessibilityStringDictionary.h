@@ -32,5 +32,10 @@ namespace Accessibility {
 			ATTACK = 374,
 			CHANGE_MODE = 375,
 		};
+
+		enum Chain {
+			CHAIN_CANCEL = 266,
+			CHAIN_SELECT_CARD = 36
+		};
 	};
 }

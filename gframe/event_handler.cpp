@@ -42,6 +42,7 @@
 #include "../accessibility/Control/EventHandler.h"
 #include "../accessibility/ScreenReader/ScreenReader.h"
 #include "../accessibility/Configuration/AccessibilityConfiguration.h"
+#include "Helper/ButtonHelper.h"
 
 namespace {
 

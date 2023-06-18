@@ -1746,17 +1746,17 @@ namespace ygo {
 	{
 		std::wstring options = std::wstring();
 		if(mainGame->btnSummon->isTrulyVisible())
-			options += fmt::format(L"{},",gDataManager->GetAccessibilityString(Accessibility::Dict::CardUses::SUMMON).data());
+			options += fmt::format(L"{}, {}, ",gDataManager->GetAccessibilityString(Accessibility::Dict::CardUses::SUMMON).data(),AccessibilityConfiguration::GetKeyString(KeyboardConfiguration::NormalSummon));
 		if(mainGame->btnMSet->isTrulyVisible() || mainGame->btnSSet->isTrulyVisible())
-			options += fmt::format(L"{},",gDataManager->GetAccessibilityString(Accessibility::Dict::CardUses::SET).data());
+			options += fmt::format(L"{}, {}, ",gDataManager->GetAccessibilityString(Accessibility::Dict::CardUses::SET).data(),AccessibilityConfiguration::GetKeyString(KeyboardConfiguration::SetSummon));
 		if(mainGame->btnSPSummon->isTrulyVisible())
-			options += fmt::format(L"{},",gDataManager->GetAccessibilityString(Accessibility::Dict::CardUses::SPECIAL_SUMMON).data());
+			options += fmt::format(L"{}, {}, ",gDataManager->GetAccessibilityString(Accessibility::Dict::CardUses::SPECIAL_SUMMON).data(),AccessibilityConfiguration::GetKeyString(KeyboardConfiguration::SpecialSummon));
 		if(mainGame->btnActivate->isTrulyVisible() || mainGame->btnOperation->isTrulyVisible())
-			options += fmt::format(L"{},",gDataManager->GetAccessibilityString(Accessibility::Dict::CardUses::ACTIVATE).data());
+			options += fmt::format(L"{}, {}, ",gDataManager->GetAccessibilityString(Accessibility::Dict::CardUses::ACTIVATE).data(),AccessibilityConfiguration::GetKeyString(KeyboardConfiguration::ActivateCard));
 		if(mainGame->btnAttack->isTrulyVisible())
-			options += fmt::format(L"{},",gDataManager->GetAccessibilityString(Accessibility::Dict::CardUses::ATTACK).data());
+			options += fmt::format(L"{}, {}, ",gDataManager->GetAccessibilityString(Accessibility::Dict::CardUses::ATTACK).data(),AccessibilityConfiguration::GetKeyString(KeyboardConfiguration::Attack));
 		if(mainGame->btnRepos->isTrulyVisible())
-			options += gDataManager->GetAccessibilityString(Accessibility::Dict::CardUses::CHANGE_MODE).data();
+			options += fmt::format(L"{}, {}",gDataManager->GetAccessibilityString(Accessibility::Dict::CardUses::CHANGE_MODE).data(),AccessibilityConfiguration::GetKeyString(KeyboardConfiguration::ChangeBattlePosition));
 		if(!options.empty())
 			ScreenReader::getReader()->readScreen(options, false);
 	}
@@ -1826,6 +1826,11 @@ namespace ygo {
 		};
 
 		CheckAndPost(JWrapper::Buttons::A, rightClick ? irr::EMIE_RMOUSE_PRESSED_DOWN : irr::EMIE_LMOUSE_PRESSED_DOWN);
+	}
+
+	void EventHandler::CancelOrFinish()
+	{
+		DuelClient::SetResponseI(0);
 	}
 
 	void EventHandler::GuiEvent(const irr::SEvent& event)

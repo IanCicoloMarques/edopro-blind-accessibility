@@ -83,6 +83,7 @@ namespace ygo {
 		void ShowSelectCard();
 		void ShowMenu(int flag, int x, int y);
 		void MouseClick(const irr::SEvent& event, bool rightClick = false);
+		void CancelOrFinish();
 		void ChangeFieldAndLook(bool click = false);
 		void SelectFieldSlotHandAllowed(int slot, const AccessibilityFieldFocus::DisplayedField& player = AccessibilityFieldFocus::DisplayedField::PLAYER);
 		float GetYPosition(const AccessibilityFieldFocus::DisplayedField& player = AccessibilityFieldFocus::DisplayedField::PLAYER);

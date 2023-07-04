@@ -2,6 +2,8 @@
 
 #include <Control/EventHandler.h>
 
+#include "MainMenu.h"
+
 namespace ygo {
 	IEventHandler* MenuEventHandler::menuHandler = nullptr;
 	static inline void TriggerEvent(irr::gui::IGUIElement* target, irr::gui::EGUI_EVENT_TYPE type) {
@@ -230,31 +232,16 @@ namespace ygo {
 
 	void MenuEventHandler::ReadMenu(irr::EKEY_CODE ekeyCode)
 	{
-		if (!scrollSelected) {
-			CheckMenu();
-			typing = false;
-			mainGame->env->removeFocus(mainGame->env->getFocus());
-			if (menu.empty())
-				menu = menuMain;
-			if(ekeyCode == irr::KEY_RIGHT)
-			{
-				menuSelectCounter++;
-				if (menuSelectCounter >= menu.size())
-					menuSelectCounter = 0;
-			}
-			else if(ekeyCode == irr::KEY_LEFT)
-			{
-				menuSelectCounter--;
-				if (menuSelectCounter < 0)
-					menuSelectCounter = menu.size() - 1;
-			}
-			currentMenu = menu.at(menuSelectCounter);
-			ReadMenuAndValue();
+		if (!scrollSelected && activeMenu != nullptr) {
+			activeMenu->ReadMenu(ekeyCode);
 		}
 	};
 
 	void MenuEventHandler::KeyInputEvent(const irr::SEvent& event)
 	{
+		CheckMenu();
+		if(activeMenu != nullptr)
+			activeMenu->KeyInputEvent(event);
 		switch (event.KeyInput.Key) {
 			case irr::KEY_KEY_D: {
 				if (!event.KeyInput.PressedDown && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
@@ -383,7 +370,6 @@ namespace ygo {
 					if (menu.empty())
 						menu = menuMain;
 					if (menu.at(0) == MenuType::MainMenu::MM_ONLINE_DUEL) {
-						MainMenu();
 					}
 					else if (menu.at(0) == MenuType::SinglePlayerMenu::SP_HOST) {
 						SPDuel();
@@ -577,10 +563,17 @@ namespace ygo {
 						ScreenReader::getReader()->readScreen(gDataManager->GetAccessibilityString(218).data());
 						break;
 					}
+					default:{
+						CheckMenu();
+						if(activeMenu != nullptr)
+							activeMenu->KeyInputEvent(event);
+						break;
+					}
 				}
 			}
 			case irr::gui::EGET_CHECKBOX_CHANGED: {
 				switch (id) {
+
 					case CHECK_SHOW_LOCKED_ROOMS: {
 						std::wstring screenReaderString;
 						if (mainGame->chkShowPassword->isChecked())
@@ -597,6 +590,12 @@ namespace ygo {
 						else
 							screenReaderString = gDataManager->GetAccessibilityString(222).data();
 						ScreenReader::getReader()->readScreen(screenReaderString);
+						break;
+					}
+					default:{
+						CheckMenu();
+						if(activeMenu != nullptr)
+							activeMenu->KeyInputEvent(event);
 						break;
 					}
 				}
@@ -628,6 +627,12 @@ namespace ygo {
 						ScreenReader::getReader()->readScreen(nvdaString.c_str());
 						break;
 					}
+					default:{
+						CheckMenu();
+						if(activeMenu != nullptr)
+							activeMenu->KeyInputEvent(event);
+						break;
+					}
 				}
 			}
 		}
@@ -636,8 +641,13 @@ namespace ygo {
 	void MenuEventHandler::CheckMenu() {
 		if (mainGame->gSettings.window->isTrulyVisible())
 			menu = menuGameOptions;
-		else if ((mainGame->btnOnlineMode->isEnabled() && mainGame->btnOnlineMode->isTrulyVisible()) || (mainGame->btnReplayCancel->isEnabled() && mainGame->btnReplayCancel->isTrulyVisible()))
+		else if (
+			(mainGame->btnOnlineMode->isEnabled() && mainGame->btnOnlineMode->isTrulyVisible()) ||
+			(mainGame->btnReplayCancel->isEnabled() && mainGame->btnReplayCancel->isTrulyVisible()))
+		{
 			menu = menuMain;
+			activeMenu = MainMenuHandler::GetMenu();
+		}
 		else if (mainGame->ebRPName->isEnabled() && mainGame->ebRPName->isTrulyVisible())
 			menu = menuPassword;
 		else if (mainGame->btnCreateHost->isEnabled() && mainGame->btnCreateHost->isTrulyVisible())
@@ -657,30 +667,6 @@ namespace ygo {
 			menu = menuHostDuel;
 	}
 
-	void MenuEventHandler::MainMenu() {
-		if (currentMenu == MenuType::MainMenu::MM_ONLINE_DUEL && mainGame->btnOnlineMode->isEnabled()) {
-			ClickButton(mainGame->btnOnlineMode);
-		}
-		else if (currentMenu == MenuType::MainMenu::MM_SP_DUEL && mainGame->btnLanMode->isEnabled()) {
-			ClickButton(mainGame->btnLanMode);
-		}
-		else if (currentMenu == MenuType::MainMenu::MM_PUZZLES && mainGame->btnSingleMode->isEnabled()) {
-			ClickButton(mainGame->btnSingleMode);
-		}
-		else if (currentMenu == MenuType::MainMenu::MM_REPLAY && mainGame->btnReplayMode->isEnabled()) {
-			ClickButton(mainGame->btnReplayMode);
-		}
-		else if (currentMenu == MenuType::MainMenu::MM_DECK_EDITOR && mainGame->btnDeckEdit->isEnabled()) {
-			ClickButton(mainGame->btnDeckEdit);
-		}
-		else if (currentMenu == MenuType::MainMenu::MM_GAME_OPTIONS && mainGame->wBtnSettings->isEnabled()) {
-			ClickButton(mainGame->btnSettings);
-			menu = menuGameOptions;
-		}
-		else if (currentMenu == MenuType::MainMenu::MM_ACCESSIBILITY_KEYS) {
-			ScreenReader::getReader()->readScreen(StringBuilder::getBuiltMessage());
-		}
-	}
 
 	void MenuEventHandler::PasswordMenu() {
 		if (currentMenu == MenuType::PasswordMenu::PASS_SET_PASSWORD && mainGame->ebRPName->isTrulyVisible()) {

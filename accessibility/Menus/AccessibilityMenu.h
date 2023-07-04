@@ -24,6 +24,8 @@
 #include <IrrlichtDevice.h>
 #include <IGUITabControl.h>
 
+#include "BaseMenu.h"
+
 namespace ygo {
 	class MenuEventHandler : public IEventHandler {
 	public:
@@ -32,6 +34,7 @@ namespace ygo {
 		void GuiEvent(const irr::SEvent& event) override;
 	private:
 		static IEventHandler* menuHandler;
+		BaseMenu* activeMenu;
 		int prev_operation;
 		int prev_sel;
 		int menuSelectCounter = 0;
@@ -57,7 +60,6 @@ namespace ygo {
 		std::vector<int> menuGameOptions = { MenuType::GameOptionsMenu::GAMEOP_ENABLE_SOUND_EFFECTS, MenuType::GameOptionsMenu::GAMEOP_SOUND_EFFECTS_VOLUME, MenuType::GameOptionsMenu::GAMEOP_ENABLE_MUSIC, MenuType::GameOptionsMenu::GAMEOP_MUSIC_VOLUME, MenuType::GameOptionsMenu::USE_MUD_KEYBOARD };
 		std::vector<int> menuPuzzles = { 0 };
 		void CheckMenu();
-		void MainMenu();
 		void HostDuel();
 		void DuelMenu();
 		void SPDuel();

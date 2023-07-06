@@ -131,6 +131,7 @@
     <ClInclude Include="..\accessibility\Menus\LanModeMenu.h" />
     <ClInclude Include="..\accessibility\Menus\MainMenu.h" />
     <ClInclude Include="..\accessibility\Menus\BaseMenu.h" />
+    <ClInclude Include="..\accessibility\Menus\PreDuelMenu.h" />
     <ClInclude Include="..\gframe\Base64.h" />
     <ClInclude Include="..\gframe\CGUICustomCheckBox\CGUICustomCheckBox.h" />
     <ClInclude Include="..\gframe\CGUICustomComboBox\CGUICustomComboBox.h" />
@@ -235,6 +236,7 @@
     <ClCompile Include="..\accessibility\Menus\DuelRulesMenu.cpp" />
     <ClCompile Include="..\accessibility\Menus\LanModeMenu.cpp" />
     <ClCompile Include="..\accessibility\Menus\MainMenu.cpp" />
+    <ClCompile Include="..\accessibility\Menus\PreDuelMenu.cpp" />
     <ClCompile Include="..\gframe\CGUICustomCheckBox\CGUICustomCheckBox.cpp" />
     <ClCompile Include="..\gframe\CGUICustomComboBox\CGUICustomComboBox.cpp" />
     <ClCompile Include="..\gframe\CGUICustomContextMenu\CGUICustomContextMenu.cpp" />

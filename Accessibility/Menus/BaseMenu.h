@@ -16,11 +16,6 @@ namespace ygo {
 		{
 		}
 
-		static BaseMenu* GetMenu()
-		{
-			return nullptr;
-		}
-
 		/**
 		 * \brief Simulates an event
 		 * \param target graphical element to simulate the event on
@@ -85,6 +80,11 @@ namespace ygo {
 		 * \brief Code of the current menu option selected
 		 */
 		int _currentMenu = 0;
+
+		/**
+		 * \brief The code of the previous selected menu
+		 */
+		int _previousMenu;
 	};
 
 	inline void BaseMenu::TriggerEvent(irr::gui::IGUIElement* target, irr::gui::EGUI_EVENT_TYPE type)

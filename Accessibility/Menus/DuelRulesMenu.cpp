@@ -20,12 +20,32 @@ namespace ygo {
 	void DuelRulesMenuHandler::ReadMenuAndValue()
 	{
 		std::wstring menuValue = std::wstring();
-		if(_activeMenu == _activeMenu)
+		if(_selectedMenu == _activeMenu)
 		{
-			if(_currentMenu == MenuType::SinglePlayerMenu::SP_HOST)
-				menuValue = gDataManager->GetAccessibilityString(MenuType::SinglePlayerMenu::SP_HOST).data();
-			else if(_currentMenu == MenuType::SinglePlayerMenu::SP_PLAYER_NAME)
-				menuValue = fmt::format(L"{}: {}", gDataManager->GetAccessibilityString(MenuType::SinglePlayerMenu::SP_PLAYER_NAME).data(), mainGame->ebNickName->getText());
+			if(_currentMenu == MenuType::HostDuel::RULES_OK)
+				menuValue = gDataManager->GetAccessibilityString(MenuType::HostDuel::RULES_OK).data();
+			else if(_currentMenu == MenuType::HostDuel::NUM_PLAYERS_T1)
+				menuValue = fmt::format(L"{}: {}", gDataManager->GetAccessibilityString(MenuType::HostDuel::NUM_PLAYERS_T1).data(), mainGame->ebTeam1->getText());
+			else if(_currentMenu == MenuType::HostDuel::NUM_PLAYERS_T2)
+				menuValue = fmt::format(L"{}: {}", gDataManager->GetAccessibilityString(MenuType::HostDuel::NUM_PLAYERS_T2).data(), mainGame->ebTeam2->getText());
+			else if(_currentMenu == MenuType::HostDuel::BEST_OF)
+				menuValue = fmt::format(L"{}: {}", gDataManager->GetAccessibilityString(MenuType::HostDuel::BEST_OF).data(), mainGame->ebBestOf->getText());
+			else if(_currentMenu == MenuType::HostDuel::TIME_LIMIT)
+				menuValue = fmt::format(L"{}: {}", gDataManager->GetAccessibilityString(MenuType::HostDuel::TIME_LIMIT).data(), mainGame->ebTimeLimit->getText());
+			else if(_currentMenu == MenuType::HostDuel::STARTING_LP)
+				menuValue = fmt::format(L"{}: {}", gDataManager->GetAccessibilityString(MenuType::HostDuel::STARTING_LP).data(), mainGame->ebStartLP->getText());
+			else if(_currentMenu == MenuType::HostDuel::STARTING_HAND)
+				menuValue = fmt::format(L"{}: {}", gDataManager->GetAccessibilityString(MenuType::HostDuel::STARTING_HAND).data(), mainGame->ebStartHand->getText());
+			else if(_currentMenu == MenuType::HostDuel::CARDS_DRAW)
+				menuValue = fmt::format(L"{}: {}", gDataManager->GetAccessibilityString(MenuType::HostDuel::CARDS_DRAW).data(), mainGame->ebDrawCount->getText());
+			else if(_currentMenu == MenuType::HostDuel::CHECK_DECK)
+				menuValue = fmt::format(L"{}: {}", gDataManager->GetAccessibilityString(MenuType::HostDuel::CHECK_DECK).data(), mainGame->chkNoCheckDeckContent->isChecked());
+			else if(_currentMenu == MenuType::HostDuel::SHUFFLE_DECK)
+				menuValue = fmt::format(L"{}: {}", gDataManager->GetAccessibilityString(MenuType::HostDuel::SHUFFLE_DECK).data(), mainGame->chkNoShuffleDeck->isChecked());
+			else if(_currentMenu == MenuType::HostDuel::ROOM_NAME)
+				menuValue = fmt::format(L"{}: {}", gDataManager->GetAccessibilityString(MenuType::HostDuel::ROOM_NAME).data(), mainGame->ebHostNotes->getText());
+			else if(_currentMenu == MenuType::HostDuel::ROOM_PASSWORD)
+				menuValue = fmt::format(L"{}: {}", gDataManager->GetAccessibilityString(MenuType::HostDuel::ROOM_PASSWORD).data(), mainGame->ebServerPass->getText());
 		}
 		if(!menuValue.empty())
 			ScreenReader::getReader()->readScreen(menuValue);
@@ -50,7 +70,7 @@ namespace ygo {
 				if (!event.KeyInput.PressedDown && mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX))
 					mainGame->env->removeFocus(mainGame->env->getFocus());
 				if (!event.KeyInput.PressedDown) {
-					if (_activeMenu != _activeMenu)
+					if (_selectedMenu != _activeMenu)
 						SetMenu();
 					if (_currentMenu == MenuType::SinglePlayerMenu::SP_HOST && mainGame->btnCreateHost->isEnabled()) {
 						ClickButton(mainGame->btnCreateHost);
@@ -77,7 +97,7 @@ namespace ygo {
 					else if (mainGame->btnModeExit->isTrulyVisible())
 						ClickButton(mainGame->btnModeExit);
 					if (_activeMenu.empty())
-						_activeMenu = _activeMenu;
+						_selectedMenu = _activeMenu;
 					else
 						_currentMenu = _activeMenu.at(_currentMenuIndex);
 				}

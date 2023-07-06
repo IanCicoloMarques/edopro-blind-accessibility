@@ -2,6 +2,7 @@
 
 #include <Control/EventHandler.h>
 
+#include "LanModeMenu.h"
 #include "MainMenu.h"
 
 namespace ygo {
@@ -233,7 +234,7 @@ namespace ygo {
 	void MenuEventHandler::ReadMenu(irr::EKEY_CODE ekeyCode)
 	{
 		if (!scrollSelected && activeMenu != nullptr) {
-			activeMenu->ReadMenu(ekeyCode);
+			activeMenu->SetMenu(ekeyCode);
 		}
 	};
 
@@ -368,7 +369,10 @@ namespace ygo {
 					mainGame->env->removeFocus(mainGame->env->getFocus());
 				if (!event.KeyInput.PressedDown) {
 					if (menu.empty())
+					{
 						menu = menuMain;
+						activeMenu = MainMenuHandler::GetMenu();
+					}
 					if (menu.at(0) == MenuType::MainMenu::MM_ONLINE_DUEL) {
 					}
 					else if (menu.at(0) == MenuType::SinglePlayerMenu::SP_HOST) {
@@ -418,7 +422,10 @@ namespace ygo {
 					else if (mainGame->btnModeExit->isTrulyVisible())
 						ClickButton(mainGame->btnModeExit);
 					if (menu.empty())
+					{
 						menu = menuMain;
+						activeMenu = MainMenuHandler::GetMenu();
+					}
 					else
 						currentMenu = menu.at(menuSelectCounter);
 				}
@@ -465,14 +472,16 @@ namespace ygo {
 						break;
 					}
 					case BUTTON_LAN_MODE: {
-						ScreenReader::getReader()->readScreen(gDataManager->GetAccessibilityString(206).data());
+						ScreenReader::getReader()->readScreen(gDataManager->GetAccessibilityString(MenuType::MainMenu::MM_SP_DUEL).data());
 						menu = menuSinglePlayer;
 						menuSelectCounter = 0;
 						currentMenu = menu.at(menuSelectCounter);
+						activeMenu = LanModeMenuHandler::GetMenu();
 						break;
 					}
 					case BUTTON_JOIN_CANCEL: {
 						menu = menuMain;
+						activeMenu = MainMenuHandler::GetMenu();
 						break;
 					}
 					case BUTTON_CREATE_HOST: {
@@ -513,6 +522,7 @@ namespace ygo {
 						}
 						else {
 							menu = menuSinglePlayer;
+							activeMenu = LanModeMenuHandler::GetMenu();
 						}
 						break;
 					}
@@ -651,7 +661,7 @@ namespace ygo {
 		else if (mainGame->ebRPName->isEnabled() && mainGame->ebRPName->isTrulyVisible())
 			menu = menuPassword;
 		else if (mainGame->btnCreateHost->isEnabled() && mainGame->btnCreateHost->isTrulyVisible())
-			menu = menuSinglePlayer;
+			activeMenu = LanModeMenuHandler::GetMenu();
 		else if (mainGame->gBot.btnAdd->isEnabled() && mainGame->gBot.btnAdd->isTrulyVisible())
 			menu = menuSelectAI;
 		else if (mainGame->btnHostPrepWindBot->isEnabled() && mainGame->btnHostPrepWindBot->isTrulyVisible())

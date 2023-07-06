@@ -7,8 +7,8 @@ namespace ygo {
 
 		enum MenuList {
 			MAIN_MENU,
-			SINGLE_PLAYER_MENU,
-			HOST_DUEL_MENU,
+			LAN_MODE_MENU,
+			DUEL_RULES_MENU,
 			DUEL_MENU,
 			SELECT_AI_MENU,
 			ONLINE_MENU,

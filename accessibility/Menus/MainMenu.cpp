@@ -18,6 +18,9 @@ namespace ygo {
 		TriggerEvent(btn, irr::gui::EGET_BUTTON_CLICKED);
 	}
 
+	MainMenuHandler::MainMenuHandler(const int activeMenu, const std::vector<int>& selectedMenu): BaseMenu{ activeMenu, selectedMenu }
+	{}
+
 	BaseMenu* MainMenuHandler::GetMenu()
 	{
 		if (menuHandler == nullptr)
@@ -25,48 +28,22 @@ namespace ygo {
 		return menuHandler;
 	}
 
-	void MainMenuHandler::ReadMenu(irr::EKEY_CODE key)
-	{
-		typing = false;
-		mainGame->env->removeFocus(mainGame->env->getFocus());
-		if (menu != menuMain)
-		{
-			menu = menuMain;
-			menuSelectCounter = 0;
-		}
-		if(key == irr::KEY_RIGHT)
-		{
-			menuSelectCounter++;
-			if (menuSelectCounter >= menu.size())
-				menuSelectCounter = 0;
-		}
-		else if(key == irr::KEY_LEFT)
-		{
-			menuSelectCounter--;
-			if (menuSelectCounter < 0)
-				menuSelectCounter = menu.size() - 1;
-		}
-		currentMenu = menu.at(menuSelectCounter);
-		ReadMenuAndValue();
-	};
-
-
 	void MainMenuHandler::ReadMenuAndValue()
 	{
 		std::wstring menuValue = std::wstring();
-		if(menu == menuMain)
+		if(_selectedMenu == _activeMenu)
 		{
-			if(currentMenu == MenuType::MainMenu::MM_ONLINE_DUEL)
+			if(_currentMenu == MenuType::MainMenu::MM_ONLINE_DUEL)
 				menuValue = gDataManager->GetAccessibilityString(MenuType::MainMenu::MM_ONLINE_DUEL).data();
-			else if(currentMenu == MenuType::MainMenu::MM_SP_DUEL)
+			else if(_currentMenu == MenuType::MainMenu::MM_SP_DUEL)
 				menuValue = gDataManager->GetAccessibilityString(MenuType::MainMenu::MM_SP_DUEL).data();
-			else if(currentMenu == MenuType::MainMenu::MM_PUZZLES)
+			else if(_currentMenu == MenuType::MainMenu::MM_PUZZLES)
 				menuValue = gDataManager->GetAccessibilityString(MenuType::MainMenu::MM_PUZZLES).data();
-			else if(currentMenu == MenuType::MainMenu::MM_REPLAY)
+			else if(_currentMenu == MenuType::MainMenu::MM_REPLAY)
 				menuValue = gDataManager->GetAccessibilityString(MenuType::MainMenu::MM_REPLAY).data();
-			else if(currentMenu == MenuType::MainMenu::MM_DECK_EDITOR)
+			else if(_currentMenu == MenuType::MainMenu::MM_DECK_EDITOR)
 				menuValue = gDataManager->GetAccessibilityString(MenuType::MainMenu::MM_DECK_EDITOR).data();
-			else if(currentMenu == MenuType::MainMenu::MM_GAME_OPTIONS)
+			else if(_currentMenu == MenuType::MainMenu::MM_GAME_OPTIONS)
 				menuValue = gDataManager->GetAccessibilityString(MenuType::MainMenu::MM_GAME_OPTIONS).data();
 		}
 		if(!menuValue.empty())
@@ -93,35 +70,35 @@ namespace ygo {
 			case irr::KEY_LEFT:
 			case irr::KEY_RIGHT: {
 				if (!event.KeyInput.PressedDown && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX))
-					ReadMenu(event.KeyInput.Key);
+					SetMenu(event.KeyInput.Key);
 				break;
 			}
 			case irr::KEY_RETURN: {
 				if (!event.KeyInput.PressedDown && mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX))
 					mainGame->env->removeFocus(mainGame->env->getFocus());
 				if (!event.KeyInput.PressedDown) {
-					if (menu != menuMain)
-						ReadMenu();
-					if (currentMenu == MenuType::MainMenu::MM_ONLINE_DUEL && mainGame->btnOnlineMode->isEnabled()) {
+					if (_selectedMenu != _activeMenu)
+						SetMenu();
+					if (_currentMenu == MenuType::MainMenu::MM_ONLINE_DUEL && mainGame->btnOnlineMode->isEnabled()) {
 						ClickButton(mainGame->btnOnlineMode);
 					}
-					else if (currentMenu == MenuType::MainMenu::MM_SP_DUEL && mainGame->btnLanMode->isEnabled()) {
+					else if (_currentMenu == MenuType::MainMenu::MM_SP_DUEL && mainGame->btnLanMode->isEnabled()) {
 						ClickButton(mainGame->btnLanMode);
 					}
-					else if (currentMenu == MenuType::MainMenu::MM_PUZZLES && mainGame->btnSingleMode->isEnabled()) {
+					else if (_currentMenu == MenuType::MainMenu::MM_PUZZLES && mainGame->btnSingleMode->isEnabled()) {
 						ClickButton(mainGame->btnSingleMode);
 					}
-					else if (currentMenu == MenuType::MainMenu::MM_REPLAY && mainGame->btnReplayMode->isEnabled()) {
+					else if (_currentMenu == MenuType::MainMenu::MM_REPLAY && mainGame->btnReplayMode->isEnabled()) {
 						ClickButton(mainGame->btnReplayMode);
 					}
-					else if (currentMenu == MenuType::MainMenu::MM_DECK_EDITOR && mainGame->btnDeckEdit->isEnabled()) {
+					else if (_currentMenu == MenuType::MainMenu::MM_DECK_EDITOR && mainGame->btnDeckEdit->isEnabled()) {
 						ClickButton(mainGame->btnDeckEdit);
 					}
-					else if (currentMenu == MenuType::MainMenu::MM_GAME_OPTIONS && mainGame->wBtnSettings->isEnabled()) {
+					else if (_currentMenu == MenuType::MainMenu::MM_GAME_OPTIONS && mainGame->wBtnSettings->isEnabled()) {
 						ClickButton(mainGame->btnSettings);
-						menu = menuGameOptions;
+						_selectedMenu = menuGameOptions;
 					}
-					else if (currentMenu == MenuType::MainMenu::MM_ACCESSIBILITY_KEYS) {
+					else if (_currentMenu == MenuType::MainMenu::MM_ACCESSIBILITY_KEYS) {
 						ScreenReader::getReader()->readScreen(StringBuilder::getBuiltMessage());
 					}
 				}
@@ -133,10 +110,10 @@ namespace ygo {
 						mainGame->HideElement(mainGame->gSettings.window);
 					else if (mainGame->btnModeExit->isTrulyVisible())
 						ClickButton(mainGame->btnModeExit);
-					if (menu.empty())
-						menu = menuMain;
+					if (_selectedMenu.empty())
+						_selectedMenu = _activeMenu;
 					else
-						currentMenu = menu.at(menuSelectCounter);
+						_currentMenu = _selectedMenu.at(_currentMenuIndex);
 				}
 
 				break;

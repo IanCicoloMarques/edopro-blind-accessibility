@@ -27,38 +27,20 @@ namespace ygo {
 		}
 	}
 
-	void OnlineModeMenuHandler::ReadMenuAndValue()
-	{
-		std::wstring menuValue = std::wstring();
-		if(_activeMenu == _selectedMenu)
-		{
-			if(_currentMenu == MenuType::PlayerDuel::PD_START_DUEL)
-				menuValue = gDataManager->GetAccessibilityString(MenuType::PlayerDuel::PD_START_DUEL).data();
-			else if(_currentMenu == MenuType::PlayerDuel::PD_SELECT_DECK)
-				menuValue = fmt::format(L"{}: {}", gDataManager->GetAccessibilityString(MenuType::PlayerDuel::PD_SELECT_DECK).data(), mainGame->cbDeckSelect->getItem(mainGame->cbDeckSelect->getSelected()));
-			else if(_currentMenu == MenuType::PlayerDuel::PD_SELECT_DECK)
-				menuValue = gDataManager->GetAccessibilityString(MenuType::PlayerDuel::PD_SELECT_DECK).data();
-			else if(_currentMenu == MenuType::PlayerDuel::PD_PLAYER_READY)
-				menuValue = gDataManager->GetAccessibilityString(MenuType::PlayerDuel::PD_PLAYER_READY).data();
-			else if(_currentMenu == MenuType::SinglePlayerDuel::SP_AI_MENU)
-				menuValue = gDataManager->GetAccessibilityString(MenuType::SinglePlayerDuel::SP_AI_MENU).data();
-			else if(_currentMenu == MenuType::OnlineDuel::OD_DUEL_MODE)
-				menuValue = gDataManager->GetAccessibilityString(MenuType::OnlineDuel::OD_DUEL_MODE).data();
-			else if(_currentMenu == MenuType::OnlineDuel::OD_SPECTATE_MODE)
-				menuValue = gDataManager->GetAccessibilityString(MenuType::OnlineDuel::OD_SPECTATE_MODE).data();
-		}
-		if(!menuValue.empty())
-			ScreenReader::getReader()->readScreen(menuValue);
-	};
-
 	void OnlineModeMenuHandler::KeyInputEvent(const irr::SEvent& event)
 	{
 		switch (event.KeyInput.Key) {
-			case irr::KEY_KEY_B: {
-				if (!event.KeyInput.PressedDown && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
-					ScreenReader::getReader()->readLastMessage();
-				}
-				break;
+			case irr::KEY_DOWN:
+			case irr::KEY_UP: {
+						if (!event.KeyInput.PressedDown && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
+							if (!event.KeyInput.PressedDown && mainGame->cbDeckSelect->isTrulyVisible() && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
+								const std::wstring nvdaString = fmt::format(gDataManager->GetAccessibilityString(192).data(), mainGame->cbDeckSelect->getItem(mainGame->cbDeckSelect->getSelected()));
+								ScreenReader::getReader()->readScreen(nvdaString);
+							}
+							else if (mainGame->roomListTable->isTrulyVisible() && _currentMenu == MenuType::OnlineMenu::ROOMS)
+								ReadOnlineRoomFromList(event.KeyInput.Key);
+						}
+						break;
 			}
 			case irr::KEY_LEFT:
 			case irr::KEY_RIGHT: {
@@ -67,15 +49,13 @@ namespace ygo {
 				break;
 			}
 			case irr::KEY_RETURN: {
-				if (!event.KeyInput.PressedDown && mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX))
-					mainGame->env->removeFocus(mainGame->env->getFocus());
 				if (!event.KeyInput.PressedDown) {
 					if (_activeMenu != _selectedMenu)
 						SetMenu();
 					if (_currentMenu == MenuType::OnlineMenu::HOST && mainGame->btnCreateHost2->isEnabled())
 						ClickButton(mainGame->btnCreateHost2);
 					else if (_currentMenu == MenuType::OnlineMenu::REFRESH && mainGame->btnLanRefresh2->isEnabled()) {
-						_onlineMatchCounter = 0;
+						_onlineMatchIndex = 0;
 						ServerLobby::RefreshRooms();
 					}
 					else if (_currentMenu == MenuType::OnlineMenu::JOIN_ONLINE_DUEL && mainGame->btnJoinHost2->isEnabled())
@@ -176,5 +156,50 @@ namespace ygo {
 				}
 			}
 		}
+	}
+
+	void OnlineModeMenuHandler::ReadMenuAndValue()
+	{
+		std::wstring menuValue = std::wstring();
+		if(_activeMenu == _selectedMenu)
+		{
+			if(_currentMenu == MenuType::PlayerDuel::PD_START_DUEL)
+				menuValue = gDataManager->GetAccessibilityString(MenuType::PlayerDuel::PD_START_DUEL).data();
+			else if(_currentMenu == MenuType::PlayerDuel::PD_SELECT_DECK)
+				menuValue = fmt::format(L"{}: {}", gDataManager->GetAccessibilityString(MenuType::PlayerDuel::PD_SELECT_DECK).data(), mainGame->cbDeckSelect->getItem(mainGame->cbDeckSelect->getSelected()));
+			else if(_currentMenu == MenuType::PlayerDuel::PD_SELECT_DECK)
+				menuValue = gDataManager->GetAccessibilityString(MenuType::PlayerDuel::PD_SELECT_DECK).data();
+			else if(_currentMenu == MenuType::PlayerDuel::PD_PLAYER_READY)
+				menuValue = gDataManager->GetAccessibilityString(MenuType::PlayerDuel::PD_PLAYER_READY).data();
+			else if(_currentMenu == MenuType::SinglePlayerDuel::SP_AI_MENU)
+				menuValue = gDataManager->GetAccessibilityString(MenuType::SinglePlayerDuel::SP_AI_MENU).data();
+			else if(_currentMenu == MenuType::OnlineDuel::OD_DUEL_MODE)
+				menuValue = gDataManager->GetAccessibilityString(MenuType::OnlineDuel::OD_DUEL_MODE).data();
+			else if(_currentMenu == MenuType::OnlineDuel::OD_SPECTATE_MODE)
+				menuValue = gDataManager->GetAccessibilityString(MenuType::OnlineDuel::OD_SPECTATE_MODE).data();
+		}
+		if(!menuValue.empty())
+			ScreenReader::getReader()->readScreen(menuValue);
+	};
+
+	void OnlineModeMenuHandler::ReadOnlineRoomFromList(irr::EKEY_CODE key)
+	{
+		if(key == irr::KEY_UP)
+		{
+			if (_onlineMatchIndex > 0)
+				_onlineMatchIndex--;
+		}
+		else if(key == irr::KEY_DOWN)
+		{
+			if (_onlineMatchIndex < mainGame->roomListTable->getRowCount() - 1)
+				_onlineMatchIndex++;
+		}
+		mainGame->roomListTable->setSelected(_onlineMatchIndex);
+		std::wstring numberPlayers = std::wstring(mainGame->roomListTable->getCellText(_onlineMatchIndex, 5));
+		int numPlayers = std::count(numberPlayers.begin(), numberPlayers.end(), ',') + 1;
+		if (numPlayers > 1)
+			ScreenReader::getReader()->textToSpeech(fmt::format(gDataManager->GetAccessibilityString(195).data(), numPlayers, mainGame->roomListTable->getCellText(_onlineMatchIndex, 5), mainGame->roomListTable->getCellText(_onlineMatchIndex, 6)));
+		else
+			ScreenReader::getReader()->textToSpeech(fmt::format(gDataManager->GetAccessibilityString(196).data(), numPlayers, mainGame->roomListTable->getCellText(_onlineMatchIndex, 5), mainGame->roomListTable->getCellText(_onlineMatchIndex, 6)));
 	}
 }

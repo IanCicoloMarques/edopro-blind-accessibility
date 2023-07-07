@@ -245,12 +245,6 @@ namespace ygo {
 
 	void MenuEventHandler::KeyInputEvent(const irr::SEvent& event)
 	{
-		CheckMenu();
-		if(activeMenu != nullptr)
-		{
-			activeMenu->KeyInputEvent(event);
-			return;
-		}
 		switch (event.KeyInput.Key) {
 			case irr::KEY_KEY_D: {
 				if (!event.KeyInput.PressedDown && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
@@ -305,16 +299,16 @@ namespace ygo {
 			case irr::KEY_KEY_C: {
 				if (!event.KeyInput.PressedDown && mainGame->cbDeckSelect->isTrulyVisible() && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
 					mainGame->env->setFocus(mainGame->cbDeckSelect);
-					std::wstring nvdaString = fmt::format(gDataManager->GetAccessibilityString(192).data(), mainGame->cbDeckSelect->getItem(mainGame->cbDeckSelect->getSelected()));
-					ScreenReader::getReader()->readScreen(nvdaString.c_str());
+					const std::wstring nvdaString = fmt::format(gDataManager->GetAccessibilityString(192).data(), mainGame->cbDeckSelect->getItem(mainGame->cbDeckSelect->getSelected()));
+					ScreenReader::getReader()->readScreen(nvdaString);
 				}
 				break;
 			}
 			case irr::KEY_KEY_V: {
 				if (!event.KeyInput.PressedDown && mainGame->gBot.cbBotDeck->isTrulyVisible() && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
 					mainGame->env->setFocus(mainGame->gBot.cbBotDeck);
-					std::wstring nvdaString = fmt::format(gDataManager->GetAccessibilityString(192).data(), mainGame->gBot.cbBotDeck->getItem(mainGame->gBot.cbBotDeck->getSelected()));
-					ScreenReader::getReader()->readScreen(nvdaString.c_str());
+					const std::wstring nvdaString = fmt::format(gDataManager->GetAccessibilityString(192).data(), mainGame->gBot.cbBotDeck->getItem(mainGame->gBot.cbBotDeck->getSelected()));
+					ScreenReader::getReader()->readScreen(nvdaString);
 				}
 				break;
 			}
@@ -328,75 +322,15 @@ namespace ygo {
 				if (!event.KeyInput.PressedDown && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
 					ScreenReader::getReader()->readScreen(fmt::format(gDataManager->GetAccessibilityString(193).data()), false);
 					mainGame->env->setFocus(mainGame->ebChatInput);
+					return;
 				}
 				break;
 			}
-			case irr::KEY_DOWN: {
-				if (!event.KeyInput.PressedDown && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
-					if (!event.KeyInput.PressedDown && mainGame->cbDeckSelect->isTrulyVisible() && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
-						std::wstring nvdaString = fmt::format(gDataManager->GetAccessibilityString(192).data(), mainGame->cbDeckSelect->getItem(mainGame->cbDeckSelect->getSelected()));
-						ScreenReader::getReader()->readScreen(nvdaString.c_str());
-					}
-					else if (mainGame->roomListTable->isTrulyVisible() && currentMenu == MenuType::OnlineMenu::ROOMS)
-						ReadOnlineRoomFromList(irr::KEY_DOWN);
-					else if (mainGame->lstSinglePlayList->isTrulyVisible())
-						ReadSinglePlayerList();
-					else if (mainGame->lstReplayList->isTrulyVisible())
-						ReadReplayList();
-				}
-				break;
-			}
-			case irr::KEY_UP: {
-				if (!event.KeyInput.PressedDown && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
-					if (!event.KeyInput.PressedDown && mainGame->cbDeckSelect->isTrulyVisible() && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
-						std::wstring nvdaString = fmt::format(gDataManager->GetAccessibilityString(192).data(), mainGame->cbDeckSelect->getItem(mainGame->cbDeckSelect->getSelected()));
-						ScreenReader::getReader()->readScreen(nvdaString.c_str());
-					}
-					else if (mainGame->roomListTable->isTrulyVisible() && currentMenu == MenuType::OnlineMenu::ROOMS) {
-						ReadOnlineRoomFromList(irr::KEY_UP);
-					}
-					else if (mainGame->lstSinglePlayList->isTrulyVisible())
-						ReadSinglePlayerList();
-					else if (mainGame->lstReplayList->isTrulyVisible())
-						ReadReplayList();
-				}
-				break;
-			}
-			case irr::KEY_RIGHT: {
-				if (!event.KeyInput.PressedDown && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX))
-					ReadMenu(irr::KEY_RIGHT);
-				break;
-			}
-			case irr::KEY_LEFT: {
-				if (!event.KeyInput.PressedDown && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX))
-					ReadMenu(irr::KEY_LEFT);
-				break;
-			}
-			case irr::KEY_RETURN: {
+			case irr::KEY_RETURN:{
 				if (!event.KeyInput.PressedDown && mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX))
+				{
 					mainGame->env->removeFocus(mainGame->env->getFocus());
-				if (!event.KeyInput.PressedDown) {
-					if (menu.empty())
-						activeMenu = MainMenuHandler::GetMenu();
-					if (menu.at(0) == MenuType::MainMenu::MM_ONLINE_DUEL)
-						activeMenu = MainMenuHandler::GetMenu();
-					else if (menu.at(0) == MenuType::SinglePlayerMenu::SP_HOST)
-						activeMenu = LanModeMenuHandler::GetMenu();
-					else if (menu.at(0) == MenuType::HostDuel::RULES_OK)
-						activeMenu = DuelRulesMenuHandler::GetMenu();
-					else if (menu.at(0) == MenuType::PlayerDuel::PD_START_DUEL)
-						activeMenu = PreDuelOnlineMenuHandler::GetMenu();
-					else if (menu.at(0) == MenuType::AIConfigMenu::AIC_OK) {
-						AIConfigMenu();
-					}
-					else if (menu.at(0) == MenuType::OnlineMenu::HOST)
-						activeMenu = OnlineModeMenuHandler::GetMenu();
-					else if (menu.at(0) == MenuType::PasswordMenu::PASS_SET_PASSWORD) {
-						PasswordMenu();
-					}
-					else if (menu.at(0) == MenuType::GameOptionsMenu::GAMEOP_ENABLE_SOUND_EFFECTS) {
-						GameOptions();
-					}
+					return;
 				}
 				break;
 			}
@@ -433,6 +367,11 @@ namespace ygo {
 
 				break;
 			}
+		}
+		CheckMenu();
+		if(activeMenu != nullptr && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX))
+		{
+			activeMenu->KeyInputEvent(event);
 		}
 	}
 

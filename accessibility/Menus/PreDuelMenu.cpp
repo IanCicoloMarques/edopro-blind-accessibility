@@ -40,12 +40,6 @@ namespace ygo {
 	void PreDuelMenuHandler::KeyInputEvent(const irr::SEvent& event)
 	{
 		switch (event.KeyInput.Key) {
-			case irr::KEY_KEY_B: {
-				if (!event.KeyInput.PressedDown && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
-					ScreenReader::getReader()->readLastMessage();
-				}
-				break;
-			}
 			case irr::KEY_LEFT:
 			case irr::KEY_RIGHT: {
 				if (!event.KeyInput.PressedDown && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX))
@@ -53,8 +47,6 @@ namespace ygo {
 				break;
 			}
 			case irr::KEY_RETURN: {
-				if (!event.KeyInput.PressedDown && mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX))
-					mainGame->env->removeFocus(mainGame->env->getFocus());
 				if (!event.KeyInput.PressedDown) {
 					if (_activeMenu != _selectedMenu)
 						SetMenu();

@@ -16,8 +16,14 @@ namespace ygo {
 		void GuiEvent(const irr::SEvent& event) override;
 	private:
 		void ReadMenuAndValue() override;
+
+		/**
+		 * \brief Reads, using text-to-speech, the current room name and player for an online match
+		 */
+		void ReadOnlineRoomFromList(irr::EKEY_CODE key);
+
 		static OnlineModeMenuHandler* _menuHandler;
-		int _onlineMatchCounter = 0;
+		int _onlineMatchIndex = 0;
 	};
 }
 

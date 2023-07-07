@@ -5,7 +5,7 @@
 #include <Control/EventHandler.h>
 
 namespace ygo {
-	IEventHandler* MenuEventHandler::menuHandler = nullptr;
+	OnlineModeMenuHandler* OnlineModeMenuHandler::_menuHandler = nullptr;
 
 	OnlineModeMenuHandler::OnlineModeMenuHandler(const int activeMenu, const std::vector<int>& selectedMenu): BaseMenu{ activeMenu, selectedMenu }
 	{}

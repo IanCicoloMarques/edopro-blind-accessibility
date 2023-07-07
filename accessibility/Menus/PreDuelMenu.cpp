@@ -5,16 +5,16 @@
 #include <Control/EventHandler.h>
 
 namespace ygo {
-	IEventHandler* MenuEventHandler::menuHandler = nullptr;
+	PreDuelMenuHandler* PreDuelMenuHandler::_menuHandler = nullptr;
 
 	PreDuelMenuHandler::PreDuelMenuHandler(const int activeMenu, const std::vector<int>& selectedMenu): BaseMenu{ activeMenu, selectedMenu }
 	{}
 
 	BaseMenu* PreDuelMenuHandler::GetMenu()
 	{
-		if (menuHandler == nullptr)
-			menuHandler = new PreDuelMenuHandler();
-		return menuHandler;
+		if (_menuHandler == nullptr)
+			_menuHandler = new PreDuelMenuHandler();
+		return _menuHandler;
 	}
 
 	void PreDuelMenuHandler::ReadMenuAndValue()

@@ -19,7 +19,7 @@ namespace ygo {
 		void KeyInputEvent(const irr::SEvent& event) override;
 		void GuiEvent(const irr::SEvent& event) override;
 	private:
-		static LanModeMenuHandler* menuHandler;
+		static LanModeMenuHandler* _menuHandler;
 		void ReadMenuAndValue() override;
 	};
 }

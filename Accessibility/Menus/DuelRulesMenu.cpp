@@ -5,7 +5,7 @@
 #include <Control/EventHandler.h>
 
 namespace ygo {
-	IEventHandler* MenuEventHandler::menuHandler = nullptr;
+	DuelRulesMenuHandler* DuelRulesMenuHandler::_menuHandler = nullptr;
 
 	DuelRulesMenuHandler::DuelRulesMenuHandler(const int activeMenu, const std::vector<int>& selectedMenu): BaseMenu{ activeMenu, selectedMenu }
 	{}
@@ -22,9 +22,9 @@ namespace ygo {
 
 	BaseMenu* DuelRulesMenuHandler::GetMenu()
 	{
-		if (menuHandler == nullptr)
-			menuHandler = new DuelRulesMenuHandler();
-		return menuHandler;
+		if (_menuHandler == nullptr)
+			_menuHandler = new DuelRulesMenuHandler();
+		return _menuHandler;
 	}
 
 	void DuelRulesMenuHandler::ReadMenuAndValue()

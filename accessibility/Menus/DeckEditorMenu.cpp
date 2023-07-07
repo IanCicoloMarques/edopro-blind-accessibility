@@ -5,7 +5,7 @@
 #include <Control/EventHandler.h>
 
 namespace ygo {
-	IEventHandler* MenuEventHandler::menuHandler = nullptr;
+	DeckEditorMenuHandler* DeckEditorMenuHandler::_menuHandler = nullptr;
 
 	DeckEditorMenuHandler::DeckEditorMenuHandler(const int activeMenu, const std::vector<int>& selectedMenu): BaseMenu{ activeMenu, selectedMenu }
 	{}

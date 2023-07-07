@@ -15,7 +15,7 @@ namespace ygo {
 		void KeyInputEvent(const irr::SEvent& event) override;
 		void GuiEvent(const irr::SEvent& event) override;
 	private:
-		static PreDuelMenuHandler* menuHandler;
+		static PreDuelMenuHandler* _menuHandler;
 		void ReadMenuAndValue() override;
 	};
 }

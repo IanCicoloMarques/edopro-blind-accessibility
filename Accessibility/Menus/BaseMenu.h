@@ -11,11 +11,6 @@
 namespace ygo {
 	class BaseMenu : public IEventHandler {
 
-		BaseMenu(int activeMenu, std::vector<int> selectedMenu) : _selectedMenu(std::move(selectedMenu)),
-		                                                          _currentMenu{activeMenu}
-		{
-		}
-
 		/**
 		 * \brief Simulates an event
 		 * \param target graphical element to simulate the event on
@@ -24,6 +19,11 @@ namespace ygo {
 		static void TriggerEvent(irr::gui::IGUIElement* target, irr::gui::EGUI_EVENT_TYPE type);
 
 	public:
+
+		BaseMenu(int activeMenu, std::vector<int> selectedMenu) : _selectedMenu(std::move(selectedMenu)),
+																  _currentMenu{activeMenu}
+		{
+		}
 		/**
 		 * \brief Set the next menu selected after pressing the keys Arrow Right or Arrow Left
 		 * \param key can be either Arrow Right or Arrow Left

@@ -18,7 +18,7 @@ namespace ygo {
 		void KeyInputEvent(const irr::SEvent& event) override;
 		void GuiEvent(const irr::SEvent& event) override;
 	private:
-		static MainMenuHandler* menuHandler;
+		static MainMenuHandler* _menuHandler;
 		std::vector<int> menuGameOptions = { MenuType::GameOptionsMenu::GAMEOP_ENABLE_SOUND_EFFECTS, MenuType::GameOptionsMenu::GAMEOP_SOUND_EFFECTS_VOLUME, MenuType::GameOptionsMenu::GAMEOP_ENABLE_MUSIC, MenuType::GameOptionsMenu::GAMEOP_MUSIC_VOLUME, MenuType::GameOptionsMenu::USE_MUD_KEYBOARD };
 		void ReadMenuAndValue() override;
 		void ReadReplayList();

@@ -5,7 +5,7 @@
 #include <Control/EventHandler.h>
 
 namespace ygo {
-	IEventHandler* MenuEventHandler::menuHandler = nullptr;
+	PreDuelOnlineMenuHandler* PreDuelOnlineMenuHandler::_menuHandler = nullptr;
 
 	PreDuelOnlineMenuHandler::PreDuelOnlineMenuHandler(const int activeMenu, const std::vector<int>& selectedMenu): BaseMenu{ activeMenu, selectedMenu }
 	{}

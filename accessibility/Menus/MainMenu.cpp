@@ -5,7 +5,8 @@
 #include <Control/EventHandler.h>
 
 namespace ygo {
-	IEventHandler* MenuEventHandler::menuHandler = nullptr;
+	MainMenuHandler* MainMenuHandler::_menuHandler = nullptr;
+
 	static inline void TriggerEvent(irr::gui::IGUIElement* target, irr::gui::EGUI_EVENT_TYPE type) {
 		irr::SEvent event;
 		event.EventType = irr::EET_GUI_EVENT;
@@ -23,9 +24,9 @@ namespace ygo {
 
 	BaseMenu* MainMenuHandler::GetMenu()
 	{
-		if (menuHandler == nullptr)
-			menuHandler = new MainMenuHandler();
-		return menuHandler;
+		if (_menuHandler == nullptr)
+			_menuHandler = new MainMenuHandler();
+		return _menuHandler;
 	}
 
 	void MainMenuHandler::ReadMenuAndValue()

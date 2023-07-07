@@ -5,16 +5,16 @@
 #include <Control/EventHandler.h>
 
 namespace ygo {
-	IEventHandler* MenuEventHandler::menuHandler = nullptr;
+	LanModeMenuHandler* LanModeMenuHandler::_menuHandler = nullptr;
 
 	LanModeMenuHandler::LanModeMenuHandler(const int activeMenu, const std::vector<int>& selectedMenu): BaseMenu{ activeMenu, selectedMenu }
 	{}
 
 	BaseMenu* LanModeMenuHandler::GetMenu()
 	{
-		if (menuHandler == nullptr)
-			menuHandler = new LanModeMenuHandler();
-		return menuHandler;
+		if (_menuHandler == nullptr)
+			_menuHandler = new LanModeMenuHandler();
+		return _menuHandler;
 	}
 
 	void LanModeMenuHandler::ReadMenuAndValue()

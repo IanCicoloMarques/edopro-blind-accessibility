@@ -11,6 +11,7 @@
 
 namespace ygo {
 	IEventHandler* MenuEventHandler::menuHandler = nullptr;
+
 	static inline void TriggerEvent(irr::gui::IGUIElement* target, irr::gui::EGUI_EVENT_TYPE type) {
 		irr::SEvent event;
 		event.EventType = irr::EET_GUI_EVENT;

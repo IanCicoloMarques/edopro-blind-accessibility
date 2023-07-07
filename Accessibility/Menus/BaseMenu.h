@@ -54,7 +54,6 @@ namespace ygo {
 			}
 		}
 
-
 	protected:
 		/**
 		 * \brief Tells if the player is typing, so he can't navigate through the menu with the shotcuts

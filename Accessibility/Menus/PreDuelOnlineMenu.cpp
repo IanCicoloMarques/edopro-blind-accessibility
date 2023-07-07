@@ -1,4 +1,4 @@
-#include "PreDuelMenu.h"
+#include "PreDuelOnlineMenu.h"
 
 #include "AccessibilityMenu.h"
 
@@ -7,17 +7,17 @@
 namespace ygo {
 	IEventHandler* MenuEventHandler::menuHandler = nullptr;
 
-	PreDuelMenuHandler::PreDuelMenuHandler(const int activeMenu, const std::vector<int>& selectedMenu): BaseMenu{ activeMenu, selectedMenu }
+	PreDuelOnlineMenuHandler::PreDuelOnlineMenuHandler(const int activeMenu, const std::vector<int>& selectedMenu): BaseMenu{ activeMenu, selectedMenu }
 	{}
 
-	BaseMenu* PreDuelMenuHandler::GetMenu()
+	BaseMenu* PreDuelOnlineMenuHandler::GetMenu()
 	{
-		if (menuHandler == nullptr)
-			menuHandler = new PreDuelMenuHandler();
-		return menuHandler;
+		if (_menuHandler == nullptr)
+			_menuHandler = new PreDuelOnlineMenuHandler();
+		return _menuHandler;
 	}
 
-	void PreDuelMenuHandler::ReadMenuAndValue()
+	void PreDuelOnlineMenuHandler::ReadMenuAndValue()
 	{
 		std::wstring menuValue = std::wstring();
 		if(_activeMenu == _selectedMenu)
@@ -32,12 +32,16 @@ namespace ygo {
 				menuValue = gDataManager->GetAccessibilityString(MenuType::PlayerDuel::PD_PLAYER_READY).data();
 			else if(_currentMenu == MenuType::SinglePlayerDuel::SP_AI_MENU)
 				menuValue = gDataManager->GetAccessibilityString(MenuType::SinglePlayerDuel::SP_AI_MENU).data();
+			else if(_currentMenu == MenuType::OnlineDuel::OD_DUEL_MODE)
+				menuValue = gDataManager->GetAccessibilityString(MenuType::OnlineDuel::OD_DUEL_MODE).data();
+			else if(_currentMenu == MenuType::OnlineDuel::OD_SPECTATE_MODE)
+				menuValue = gDataManager->GetAccessibilityString(MenuType::OnlineDuel::OD_SPECTATE_MODE).data();
 		}
 		if(!menuValue.empty())
 			ScreenReader::getReader()->readScreen(menuValue);
 	};
 
-	void PreDuelMenuHandler::KeyInputEvent(const irr::SEvent& event)
+	void PreDuelOnlineMenuHandler::KeyInputEvent(const irr::SEvent& event)
 	{
 		switch (event.KeyInput.Key) {
 			case irr::KEY_KEY_B: {
@@ -58,9 +62,8 @@ namespace ygo {
 				if (!event.KeyInput.PressedDown) {
 					if (_activeMenu != _selectedMenu)
 						SetMenu();
-					if (_currentMenu == MenuType::PlayerDuel::PD_START_DUEL && mainGame->btnHostPrepStart->isEnabled()) {
+					if (_currentMenu == MenuType::PlayerDuel::PD_START_DUEL && mainGame->btnHostPrepStart->isEnabled())
 						ClickButton(mainGame->btnHostPrepStart);
-					}
 					else if (_currentMenu == MenuType::PlayerDuel::PD_START_DUEL && !mainGame->btnHostPrepStart->isEnabled() && mainGame->btnHostPrepStart->isTrulyVisible()) {
 						std::wstring nvdaString;
 						if (_previousMenu == MenuType::MainMenu::MM_SP_DUEL)
@@ -69,32 +72,25 @@ namespace ygo {
 							nvdaString = gDataManager->GetAccessibilityString(228).data();
 						ScreenReader::getReader()->readScreen(nvdaString);
 					}
-					else if (_currentMenu == MenuType::PlayerDuel::PD_PLAYER_READY && mainGame->btnHostPrepReady->isTrulyVisible() && mainGame->btnHostPrepReady->isEnabled()) {
+					else if (_currentMenu == MenuType::PlayerDuel::PD_PLAYER_READY && mainGame->btnHostPrepReady->isTrulyVisible() && mainGame->btnHostPrepReady->isEnabled())
 						ClickButton(mainGame->btnHostPrepReady);
-					}
-					else if (_currentMenu == MenuType::PlayerDuel::PD_PLAYER_READY && mainGame->btnHostPrepNotReady->isEnabled()) {
+					else if (_currentMenu == MenuType::PlayerDuel::PD_PLAYER_READY && mainGame->btnHostPrepNotReady->isEnabled())
 						ClickButton(mainGame->btnHostPrepNotReady);
-					}
 					else if (_currentMenu == MenuType::PlayerDuel::PD_SELECT_DECK && mainGame->cbDeckSelect->isTrulyVisible()) {
 						mainGame->env->setFocus(mainGame->cbDeckSelect);
 						const std::wstring nvdaString = fmt::format(gDataManager->GetAccessibilityString(192).data(), mainGame->cbDeckSelect->getItem(mainGame->cbDeckSelect->getSelected()));
 						ScreenReader::getReader()->readScreen(nvdaString);
 					}
-					else if (_currentMenu == MenuType::SinglePlayerDuel::SP_AI_MENU && mainGame->btnHostPrepWindBot->isTrulyVisible() && mainGame->btnHostPrepWindBot->isEnabled()) {
+					else if (_currentMenu == MenuType::SinglePlayerDuel::SP_AI_MENU && mainGame->btnHostPrepWindBot->isTrulyVisible() && mainGame->btnHostPrepWindBot->isEnabled())
 						ClickButton(mainGame->btnHostPrepWindBot);
-					}
-					else if (_currentMenu == MenuType::OnlineDuel::OD_DUEL_MODE && mainGame->btnHostPrepDuelist->isTrulyVisible() && mainGame->btnHostPrepDuelist->isEnabled()) {
+					else if (_currentMenu == MenuType::OnlineDuel::OD_DUEL_MODE && mainGame->btnHostPrepDuelist->isTrulyVisible() && mainGame->btnHostPrepDuelist->isEnabled())
 						ClickButton(mainGame->btnHostPrepDuelist);
-					}
-					else if (_currentMenu == MenuType::OnlineDuel::OD_DUEL_MODE && mainGame->btnHostPrepDuelist->isTrulyVisible() && !mainGame->btnHostPrepDuelist->isEnabled()) {
+					else if (_currentMenu == MenuType::OnlineDuel::OD_DUEL_MODE && mainGame->btnHostPrepDuelist->isTrulyVisible() && !mainGame->btnHostPrepDuelist->isEnabled())
 						ScreenReader::getReader()->readScreen(gDataManager->GetAccessibilityString(229).data());
-					}
-					else if (_currentMenu == MenuType::OnlineDuel::OD_SPECTATE_MODE && mainGame->btnHostPrepOB->isTrulyVisible() && mainGame->btnHostPrepOB->isEnabled()) {
+					else if (_currentMenu == MenuType::OnlineDuel::OD_SPECTATE_MODE && mainGame->btnHostPrepOB->isTrulyVisible() && mainGame->btnHostPrepOB->isEnabled())
 						ClickButton(mainGame->btnHostPrepOB);
-					}
-					else if (_currentMenu == MenuType::OnlineDuel::OD_SPECTATE_MODE && mainGame->btnHostPrepOB->isTrulyVisible() && !mainGame->btnHostPrepOB->isEnabled()) {
+					else if (_currentMenu == MenuType::OnlineDuel::OD_SPECTATE_MODE && mainGame->btnHostPrepOB->isTrulyVisible() && !mainGame->btnHostPrepOB->isEnabled())
 						ScreenReader::getReader()->readScreen(gDataManager->GetAccessibilityString(230).data());
-					}
 				}
 				break;
 			}
@@ -115,23 +111,23 @@ namespace ygo {
 		}
 	}
 
-	void PreDuelMenuHandler::GuiEvent(const irr::SEvent& event)
+	void PreDuelOnlineMenuHandler::GuiEvent(const irr::SEvent& event)
 	{
 		int id = event.GUIEvent.Caller->getID();
 		switch (event.GUIEvent.EventType) {
 			case irr::gui::EGET_COMBO_BOX_CHANGED: {
-					switch (id) {
+				switch (id) {
 					case COMBOBOX_PLAYER_DECK: {
-							std::wstring nvdaString = fmt::format(gDataManager->GetAccessibilityString(192).data(), mainGame->cbDeckSelect->getItem(mainGame->cbDeckSelect->getSelected()));
-							ScreenReader::getReader()->readScreen(nvdaString.c_str());
-							break;
+						std::wstring nvdaString = fmt::format(gDataManager->GetAccessibilityString(192).data(), mainGame->cbDeckSelect->getItem(mainGame->cbDeckSelect->getSelected()));
+						ScreenReader::getReader()->readScreen(nvdaString.c_str());
+						break;
 					}
 					case COMBOBOX_BOT_DECK: {
-							std::wstring nvdaString = fmt::format(gDataManager->GetAccessibilityString(192).data(), mainGame->gBot.cbBotDeck->getItem(mainGame->gBot.cbBotDeck->getSelected()));
-							ScreenReader::getReader()->readScreen(nvdaString.c_str());
-							break;
+						std::wstring nvdaString = fmt::format(gDataManager->GetAccessibilityString(192).data(), mainGame->gBot.cbBotDeck->getItem(mainGame->gBot.cbBotDeck->getSelected()));
+						ScreenReader::getReader()->readScreen(nvdaString.c_str());
+						break;
 					}
-					}
+				}
 			}
 		}
 	}

@@ -2,11 +2,7 @@
 #define PRE_DUEL_MENU_HANDLER_H
 
 #include <vector>
-#include <string>
 #include "MenuType.h"
-#include "../gframe/game_config.h"
-#include "../gframe/data_manager.h"
-#include "../gframe/sound_manager.h"
 
 #include "BaseMenu.h"
 

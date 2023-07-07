@@ -7,8 +7,18 @@
 namespace ygo {
 	IEventHandler* MenuEventHandler::menuHandler = nullptr;
 
-	DuelRulesMenuHandler::DuelRulesMenuHandler(int activeMenu, const std::vector<int>& selectedMenu): BaseMenu{ activeMenu, selectedMenu }
+	DuelRulesMenuHandler::DuelRulesMenuHandler(const int activeMenu, const std::vector<int>& selectedMenu): BaseMenu{ activeMenu, selectedMenu }
 	{}
+
+	static void CheckBox(irr::gui::IGUICheckBox* chkbox) {
+		if (chkbox->isTrulyVisible()) {
+			if (chkbox->isChecked())
+				gSoundManager->PlaySoundEffect(SoundManager::SFX::UNCONFIRM);
+			else
+				gSoundManager->PlaySoundEffect(SoundManager::SFX::CONFIRM);
+			chkbox->setChecked(!chkbox->isChecked());
+		}
+	}
 
 	BaseMenu* DuelRulesMenuHandler::GetMenu()
 	{
@@ -72,19 +82,120 @@ namespace ygo {
 				if (!event.KeyInput.PressedDown) {
 					if (_selectedMenu != _activeMenu)
 						SetMenu();
-					if (_currentMenu == MenuType::SinglePlayerMenu::SP_HOST && mainGame->btnCreateHost->isEnabled()) {
-						ClickButton(mainGame->btnCreateHost);
-					}
-					else if (_currentMenu == MenuType::SinglePlayerMenu::SP_PLAYER_NAME && mainGame->ebNickName->isTrulyVisible()) {
+					if (_currentMenu == MenuType::HostDuel::RULES_OK && mainGame->btnHostConfirm->isEnabled())
+						ClickButton(mainGame->btnHostConfirm);
+					else if (_currentMenu == MenuType::HostDuel::NUM_PLAYERS_T1 && mainGame->ebTeam1->isTrulyVisible()) {
 						if (!_typing) {
-							ScreenReader::getReader()->readScreen(std::wstring(gDataManager->GetAccessibilityString(225).data()));
-							FocusTextBox(mainGame->ebNickName);
+							ScreenReader::getReader()->readScreen(std::wstring(gDataManager->GetAccessibilityString(231).data()).c_str());
+							FocusTextBox(mainGame->ebTeam1);
 							_typing = true;
 						}
 						else {
 							_typing = false;
 							mainGame->env->removeFocus(mainGame->env->getFocus());
-							ScreenReader::getReader()->readScreen(fmt::format(gDataManager->GetAccessibilityString(226).data(), mainGame->ebNickName->getText()));
+							ScreenReader::getReader()->readScreen(fmt::format(gDataManager->GetAccessibilityString(232).data(), mainGame->ebTeam1->getText()));
+						}
+					}
+					else if (_currentMenu == MenuType::HostDuel::NUM_PLAYERS_T2 && mainGame->ebTeam2->isTrulyVisible()) {
+						if (!_typing) {
+							ScreenReader::getReader()->readScreen(std::wstring(gDataManager->GetAccessibilityString(233).data()).c_str());
+							FocusTextBox(mainGame->ebTeam2);
+							_typing = true;
+						}
+						else {
+							_typing = false;
+							mainGame->env->removeFocus(mainGame->env->getFocus());
+							ScreenReader::getReader()->readScreen(fmt::format(gDataManager->GetAccessibilityString(234).data(), mainGame->ebTeam2->getText()));
+						}
+					}
+					else if (_currentMenu == MenuType::HostDuel::BEST_OF && mainGame->ebBestOf->isTrulyVisible()) {
+						if (!_typing) {
+							ScreenReader::getReader()->readScreen(std::wstring(gDataManager->GetAccessibilityString(235).data()).c_str());
+							FocusTextBox(mainGame->ebBestOf);
+							_typing = true;
+						}
+						else {
+							_typing = false;
+							mainGame->env->removeFocus(mainGame->env->getFocus());
+							ScreenReader::getReader()->readScreen(fmt::format(gDataManager->GetAccessibilityString(236).data(), mainGame->ebBestOf->getText()));
+						}
+					}
+					else if (_currentMenu == MenuType::HostDuel::TIME_LIMIT && mainGame->ebTimeLimit->isTrulyVisible()) {
+						if (!_typing) {
+							ScreenReader::getReader()->readScreen(std::wstring(gDataManager->GetAccessibilityString(237).data()).c_str());
+							FocusTextBox(mainGame->ebTimeLimit);
+							_typing = true;
+						}
+						else {
+							_typing = false;
+							mainGame->env->removeFocus(mainGame->env->getFocus());
+							ScreenReader::getReader()->readScreen(fmt::format(gDataManager->GetAccessibilityString(238).data(), mainGame->ebTimeLimit->getText()));
+						}
+					}
+					else if (_currentMenu == MenuType::HostDuel::STARTING_LP && mainGame->ebStartLP->isTrulyVisible()) {
+						if (!_typing) {
+							ScreenReader::getReader()->readScreen(gDataManager->GetAccessibilityString(239).data());
+							FocusTextBox(mainGame->ebStartLP);
+							_typing = true;
+						}
+						else {
+							_typing = false;
+							mainGame->env->removeFocus(mainGame->env->getFocus());
+							ScreenReader::getReader()->readScreen(fmt::format(gDataManager->GetAccessibilityString(240).data(), mainGame->ebStartLP->getText()));
+						}
+					}
+					else if (_currentMenu == MenuType::HostDuel::STARTING_HAND && mainGame->ebStartHand->isTrulyVisible()) {
+						if (!_typing) {
+							ScreenReader::getReader()->readScreen(gDataManager->GetAccessibilityString(241).data());
+							FocusTextBox(mainGame->ebStartHand);
+							_typing = true;
+						}
+						else {
+							_typing = false;
+							mainGame->env->removeFocus(mainGame->env->getFocus());
+							ScreenReader::getReader()->readScreen(fmt::format(gDataManager->GetAccessibilityString(242).data(), mainGame->ebStartHand->getText()));
+						}
+					}
+					else if (_currentMenu == MenuType::HostDuel::CARDS_DRAW && mainGame->ebDrawCount->isTrulyVisible()) {
+						if (!_typing) {
+							ScreenReader::getReader()->readScreen(gDataManager->GetAccessibilityString(243).data());
+							FocusTextBox(mainGame->ebDrawCount);
+							_typing = true;
+						}
+						else {
+							_typing = false;
+							mainGame->env->removeFocus(mainGame->env->getFocus());
+							ScreenReader::getReader()->readScreen(fmt::format(gDataManager->GetAccessibilityString(244).data(), mainGame->ebDrawCount->getText()));
+						}
+					}
+					else if (_currentMenu == MenuType::HostDuel::CHECK_DECK && mainGame->chkNoCheckDeckContent->isTrulyVisible()) {
+						CheckBox(mainGame->chkNoCheckDeckContent);
+						CheckBox(mainGame->chkNoCheckDeckSize);
+					}
+					else if (_currentMenu == MenuType::HostDuel::SHUFFLE_DECK && mainGame->chkNoShuffleDeck->isTrulyVisible())
+						CheckBox(mainGame->chkNoShuffleDeck);
+					else if (_currentMenu == MenuType::HostDuel::ROOM_NAME && mainGame->ebHostNotes->isTrulyVisible()) {
+						if (!_typing) {
+							ScreenReader::getReader()->readScreen(gDataManager->GetAccessibilityString(245).data());
+							FocusTextBox(mainGame->ebHostNotes);
+							_typing = true;
+						}
+						else {
+							_typing = false;
+							mainGame->env->removeFocus(mainGame->env->getFocus());
+							ScreenReader::getReader()->readScreen(fmt::format(gDataManager->GetAccessibilityString(246).data(), mainGame->ebHostNotes->getText()));
+						}
+					}
+					else if (_currentMenu == MenuType::HostDuel::ROOM_PASSWORD && mainGame->ebServerPass->isTrulyVisible()) {
+						if (!_typing) {
+							ScreenReader::getReader()->readScreen(gDataManager->GetAccessibilityString(247).data());
+							FocusTextBox(mainGame->ebServerPass);
+							_typing = true;
+						}
+						else {
+							_typing = false;
+							mainGame->env->removeFocus(mainGame->env->getFocus());
+							ScreenReader::getReader()->readScreen(fmt::format(gDataManager->GetAccessibilityString(248).data(), mainGame->ebServerPass->getText()));
 						}
 					}
 				}

@@ -412,6 +412,8 @@ namespace ygo {
 
 	void EventHandler::ReadCardInfo()
 	{
+		if(mainGame->dField.display_cards.size() <= indexLookedUpCard)
+			return;
 		const auto selectedCard = mainGame->dField.display_cards[indexLookedUpCard];
 		Card* card = new Card(selectedCard);
 		card->SetFieldSlot(SearchFieldSlot(displayedField, selectedCard));
@@ -843,8 +845,6 @@ namespace ygo {
 	void EventHandler::CloseDialog() {
 		if (mainGame->wCardDisplay->isVisible()) {
 			TriggerEvent(mainGame->btnDisplayOK, irr::gui::EGET_BUTTON_CLICKED);
-			if (!mainGame->dField.display_cards.empty())
-				mainGame->dField.display_cards.clear();
 		}
 	}
 

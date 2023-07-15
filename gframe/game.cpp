@@ -1729,49 +1729,6 @@ void Game::PopulateSettingsWindow() {
 	}
 
 	{
-		gSettings.sound.construct(env, gSettings.tabcontrolwindow, gDataManager->GetSysString(2090).data());
-		defaultStrings.emplace_back(gSettings.sound.tab, 2090);
-
-		ResetXandY();
-		auto* sPanel = gSettings.sound.panel->getSubpanel();
-		gSettings.chkEnableSound = env->addCheckBox(gGameConfig->enablesound, GetNextRect(), sPanel, CHECKBOX_ENABLE_SOUND, gDataManager->GetSysString(2047).data());
-		menuHandler.MakeElementSynchronized(gSettings.chkEnableSound);
-		defaultStrings.emplace_back(gSettings.chkEnableSound, 2047);
-		{
-			gSettings.stSoundVolume = env->addStaticText(gDataManager->GetSysString(2049).data(), GetCurrentRectWithXOffset(15, 75), false, true, sPanel);
-			defaultStrings.emplace_back(gSettings.stSoundVolume, 2049);
-			gSettings.scrSoundVolume = env->addScrollBar(true, GetCurrentRectWithXOffset(80, 320, true), sPanel, SCROLL_SOUND_VOLUME);
-			menuHandler.MakeElementSynchronized(gSettings.scrSoundVolume);
-			gSettings.scrSoundVolume->setMax(100);
-			gSettings.scrSoundVolume->setMin(0);
-			gSettings.scrSoundVolume->setPos(gGameConfig->soundVolume);
-			gSettings.scrSoundVolume->setLargeStep(1);
-			gSettings.scrSoundVolume->setSmallStep(1);
-			IncrementXorY();
-		}
-		gSettings.chkEnableMusic = env->addCheckBox(gGameConfig->enablemusic, GetNextRect(), sPanel, CHECKBOX_ENABLE_MUSIC, gDataManager->GetSysString(2046).data());
-		menuHandler.MakeElementSynchronized(gSettings.chkEnableMusic);
-		defaultStrings.emplace_back(gSettings.chkEnableMusic, 2046);
-		{
-			gSettings.stMusicVolume = env->addStaticText(gDataManager->GetSysString(2048).data(), GetCurrentRectWithXOffset(15, 75), false, true, sPanel);
-			defaultStrings.emplace_back(gSettings.stMusicVolume, 2048);
-			gSettings.scrMusicVolume = env->addScrollBar(true, GetCurrentRectWithXOffset(80, 320, true), sPanel, SCROLL_MUSIC_VOLUME);
-			menuHandler.MakeElementSynchronized(gSettings.scrMusicVolume);
-			gSettings.scrMusicVolume->setMax(100);
-			gSettings.scrMusicVolume->setMin(0);
-			gSettings.scrMusicVolume->setPos(gGameConfig->musicVolume);
-			gSettings.scrMusicVolume->setLargeStep(1);
-			gSettings.scrMusicVolume->setSmallStep(1);
-			IncrementXorY();
-		}
-		gSettings.chkLoopMusic = env->addCheckBox(gGameConfig->loopMusic, GetNextRect(), sPanel, CHECKBOX_LOOP_MUSIC, gDataManager->GetSysString(2079).data());
-		defaultStrings.emplace_back(gSettings.chkLoopMusic, 2079);
-		gSettings.stNoAudioBackend = env->addStaticText(gDataManager->GetSysString(2058).data(), GetCurrentRectWithXOffset(15, 320), false, true, sPanel);
-		defaultStrings.emplace_back(gSettings.stNoAudioBackend, 2058);
-		gSettings.stNoAudioBackend->setVisible(false);
-	}
-
-	{
 		gSettings.graphics.construct(env, gSettings.tabcontrolwindow, gDataManager->GetSysString(2091).data());
 		defaultStrings.emplace_back(gSettings.graphics.tab, 2091);
 

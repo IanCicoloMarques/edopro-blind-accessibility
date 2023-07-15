@@ -8,6 +8,7 @@
 #include "LanModeMenu.h"
 #include "MainMenu.h"
 #include "OnlineModeMenu.h"
+#include "PasswordMenu.h"
 #include "PreDuelMenu.h"
 #include "PreDuelOnlineMenu.h"
 #include "PuzzlesMenu.h"
@@ -50,22 +51,6 @@ namespace ygo {
 			mainGame->lstReplayList->setSelected(mainGame->lstReplayList->getListItem(listItem));
 		}
 		ScreenReader::getReader()->textToSpeech(fmt::format(L"{}", mainGame->lstReplayList->getListItem(listItem)));
-	};
-
-	void MenuEventHandler::ReadMenuAndValue()
-	{
-		std::wstring menuValue = std::wstring();
-		if(menu == menuPassword)
-		{
-			if(currentMenu == MenuType::PasswordMenu::PASS_SET_PASSWORD)
-				menuValue = fmt::format(L"{}: {}", gDataManager->GetAccessibilityString(MenuType::PasswordMenu::PASS_SET_PASSWORD).data(), mainGame->ebRPName->getText());
-			else if(currentMenu == MenuType::PasswordMenu::PASS_OK)
-				menuValue = gDataManager->GetAccessibilityString(MenuType::PasswordMenu::PASS_OK).data();
-			else if(currentMenu == MenuType::PasswordMenu::PASS_CANCEL)
-				menuValue = gDataManager->GetAccessibilityString(MenuType::PasswordMenu::PASS_CANCEL).data();
-		}
-		if(!menuValue.empty())
-			ScreenReader::getReader()->readScreen(menuValue);
 	};
 
 	void MenuEventHandler::ReadMenu(irr::EKEY_CODE ekeyCode)
@@ -159,10 +144,6 @@ namespace ygo {
 						ClickButton(mainGame->btnRPNo);
 					else if (mainGame->btnJoinCancel2->isTrulyVisible())
 						ClickButton(mainGame->btnJoinCancel2);
-					else if (mainGame->gSettings.window->isTrulyVisible())
-						mainGame->HideElement(mainGame->gSettings.window);
-					else if (mainGame->btnSinglePlayCancel->isTrulyVisible())
-						ClickButton(mainGame->btnSinglePlayCancel);
 					else if (mainGame->btnReplayCancel->isTrulyVisible())
 						ClickButton(mainGame->btnReplayCancel);
 				}
@@ -185,9 +166,8 @@ namespace ygo {
 				switch (id) {
 					case BUTTON_JOIN_HOST2: {
 						if (mainGame->roomListTable->getSelected() >= 0) {
-							if (mainGame->ebRPName->isTrulyVisible()) {
-								menu = menuPassword;
-							}
+							if (mainGame->ebRPName->isTrulyVisible())
+								activeMenu = PasswordMenuHandler::GetMenu();
 							else
 								activeMenu = PreDuelOnlineMenuHandler::GetMenu();
 						}
@@ -317,29 +297,7 @@ namespace ygo {
 			activeMenu = DuelRulesMenuHandler::GetMenu();
 		else if (PuzzlesMenuHandler::IsActive())
 			activeMenu = PuzzlesMenuHandler::GetMenu();
-		else if (mainGame->ebRPName->isEnabled() && mainGame->ebRPName->isTrulyVisible())
-			menu = menuPassword;
-	}
-
-
-	void MenuEventHandler::PasswordMenu() {
-		if (currentMenu == MenuType::PasswordMenu::PASS_SET_PASSWORD && mainGame->ebRPName->isTrulyVisible()) {
-			if (!typing) {
-				ScreenReader::getReader()->readScreen(std::wstring(gDataManager->GetAccessibilityString(223).data()).c_str());
-				FocusTextBox(mainGame->ebRPName);
-				typing = true;
-			}
-			else {
-				typing = false;
-				mainGame->env->removeFocus(mainGame->env->getFocus());
-				ScreenReader::getReader()->readScreen(fmt::format(gDataManager->GetAccessibilityString(224).data(), mainGame->ebRPName->getText()));
-			}
-		}
-		else if (currentMenu == MenuType::PasswordMenu::PASS_OK && mainGame->btnRPYes->isEnabled()) {
-			ClickButton(mainGame->btnRPYes);
-		}
-		else if (currentMenu == MenuType::PasswordMenu::PASS_CANCEL && mainGame->btnRPNo->isEnabled()) {
-			ClickButton(mainGame->btnRPNo);
-		}
+		else if (PasswordMenuHandler::IsActive())
+			activeMenu = PasswordMenuHandler::GetMenu();
 	}
 }

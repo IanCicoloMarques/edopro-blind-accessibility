@@ -135,6 +135,7 @@
     <ClInclude Include="..\accessibility\Menus\MainMenu.h" />
     <ClInclude Include="..\accessibility\Menus\BaseMenu.h" />
     <ClInclude Include="..\accessibility\Menus\OnlineModeMenu.h" />
+    <ClInclude Include="..\accessibility\Menus\PasswordMenu.h" />
     <ClInclude Include="..\accessibility\Menus\PreDuelMenu.h" />
     <ClInclude Include="..\accessibility\Menus\PreDuelOnlineMenu.h" />
     <ClInclude Include="..\accessibility\Menus\PuzzlesMenu.h" />
@@ -246,6 +247,7 @@
     <ClCompile Include="..\accessibility\Menus\LanModeMenu.cpp" />
     <ClCompile Include="..\accessibility\Menus\MainMenu.cpp" />
     <ClCompile Include="..\accessibility\Menus\OnlineModeMenu.cpp" />
+    <ClCompile Include="..\accessibility\Menus\PasswordMenu.cpp" />
     <ClCompile Include="..\accessibility\Menus\PreDuelMenu.cpp" />
     <ClCompile Include="..\accessibility\Menus\PreDuelOnlineMenu.cpp" />
     <ClCompile Include="..\accessibility\Menus\PuzzlesMenu.cpp" />

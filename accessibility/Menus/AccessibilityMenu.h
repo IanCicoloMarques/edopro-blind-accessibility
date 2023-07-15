@@ -35,11 +35,7 @@ namespace ygo {
 	private:
 		static IEventHandler* menuHandler;
 		BaseMenu* activeMenu;
-		int currentMenu = MenuType::MenuList::MAIN_MENU;
-		std::vector<int> menu;
-		std::vector<int> menuPassword = { MenuType::PasswordMenu::PASS_SET_PASSWORD, MenuType::PasswordMenu::PASS_OK, MenuType::PasswordMenu::PASS_CANCEL };
 		void CheckMenu();
-		void PasswordMenu();
 		void ReadMenu(irr::EKEY_CODE key);
 		void ReadReplayList();
 		void ReadMenuAndValue();

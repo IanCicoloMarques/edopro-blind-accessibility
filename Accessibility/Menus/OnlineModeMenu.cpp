@@ -139,7 +139,6 @@ namespace ygo {
 		switch (event.GUIEvent.EventType) {
 			case irr::gui::EGET_CHECKBOX_CHANGED: {
 				switch (id) {
-
 					case CHECK_SHOW_LOCKED_ROOMS: {
 						std::wstring screenReaderString;
 						if (mainGame->chkShowPassword->isChecked())

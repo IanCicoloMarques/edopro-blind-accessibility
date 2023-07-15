@@ -17,7 +17,7 @@ namespace ygo {
 	IEventHandler* MenuEventHandler::menuHandler = nullptr;
 
 	static inline void TriggerEvent(irr::gui::IGUIElement* target, irr::gui::EGUI_EVENT_TYPE type) {
-		irr::SEvent event;
+		irr::SEvent event{};
 		event.EventType = irr::EET_GUI_EVENT;
 		event.GUIEvent.EventType = type;
 		event.GUIEvent.Caller = target;
@@ -26,13 +26,6 @@ namespace ygo {
 
 	static inline void ClickButton(irr::gui::IGUIElement* btn) {
 		TriggerEvent(btn, irr::gui::EGET_BUTTON_CLICKED);
-	}
-
-	static inline void FocusTextBox(irr::gui::IGUIEditBox* editBox) {
-		if (editBox->isTrulyVisible()) {
-			editBox->setText(L"");
-			mainGame->env->setFocus(editBox);
-		}
 	}
 
 	IEventHandler* MenuEventHandler::getMenuHandler()
@@ -150,6 +143,8 @@ namespace ygo {
 
 				break;
 			}
+			default:
+				break;
 		}
 		CheckMenu();
 		if(activeMenu != nullptr && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX))
@@ -160,7 +155,7 @@ namespace ygo {
 
 	void MenuEventHandler::GuiEvent(const irr::SEvent& event)
 	{
-		int id = event.GUIEvent.Caller->getID();
+		const int id = event.GUIEvent.Caller->getID();
 		switch (event.GUIEvent.EventType) {
 			case irr::gui::EGET_BUTTON_CLICKED: {
 				switch (id) {
@@ -275,6 +270,7 @@ namespace ygo {
 					}
 				}
 			}
+		default: break;
 		}
 	}
 

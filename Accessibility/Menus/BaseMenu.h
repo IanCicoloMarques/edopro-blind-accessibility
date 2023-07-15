@@ -24,6 +24,13 @@ namespace ygo {
 																  _currentMenu{activeMenu}
 		{
 		}
+
+		/**
+		 * \brief Check if the current menu is in the list of selected menus
+		 * \return True or false
+		 */
+		bool MenuInRange();
+
 		/**
 		 * \brief Set the next menu selected after pressing the keys Arrow Right or Arrow Left
 		 * \param key can be either Arrow Right or Arrow Left
@@ -60,6 +67,12 @@ namespace ygo {
 		 */
 		bool _typing = false;
 
+
+		/**
+		 * \brief Tells if the player is using a scroll menu (to select the volume, for example)
+		 */
+		bool _scrolling = false;
+
 		/**
 		 * \brief Has a list of the active menu options
 		 */
@@ -95,6 +108,13 @@ namespace ygo {
 		ygo::mainGame->device->postEventFromUser(event);
 	}
 
+	inline bool BaseMenu::MenuInRange()
+	{
+		if(_activeMenu.empty() || _currentMenuIndex >= _activeMenu.size() || _currentMenuIndex < 0)
+			return false;
+		return true;
+	}
+
 	inline void BaseMenu::SetMenu(irr::EKEY_CODE key)
 	{
 		_typing = false;
@@ -114,9 +134,10 @@ namespace ygo {
 		{
 			_currentMenuIndex--;
 			if (_currentMenuIndex < 0)
-				_currentMenuIndex = _activeMenu.size() - 1;
+				_currentMenuIndex = 0;
 		}
-		_currentMenu = _activeMenu.at(_currentMenuIndex);
+		if(MenuInRange())
+			_currentMenu = _activeMenu.at(_currentMenuIndex);
 		ReadMenuAndValue();
 	}
 }

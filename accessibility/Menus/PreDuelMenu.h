@@ -9,9 +9,11 @@
 namespace ygo {
 	class PreDuelMenuHandler final : public BaseMenu {
 	public:
+		static std::vector<int> preDuelMenu;
 		PreDuelMenuHandler(int activeMenu = MenuType::MenuList::PRE_DUEL_MENU, const std::vector<int>&
-			                   selectedMenu = { MenuType::PlayerDuel::PD_START_DUEL, MenuType::PlayerDuel::PD_SELECT_DECK, MenuType::PlayerDuel::PD_PLAYER_READY, MenuType::SinglePlayerDuel::SP_AI_MENU });
+			                   selectedMenu = preDuelMenu);
 		static BaseMenu* GetMenu();
+		static bool IsActive();
 		void KeyInputEvent(const irr::SEvent& event) override;
 		void GuiEvent(const irr::SEvent& event) override;
 	private:

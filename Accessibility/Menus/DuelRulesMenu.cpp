@@ -6,6 +6,12 @@
 
 namespace ygo {
 	DuelRulesMenuHandler* DuelRulesMenuHandler::_menuHandler = nullptr;
+	std::vector<int> DuelRulesMenuHandler::duelRulesMenu = {
+		MenuType::HostDuel::RULES_OK, MenuType::HostDuel::NUM_PLAYERS_T1, MenuType::HostDuel::NUM_PLAYERS_T2,
+		MenuType::HostDuel::BEST_OF, MenuType::HostDuel::TIME_LIMIT, MenuType::HostDuel::STARTING_LP,
+		MenuType::HostDuel::STARTING_HAND, MenuType::HostDuel::CARDS_DRAW, MenuType::HostDuel::CHECK_DECK,
+		MenuType::HostDuel::SHUFFLE_DECK, MenuType::HostDuel::ROOM_NAME, MenuType::HostDuel::ROOM_PASSWORD
+	};
 
 	DuelRulesMenuHandler::DuelRulesMenuHandler(const int activeMenu, const std::vector<int>& selectedMenu): BaseMenu{ activeMenu, selectedMenu }
 	{}
@@ -25,6 +31,14 @@ namespace ygo {
 		if (_menuHandler == nullptr)
 			_menuHandler = new DuelRulesMenuHandler();
 		return _menuHandler;
+	}
+
+	bool DuelRulesMenuHandler::IsActive()
+	{
+		bool isActive = false;
+		if (mainGame->btnCreateHost2->isEnabled() && mainGame->btnCreateHost2->isTrulyVisible())
+			isActive = true;
+		return isActive;
 	}
 
 	void DuelRulesMenuHandler::ReadMenuAndValue()
@@ -67,7 +81,11 @@ namespace ygo {
 			case irr::KEY_LEFT:
 			case irr::KEY_RIGHT: {
 				if (!event.KeyInput.PressedDown && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX))
+				{
+					if (_selectedMenu != duelRulesMenu)
+						_selectedMenu = duelRulesMenu;
 					SetMenu(event.KeyInput.Key);
+				}
 				break;
 			}
 			case irr::KEY_RETURN: {
@@ -195,10 +213,8 @@ namespace ygo {
 			}
 			case irr::KEY_KEY_0: {
 				if (!event.KeyInput.PressedDown && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
-					if (mainGame->gSettings.window->isTrulyVisible())
-						mainGame->HideElement(mainGame->gSettings.window);
-					else if (mainGame->btnModeExit->isTrulyVisible())
-						ClickButton(mainGame->btnModeExit);
+					if (mainGame->btnHostCancel->isTrulyVisible())
+						ClickButton(mainGame->btnHostCancel);
 					if (_activeMenu.empty())
 						_selectedMenu = _activeMenu;
 					else

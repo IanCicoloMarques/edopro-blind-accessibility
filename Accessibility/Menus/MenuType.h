@@ -15,7 +15,8 @@ namespace ygo {
 			ROOM_PASSWORD_MENU,
 			DECK_EDITOR,
 			AI_CONFIGURATION,
-			ONLINE_MODE_MENU
+			ONLINE_MODE_MENU,
+			PUZZLES_MENU
 		};
 
 		enum MainMenu {
@@ -61,7 +62,7 @@ namespace ygo {
 		enum AIConfigMenu {
 			AIC_OK = 354,
 			AIC_SELECT_DECK = 349,
-			AIC_ATR = 355
+			AIC_ALWAYS_ROCK = 355
 		};
 
 		enum OnlineDuel {
@@ -74,7 +75,7 @@ namespace ygo {
 			REFRESH = 356,
 			ROOMS = 194,
 			ROOMS_LIST = 197,
-			JOIN_ONLINE_DUEL,
+			JOIN_ONLINE_DUEL = 357,
 			SERVER = 358,
 			PLAYER_NAME = 335,
 			ALLOWED_CARDS = 359,
@@ -119,7 +120,10 @@ namespace ygo {
 		};
 
 		enum PuzzlesMenu {
-			PUZZLES_START
+			PUZZLES_START = 380,
+			PUZZLES_DELETE = 381,
+			PUZZLES_RENAME = 382,
+			PUZZLES_OPEN_FILE = 383
 		};
 	};
 }

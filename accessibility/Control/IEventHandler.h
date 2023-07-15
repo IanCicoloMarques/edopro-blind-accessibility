@@ -1,7 +1,6 @@
 #ifndef IEVENTHANDLER_H
 #define IEVENTHANDLER_H
 
-#include "../../irrlicht/include/Keycodes.h"
 #include "../../irrlicht/include/IEventReceiver.h"
 /**
  * \brief Interface used to control the game events, like key presses, mouse clicks, etc.

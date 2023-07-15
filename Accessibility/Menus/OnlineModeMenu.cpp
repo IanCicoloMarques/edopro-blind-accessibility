@@ -6,6 +6,11 @@
 
 namespace ygo {
 	OnlineModeMenuHandler* OnlineModeMenuHandler::_menuHandler = nullptr;
+	std::vector<int> OnlineModeMenuHandler::onlineModeMenu = {
+		MenuType::OnlineMenu::HOST, MenuType::OnlineMenu::REFRESH, MenuType::OnlineMenu::ROOMS,
+		MenuType::OnlineMenu::SERVER, MenuType::OnlineMenu::PLAYER_NAME, MenuType::OnlineMenu::ALLOWED_CARDS,
+		MenuType::OnlineMenu::FORBIDDEN_LIST, MenuType::OnlineMenu::LOCKED_ROOMS, MenuType::OnlineMenu::STARTED_ROOMS
+	};
 
 	OnlineModeMenuHandler::OnlineModeMenuHandler(const int activeMenu, const std::vector<int>& selectedMenu): BaseMenu{ activeMenu, selectedMenu }
 	{}
@@ -15,6 +20,14 @@ namespace ygo {
 		if (_menuHandler == nullptr)
 			_menuHandler = new OnlineModeMenuHandler();
 		return _menuHandler;
+	}
+
+	bool OnlineModeMenuHandler::IsActive()
+	{
+		bool isActive = false;
+		if (mainGame->ebStartLP->isTrulyVisible())
+			isActive = true;
+		return isActive;
 	}
 
 	static void CheckBox(irr::gui::IGUICheckBox* chkbox) {
@@ -30,22 +43,35 @@ namespace ygo {
 	void OnlineModeMenuHandler::KeyInputEvent(const irr::SEvent& event)
 	{
 		switch (event.KeyInput.Key) {
+
+			case irr::KEY_KEY_I: {
+					if (!event.KeyInput.PressedDown && mainGame->roomListTable->isTrulyVisible() && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
+						//ScreenReader::getReader()->textToSpeech(fmt::format(L"Player {}", mainGame->roomListTable->getCellData(onlineMatchCounter, 0)));
+						ScreenReader::getReader()->textToSpeech(fmt::format(gDataManager->GetAccessibilityString(186).data(), mainGame->roomListTable->getCellText(_onlineMatchIndex, 1)));
+						ScreenReader::getReader()->textToSpeech(fmt::format(gDataManager->GetAccessibilityString(187).data(), mainGame->roomListTable->getCellText(_onlineMatchIndex, 2)));
+						ScreenReader::getReader()->textToSpeech(fmt::format(gDataManager->GetAccessibilityString(188).data(), mainGame->roomListTable->getCellText(_onlineMatchIndex, 3)));
+						ScreenReader::getReader()->textToSpeech(fmt::format(gDataManager->GetAccessibilityString(189).data(), mainGame->roomListTable->getCellText(_onlineMatchIndex, 4)));
+						ScreenReader::getReader()->textToSpeech(fmt::format(gDataManager->GetAccessibilityString(190).data(), mainGame->roomListTable->getCellText(_onlineMatchIndex, 5)));
+						ScreenReader::getReader()->textToSpeech(fmt::format(gDataManager->GetAccessibilityString(191).data(), mainGame->roomListTable->getCellText(_onlineMatchIndex, 6)));
+					}
+					break;
+			}
 			case irr::KEY_DOWN:
 			case irr::KEY_UP: {
-						if (!event.KeyInput.PressedDown && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
-							if (!event.KeyInput.PressedDown && mainGame->cbDeckSelect->isTrulyVisible() && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
-								const std::wstring nvdaString = fmt::format(gDataManager->GetAccessibilityString(192).data(), mainGame->cbDeckSelect->getItem(mainGame->cbDeckSelect->getSelected()));
-								ScreenReader::getReader()->readScreen(nvdaString);
-							}
-							else if (mainGame->roomListTable->isTrulyVisible() && _currentMenu == MenuType::OnlineMenu::ROOMS)
-								ReadOnlineRoomFromList(event.KeyInput.Key);
-						}
-						break;
+				if (!event.KeyInput.PressedDown && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
+					if (mainGame->roomListTable->isTrulyVisible() && _currentMenu == MenuType::OnlineMenu::ROOMS)
+						ReadOnlineRoomFromList(event.KeyInput.Key);
+				}
+				break;
 			}
 			case irr::KEY_LEFT:
 			case irr::KEY_RIGHT: {
 				if (!event.KeyInput.PressedDown && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX))
+				{
+					if (_selectedMenu != onlineModeMenu)
+						_selectedMenu = onlineModeMenu;
 					SetMenu(event.KeyInput.Key);
+				}
 				break;
 			}
 			case irr::KEY_RETURN: {
@@ -58,7 +84,7 @@ namespace ygo {
 						_onlineMatchIndex = 0;
 						ServerLobby::RefreshRooms();
 					}
-					else if (_currentMenu == MenuType::OnlineMenu::JOIN_ONLINE_DUEL && mainGame->btnJoinHost2->isEnabled())
+					else if (_currentMenu == MenuType::OnlineMenu::ROOMS && mainGame->btnJoinHost2->isEnabled())
 						ClickButton(mainGame->btnJoinHost2);
 					else if (_currentMenu == MenuType::OnlineMenu::SERVER && mainGame->serverChoice->isTrulyVisible())
 					{
@@ -94,10 +120,8 @@ namespace ygo {
 			}
 			case irr::KEY_KEY_0: {
 				if (!event.KeyInput.PressedDown && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
-					if (mainGame->gSettings.window->isTrulyVisible())
-						mainGame->HideElement(mainGame->gSettings.window);
-					else if (mainGame->btnModeExit->isTrulyVisible())
-						ClickButton(mainGame->btnModeExit);
+					if (mainGame->btnJoinCancel2->isTrulyVisible())
+						ClickButton(mainGame->btnJoinCancel2);
 					if (_selectedMenu.empty())
 						_selectedMenu = _activeMenu;
 					else
@@ -111,7 +135,7 @@ namespace ygo {
 
 	void OnlineModeMenuHandler::GuiEvent(const irr::SEvent& event)
 	{
-		int id = event.GUIEvent.Caller->getID();
+		const int id = event.GUIEvent.Caller->getID();
 		switch (event.GUIEvent.EventType) {
 			case irr::gui::EGET_CHECKBOX_CHANGED: {
 				switch (id) {
@@ -139,18 +163,18 @@ namespace ygo {
 			case irr::gui::EGET_COMBO_BOX_CHANGED: {
 				switch (id) {
 					case SERVER_CHOICE: {
-						std::wstring nvdaString = fmt::format(L"{}", mainGame->serverChoice->getItem(mainGame->serverChoice->getSelected()));
-						ScreenReader::getReader()->readScreen(nvdaString.c_str());
+						const std::wstring nvdaString = fmt::format(L"{}", mainGame->serverChoice->getItem(mainGame->serverChoice->getSelected()));
+						ScreenReader::getReader()->readScreen(nvdaString);
 						break;
 					}
 					case CB_FILTER_ALLOWED_CARDS: {
-						std::wstring nvdaString = fmt::format(L"{}", mainGame->cbFilterRule->getItem(mainGame->cbFilterRule->getSelected()));
-						ScreenReader::getReader()->readScreen(nvdaString.c_str());
+						const std::wstring nvdaString = fmt::format(L"{}", mainGame->cbFilterRule->getItem(mainGame->cbFilterRule->getSelected()));
+						ScreenReader::getReader()->readScreen(nvdaString);
 						break;
 					}
 					case CB_FILTER_BANLIST: {
-						std::wstring nvdaString = fmt::format(L"{}", mainGame->cbFilterBanlist->getItem(mainGame->cbFilterBanlist->getSelected()));
-						ScreenReader::getReader()->readScreen(nvdaString.c_str());
+						const std::wstring nvdaString = fmt::format(L"{}", mainGame->cbFilterBanlist->getItem(mainGame->cbFilterBanlist->getSelected()));
+						ScreenReader::getReader()->readScreen(nvdaString);
 						break;
 					}
 				}

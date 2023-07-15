@@ -6,6 +6,10 @@
 
 namespace ygo {
 	MainMenuHandler* MainMenuHandler::_menuHandler = nullptr;
+	std::vector<int> MainMenuHandler::mainMenu = { MenuType::MainMenu::MM_ONLINE_DUEL, MenuType::MainMenu::MM_SP_DUEL,
+		MenuType::MainMenu::MM_PUZZLES, MenuType::MainMenu::MM_REPLAY,
+		MenuType::MainMenu::MM_DECK_EDITOR, MenuType::MainMenu::MM_GAME_OPTIONS
+	};
 
 	static inline void TriggerEvent(irr::gui::IGUIElement* target, irr::gui::EGUI_EVENT_TYPE type) {
 		irr::SEvent event;
@@ -27,6 +31,16 @@ namespace ygo {
 		if (_menuHandler == nullptr)
 			_menuHandler = new MainMenuHandler();
 		return _menuHandler;
+	}
+
+	bool MainMenuHandler::IsActive()
+	{
+		bool isActive = false;
+		if (mainGame->btnOnlineMode->isEnabled() && mainGame->btnOnlineMode->isTrulyVisible())
+			isActive = true;
+		else if(mainGame->btnReplayCancel->isEnabled() && mainGame->btnReplayCancel->isTrulyVisible())
+			isActive = true;
+		return isActive;
 	}
 
 	void MainMenuHandler::ReadMenuAndValue()
@@ -65,7 +79,11 @@ namespace ygo {
 			case irr::KEY_LEFT:
 			case irr::KEY_RIGHT: {
 				if (!event.KeyInput.PressedDown && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX))
+				{
+					if (_selectedMenu != mainMenu)
+						_selectedMenu = mainMenu;
 					SetMenu(event.KeyInput.Key);
+				}
 				break;
 			}
 			case irr::KEY_RETURN: {
@@ -89,7 +107,6 @@ namespace ygo {
 					}
 					else if (_currentMenu == MenuType::MainMenu::MM_GAME_OPTIONS && mainGame->wBtnSettings->isEnabled()) {
 						ClickButton(mainGame->btnSettings);
-						_selectedMenu = menuGameOptions;
 					}
 					else if (_currentMenu == MenuType::MainMenu::MM_ACCESSIBILITY_KEYS) {
 						ScreenReader::getReader()->readScreen(StringBuilder::getBuiltMessage());

@@ -9,9 +9,10 @@
 namespace ygo {
 	class OnlineModeMenuHandler final : public BaseMenu {
 	public:
-		OnlineModeMenuHandler(int activeMenu = MenuType::MenuList::ONLINE_MODE_MENU, const std::vector<int>&
-			                   selectedMenu = { MenuType::OnlineMenu::HOST, MenuType::OnlineMenu::REFRESH, MenuType::OnlineMenu::ROOMS, MenuType::OnlineMenu::SERVER, MenuType::OnlineMenu::PLAYER_NAME, MenuType::OnlineMenu::ALLOWED_CARDS, MenuType::OnlineMenu::FORBIDDEN_LIST, MenuType::OnlineMenu::LOCKED_ROOMS, MenuType::OnlineMenu::STARTED_ROOMS });
+		static std::vector<int> onlineModeMenu;
+		OnlineModeMenuHandler(int activeMenu = MenuType::MenuList::ONLINE_MODE_MENU, const std::vector<int>& selectedMenu = onlineModeMenu);
 		static BaseMenu* GetMenu();
+		static bool IsActive();
 		void KeyInputEvent(const irr::SEvent& event) override;
 		void GuiEvent(const irr::SEvent& event) override;
 	private:

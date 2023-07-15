@@ -127,6 +127,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\accessibility\Helper\ButtonHelper.h" />
+    <ClInclude Include="..\accessibility\Menus\AIMenu.h" />
+    <ClInclude Include="..\accessibility\Menus\ConfigurationMenu.h" />
     <ClInclude Include="..\accessibility\Menus\DeckEditorMenu.h" />
     <ClInclude Include="..\accessibility\Menus\DuelRulesMenu.h" />
     <ClInclude Include="..\accessibility\Menus\LanModeMenu.h" />
@@ -135,6 +137,7 @@
     <ClInclude Include="..\accessibility\Menus\OnlineModeMenu.h" />
     <ClInclude Include="..\accessibility\Menus\PreDuelMenu.h" />
     <ClInclude Include="..\accessibility\Menus\PreDuelOnlineMenu.h" />
+    <ClInclude Include="..\accessibility\Menus\PuzzlesMenu.h" />
     <ClInclude Include="..\gframe\Base64.h" />
     <ClInclude Include="..\gframe\CGUICustomCheckBox\CGUICustomCheckBox.h" />
     <ClInclude Include="..\gframe\CGUICustomComboBox\CGUICustomComboBox.h" />
@@ -236,6 +239,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\accessibility\Helper\ButtonHelper.cpp" />
+    <ClCompile Include="..\accessibility\Menus\AIMenu.cpp" />
+    <ClCompile Include="..\accessibility\Menus\ConfigurationMenu.cpp" />
     <ClCompile Include="..\accessibility\Menus\DeckEditorMenu.cpp" />
     <ClCompile Include="..\accessibility\Menus\DuelRulesMenu.cpp" />
     <ClCompile Include="..\accessibility\Menus\LanModeMenu.cpp" />
@@ -243,6 +248,7 @@
     <ClCompile Include="..\accessibility\Menus\OnlineModeMenu.cpp" />
     <ClCompile Include="..\accessibility\Menus\PreDuelMenu.cpp" />
     <ClCompile Include="..\accessibility\Menus\PreDuelOnlineMenu.cpp" />
+    <ClCompile Include="..\accessibility\Menus\PuzzlesMenu.cpp" />
     <ClCompile Include="..\gframe\CGUICustomCheckBox\CGUICustomCheckBox.cpp" />
     <ClCompile Include="..\gframe\CGUICustomComboBox\CGUICustomComboBox.cpp" />
     <ClCompile Include="..\gframe\CGUICustomContextMenu\CGUICustomContextMenu.cpp" />

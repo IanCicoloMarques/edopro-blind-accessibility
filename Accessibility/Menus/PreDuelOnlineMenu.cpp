@@ -6,6 +6,11 @@
 
 namespace ygo {
 	PreDuelOnlineMenuHandler* PreDuelOnlineMenuHandler::_menuHandler = nullptr;
+	std::vector<int> PreDuelOnlineMenuHandler::preDuelOnlineMenu = {
+		MenuType::PlayerDuel::PD_START_DUEL, MenuType::PlayerDuel::PD_SELECT_DECK,
+		MenuType::PlayerDuel::PD_PLAYER_READY, MenuType::OnlineDuel::OD_DUEL_MODE,
+		MenuType::OnlineDuel::OD_SPECTATE_MODE
+	};
 
 	PreDuelOnlineMenuHandler::PreDuelOnlineMenuHandler(const int activeMenu, const std::vector<int>& selectedMenu): BaseMenu{ activeMenu, selectedMenu }
 	{}
@@ -15,6 +20,16 @@ namespace ygo {
 		if (_menuHandler == nullptr)
 			_menuHandler = new PreDuelOnlineMenuHandler();
 		return _menuHandler;
+	}
+
+	bool PreDuelOnlineMenuHandler::IsActive()
+	{
+		bool isActive = false;
+		if (mainGame->btnHostPrepDuelist->isEnabled() && mainGame->btnHostPrepDuelist->isTrulyVisible())
+			isActive = true;
+		else if(mainGame->btnHostPrepOB->isEnabled() && mainGame->btnHostPrepOB->isTrulyVisible())
+			isActive = true;
+		return isActive;
 	}
 
 	void PreDuelOnlineMenuHandler::ReadMenuAndValue()
@@ -47,7 +62,11 @@ namespace ygo {
 			case irr::KEY_LEFT:
 			case irr::KEY_RIGHT: {
 				if (!event.KeyInput.PressedDown && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX))
+				{
+					if (_selectedMenu != preDuelOnlineMenu)
+						_selectedMenu = preDuelOnlineMenu;
 					SetMenu(event.KeyInput.Key);
+				}
 				break;
 			}
 			case irr::KEY_RETURN: {
@@ -88,10 +107,8 @@ namespace ygo {
 			}
 			case irr::KEY_KEY_0: {
 				if (!event.KeyInput.PressedDown && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
-					if (mainGame->gSettings.window->isTrulyVisible())
-						mainGame->HideElement(mainGame->gSettings.window);
-					else if (mainGame->btnModeExit->isTrulyVisible())
-						ClickButton(mainGame->btnModeExit);
+					if (mainGame->btnHostPrepCancel->isTrulyVisible())
+						ClickButton(mainGame->btnHostPrepCancel);
 					if (_selectedMenu.empty())
 						_selectedMenu = _activeMenu;
 					else
@@ -105,18 +122,18 @@ namespace ygo {
 
 	void PreDuelOnlineMenuHandler::GuiEvent(const irr::SEvent& event)
 	{
-		int id = event.GUIEvent.Caller->getID();
+		const int id = event.GUIEvent.Caller->getID();
 		switch (event.GUIEvent.EventType) {
 			case irr::gui::EGET_COMBO_BOX_CHANGED: {
 				switch (id) {
 					case COMBOBOX_PLAYER_DECK: {
-						std::wstring nvdaString = fmt::format(gDataManager->GetAccessibilityString(192).data(), mainGame->cbDeckSelect->getItem(mainGame->cbDeckSelect->getSelected()));
-						ScreenReader::getReader()->readScreen(nvdaString.c_str());
+						const std::wstring nvdaString = fmt::format(gDataManager->GetAccessibilityString(192).data(), mainGame->cbDeckSelect->getItem(mainGame->cbDeckSelect->getSelected()));
+						ScreenReader::getReader()->readScreen(nvdaString);
 						break;
 					}
 					case COMBOBOX_BOT_DECK: {
-						std::wstring nvdaString = fmt::format(gDataManager->GetAccessibilityString(192).data(), mainGame->gBot.cbBotDeck->getItem(mainGame->gBot.cbBotDeck->getSelected()));
-						ScreenReader::getReader()->readScreen(nvdaString.c_str());
+						const std::wstring nvdaString = fmt::format(gDataManager->GetAccessibilityString(192).data(), mainGame->gBot.cbBotDeck->getItem(mainGame->gBot.cbBotDeck->getSelected()));
+						ScreenReader::getReader()->readScreen(nvdaString);
 						break;
 					}
 				}

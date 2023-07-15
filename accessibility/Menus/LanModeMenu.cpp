@@ -6,6 +6,7 @@
 
 namespace ygo {
 	LanModeMenuHandler* LanModeMenuHandler::_menuHandler = nullptr;
+	std::vector<int> LanModeMenuHandler::lanModeMenu = { MenuType::SinglePlayerMenu::SP_HOST, MenuType::SinglePlayerMenu::SP_PLAYER_NAME };
 
 	LanModeMenuHandler::LanModeMenuHandler(const int activeMenu, const std::vector<int>& selectedMenu): BaseMenu{ activeMenu, selectedMenu }
 	{}
@@ -15,6 +16,14 @@ namespace ygo {
 		if (_menuHandler == nullptr)
 			_menuHandler = new LanModeMenuHandler();
 		return _menuHandler;
+	}
+
+	bool LanModeMenuHandler::IsActive()
+	{
+		bool isActive = false;
+		if (mainGame->btnCreateHost->isEnabled() && mainGame->btnCreateHost->isTrulyVisible())
+			isActive = true;
+		return isActive;
 	}
 
 	void LanModeMenuHandler::ReadMenuAndValue()
@@ -37,16 +46,19 @@ namespace ygo {
 			case irr::KEY_LEFT:
 			case irr::KEY_RIGHT: {
 				if (!event.KeyInput.PressedDown && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX))
+				{
+					if (_selectedMenu != lanModeMenu)
+						_selectedMenu = lanModeMenu;
 					SetMenu(event.KeyInput.Key);
+				}
 				break;
 			}
 			case irr::KEY_RETURN: {
 				if (!event.KeyInput.PressedDown) {
 					if (_activeMenu != _selectedMenu)
 						SetMenu();
-					if (_currentMenu == MenuType::SinglePlayerMenu::SP_HOST && mainGame->btnCreateHost->isEnabled()) {
+					if (_currentMenu == MenuType::SinglePlayerMenu::SP_HOST && mainGame->btnCreateHost->isEnabled())
 						ClickButton(mainGame->btnCreateHost);
-					}
 					else if (_currentMenu == MenuType::SinglePlayerMenu::SP_PLAYER_NAME && mainGame->ebNickName->isTrulyVisible()) {
 						if (!_typing) {
 							ScreenReader::getReader()->readScreen(std::wstring(gDataManager->GetAccessibilityString(225).data()));
@@ -59,15 +71,14 @@ namespace ygo {
 							ScreenReader::getReader()->readScreen(fmt::format(gDataManager->GetAccessibilityString(226).data(), mainGame->ebNickName->getText()));
 						}
 					}
+					ReadMenuAndValue();
 				}
 				break;
 			}
 			case irr::KEY_KEY_0: {
 				if (!event.KeyInput.PressedDown && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
-					if (mainGame->gSettings.window->isTrulyVisible())
-						mainGame->HideElement(mainGame->gSettings.window);
-					else if (mainGame->btnModeExit->isTrulyVisible())
-						ClickButton(mainGame->btnModeExit);
+					if (mainGame->btnJoinCancel->isTrulyVisible())
+						ClickButton(mainGame->btnJoinCancel);
 					if (_selectedMenu.empty())
 						_selectedMenu = _selectedMenu;
 					else

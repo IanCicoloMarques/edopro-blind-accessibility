@@ -6,6 +6,7 @@
 
 namespace ygo {
 	DeckEditorMenuHandler* DeckEditorMenuHandler::_menuHandler = nullptr;
+	std::vector<int> DeckEditorMenuHandler::deckEditorMenu = { Accessibility::Dict::Menu::OK, Accessibility::Dict::Menu::CANCEL };
 
 	DeckEditorMenuHandler::DeckEditorMenuHandler(const int activeMenu, const std::vector<int>& selectedMenu): BaseMenu{ activeMenu, selectedMenu }
 	{}
@@ -37,7 +38,11 @@ namespace ygo {
 			case irr::KEY_LEFT:
 			case irr::KEY_RIGHT: {
 				if (!event.KeyInput.PressedDown && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX))
+				{
+					if (_selectedMenu != deckEditorMenu)
+						_selectedMenu = deckEditorMenu;
 					SetMenu(event.KeyInput.Key);
+				}
 				break;
 			}
 			case irr::KEY_RETURN: {

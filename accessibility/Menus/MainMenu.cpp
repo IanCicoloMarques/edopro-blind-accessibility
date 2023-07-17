@@ -82,14 +82,14 @@ namespace ygo {
 				{
 					if (_selectedMenu != mainMenu)
 						_selectedMenu = mainMenu;
-					SetMenu(event.KeyInput.Key);
+					SetSelectedMenu(event.KeyInput.Key);
 				}
 				break;
 			}
 			case irr::KEY_RETURN: {
 				if (!event.KeyInput.PressedDown) {
 					if (_selectedMenu != _activeMenu)
-						SetMenu();
+						SetSelectedMenu();
 					if (_currentMenu == MenuType::MainMenu::MM_ONLINE_DUEL && mainGame->btnOnlineMode->isEnabled()) {
 						ClickButton(mainGame->btnOnlineMode);
 					}

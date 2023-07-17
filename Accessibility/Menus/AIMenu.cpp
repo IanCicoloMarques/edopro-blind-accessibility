@@ -71,14 +71,14 @@ namespace ygo {
 				{
 					if (_selectedMenu != aiMenu)
 						_selectedMenu = aiMenu;
-					SetMenu(event.KeyInput.Key);
+					SetSelectedMenu(event.KeyInput.Key);
 				}
 				break;
 			}
 			case irr::KEY_RETURN: {
 				if (!event.KeyInput.PressedDown) {
 					if (_activeMenu != _selectedMenu)
-						SetMenu();
+						SetSelectedMenu();
 					if (_currentMenu == MenuType::AIConfigMenu::AIC_OK && mainGame->gBot.btnAdd->isTrulyVisible() && mainGame->gBot.btnAdd->isEnabled()) {
 						ClickButton(mainGame->gBot.btnAdd);
 					}

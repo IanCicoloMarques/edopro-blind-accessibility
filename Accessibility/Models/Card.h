@@ -1,6 +1,8 @@
 ﻿#pragma once
 #include <string>
-
+/**
+ * \brief Used to store card data during a Battle or in the Deck Editor
+ */
 class Card
 {
 public:
@@ -19,9 +21,14 @@ public:
 	std::wstring linkMarks;
 	std::wstring overlayedCards;
 	std::wstring location;
+	std::wstring limited;
 	uint8_t selectedPosition;
 	bool isLink = false;
 
+	/**
+	 * \brief Used to store card data during a Battle
+	 * \param selectedCard - Selected card to read data
+	 */
 	Card(ygo::ClientCard* selectedCard)
 	{
 		cardName = fmt::format(L"{}", ygo::gDataManager->GetName(selectedCard->code));
@@ -40,6 +47,27 @@ public:
 		selectedPosition = 0;
 	}
 
+	/**
+	 * \brief Used to store card data in the deck editor menu
+	 * \param selectedCard - Selected card to read data
+	 */
+	Card(const ygo::CardDataC* selectedCard)
+	{
+		cardName = fmt::format(L"{}", ygo::gDataManager->GetName(selectedCard->code));
+		cardType = fmt::format(L"{}", ygo::gDataManager->FormatType(selectedCard->type));
+		cardAttribute = fmt::format(L"{}", ygo::gDataManager->FormatAttribute(selectedCard->attribute));
+		SetLevel(selectedCard);
+		cardRace = fmt::format(L"{}", ygo::gDataManager->FormatRace(selectedCard->race));
+		cardAttack = fmt::format(ygo::gDataManager->GetAccessibilityString(69).data(), selectedCard->attack);
+		cardDefense = fmt::format(ygo::gDataManager->GetAccessibilityString(70).data(), selectedCard->defense);
+		cardEffect = fmt::format(L"{}", ygo::gDataManager->GetText(selectedCard->code));
+		leftScale = fmt::format(ygo::gDataManager->GetAccessibilityString(73).data(), selectedCard->lscale);
+		rightScale = fmt::format(ygo::gDataManager->GetAccessibilityString(74).data(), selectedCard->rscale);
+		linkMarks = GetLinkMarks(selectedCard);
+		limited = GetCardLimit(selectedCard);
+		selectedPosition = 0;
+	}
+
 	static bool IsLink(const ygo::ClientCard* selectedCard)
 	{
 		const std::wstring cardType = fmt::format(L"{}", ygo::gDataManager->FormatType(selectedCard->type));
@@ -54,7 +82,8 @@ public:
 	void ReadCardInfo()
 	{
 		ScreenReader::getReader()->readScreen(cardName, false);
-		ScreenReader::getReader()->readScreen(location, false);
+		if(!location.empty())
+			ScreenReader::getReader()->readScreen(location, false);
 		if (fieldSlot != fmt::format(ygo::gDataManager->GetAccessibilityString(75).data(), 0))
 			ScreenReader::getReader()->readScreen(fieldSlot, false);
 		if (selectedPosition != 10)
@@ -77,10 +106,35 @@ public:
 		if (rightScale != ygo::gDataManager->GetAccessibilityString(81).data())
 			ScreenReader::getReader()->readScreen(rightScale, false);
 		ScreenReader::getReader()->readScreen(cardEffect, false);
+		if (!limited.empty())
+			ScreenReader::getReader()->readScreen(limited, false);
+	}
+
+	void ReadCardResumedInfo()
+	{
+		ScreenReader::getReader()->readScreen(cardName, false);
+		ScreenReader::getReader()->readScreen(cardType, false);
+		if (cardType.find(ygo::gDataManager->GetAccessibilityString(76).data()) == std::string::npos &&
+			cardType.find(ygo::gDataManager->GetAccessibilityString(77).data()) == std::string::npos) {
+			ScreenReader::getReader()->readScreen(cardLevel, false);
+			ScreenReader::getReader()->readScreen(cardRace, false);
+			ScreenReader::getReader()->readScreen(cardAttack, false);
+			ScreenReader::getReader()->readScreen(cardDefense, false);
+		}
+		if (!limited.empty())
+			ScreenReader::getReader()->readScreen(limited, false);
 	}
 
 private:
 	void SetLevel(ygo::ClientCard* selectedCard)
+	{
+		cardLevel = selectedCard->link_marker != 0 ?
+			fmt::format(ygo::gDataManager->GetAccessibilityString(67).data(), ygo::gDataManager->GetCardData(selectedCard->code)->level) :
+			fmt::format(ygo::gDataManager->GetAccessibilityString(68).data(), ygo::gDataManager->GetCardData(selectedCard->code)->level);
+	}
+
+
+	void SetLevel(const ygo::CardDataC* selectedCard)
 	{
 		cardLevel = selectedCard->link_marker != 0 ?
 			fmt::format(ygo::gDataManager->GetAccessibilityString(67).data(), ygo::gDataManager->GetCardData(selectedCard->code)->level) :
@@ -120,6 +174,33 @@ private:
 		return _linkMark;
 	}
 
+	std::wstring GetLinkMarks(const ygo::CardDataC* selectedCard)
+	{
+		std::wstring _linkMark = std::wstring();
+		const uint32_t mark = selectedCard->link_marker;
+		if (mark & LINK_MARKER_BOTTOM_LEFT) {
+			_linkMark += ygo::gDataManager->GetAccessibilityString(130).data();
+		}
+		if (mark & LINK_MARKER_BOTTOM) {
+			_linkMark += ygo::gDataManager->GetAccessibilityString(131).data();
+		}
+		if (mark & LINK_MARKER_BOTTOM_RIGHT) {
+			_linkMark += ygo::gDataManager->GetAccessibilityString(132).data();
+		}
+		if (mark & LINK_MARKER_TOP_LEFT) {
+			_linkMark += ygo::gDataManager->GetAccessibilityString(133).data();
+		}
+		if (mark & LINK_MARKER_TOP) {
+			_linkMark += ygo::gDataManager->GetAccessibilityString(134).data();
+		}
+		if (mark & LINK_MARKER_TOP_RIGHT) {
+			_linkMark += ygo::gDataManager->GetAccessibilityString(135).data();
+		}
+		if(!_linkMark.empty())
+			isLink = true;
+		return _linkMark;
+	}
+
 	std::wstring GetOverlayedCards(ygo::ClientCard* selectedCard)
 	{
 		std::wstring _overlayedCards = std::wstring();
@@ -132,4 +213,20 @@ private:
 		}
 		return _overlayedCards;
 	}
+
+
+	std::wstring GetCardLimit(const ygo::CardDataC* selectedCard)
+	{
+		std::wstring limited = std::wstring();
+		int limit = ygo::mainGame->deckBuilder.filterList->whitelist ? 0 : 3;
+		auto endit = ygo::mainGame->deckBuilder.filterList->content.end();
+		auto it = ygo::mainGame->deckBuilder.filterList->GetLimitationIterator(selectedCard);
+		if (it != endit)
+			limit = it->second;
+		if (limit == 0)
+			limited = ygo::gDataManager->GetAccessibilityString(167).data();
+		else if (limit != 0)
+			limited = fmt::format(ygo::gDataManager->GetAccessibilityString(168).data(), limit);
+		return limited;
+	};
 };

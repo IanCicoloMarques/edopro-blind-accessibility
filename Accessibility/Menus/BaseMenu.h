@@ -8,6 +8,9 @@
 #include <IGUIEditBox.h>
 #include <IrrlichtDevice.h>
 
+#include "IGUIComboBox.h"
+#include "ScreenReader/ScreenReader.h"
+
 namespace ygo {
 	class BaseMenu : public IEventHandler {
 
@@ -35,7 +38,12 @@ namespace ygo {
 		 * \brief Set the next menu selected after pressing the keys Arrow Right or Arrow Left
 		 * \param key can be either Arrow Right or Arrow Left
 		 */
-		virtual void SetMenu(irr::EKEY_CODE key = irr::EKEY_CODE::KEY_UNKNOWN);
+		virtual void SetSelectedMenu(irr::EKEY_CODE key = irr::EKEY_CODE::KEY_UNKNOWN);
+
+		/**
+		 * \brief Set the active menu
+		 */
+		virtual void SetMenu();
 
 		/**
 		 * \brief Reads, using text-to-speech, the current menu name and value
@@ -58,6 +66,17 @@ namespace ygo {
 			if (editBox->isTrulyVisible()) {
 				editBox->setText(L"");
 				mainGame->env->setFocus(editBox);
+			}
+		}
+
+		/**
+		 * \brief Read the current value of a combo box
+		 * \param comboBox the combo box to be read
+		 */
+		static void ReadComboBox(const irr::gui::IGUIComboBox* comboBox) {
+			if (comboBox->isTrulyVisible()) {
+				const std::wstring nvdaString = fmt::format(L"{}", comboBox->getItem(comboBox->getSelected()));
+				ScreenReader::getReader()->readScreen(nvdaString);
 			}
 		}
 
@@ -115,15 +134,9 @@ namespace ygo {
 		return true;
 	}
 
-	inline void BaseMenu::SetMenu(irr::EKEY_CODE key)
+	inline void BaseMenu::SetSelectedMenu(irr::EKEY_CODE key)
 	{
-		_typing = false;
-		mainGame->env->removeFocus(mainGame->env->getFocus());
-		if (_activeMenu != _selectedMenu)
-		{
-			_activeMenu = _selectedMenu;
-			_currentMenuIndex = 0;
-		}
+		SetMenu();
 		if(key == irr::KEY_RIGHT)
 		{
 			_currentMenuIndex++;
@@ -139,6 +152,19 @@ namespace ygo {
 		if(MenuInRange())
 			_currentMenu = _activeMenu.at(_currentMenuIndex);
 		ReadMenuAndValue();
+	}
+
+	inline void BaseMenu::SetMenu()
+	{
+		_typing = false;
+		mainGame->env->removeFocus(mainGame->env->getFocus());
+		if (_activeMenu != _selectedMenu)
+		{
+			_activeMenu = _selectedMenu;
+			_currentMenuIndex = 0;
+			if(MenuInRange())
+				_currentMenu = _activeMenu.at(_currentMenuIndex);
+		}
 	}
 }
 

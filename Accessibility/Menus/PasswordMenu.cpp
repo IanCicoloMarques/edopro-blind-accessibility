@@ -67,14 +67,14 @@ namespace ygo {
 				{
 					if (_selectedMenu != passwordMenu)
 						_selectedMenu = passwordMenu;
-					SetMenu(event.KeyInput.Key);
+					SetSelectedMenu(event.KeyInput.Key);
 				}
 				break;
 			}
 			case irr::KEY_RETURN: {
 				if (!event.KeyInput.PressedDown) {
 					if (_activeMenu != _selectedMenu)
-						SetMenu();
+						SetSelectedMenu();
 					if (_currentMenu == MenuType::PasswordMenu::PASS_SET_PASSWORD && mainGame->ebRPName->isTrulyVisible()) {
 						if (!_typing) {
 							ScreenReader::getReader()->readScreen(std::wstring(gDataManager->GetAccessibilityString(223).data()));

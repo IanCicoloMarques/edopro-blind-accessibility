@@ -58,14 +58,14 @@ namespace ygo {
 				{
 					if (_selectedMenu != preDuelMenu)
 						_selectedMenu = preDuelMenu;
-					SetMenu(event.KeyInput.Key);
+					SetSelectedMenu(event.KeyInput.Key);
 				}
 				break;
 			}
 			case irr::KEY_RETURN: {
 				if (!event.KeyInput.PressedDown) {
 					if (_activeMenu != _selectedMenu)
-						SetMenu();
+						SetSelectedMenu();
 					if (_currentMenu == MenuType::PlayerDuel::PD_START_DUEL && mainGame->btnHostPrepStart->isEnabled()) {
 						ClickButton(mainGame->btnHostPrepStart);
 					}

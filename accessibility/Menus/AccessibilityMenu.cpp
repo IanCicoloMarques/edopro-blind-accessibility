@@ -49,7 +49,7 @@ namespace ygo {
 	void MenuEventHandler::ReadMenu(irr::EKEY_CODE ekeyCode)
 	{
 		if (activeMenu != nullptr) {
-			activeMenu->SetMenu(ekeyCode);
+			activeMenu->SetSelectedMenu(ekeyCode);
 		}
 	};
 

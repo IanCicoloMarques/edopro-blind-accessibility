@@ -84,14 +84,14 @@ namespace ygo {
 				{
 					if (_selectedMenu != duelRulesMenu)
 						_selectedMenu = duelRulesMenu;
-					SetMenu(event.KeyInput.Key);
+					SetSelectedMenu(event.KeyInput.Key);
 				}
 				break;
 			}
 			case irr::KEY_RETURN: {
 				if (!event.KeyInput.PressedDown) {
 					if (_selectedMenu != _activeMenu)
-						SetMenu();
+						SetSelectedMenu();
 					if (_currentMenu == MenuType::HostDuel::RULES_OK && mainGame->btnHostConfirm->isEnabled())
 						ClickButton(mainGame->btnHostConfirm);
 					else if (_currentMenu == MenuType::HostDuel::NUM_PLAYERS_T1 && mainGame->ebTeam1->isTrulyVisible()) {

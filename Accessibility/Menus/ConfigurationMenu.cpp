@@ -70,14 +70,14 @@ namespace ygo {
 					if (_selectedMenu != configurationMenu)
 						_selectedMenu = configurationMenu;
 					if(!_scrolling)
-						SetMenu(event.KeyInput.Key);
+						SetSelectedMenu(event.KeyInput.Key);
 				}
 				break;
 			}
 			case irr::KEY_RETURN: {
 				if (!event.KeyInput.PressedDown) {
 					if (_activeMenu != _selectedMenu)
-						SetMenu();
+						SetSelectedMenu();
 					if (_currentMenu == MenuType::GameOptionsMenu::GAMEOP_ENABLE_SOUND_EFFECTS && mainGame->gSettings.chkEnableSound->isTrulyVisible()) {
 						CheckBox(mainGame->gSettings.chkEnableSound);
 						gSoundManager->EnableSounds(mainGame->gSettings.chkEnableSound->isChecked());

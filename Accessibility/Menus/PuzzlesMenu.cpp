@@ -65,14 +65,14 @@ namespace ygo {
 					if (_selectedMenu != puzzlesMenu)
 						_selectedMenu = puzzlesMenu;
 					if(!_scrolling)
-						SetMenu(event.KeyInput.Key);
+						SetSelectedMenu(event.KeyInput.Key);
 				}
 				break;
 			}
 			case irr::KEY_RETURN: {
 				if (!event.KeyInput.PressedDown) {
 					if (_activeMenu != _selectedMenu)
-						SetMenu();
+						SetSelectedMenu();
 					if (_currentMenu == MenuType::PuzzlesMenu::PUZZLES_START && mainGame->btnLoadSinglePlay->isTrulyVisible())
 						ClickButton(mainGame->btnLoadSinglePlay);
 					else if (_currentMenu == MenuType::PuzzlesMenu::PUZZLES_DELETE && mainGame->btnDeleteSinglePlay->isTrulyVisible())

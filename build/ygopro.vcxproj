@@ -313,7 +313,6 @@
     <ClCompile Include="..\gframe\windbot_panel.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\accessibility\Control\DeckHandler.cpp" />
     <ClCompile Include="..\accessibility\Control\EventHandler.cpp" />
     <ClCompile Include="..\accessibility\Menus\AccessibilityMenu.cpp" />
   </ItemGroup>

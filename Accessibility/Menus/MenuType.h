@@ -85,7 +85,10 @@ namespace ygo {
 		};
 
 		enum DeckEditorMenu {
-			DE_NEW_DECK
+			DE_VIEW_CARDS,
+			DE_DECK_OPTIONS,
+			DE_SEARCH_OPTIONS,
+			DE_MENU
 		};
 
 		enum PasswordMenu {
@@ -100,23 +103,6 @@ namespace ygo {
 			GAMEOP_ENABLE_MUSIC = 368,
 			GAMEOP_MUSIC_VOLUME = 369,
 			USE_MUD_KEYBOARD = 377
-		};
-
-		enum DeckOptionsMenu {
-			DECKOP_SELECT_DECK,
-			DECKOP_SEARCH,
-			DECKOP_CATEGORY,
-			DECKOP_SUB_CATEGORY,
-			DECKOP_ATTRIBUTE,
-			DECKOP_TYPE,
-			DECKOP_LEVEL,
-			DECKOP_SCALE,
-			DECKOP_LIMIT,
-			DECKOP_ATTACK,
-			DECKOP_DEFENSE,
-			DECKOP_LINK_MARKER,
-			DECKOP_EFFECT,
-			DECKOP_CLEAR_SEARCH
 		};
 
 		enum PuzzlesMenu {

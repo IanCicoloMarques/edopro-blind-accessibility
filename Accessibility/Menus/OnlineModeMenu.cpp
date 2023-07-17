@@ -70,14 +70,14 @@ namespace ygo {
 				{
 					if (_selectedMenu != onlineModeMenu)
 						_selectedMenu = onlineModeMenu;
-					SetMenu(event.KeyInput.Key);
+					SetSelectedMenu(event.KeyInput.Key);
 				}
 				break;
 			}
 			case irr::KEY_RETURN: {
 				if (!event.KeyInput.PressedDown) {
 					if (_activeMenu != _selectedMenu)
-						SetMenu();
+						SetSelectedMenu();
 					if (_currentMenu == MenuType::OnlineMenu::HOST && mainGame->btnCreateHost2->isEnabled())
 						ClickButton(mainGame->btnCreateHost2);
 					else if (_currentMenu == MenuType::OnlineMenu::REFRESH && mainGame->btnLanRefresh2->isEnabled()) {

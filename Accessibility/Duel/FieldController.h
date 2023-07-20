@@ -1,11 +1,11 @@
-#ifndef FIELD_CONTROLLER_HANDLER_H
-#define FIELD_CONTROLLER_HANDLER_H
+#ifndef FIELD_CONTROLLER_H
+#define FIELD_CONTROLLER_H
 
+#include "Models/FieldSlotModel.h"
 #include "CardController.h"
-#include "FieldSlotController.h"
 #include "../gframe/client_card.h"
+#include "../Control/IEventHandler.h"
 
-#include "IEventReceiver.h"
 
 namespace ygo {
 	class FieldController{
@@ -24,4 +24,4 @@ namespace ygo {
 	};
 }
 
-#endif //FIELD_CONTROLLER_HANDLER_H
+#endif //FIELD_CONTROLLER_H

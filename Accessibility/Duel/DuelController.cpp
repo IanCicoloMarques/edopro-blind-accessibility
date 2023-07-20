@@ -1,15 +1,15 @@
-#include "DuelController.h"
-
-#include <Control/EventHandler.h>
+﻿#include "DuelController.h"
 
 #include "CardController.h"
 #include "CardDisplayController.h"
 #include "FieldController.h"
+#include "IGUIButton.h"
 #include "Configuration/Keyboard/KeyboardConfiguration.h"
 #include "Helper/ButtonHelper.h"
-#include "Models/Card.h"
 #include "Models/UseCardModel.h"
 #include "ScreenReader/ScreenReader.h"
+#include "../gframe/game.h"
+#include "Models/Card.h"
 
 namespace ygo {
 	IEventHandler* DuelController::_duelController = nullptr;
@@ -33,18 +33,7 @@ namespace ygo {
 
 	void DuelController::GuiEvent(const irr::SEvent& event)
 	{
-		const int id = event.GUIEvent.Caller->getID();
-		switch (event.GUIEvent.EventType) {
-			case irr::gui::EGET_COMBO_BOX_CHANGED: {
-					switch (id) {
-					case COMBOBOX_BOT_DECK: {
-						const std::wstring nvdaString = fmt::format(gDataManager->GetAccessibilityString(192).data(), mainGame->gBot.cbBotDeck->getItem(mainGame->gBot.cbBotDeck->getSelected()));
-						ScreenReader::getReader()->readScreen(nvdaString);
-						break;
-					}
-				}
-			}
-		}
+		return;
 	}
 
 	void DuelController::DuelCommands(const irr::SEvent& event, ClientCard* card)

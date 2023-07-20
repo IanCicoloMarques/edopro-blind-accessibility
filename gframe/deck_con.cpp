@@ -15,8 +15,8 @@
 #include "single_mode.h"
 #include "client_card.h"
 #include "../accessibility/ScreenReader/ScreenReader.h"
-#include "../accessibility/Control/DeckHandler.h"
 #include "../accessibility/Configuration/AccessibilityConfiguration.h"
+#include "Menus/DeckEditorMenu.h"
 // #include "Menus/DeckEditorMenu.h"
 
 namespace ygo {
@@ -836,8 +836,8 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 	}
 	case irr::EET_KEY_INPUT_EVENT: {
 		if (AccessibilityConfiguration::accessibilityShortcuts) {
-			// DeckEditorMenuHandler::GetMenu()->KeyInputEvent(event);
-			DeckHandler::getDeckHandler()->KeyInputEvent(event);
+			DeckEditorMenuHandler::GetMenu()->KeyInputEvent(event);
+			// DeckHandler::getDeckHandler()->KeyInputEvent(event);
 		}
 		if(event.KeyInput.PressedDown && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
 			switch(event.KeyInput.Key) {

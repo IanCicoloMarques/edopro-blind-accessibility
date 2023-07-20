@@ -1,7 +1,7 @@
 #ifndef USE_CARD_MODEL_H
 #define USE_CARD_MODEL_H
-#include <string>
 
+#include <string>
 #include "ScreenReader/ScreenReader.h"
 
 

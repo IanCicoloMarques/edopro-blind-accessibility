@@ -1,5 +1,12 @@
 ﻿#pragma once
 #include <string>
+#include <vector>
+#include "../accessibility/ScreenReader/ScreenReader.h"
+#include "../gframe/data_manager.h"
+// #include "../gframe/duelclient.h"
+// #include "../gframe/client_card.h"
+#include "../gframe/game.h"
+
 /**
  * \brief Used to store card data during a Battle or in the Deck Editor
  */
@@ -136,7 +143,7 @@ public:
 	}
 
 private:
-	void SetLevel(ygo::ClientCard* selectedCard)
+	void SetLevel(const ygo::ClientCard* selectedCard)
 	{
 		cardLevel = selectedCard->link_marker != 0 ?
 			fmt::format(ygo::gDataManager->GetAccessibilityString(67).data(), ygo::gDataManager->GetCardData(selectedCard->code)->level) :
@@ -151,13 +158,13 @@ private:
 			fmt::format(ygo::gDataManager->GetAccessibilityString(68).data(), ygo::gDataManager->GetCardData(selectedCard->code)->level);
 	}
 
-	void SetPosition(ygo::ClientCard* selectedCard)
+	void SetPosition(const ygo::ClientCard* selectedCard)
 	{
 		selectedPosition = selectedCard->position;
 		position = selectedCard->position == 1 ? fmt::format(ygo::gDataManager->GetAccessibilityString(71).data()) : fmt::format(ygo::gDataManager->GetAccessibilityString(72).data());
 	}
 
-	std::wstring GetLinkMarks(ygo::ClientCard* selectedCard)
+	std::wstring GetLinkMarks(const ygo::ClientCard* selectedCard)
 	{
 		std::wstring _linkMark = std::wstring();
 		const uint32_t mark = selectedCard->link_marker;
@@ -224,7 +231,6 @@ private:
 		return _overlayedCards;
 	}
 
-
 	std::wstring GetCardLimit(const ygo::CardDataC* selectedCard)
 	{
 		std::wstring limited = std::wstring();
@@ -238,5 +244,5 @@ private:
 		else if (limit != 0)
 			limited = fmt::format(ygo::gDataManager->GetAccessibilityString(168).data(), limit);
 		return limited;
-	};
+	}
 };

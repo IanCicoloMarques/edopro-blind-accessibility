@@ -1,7 +1,6 @@
 #ifndef FIELD_SLOT_CONTROLLER_H
 #define FIELD_SLOT_CONTROLLER_H
 
-#include "IEventReceiver.h"
 #include "Models/FieldSlotModel.h"
 
 

@@ -1,15 +1,14 @@
 #include "FieldController.h"
 
-#include <Control/EventHandler.h>
-
-#include "card.h"
 #include "FieldSlotController.h"
 #include "Helper/MouseHelper.h"
 #include "Models/Card.h"
 #include "ScreenReader/ScreenReader.h"
 #include "ScreenReader/Messages/AccessibilityStringDictionary.h"
+#include "../gframe/data_manager.h"
 
 namespace ygo {
+	FieldController* FieldController::_fieldController = nullptr;
 	FieldController* FieldController::GetFieldController()
 	{
 		if (_fieldController == nullptr)
@@ -50,7 +49,7 @@ namespace ygo {
 		bool isLink)
 	{
 		constexpr int maxCommonSlots = 5;
-		std::wstring freeSlots = gDataManager->GetAccessibilityString(Accessibility::Dict::Duel::FREE_SLOTS).data();
+		std::wstring freeSlots = ygo::gDataManager->GetAccessibilityString(Accessibility::Dict::Duel::FREE_SLOTS).data();
 		if(cardType == AccessibilityFieldFocus::CardType::MONSTER)
 		{
 			int slot = 1;

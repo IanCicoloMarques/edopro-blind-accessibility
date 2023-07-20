@@ -41,6 +41,17 @@ namespace ygo {
 		return _menuHandler;
 	}
 
+	/**
+	 * \brief Read the current value of a combo box
+	 * \param comboBox the combo box to be read
+	 */
+	static void ReadComboBox(const irr::gui::IGUIComboBox* comboBox) {
+		if (comboBox->isTrulyVisible()) {
+			const std::wstring nvdaString = fmt::format(L"{}", comboBox->getItem(comboBox->getSelected()));
+			ScreenReader::getReader()->readScreen(nvdaString);
+		}
+	}
+
 	void DeckEditorMenuHandler::ReadMenuAndValue()
 	{
 		std::wstring menuValue = std::wstring();

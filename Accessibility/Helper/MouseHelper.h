@@ -1,8 +1,7 @@
 #ifndef MOUSE_HELPER_H
 #define MOUSE_HELPER_H
 
-#include "IEventReceiver.h"
-#include "IrrlichtDevice.h"
+#include <IrrlichtDevice.h>
 #include "../gframe/game.h"
 #include "../gframe/joystick_wrapper.h"
 

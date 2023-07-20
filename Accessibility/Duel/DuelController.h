@@ -1,18 +1,17 @@
-#ifndef DUEL_CONTROLLER_H
+﻿#ifndef DUEL_CONTROLLER_H
 #define DUEL_CONTROLLER_H
 
-#include "IEventReceiver.h"
-#include "Control/IEventHandler.h"
-#include "FieldFocus/AccessibilityFieldFocus.h"
+#include "../Control/IEventHandler.h"
 #include "../gframe/client_card.h"
+#include "FieldFocus/AccessibilityFieldFocus.h"
 #include "Models/UseCardModel.h"
 
 namespace ygo {
 	class DuelController : IEventHandler{
 	public:
 		static IEventHandler* GetDuelController();
-		void KeyInputEvent(const irr::SEvent& event);
-		void GuiEvent(const irr::SEvent& event);
+		void KeyInputEvent(const irr::SEvent& event) override;
+		void GuiEvent(const irr::SEvent& event) override;
 	private:
 		void Command(AccessibilityFieldFocus::UseType useType, const irr::SEvent& event, ClientCard* card);
 		void DuelCommands(const irr::SEvent& event, ClientCard* card);

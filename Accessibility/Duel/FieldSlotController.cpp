@@ -1,6 +1,7 @@
 #include "FieldSlotController.h"
 
-#include <Control/EventHandler.h>
+#include "FieldFocus/AccessibilityFieldFocus.h"
+
 
 namespace ygo {
 	FieldSlotModel* FieldSlotController::GetFieldSlotData(const int& slot, const int& field)

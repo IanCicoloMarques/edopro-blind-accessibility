@@ -1,8 +1,12 @@
 #include "CardController.h"
+
+#include "IGUIButton.h"
+#include "IGUIWindow.h"
 #include "../gframe/game.h"
-#include <Control/EventHandler.h>
+#include "../gframe/data_manager.h"
 
 namespace ygo {
+	CardController* CardController::_cardController = nullptr;
 	CardController* CardController::GetCardController()
 	{
 		if (_cardController == nullptr)

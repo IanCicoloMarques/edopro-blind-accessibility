@@ -8,8 +8,7 @@
 #include <IGUIEditBox.h>
 #include <IrrlichtDevice.h>
 
-#include "IGUIComboBox.h"
-#include "ScreenReader/ScreenReader.h"
+
 
 namespace ygo {
 	class BaseMenu : public IEventHandler {
@@ -66,17 +65,6 @@ namespace ygo {
 			if (editBox->isTrulyVisible()) {
 				editBox->setText(L"");
 				mainGame->env->setFocus(editBox);
-			}
-		}
-
-		/**
-		 * \brief Read the current value of a combo box
-		 * \param comboBox the combo box to be read
-		 */
-		static void ReadComboBox(const irr::gui::IGUIComboBox* comboBox) {
-			if (comboBox->isTrulyVisible()) {
-				const std::wstring nvdaString = fmt::format(L"{}", comboBox->getItem(comboBox->getSelected()));
-				ScreenReader::getReader()->readScreen(nvdaString);
 			}
 		}
 

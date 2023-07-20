@@ -11,7 +11,6 @@ namespace ygo {
 		int slotNumber;
 		int field;
 	};
-	double FieldSlotModel::slotSize = 0.08;
 }
 
 #endif //FIELD_SLOT_MODEL_H

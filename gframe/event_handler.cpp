@@ -42,6 +42,7 @@
 #include "../accessibility/Control/EventHandler.h"
 #include "../accessibility/ScreenReader/ScreenReader.h"
 #include "../accessibility/Configuration/AccessibilityConfiguration.h"
+// #include "Duel/DuelController.h"
 #include "Helper/ButtonHelper.h"
 
 namespace {
@@ -1763,6 +1764,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 	case irr::EET_KEY_INPUT_EVENT: {
 		if (AccessibilityConfiguration::accessibilityShortcuts) {
 			EventHandler::getEventHandler()->KeyInputEvent(event);
+			// DuelController::GetDuelController()->KeyInputEvent(event);
 			break;
 		}
 		switch(event.KeyInput.Key) {

@@ -3,9 +3,6 @@
 #include <vector>
 #include "../accessibility/ScreenReader/ScreenReader.h"
 #include "../gframe/data_manager.h"
-// #include "../gframe/duelclient.h"
-// #include "../gframe/client_card.h"
-#include "../gframe/game.h"
 
 /**
  * \brief Used to store card data during a Battle or in the Deck Editor
@@ -234,15 +231,15 @@ private:
 	std::wstring GetCardLimit(const ygo::CardDataC* selectedCard)
 	{
 		std::wstring limited = std::wstring();
-		int limit = ygo::mainGame->deckBuilder.filterList->whitelist ? 0 : 3;
-		auto endit = ygo::mainGame->deckBuilder.filterList->content.end();
-		auto it = ygo::mainGame->deckBuilder.filterList->GetLimitationIterator(selectedCard);
-		if (it != endit)
-			limit = it->second;
-		if (limit == 0)
-			limited = ygo::gDataManager->GetAccessibilityString(167).data();
-		else if (limit != 0)
-			limited = fmt::format(ygo::gDataManager->GetAccessibilityString(168).data(), limit);
+		// int limit = ygo::mainGame->deckBuilder.filterList->whitelist ? 0 : 3;
+		// auto endit = ygo::mainGame->deckBuilder.filterList->content.end();
+		// auto it = ygo::mainGame->deckBuilder.filterList->GetLimitationIterator(selectedCard);
+		// if (it != endit)
+		// 	limit = it->second;
+		// if (limit == 0)
+		// 	limited = ygo::gDataManager->GetAccessibilityString(167).data();
+		// else if (limit != 0)
+		// 	limited = fmt::format(ygo::gDataManager->GetAccessibilityString(168).data(), limit);
 		return limited;
 	}
 };

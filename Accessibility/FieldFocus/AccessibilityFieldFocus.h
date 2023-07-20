@@ -70,7 +70,8 @@ namespace ygo {
 		{
 			NO_CARD_TYPE = 0,
 			MONSTER = 1,
-			SPELL = 2,
+			SPELL = 76,
+			TRAP = 77,
 			ACTIVABLE_EFFECT = 3,
 			SELECTABLE = 4,
 			LINK = 5,

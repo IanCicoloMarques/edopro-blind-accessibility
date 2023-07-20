@@ -47,9 +47,9 @@ namespace ygo
 	void KeyboardConfiguration::LoadConfiguration(KeyboardConfigurationType::ConfigurationType type)
 	{
 		if(type == KeyboardConfigurationType::Default)
-		{
 			LoadDefaultConfiguration();
-		}
+		else if(type == KeyboardConfigurationType::Mud)
+			LoadMudConfiguration();
 	}
 
 	void KeyboardConfiguration::LoadDefaultConfiguration()
@@ -117,5 +117,5 @@ namespace ygo
 		Deck = irr::KEY_UNKNOWN;
 	}
 
-	
+
 }

@@ -17,7 +17,7 @@
 #include "../accessibility/ScreenReader/ScreenReader.h"
 #include "../accessibility/Control/DeckHandler.h"
 #include "../accessibility/Configuration/AccessibilityConfiguration.h"
-#include "Menus/DeckEditorMenu.h"
+// #include "Menus/DeckEditorMenu.h"
 
 namespace ygo {
 static inline void TriggerEvent(irr::gui::IGUIElement* target, irr::gui::EGUI_EVENT_TYPE type) {
@@ -836,7 +836,8 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 	}
 	case irr::EET_KEY_INPUT_EVENT: {
 		if (AccessibilityConfiguration::accessibilityShortcuts) {
-			DeckEditorMenuHandler::GetMenu()->KeyInputEvent(event);
+			// DeckEditorMenuHandler::GetMenu()->KeyInputEvent(event);
+			DeckHandler::getDeckHandler()->KeyInputEvent(event);
 		}
 		if(event.KeyInput.PressedDown && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
 			switch(event.KeyInput.Key) {

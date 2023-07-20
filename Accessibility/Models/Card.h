@@ -125,6 +125,16 @@ public:
 			ScreenReader::getReader()->readScreen(limited, false);
 	}
 
+	int GetCardType()
+	{
+		int type = ygo::AccessibilityFieldFocus::CardType::MONSTER;
+		if(cardType.find(ygo::gDataManager->GetAccessibilityString(ygo::AccessibilityFieldFocus::CardType::SPELL).data()) != std::string::npos)
+			type = ygo::AccessibilityFieldFocus::CardType::SPELL;
+		else if(cardType.find(ygo::gDataManager->GetAccessibilityString(ygo::AccessibilityFieldFocus::CardType::TRAP).data()) != std::string::npos)
+			type = ygo::AccessibilityFieldFocus::CardType::TRAP;
+		return type;
+	}
+
 private:
 	void SetLevel(ygo::ClientCard* selectedCard)
 	{

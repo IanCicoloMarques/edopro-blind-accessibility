@@ -126,7 +126,10 @@
     </Manifest>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\accessibility\Control\DeckHandler.h" />
     <ClInclude Include="..\accessibility\Helper\ButtonHelper.h" />
+    <ClInclude Include="..\accessibility\Helper\KeyboardHelper.h" />
+    <ClInclude Include="..\accessibility\Helper\MouseHelper.h" />
     <ClInclude Include="..\accessibility\Menus\AIMenu.h" />
     <ClInclude Include="..\accessibility\Menus\ConfigurationMenu.h" />
     <ClInclude Include="..\accessibility\Menus\DeckEditorMenu.h" />
@@ -239,6 +242,7 @@
     <ClInclude Include="..\gframe\windbot_panel.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\accessibility\Control\DeckHandler.cpp" />
     <ClCompile Include="..\accessibility\Helper\ButtonHelper.cpp" />
     <ClCompile Include="..\accessibility\Menus\AIMenu.cpp" />
     <ClCompile Include="..\accessibility\Menus\ConfigurationMenu.cpp" />

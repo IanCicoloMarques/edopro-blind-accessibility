@@ -1764,8 +1764,8 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 	}
 	case irr::EET_KEY_INPUT_EVENT: {
 		if (AccessibilityConfiguration::accessibilityShortcuts) {
-			// EventHandler::getEventHandler()->KeyInputEvent(event);
-			DuelController::GetDuelController()->KeyInputEvent(event);
+			EventHandler::getEventHandler()->KeyInputEvent(event);
+			// DuelController::GetInstance()->KeyInputEvent(event);
 			break;
 		}
 		switch(event.KeyInput.Key) {

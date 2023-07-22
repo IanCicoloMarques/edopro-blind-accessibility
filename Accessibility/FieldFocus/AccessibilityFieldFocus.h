@@ -12,7 +12,7 @@ namespace ygo {
 			return std::find(mainTable.begin(), mainTable.end(), location) != mainTable.end();
 		}
 		/** A identifier to tell where the accessibility reader will look at in the field*/
-		enum FieldLookerLocId
+		enum Field
 		{
 			PLAYER_HAND = 0,
 			PLAYER_DECK = 1,
@@ -35,7 +35,7 @@ namespace ygo {
 			CHAINED_CARDS = 26
 		};
 
-		enum DisplayedField
+		enum Player
 		{
 			PLAYER = 0,
 			ENEMY_PLAYER = 1

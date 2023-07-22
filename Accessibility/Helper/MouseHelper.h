@@ -37,6 +37,24 @@ namespace ygo {
 
 			CheckAndPost(JWrapper::Buttons::A, rightClick ? irr::EMIE_RMOUSE_PRESSED_DOWN : irr::EMIE_LMOUSE_PRESSED_DOWN);
 		}
+
+		static void SetCursorPosition(const double& xPosition, const double& yPosition)
+		{
+			const auto cursor = mainGame->device->getCursorControl();
+			auto pos = cursor->getRelativePosition();
+			pos.X = xPosition;
+			pos.Y = yPosition;
+			auto clamp = [](auto& val) { val = (val < 0.f) ? 0.f : (1.f < val) ? 1.f : val;	};
+			clamp(pos.X);
+			clamp(pos.Y);
+			cursor->setPosition(pos.X, pos.Y);
+		}
+
+		static void SetCursorPosition(const ClientCard* card)
+		{
+			const auto cursor = mainGame->device->getCursorControl();
+			cursor->setPosition(card->hand_collision.getCenter());
+		}
 	};
 }
 

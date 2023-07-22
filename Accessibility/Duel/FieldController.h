@@ -10,16 +10,23 @@
 namespace ygo {
 	class FieldController{
 	public:
-		static FieldController* GetFieldController();
+		static FieldController* GetInstance();
+		void KeyInputEvent(const irr::SEvent& event);
+		void GuiEvent(const irr::SEvent& event);
+
 		void SetSelectedCardField();
 		void SelectFieldSlot(const irr::SEvent& event, int slot, const int& field);
-		void ReadFreeSlots(const AccessibilityFieldFocus::DisplayedField& player = AccessibilityFieldFocus::DisplayedField::PLAYER, const int& cardType = AccessibilityFieldFocus::CardType::NO_CARD_TYPE, bool isLink = false);
-		int currenField = 0;
+		void SetMousePositionOnCardOnFieldOrHand();
+		AccessibilityFieldFocus::DisplayedCards GetField();
+		FieldSlotModel* GetFieldSlotModel(bool recursion = false);
+		void ReadFreeSlots(const AccessibilityFieldFocus::Player& player = AccessibilityFieldFocus::Player::PLAYER, const int& cardType = AccessibilityFieldFocus::CardType::NO_CARD_TYPE, bool isLink = false);
+		AccessibilityFieldFocus::Field currentField = AccessibilityFieldFocus::Field::PLAYER_MONSTERS;
+		AccessibilityFieldFocus::Player currentPlayer = AccessibilityFieldFocus::Player::PLAYER;
 	private:
 		static FieldController* _fieldController;
-		bool IsOnField(const ClientCard* card, const int& player = AccessibilityFieldFocus::DisplayedField::PLAYER);
-		void SetCursorOnSlot(int slot, const int& field);
-		FieldSlotModel* GetSlotPosition(const int& slot, const int& field);
+		bool IsOnField(const ClientCard* card, const int& player = AccessibilityFieldFocus::Player::PLAYER);
+
+	private:
 		CardController* _cardController = nullptr;
 	};
 }

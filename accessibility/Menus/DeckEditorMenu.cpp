@@ -5,7 +5,7 @@
 #include <Control/EventHandler.h>
 
 #include "FieldFocus/AccessibilityDeckFocus.h"
-#include "Models/Card.h"
+#include "Models/CardModel.h"
 
 namespace ygo {
 	DeckEditorMenuHandler* DeckEditorMenuHandler::_menuHandler = nullptr;
@@ -302,7 +302,7 @@ namespace ygo {
 			const auto pointer = gDataManager->GetCardData(mainGame->deckBuilder.GetCurrentDeck().main[_selectedCardIndex]->code);
 			if (pointer) {
 				const auto selectedCard = mainGame->deckBuilder.GetCurrentDeck().main[_selectedCardIndex];
-				Card* card = new Card(selectedCard);
+				CardModel* card = new CardModel(selectedCard);
 				card->ReadCardInfo();
 			}
 		}
@@ -310,7 +310,7 @@ namespace ygo {
 			const auto pointer = gDataManager->GetCardData(mainGame->deckBuilder.GetCurrentDeck().extra[_selectedCardIndex]->code);
 			if (pointer) {
 				const auto selectedCard = mainGame->deckBuilder.GetCurrentDeck().extra[_selectedCardIndex];
-				Card* card = new Card(selectedCard);
+				CardModel* card = new CardModel(selectedCard);
 				card->ReadCardInfo();
 			}
 		}
@@ -318,7 +318,7 @@ namespace ygo {
 			const auto pointer = gDataManager->GetCardData(mainGame->deckBuilder.GetCurrentDeck().side[_selectedCardIndex]->code);
 			if (pointer) {
 				const auto selectedCard = mainGame->deckBuilder.GetCurrentDeck().side[_selectedCardIndex];
-				Card* card = new Card(selectedCard);
+				CardModel* card = new CardModel(selectedCard);
 				card->ReadCardInfo();
 			}
 		}
@@ -326,7 +326,7 @@ namespace ygo {
 			const auto pointer = gDataManager->GetCardData(mainGame->deckBuilder.results[_selectedCardIndex]->code);
 			if (pointer) {
 				const auto selectedCard = mainGame->deckBuilder.GetCurrentDeck().side[_selectedCardIndex];
-				Card* card = new Card(selectedCard);
+				CardModel* card = new CardModel(selectedCard);
 				card->ReadCardInfo();
 			}
 		}
@@ -402,7 +402,7 @@ namespace ygo {
 		{
 			mainGame->ShowCardInfo(deck[_selectedCardIndex]->code);
 			const auto selectedCard = mainGame->deckBuilder.GetCurrentDeck().main[_selectedCardIndex];
-			Card* card = new Card(selectedCard);
+			CardModel* card = new CardModel(selectedCard);
 			card->ReadCardResumedInfo();
 		}
 	}

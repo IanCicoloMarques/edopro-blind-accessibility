@@ -1,4 +1,5 @@
 ﻿#include "KeyboardConfiguration.h"
+#include "../../../irrlicht/include/Keycodes.h"
 namespace ygo
 {
 	int KeyboardConfiguration::NormalSummon = irr::KEY_KEY_A;

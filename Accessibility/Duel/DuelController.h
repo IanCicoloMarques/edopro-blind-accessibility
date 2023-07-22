@@ -9,7 +9,7 @@
 namespace ygo {
 	class DuelController : IEventHandler{
 	public:
-		static IEventHandler* GetDuelController();
+		static IEventHandler* GetInstance();
 		void KeyInputEvent(const irr::SEvent& event) override;
 		void GuiEvent(const irr::SEvent& event) override;
 	private:

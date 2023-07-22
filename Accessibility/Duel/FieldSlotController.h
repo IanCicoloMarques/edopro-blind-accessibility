@@ -7,8 +7,10 @@
 namespace ygo {
 	class FieldSlotController{
 	public:
+		static FieldSlotController* GetInstance();
 		FieldSlotModel* GetFieldSlotData(const int& slot, const int& field);
 	private:
+		static FieldSlotController* _fieldSlotController;
 		const double _linkYPosition = 0.515;
 		const double _monsterFieldYPosition = 0.64;
 		const double _spellFieldYPosition = 0.72;

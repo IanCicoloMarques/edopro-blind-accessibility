@@ -26,7 +26,7 @@
     <ClInclude Include="FieldFocus\AccessibilityDeckFocus.h" />
     <ClInclude Include="FieldFocus\AccessibilityFieldFocus.h" />
     <ClInclude Include="Menus\MenuType.h" />
-    <ClInclude Include="Models\Card.h" />
+    <ClInclude Include="Models\CardModel.h" />
     <ClInclude Include="ScreenReader\AccessibilityMessages.h" />
     <ClInclude Include="ScreenReader\CommandMessages.h" />
     <ClInclude Include="ScreenReader\IScreenReader.h" />

@@ -1,29 +1,38 @@
 #include "FieldSlotController.h"
 
+#include "FieldController.h"
 #include "FieldFocus/AccessibilityFieldFocus.h"
 
 
 namespace ygo {
+	FieldSlotController* FieldSlotController::_fieldSlotController = nullptr;
+	FieldSlotController* FieldSlotController::GetInstance()
+	{
+		if (_fieldSlotController == nullptr)
+			_fieldSlotController = new FieldSlotController();
+		return _fieldSlotController;
+	}
+
 	FieldSlotModel* FieldSlotController::GetFieldSlotData(const int& slot, const int& field)
 	{
 		auto* fieldSlot = new FieldSlotModel();
-		if (field == AccessibilityFieldFocus::FieldLookerLocId::LINK_ZONE)
+		if (field == AccessibilityFieldFocus::Field::LINK_ZONE)
 		{
-			fieldSlot->field = AccessibilityFieldFocus::FieldLookerLocId::LINK_ZONE;
+			fieldSlot->field = AccessibilityFieldFocus::Field::LINK_ZONE;
 			fieldSlot->xPosition = GetLinkFieldXPosition(slot);
 			fieldSlot->yPosition = _linkYPosition;
 			fieldSlot->slotNumber = slot;
 		}
-		else if (field == AccessibilityFieldFocus::FieldLookerLocId::PLAYER_MONSTERS)
+		else if (field == AccessibilityFieldFocus::Field::PLAYER_MONSTERS)
 		{
-			fieldSlot->field = AccessibilityFieldFocus::FieldLookerLocId::PLAYER_MONSTERS;
+			fieldSlot->field = AccessibilityFieldFocus::Field::PLAYER_MONSTERS;
 			fieldSlot->xPosition = GetPlayerFieldXPosition(slot);
 			fieldSlot->yPosition = _monsterFieldYPosition;
 			fieldSlot->slotNumber = slot;
 		}
-		else if (field == AccessibilityFieldFocus::FieldLookerLocId::PLAYER_SPELLS)
+		else if (field == AccessibilityFieldFocus::Field::PLAYER_SPELLS)
 		{
-			fieldSlot->field = AccessibilityFieldFocus::FieldLookerLocId::PLAYER_SPELLS;
+			fieldSlot->field = AccessibilityFieldFocus::Field::PLAYER_SPELLS;
 			fieldSlot->xPosition = GetPlayerFieldXPosition(slot);
 			fieldSlot->yPosition = _spellFieldYPosition;
 			fieldSlot->slotNumber = slot;
@@ -60,4 +69,6 @@ namespace ygo {
 		double posX = posX = startPosition + (slot * FieldSlotModel::slotSize);
 		return posX;
 	}
+
+
 }

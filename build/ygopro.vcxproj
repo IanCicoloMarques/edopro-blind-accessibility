@@ -126,14 +126,17 @@
     </Manifest>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\accessibility\Control\EventHandler.h" />
     <ClInclude Include="..\accessibility\Duel\CardController.h" />
     <ClInclude Include="..\accessibility\Duel\CardDisplayController.h" />
     <ClInclude Include="..\accessibility\Duel\DuelController.h" />
+    <ClInclude Include="..\accessibility\Duel\DuelMenuController.h" />
     <ClInclude Include="..\accessibility\Duel\FieldController.h" />
     <ClInclude Include="..\accessibility\Duel\FieldSlotController.h" />
     <ClInclude Include="..\accessibility\Duel\Models\FieldSlotModel.h" />
     <ClInclude Include="..\accessibility\Duel\Models\UseCardModel.h" />
     <ClInclude Include="..\accessibility\Helper\ButtonHelper.h" />
+    <ClInclude Include="..\accessibility\Helper\CardDisplayHelper.h" />
     <ClInclude Include="..\accessibility\Helper\KeyboardHelper.h" />
     <ClInclude Include="..\accessibility\Helper\MouseHelper.h" />
     <ClInclude Include="..\accessibility\Menus\AIMenu.h" />
@@ -251,6 +254,7 @@
     <ClCompile Include="..\accessibility\Duel\CardController.cpp" />
     <ClCompile Include="..\accessibility\Duel\CardDisplayController.cpp" />
     <ClCompile Include="..\accessibility\Duel\DuelController.cpp" />
+    <ClCompile Include="..\accessibility\Duel\DuelMenuController.cpp" />
     <ClCompile Include="..\accessibility\Duel\FieldController.cpp" />
     <ClCompile Include="..\accessibility\Duel\FieldSlotController.cpp" />
     <ClCompile Include="..\accessibility\Duel\Models\FieldSlotModel.cpp" />

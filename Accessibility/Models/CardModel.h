@@ -7,7 +7,7 @@
 /**
  * \brief Used to store card data during a Battle or in the Deck Editor
  */
-class Card
+class CardModel
 {
 public:
 	std::wstring cardName;
@@ -26,14 +26,17 @@ public:
 	std::wstring overlayedCards;
 	std::wstring location;
 	std::wstring limited;
+	std::wstring cardFace;
 	uint8_t selectedPosition;
 	bool isLink = false;
+	bool isSelected = false;
+	bool isFaceUp = false;
 
 	/**
 	 * \brief Used to store card data during a Battle
 	 * \param selectedCard - Selected card to read data
 	 */
-	Card(ygo::ClientCard* selectedCard)
+	CardModel(ygo::ClientCard* selectedCard)
 	{
 		cardName = fmt::format(L"{}", ygo::gDataManager->GetName(selectedCard->code));
 		cardType = fmt::format(L"{}", ygo::gDataManager->FormatType(selectedCard->type));
@@ -49,13 +52,16 @@ public:
 		overlayedCards = GetOverlayedCards(selectedCard);
 		location = fmt::format(L"{}[{}]", ygo::gDataManager->FormatLocation(selectedCard->location, selectedCard->sequence), selectedCard->sequence + 1);
 		selectedPosition = 0;
+		isSelected = ygo::gDataManager->GetAccessibilityString(selectedCard->is_selected ? 137 : 140).data();
+		isFaceUp = selectedCard->code != 0 ? true : false;
+		cardFace = fmt::format(L"Face {}", isFaceUp ? L"Up" : L"Down");
 	}
 
 	/**
 	 * \brief Used to store card data in the deck editor menu
 	 * \param selectedCard - Selected card to read data
 	 */
-	Card(const ygo::CardDataC* selectedCard)
+	CardModel(const ygo::CardDataC* selectedCard)
 	{
 		cardName = fmt::format(L"{}", ygo::gDataManager->GetName(selectedCard->code));
 		cardType = fmt::format(L"{}", ygo::gDataManager->FormatType(selectedCard->type));
@@ -83,6 +89,10 @@ public:
 		fieldSlot = fmt::format(ygo::gDataManager->GetAccessibilityString(75).data(), slot);
 	}
 
+
+	/**
+	 * \brief Read all available information about this card
+	 */
 	void ReadCardInfo()
 	{
 		ScreenReader::getReader()->readScreen(cardName, false);
@@ -114,6 +124,9 @@ public:
 			ScreenReader::getReader()->readScreen(limited, false);
 	}
 
+	/**
+	 * \brief Read resumed some info about this card, like name, type, level, race, attack, defense and limit number when making a deck
+	 */
 	void ReadCardResumedInfo()
 	{
 		ScreenReader::getReader()->readScreen(cardName, false);
@@ -127,6 +140,23 @@ public:
 		}
 		if (!limited.empty())
 			ScreenReader::getReader()->readScreen(limited, false);
+	}
+
+	/**
+	 * \brief Read basic info about this card, like name, type, level, race, attack, defense and limit number when making a deck
+	 */
+	void ReadCardBasicInfo()
+	{
+		ScreenReader::getReader()->readScreen(cardName, false);
+		if (cardType.find(ygo::gDataManager->GetAccessibilityString(76).data()) == std::string::npos &&
+			cardType.find(ygo::gDataManager->GetAccessibilityString(77).data()) == std::string::npos) {
+			ScreenReader::getReader()->readScreen(cardAttack, false);
+			ScreenReader::getReader()->readScreen(cardDefense, false);
+		}
+		ScreenReader::getReader()->readScreen(location, false);
+		if (selectedPosition != 10)
+			ScreenReader::getReader()->readScreen(position, false);
+		ScreenReader::getReader()->readScreen(cardFace, false);
 	}
 
 	int GetCardType()

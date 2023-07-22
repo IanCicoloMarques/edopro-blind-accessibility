@@ -9,13 +9,14 @@
 #include "Models/UseCardModel.h"
 #include "ScreenReader/ScreenReader.h"
 #include "../gframe/game.h"
-#include "Models/Card.h"
+#include "Helper/KeyboardHelper.h"
+#include "Models/CardModel.h"
 
 namespace ygo {
 	IEventHandler* DuelController::_duelController = nullptr;
 	int DuelController::_battlePhase = AccessibilityFieldFocus::BattleStep::MP1;
 
-	IEventHandler* DuelController::GetDuelController()
+	IEventHandler* DuelController::GetInstance()
 	{
 		if (_duelController == nullptr)
 			_duelController = new DuelController();
@@ -48,7 +49,7 @@ namespace ygo {
 
 	void DuelController::Command(AccessibilityFieldFocus::UseType useType, const irr::SEvent& event, ClientCard* card)
 	{
-		CardController* cardController = CardController::GetCardController();
+		CardController* cardController = CardController::GetInstance();
 		cardController->SetCard(card);
 		auto* useCardModel = new UseCardModel();
 		CardDisplayController::CloseDisplay();
@@ -80,18 +81,18 @@ namespace ygo {
 
 	void DuelController::NormalSummon(UseCardModel* useCardModel)
 	{
-		const auto fieldController = FieldController::GetFieldController();
+		const auto fieldController = FieldController::GetInstance();
 		useCardModel->command = CommandMessages::NORMAL_SUMMON;
 		if (mainGame->btnSummon->isVisible()) {
 			useCardModel->canUse = true;
 			ButtonHelper::ClickButton(mainGame->btnSummon);
-			fieldController->ReadFreeSlots(AccessibilityFieldFocus::DisplayedField::PLAYER, AccessibilityFieldFocus::CardType::MONSTER);
+			fieldController->ReadFreeSlots(AccessibilityFieldFocus::Player::PLAYER, AccessibilityFieldFocus::CardType::MONSTER);
 		}
 	}
 
 	void DuelController::SetCard(UseCardModel* useCardModel)
 	{
-		const auto fieldController = FieldController::GetFieldController();
+		const auto fieldController = FieldController::GetInstance();
 		fieldController->SetSelectedCardField();
 		useCardModel->command = CommandMessages::SET_CARD;
 		irr::gui::IGUIButton* button = nullptr;
@@ -109,27 +110,27 @@ namespace ygo {
 		{
 			useCardModel->canUse = true;
 			ButtonHelper::ClickButton(button);
-			fieldController->ReadFreeSlots(AccessibilityFieldFocus::DisplayedField::PLAYER, cardType);
+			fieldController->ReadFreeSlots(AccessibilityFieldFocus::Player::PLAYER, cardType);
 		}
 	}
 
 	void DuelController::SpecialSummon(UseCardModel* useCardModel, const ClientCard* card)
 	{
-		const auto fieldController = FieldController::GetFieldController();
+		const auto fieldController = FieldController::GetInstance();
 		useCardModel->command = CommandMessages::SPECIAL_SUMMON;
 		if (mainGame->btnSPSummon->isVisible()) {
 			useCardModel->canUse = true;
 			ButtonHelper::ClickButton(mainGame->btnSPSummon);
-			fieldController->ReadFreeSlots(AccessibilityFieldFocus::DisplayedField::PLAYER, AccessibilityFieldFocus::CardType::MONSTER, Card::IsLink(card));
+			fieldController->ReadFreeSlots(AccessibilityFieldFocus::Player::PLAYER, AccessibilityFieldFocus::CardType::MONSTER, CardModel::IsLink(card));
 		}
 	}
 
 	void DuelController::ActivateCardEffect(UseCardModel* useCardModel)
 	{
-		const auto fieldController = FieldController::GetFieldController();
+		const auto fieldController = FieldController::GetInstance();
 		useCardModel->command = CommandMessages::ACTIVATE;
-		if(fieldController->currenField != AccessibilityFieldFocus::FieldLookerLocId::PLAYER_MONSTERS && fieldController->currenField != AccessibilityFieldFocus::FieldLookerLocId::PLAYER_SPELLS)
-			fieldController->currenField = AccessibilityFieldFocus::FieldLookerLocId::SELECTABLE_CARDS;
+		if(fieldController->currentField != AccessibilityFieldFocus::Field::PLAYER_MONSTERS && fieldController->currentField != AccessibilityFieldFocus::Field::PLAYER_SPELLS)
+			fieldController->currentField = AccessibilityFieldFocus::Field::SELECTABLE_CARDS;
 
 		if (mainGame->btnActivate->isTrulyVisible()) {
 			useCardModel->canUse = true;

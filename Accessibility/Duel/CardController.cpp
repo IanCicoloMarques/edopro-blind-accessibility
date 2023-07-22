@@ -1,17 +1,39 @@
 #include "CardController.h"
 
+#include "CardDisplayController.h"
+#include "FieldController.h"
 #include "IGUIButton.h"
 #include "IGUIWindow.h"
 #include "../gframe/game.h"
 #include "../gframe/data_manager.h"
+#include "Configuration/Keyboard/KeyboardConfiguration.h"
+#include "Models/CardModel.h"
+#include "Models/FieldSlotModel.h"
 
 namespace ygo {
 	CardController* CardController::_cardController = nullptr;
-	CardController* CardController::GetCardController()
+	CardController* CardController::GetInstance()
 	{
 		if (_cardController == nullptr)
 			_cardController = new CardController();
 		return _cardController;
+	}
+
+	void CardController::KeyInputEvent(const irr::SEvent& event)
+	{
+		if(event.KeyInput.Key == KeyboardConfiguration::CardInformation)
+		{
+			const int currentCardIndex = CardDisplayController::GetInstance()->currentCardIndex;
+			if(mainGame->dField.display_cards.size() <= currentCardIndex)
+				return;
+			SetCard(mainGame->dField.display_cards[currentCardIndex]);
+			ReadCardInfo();
+		}
+	}
+
+	void CardController::GuiEvent(const irr::SEvent& event)
+	{
+		return;
 	}
 
 	void CardController::SetCard(ClientCard* card)
@@ -20,6 +42,24 @@ namespace ygo {
 			return;
 		_selectedCard = card;
 	}
+
+	void CardController::ReadCardInfo()
+	{
+		auto* card = new CardModel(_selectedCard);
+		const FieldSlotModel* fieldSlotModel = FieldController::GetInstance()->GetFieldSlotModel();
+		if(fieldSlotModel != nullptr)
+			card->SetFieldSlot(fieldSlotModel->slotNumber);
+		card->ReadCardInfo();
+	};
+
+	void CardController::ReadCardBasicInfo()
+	{
+		auto* card = new CardModel(_selectedCard);
+		const FieldSlotModel* fieldSlotModel = FieldController::GetInstance()->GetFieldSlotModel();
+		if(fieldSlotModel != nullptr)
+			card->SetFieldSlot(fieldSlotModel->slotNumber);
+		card->ReadCardBasicInfo();
+	};
 
 	void CardController::ShowCardOptions(int x, int y)
 	{

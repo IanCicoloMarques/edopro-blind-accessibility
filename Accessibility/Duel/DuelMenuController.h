@@ -10,6 +10,8 @@ namespace ygo {
 		static IEventHandler* GetInstance();
 		void KeyInputEvent(const irr::SEvent& event) override;
 		void GuiEvent(const irr::SEvent& event) override;
+		AccessibilityFieldFocus::BattleStep GetBattleStep();
+		AccessibilityFieldFocus::BattleStep _battleStep = AccessibilityFieldFocus::BattleStep::MP1;
 
 	private:
 		static IEventHandler* _duelMenuController;
@@ -21,11 +23,11 @@ namespace ygo {
 		void AnnounceNumber();
 		void AnnounceCard();
 		bool CheckAttributeSelector();
+		void AttributeSelector(bool up);
 		void RaceSelector(bool up);
 		bool CheckTypeSelector();
-		void AttributeSelector(bool up);
 		void FocusOnMenus();
-		AccessibilityFieldFocus::BattleStep _battleStep = AccessibilityFieldFocus::BattleStep::MP1;
+		void SetBattlePhase();
 		const int _selectAttributeMax = 7;
 		const int _selectTypeMax = 25;
 		int _selectAttribute = 0;

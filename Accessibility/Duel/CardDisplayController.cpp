@@ -114,6 +114,21 @@ namespace ygo {
 		}
 	}
 
+	void CardDisplayController::TryClickCard()
+	{
+		if (currentCardIndex < mainGame->dField.display_cards.size() && mainGame->btnCardSelect[currentCardIndex]->isTrulyVisible()) {
+			ButtonHelper::ClickButton(mainGame->btnCardSelect[currentCardIndex]);
+		}
+	}
+
+	ClientCard* CardDisplayController::GetSelectedCard()
+	{
+		ClientCard* clickedCard = nullptr;
+		if (!mainGame->dField.display_cards.empty() && currentCardIndex <= mainGame->dField.display_cards.size())
+			clickedCard = mainGame->dField.display_cards[currentCardIndex];
+		return clickedCard;
+	}
+
 	void CardDisplayController::DisplayTable(const irr::SEvent& event, const AccessibilityFieldFocus::Field field, AccessibilityFieldFocus::Player player)
 	{
 		if(field == AccessibilityFieldFocus::Field::PLAYER_MONSTERS)

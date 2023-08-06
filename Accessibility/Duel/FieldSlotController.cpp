@@ -13,7 +13,7 @@ namespace ygo {
 		return _fieldSlotController;
 	}
 
-	FieldSlotModel* FieldSlotController::GetFieldSlotData(const int& slot, const int& field)
+	FieldSlotModel* FieldSlotController::GetFieldSlotData(const int& slot, AccessibilityFieldFocus::Field field)
 	{
 		auto* fieldSlot = new FieldSlotModel();
 		if (field == AccessibilityFieldFocus::Field::LINK_ZONE)
@@ -37,7 +37,7 @@ namespace ygo {
 			fieldSlot->yPosition = _spellFieldYPosition;
 			fieldSlot->slotNumber = slot;
 		}
-		return nullptr;
+		return fieldSlot;
 	}
 
 	double FieldSlotController::GetLinkFieldXPosition(int slot)

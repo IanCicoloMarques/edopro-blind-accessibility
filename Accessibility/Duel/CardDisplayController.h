@@ -12,8 +12,9 @@ namespace ygo {
 		void KeyInputEvent(const irr::SEvent& event);
 		void GuiEvent(const irr::SEvent& event);
 		void ChangeCurrentCardIndex(irr::EKEY_CODE ekeyCode);
-		void ScrollDisplay(unsigned initialIndex, irr::EKEY_CODE ekeyCode);
 		void ShowCardInfo();
+		void TryClickCard();
+		ClientCard* GetSelectedCard();
 		static void CloseDisplay();
 		int currentCardIndex = 0;
 
@@ -32,11 +33,12 @@ namespace ygo {
 		void DisplaySpecialSummonableMonsters(const irr::SEvent& event);
 		void DisplayGraveyard(const irr::SEvent& event, AccessibilityFieldFocus::Player displayed_field);
 		void DisplayRemovedCards(const irr::SEvent& event, AccessibilityFieldFocus::Player displayed_field);
-		void DisplaySelectableCards(const irr::SEvent& event);
 		void DisplayActivableCards(const irr::SEvent& event);
+		void DisplaySelectableCards(const irr::SEvent& event);
 		void DisplaySelectableCards(const std::vector<ClientCard*>& field, const std::wstring& text = L"");
 		void DisplayCards(const std::vector<ChainInfo>& field);
 		void ShowSelectCard();
+		void ScrollDisplay(unsigned initialIndex, irr::EKEY_CODE ekeyCode);
 	};
 }
 

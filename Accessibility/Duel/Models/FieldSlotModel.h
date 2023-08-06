@@ -5,6 +5,13 @@
 namespace ygo {
 	class FieldSlotModel{
 	public:
+		FieldSlotModel()
+		{
+			xPosition = 0;
+			yPosition = 0;
+			slotNumber = 1;
+			field = 0;
+		}
 		static double slotSize;
 		double xPosition;
 		double yPosition;

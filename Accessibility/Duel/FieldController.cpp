@@ -63,7 +63,7 @@ namespace ygo {
 		return;
 	}
 
-	void FieldController::SelectFieldSlot(const irr::SEvent& event, int slot, const int& field)
+	void FieldController::SelectFieldSlot(const irr::SEvent& event, int slot, AccessibilityFieldFocus::Field field)
 	{
 		if (slot == 0) slot = 1;
 		const FieldSlotModel* fieldSlot = FieldSlotController::GetInstance()->GetFieldSlotData(slot, field);
@@ -71,9 +71,9 @@ namespace ygo {
 		MouseHelper::Click(event);
 	}
 
-	void FieldController::SetMousePositionOnCardOnFieldOrHand()
+	void FieldController::SetMousePositionOnCardOnFieldOrHand(ClientCard* card)
 	{
-		CardController::GetInstance()->SetCard(mainGame->dField.clicked_card);
+		CardController::GetInstance()->SetCard(card);
 		if (GetField() == AccessibilityFieldFocus::DisplayedCards::DISPLAY_HAND)
 			MouseHelper::SetCursorPosition(CardController::GetInstance()->GetSelectedCard());
 		else {
@@ -150,7 +150,7 @@ namespace ygo {
 		return false;
 	}
 
-	FieldSlotModel* FieldController::GetFieldSlotModel(const bool recursion) {
+	FieldSlotModel* FieldController::GetFieldSlotModel(const bool recursion, AccessibilityFieldFocus::Player player) {
 		FieldSlotModel* fieldSlotModel = nullptr;
 		int fieldSlot = 0;
 		//Busca a carta no campo selecionado;
@@ -158,8 +158,8 @@ namespace ygo {
 			currentField != AccessibilityFieldFocus::PLAYER_EXTRA_DECK &&
 			currentField != AccessibilityFieldFocus::PLAYER_BANNED_CARDS) {
 			for (int i = 0; i < 7; i++) {
-				if ((mainGame->dField.mzone[currentPlayer][i] && mainGame->dField.mzone[currentPlayer][i] == CardController::GetInstance()->GetSelectedCard()) ||
-					(mainGame->dField.szone[currentPlayer][i] && mainGame->dField.szone[currentPlayer][i] == CardController::GetInstance()->GetSelectedCard())) {
+				if ((mainGame->dField.mzone[player][i] && mainGame->dField.mzone[player][i] == CardController::GetInstance()->GetSelectedCard()) ||
+					(mainGame->dField.szone[player][i] && mainGame->dField.szone[player][i] == CardController::GetInstance()->GetSelectedCard())) {
 					if (i < 5)
 						fieldSlot = i + 1;
 					else
@@ -170,8 +170,8 @@ namespace ygo {
 		}
 		//Caso não encontre a carta, busca no outro campo;
 		if (fieldSlot == 0 && !recursion) {
-			currentPlayer = currentPlayer == AccessibilityFieldFocus::Player::PLAYER ? AccessibilityFieldFocus::Player::ENEMY_PLAYER : AccessibilityFieldFocus::Player::PLAYER;
-			fieldSlotModel = GetFieldSlotModel(true);
+			player = player == AccessibilityFieldFocus::Player::PLAYER ? AccessibilityFieldFocus::Player::ENEMY_PLAYER : AccessibilityFieldFocus::Player::PLAYER;
+			fieldSlotModel = GetFieldSlotModel(true, player);
 		}
 		else if(fieldSlot != 0)
 			fieldSlotModel = FieldSlotController::GetInstance()->GetFieldSlotData(fieldSlot, currentField);

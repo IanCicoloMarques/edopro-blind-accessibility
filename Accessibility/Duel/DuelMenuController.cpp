@@ -45,6 +45,7 @@ namespace ygo {
 
 	void DuelMenuController::KeyInputEvent(const irr::SEvent& event)
 	{
+		SetBattlePhase();
 		if(event.KeyInput.Key == KeyboardConfiguration::BattlePhase && mainGame->btnBP->isVisible() && mainGame->btnBP->isEnabled())
 			ChangeBattlePhase(AccessibilityFieldFocus::BattleStep::BP);
 		else if(event.KeyInput.Key == KeyboardConfiguration::MainPhase2 && mainGame->btnM2->isVisible() && mainGame->btnM2->isEnabled())
@@ -144,6 +145,12 @@ namespace ygo {
 	{
 		return;
 	}
+
+	AccessibilityFieldFocus::BattleStep DuelMenuController::GetBattleStep()
+	{
+		return _battleStep;
+	}
+
 	void DuelMenuController::FocusOnMenus(){
 		if (mainGame->cbANNumber->isTrulyVisible())
 			FocusAndReadGuiElement(mainGame->cbANNumber, fmt::format(L"{}", mainGame->cbANNumber->getItem(mainGame->cbANNumber->getSelected())));
@@ -153,6 +160,16 @@ namespace ygo {
 			FocusAndReadGuiElement(mainGame->wANRace, 112);
 		else if (mainGame->wANAttribute->isTrulyVisible())
 			FocusAndReadGuiElement(mainGame->wANAttribute, 113);
+	}
+
+	void DuelMenuController::SetBattlePhase()
+	{
+		if(mainGame->btnBP->isVisible() && mainGame->btnBP->isEnabled())
+			_battleStep = AccessibilityFieldFocus::BattleStep::MP1;
+		else if(mainGame->btnM2->isVisible() && mainGame->btnM2->isEnabled())
+			_battleStep = AccessibilityFieldFocus::BattleStep::BP;
+		else if(mainGame->btnEP->isVisible() && mainGame->btnEP->isEnabled())
+			_battleStep = AccessibilityFieldFocus::BattleStep::MP2;
 	};
 
 	void DuelMenuController::AnnounceNumber() {
@@ -262,7 +279,7 @@ namespace ygo {
 				eventCode = 2;
 				messageCode = 118;
 			}
-			ButtonHelper::ButtonHelper::ClickButton(mainGame->btnHand[eventCode]);
+			ButtonHelper::ClickButton(mainGame->btnHand[eventCode]);
 			const std::wstring nvdaString = fmt::format(gDataManager->GetAccessibilityString(messageCode).data());
 			ScreenReader::getReader()->readScreen(nvdaString, false);
 		}
@@ -301,18 +318,18 @@ namespace ygo {
 	{
 		if(bp == AccessibilityFieldFocus::BattleStep::BP && _battleStep != AccessibilityFieldFocus::BattleStep::BP && mainGame->btnBP->isEnabled())
 		{
-			ButtonHelper::ButtonHelper::ClickButton(mainGame->btnBP);
+			ButtonHelper::ClickButton(mainGame->btnBP);
 			_battleStep = bp;
 		}
 		else if(bp == AccessibilityFieldFocus::BattleStep::MP2 && _battleStep != AccessibilityFieldFocus::BattleStep::MP2 && mainGame->btnM2->isEnabled())
 		{
-			ButtonHelper::ButtonHelper::ClickButton(mainGame->btnM2);
+			ButtonHelper::ClickButton(mainGame->btnM2);
 			_battleStep = bp;
 		}
 		else if(bp == AccessibilityFieldFocus::BattleStep::ED && mainGame->btnEP->isEnabled())
 		{
-			ButtonHelper::ButtonHelper::ClickButton(mainGame->btnEP);
-			_battleStep = bp;
+			ButtonHelper::ClickButton(mainGame->btnEP);
+			_battleStep = AccessibilityFieldFocus::BattleStep::MP1;
 		}
 	}
 }

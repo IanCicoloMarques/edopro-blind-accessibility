@@ -2,13 +2,14 @@
 #define FIELD_SLOT_CONTROLLER_H
 
 #include "Models/FieldSlotModel.h"
+#include "FieldFocus/AccessibilityFieldFocus.h"
 
 
 namespace ygo {
 	class FieldSlotController{
 	public:
 		static FieldSlotController* GetInstance();
-		FieldSlotModel* GetFieldSlotData(const int& slot, const int& field);
+		FieldSlotModel* GetFieldSlotData(const int& slot, AccessibilityFieldFocus::Field field = AccessibilityFieldFocus::Field::PLAYER_MONSTERS);
 	private:
 		static FieldSlotController* _fieldSlotController;
 		const double _linkYPosition = 0.515;

@@ -16,6 +16,7 @@ namespace ygo {
 		void ReadCardInfo();
 		void ReadCardBasicInfo();
 		void ShowCardOptions(int x = 0, int y = 0);
+		void ReadAvailableCommands();
 		ClientCard* GetSelectedCard();
 		void SetCardType(AccessibilityFieldFocus::CardType type);
 		bool isSelected = false;

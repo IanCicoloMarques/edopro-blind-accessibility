@@ -6,9 +6,11 @@
 #include "IGUIWindow.h"
 #include "../gframe/game.h"
 #include "../gframe/data_manager.h"
+#include "Configuration/AccessibilityConfiguration.h"
 #include "Configuration/Keyboard/KeyboardConfiguration.h"
 #include "Models/CardModel.h"
 #include "Models/FieldSlotModel.h"
+#include "ScreenReader/Messages/AccessibilityStringDictionary.h"
 
 namespace ygo {
 	CardController* CardController::_cardController = nullptr;
@@ -46,7 +48,8 @@ namespace ygo {
 	void CardController::ReadCardInfo()
 	{
 		auto* card = new CardModel(_selectedCard);
-		const FieldSlotModel* fieldSlotModel = FieldController::GetInstance()->GetFieldSlotModel();
+		auto* fieldController = FieldController::GetInstance();
+		const FieldSlotModel* fieldSlotModel = fieldController->GetFieldSlotModel();
 		if(fieldSlotModel != nullptr)
 			card->SetFieldSlot(fieldSlotModel->slotNumber);
 		card->ReadCardInfo();
@@ -55,7 +58,8 @@ namespace ygo {
 	void CardController::ReadCardBasicInfo()
 	{
 		auto* card = new CardModel(_selectedCard);
-		const FieldSlotModel* fieldSlotModel = FieldController::GetInstance()->GetFieldSlotModel();
+		auto* fieldController = FieldController::GetInstance();
+		const FieldSlotModel* fieldSlotModel = fieldController->GetFieldSlotModel();
 		if(fieldSlotModel != nullptr)
 			card->SetFieldSlot(fieldSlotModel->slotNumber);
 		card->ReadCardBasicInfo();
@@ -95,7 +99,7 @@ namespace ygo {
 		}
 		else mainGame->btnMSet->setVisible(false);
 		if (flag & COMMAND_SSET) {
-			if (!(mainGame->dField.clicked_card->type & TYPE_MONSTER))
+			if (!(_selectedCard->type & TYPE_MONSTER))
 				mainGame->btnSSet->setText(gDataManager->GetSysString(1153).data());
 			else
 				mainGame->btnSSet->setText(gDataManager->GetSysString(1159).data());
@@ -105,9 +109,9 @@ namespace ygo {
 		}
 		else mainGame->btnSSet->setVisible(false);
 		if (flag & COMMAND_REPOS) {
-			if (mainGame->dField.clicked_card->position & POS_FACEDOWN)
+			if (_selectedCard->position & POS_FACEDOWN)
 				mainGame->btnRepos->setText(gDataManager->GetSysString(1154).data());
-			else if (mainGame->dField.clicked_card->position & POS_ATTACK)
+			else if (_selectedCard->position & POS_ATTACK)
 				mainGame->btnRepos->setText(gDataManager->GetSysString(1155).data());
 			else
 				mainGame->btnRepos->setText(gDataManager->GetSysString(1156).data());
@@ -146,6 +150,25 @@ namespace ygo {
 		x = mouse.X;
 		y = mouse.Y;
 		mainGame->wCmdMenu->setRelativePosition(irr::core::recti(x - mainGame->Scale(20), y - mainGame->Scale(20) - height, x + mainGame->Scale(80), y - mainGame->Scale(20)));
+	}
+
+	void CardController::ReadAvailableCommands()
+	{
+		std::wstring options = std::wstring();
+		if(mainGame->btnSummon->isTrulyVisible())
+			options += fmt::format(L"{}, {}, ",gDataManager->GetAccessibilityString(Accessibility::Dict::CardUses::SUMMON).data(),AccessibilityConfiguration::GetKeyString(KeyboardConfiguration::NormalSummon));
+		if(mainGame->btnMSet->isTrulyVisible() || mainGame->btnSSet->isTrulyVisible())
+			options += fmt::format(L"{}, {}, ",gDataManager->GetAccessibilityString(Accessibility::Dict::CardUses::SET).data(),AccessibilityConfiguration::GetKeyString(KeyboardConfiguration::SetSummon));
+		if(mainGame->btnSPSummon->isTrulyVisible())
+			options += fmt::format(L"{}, {}, ",gDataManager->GetAccessibilityString(Accessibility::Dict::CardUses::SPECIAL_SUMMON).data(),AccessibilityConfiguration::GetKeyString(KeyboardConfiguration::SpecialSummon));
+		if(mainGame->btnActivate->isTrulyVisible() || mainGame->btnOperation->isTrulyVisible())
+			options += fmt::format(L"{}, {}, ",gDataManager->GetAccessibilityString(Accessibility::Dict::CardUses::ACTIVATE).data(),AccessibilityConfiguration::GetKeyString(KeyboardConfiguration::ActivateCard));
+		if(mainGame->btnAttack->isTrulyVisible())
+			options += fmt::format(L"{}, {}, ",gDataManager->GetAccessibilityString(Accessibility::Dict::CardUses::ATTACK).data(),AccessibilityConfiguration::GetKeyString(KeyboardConfiguration::Attack));
+		if(mainGame->btnRepos->isTrulyVisible())
+			options += fmt::format(L"{}, {}",gDataManager->GetAccessibilityString(Accessibility::Dict::CardUses::CHANGE_MODE).data(),AccessibilityConfiguration::GetKeyString(KeyboardConfiguration::ChangeBattlePosition));
+		if(!options.empty())
+			ScreenReader::getReader()->readScreen(options, false);
 	}
 
 	ClientCard* CardController::GetSelectedCard()

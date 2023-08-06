@@ -15,10 +15,10 @@ namespace ygo {
 		void GuiEvent(const irr::SEvent& event);
 
 		void SetSelectedCardField();
-		void SelectFieldSlot(const irr::SEvent& event, int slot, const int& field);
-		void SetMousePositionOnCardOnFieldOrHand();
+		void SelectFieldSlot(const irr::SEvent& event, int slot, AccessibilityFieldFocus::Field field);
+		void SetMousePositionOnCardOnFieldOrHand(ClientCard* card);
 		AccessibilityFieldFocus::DisplayedCards GetField();
-		FieldSlotModel* GetFieldSlotModel(bool recursion = false);
+		FieldSlotModel* GetFieldSlotModel(bool recursion = false, AccessibilityFieldFocus::Player player = AccessibilityFieldFocus::Player::PLAYER);
 		void ReadFreeSlots(const AccessibilityFieldFocus::Player& player = AccessibilityFieldFocus::Player::PLAYER, const int& cardType = AccessibilityFieldFocus::CardType::NO_CARD_TYPE, bool isLink = false);
 		AccessibilityFieldFocus::Field currentField = AccessibilityFieldFocus::Field::PLAYER_MONSTERS;
 		AccessibilityFieldFocus::Player currentPlayer = AccessibilityFieldFocus::Player::PLAYER;

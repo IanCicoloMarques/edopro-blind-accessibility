@@ -57,13 +57,13 @@ namespace ygo {
 			SPECIAL_SUMMON_DEFENSE = 3,
 			SET_MONSTER = 4,
 			SET_SPELL = 5,
-			MONSTER_ATTACK = 6,
+			ATTACK = 6,
 			EFFECT = 7,
 			SELECT_CARD = 8,
 			MONSTER_ATTACK_SELECT = 9,
 			ACTIVATE = 10,
 			SET_CARD = 11,
-			CHANGE_MODE = 12
+			CHANGE_BATTLE_POSITION = 12
 		};
 
 		enum CardType

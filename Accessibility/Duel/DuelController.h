@@ -17,13 +17,14 @@ namespace ygo {
 		void DuelCommands(const irr::SEvent& event, ClientCard* card);
 
 		static IEventHandler* _duelController;
-		static int _battlePhase;
-
 		//Duel commands
 		void NormalSummon(UseCardModel* useCardModel);
 		void SetCard(UseCardModel* useCardModel);
 		void SpecialSummon(UseCardModel* useCardModel, const ClientCard* card);
 		void ActivateCardEffect(UseCardModel* useCardModel);
+		void Attack(UseCardModel* useCardModel, const irr::SEvent& event);
+		void ChangeBattlePosition(UseCardModel* useCardModel);
+		void SelectCard(ClientCard* card, const irr::SEvent& event);
 	};
 }
 

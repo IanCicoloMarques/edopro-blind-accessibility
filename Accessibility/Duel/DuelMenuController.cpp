@@ -78,6 +78,8 @@ namespace ygo {
 		{
 			if(IsRockPaperScissorsAvailable())
 				RockPaperScissors(event.KeyInput.Key);
+			else
+				SelectOption(0);
 		}
 		else if(event.KeyInput.Key == irr::KEY_KEY_2 || event.KeyInput.Key == irr::KEY_NUMPAD2)
 		{
@@ -137,7 +139,6 @@ namespace ygo {
 			}
 			else if (mainGame->btnOption[0]->isTrulyVisible())
 				ScreenReader::getReader()->readScreen(gDataManager->GetDesc(mainGame->dField.select_options[mainGame->dField.selected_option], mainGame->dInfo.compat_mode).data(), false);
-
 		}
 	}
 
@@ -149,6 +150,20 @@ namespace ygo {
 	AccessibilityFieldFocus::BattleStep DuelMenuController::GetBattleStep()
 	{
 		return _battleStep;
+	}
+
+	bool DuelMenuController::HasEventKey(irr::EKEY_CODE key)
+	{
+		std::vector<int> keys = {
+			KeyboardConfiguration::BattlePhase, KeyboardConfiguration::MainPhase2, KeyboardConfiguration::EndTurn, KeyboardConfiguration::MenuButtonYes,
+			KeyboardConfiguration::MenuButtonFirstTurn, KeyboardConfiguration::MenuButtonAttackDown, KeyboardConfiguration::MouseRightClick, KeyboardConfiguration::MenuButtonNo,
+			KeyboardConfiguration::MenuButtonSecondTurn, KeyboardConfiguration::MenuButtonDefenseUp, KeyboardConfiguration::MenuButtonDefenseDown, KeyboardConfiguration::MenuButtonAttackUp,
+			irr::KEY_KEY_1, irr::KEY_NUMPAD1, irr::KEY_KEY_2, irr::KEY_NUMPAD2,irr::KEY_KEY_3, irr::KEY_NUMPAD3, irr::KEY_KEY_4, irr::KEY_NUMPAD4,
+			irr::KEY_KEY_5, irr::KEY_NUMPAD5, irr::KEY_KEY_0, irr::KEY_NUMPAD0,irr::KEY_UP, irr::KEY_DOWN, irr::KEY_KEY_4, irr::KEY_NUMPAD4
+		};
+		if(std::find(keys.begin(), keys.end(), key) == keys.end())
+			return true;
+		return false;
 	}
 
 	void DuelMenuController::FocusOnMenus(){

@@ -22,6 +22,11 @@
 #include <IGUIListBox.h>
 #include <IGUICheckBox.h>
 
+#include "Duel/CardDisplayController.h"
+#include "Duel/DuelController.h"
+#include "Duel/DuelMenuController.h"
+#include "Duel/FieldController.h"
+
 namespace ygo {
 	class EventHandler : public IEventHandler
 	{
@@ -51,29 +56,37 @@ namespace ygo {
 		static bool selectZone;
 		static bool rockPaperScissor;
 	private:
+		IEventHandler* _duelMenuController = nullptr;
+		IEventHandler* _fieldControllerMenu = nullptr;
+		IEventHandler* _duelController = nullptr;
+		IEventHandler* _cardDisplayController = nullptr;
+		IEventHandler* _cardController = nullptr;
+		IEventHandler* _playerController = nullptr;
+		void InitializeController();
+
 		const int selectAttributeMax = 7;
 		const int selectTypeMax = 25;
 		int cardSelectPosition = 0;
 		int selectAttribute = 0;
 		int selectType = 0;
-		AccessibilityFieldFocus::Player displayedField = AccessibilityFieldFocus::Player::PLAYER;
+		AccessibilityFieldFocus::Player displayedField = AccessibilityFieldFocus::Player::MAIN_PLAYER;
 		int displayedCards = AccessibilityFieldFocus::DisplayedCards::NO_DISPLAY;
 		int cardType = AccessibilityFieldFocus::CardType::MONSTER;
 		void SetLookUpField();
 		void CancelOrFinish();
 		void DisplayCards(const std::vector<ClientCard*>& vector, const std::basic_string<wchar_t>& format);
 		void ChangeFieldAndLook(bool click = false);
-		float GetYPosition(const AccessibilityFieldFocus::Player& player = AccessibilityFieldFocus::Player::PLAYER);
+		float GetYPosition(const AccessibilityFieldFocus::Player& player = AccessibilityFieldFocus::Player::MAIN_PLAYER);
 		float GetYPositionPlayer();
 		float GetYPositionEnemy();
 		float GetYPositionLink();
-		float GetXPosition(int slot, const AccessibilityFieldFocus::Player& player = AccessibilityFieldFocus::Player::PLAYER);
+		float GetXPosition(int slot, const AccessibilityFieldFocus::Player& player = AccessibilityFieldFocus::Player::MAIN_PLAYER);
 		float GetXPositionPlayer(int slot);
 		float GetXPositionEnemy(int slot);
 		float GetXPositionLink(int slot);
 		void ChangeFieldByCard();
 		void ChangeField(const AccessibilityFieldFocus::CardType& cardField);
-		int GetFieldSlot(const int& slot, const AccessibilityFieldFocus::Player& player = AccessibilityFieldFocus::Player::PLAYER, const AccessibilityFieldFocus::CardType& cardType = AccessibilityFieldFocus::CardType::NO_CARD_TYPE);
+		int GetFieldSlot(const int& slot, const AccessibilityFieldFocus::Player& player = AccessibilityFieldFocus::Player::MAIN_PLAYER, const AccessibilityFieldFocus::CardType& cardType = AccessibilityFieldFocus::CardType::NO_CARD_TYPE);
 		void ScrollCardList();
 		float GetXPosition(const AccessibilityFieldFocus::Scroll& position = AccessibilityFieldFocus::Scroll::RIGHT);
 		void SetSelectableCards();
@@ -81,7 +94,7 @@ namespace ygo {
 		void EffectResolver(irr::SEvent event);
 		void GetCardLocation(ClientCard* card);
 		std::wstring GetCardLocationName(ClientCard* card);
-		void CheckFreeSlots(const AccessibilityFieldFocus::Player& player = AccessibilityFieldFocus::Player::PLAYER, const int& cardType = AccessibilityFieldFocus::CardType::NO_CARD_TYPE, bool link = false);
+		void CheckFreeSlots(const AccessibilityFieldFocus::Player& player = AccessibilityFieldFocus::Player::MAIN_PLAYER, const int& cardType = AccessibilityFieldFocus::CardType::NO_CARD_TYPE, bool link = false);
 		void ReplayCommands(const irr::SEvent& event);
 		void RotateField();
 		void PlayerInformation();
@@ -94,6 +107,9 @@ namespace ygo {
 		void ChangeBattlePosition(const irr::SEvent& event);
 		void SelectOption(int i);
 		void DuelCommandsOld(const irr::SEvent& event);
+
+	public:
+		bool HasEventKey(irr::EKEY_CODE key) override;
 	};
 }
 

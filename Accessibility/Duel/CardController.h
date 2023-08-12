@@ -6,22 +6,25 @@
 #include "FieldFocus/AccessibilityFieldFocus.h"
 
 namespace ygo {
-	class CardController{
+	class CardController : IEventHandler{
 	public:
-		static CardController* GetInstance();
+		static IEventHandler* GetInstance();
 		void KeyInputEvent(const irr::SEvent& event);
 		void GuiEvent(const irr::SEvent& event);
+		bool HasEventKey(irr::EKEY_CODE key) override;
 
 		void SetCard(ClientCard* card);
 		void ReadCardInfo();
 		void ReadCardBasicInfo();
 		void ShowCardOptions(int x = 0, int y = 0);
 		void ReadAvailableCommands();
+
 		ClientCard* GetSelectedCard();
 		void SetCardType(AccessibilityFieldFocus::CardType type);
+		AccessibilityFieldFocus::Field GetCardLocation(const ClientCard* card);
 		bool isSelected = false;
 	private:
-		static CardController* _cardController;
+		static IEventHandler* _cardController;
 		ClientCard* _selectedCard = nullptr;
 		int _cardType = AccessibilityFieldFocus::CardType::MONSTER;
 	};

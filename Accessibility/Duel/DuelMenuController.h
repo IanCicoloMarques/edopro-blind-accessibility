@@ -12,13 +12,14 @@ namespace ygo {
 		void GuiEvent(const irr::SEvent& event) override;
 		AccessibilityFieldFocus::BattleStep GetBattleStep();
 		AccessibilityFieldFocus::BattleStep _battleStep = AccessibilityFieldFocus::BattleStep::MP1;
+		bool HasEventKey(irr::EKEY_CODE key) override;
+		void SetResponseSelectedOption() const;
 
 	private:
 		static IEventHandler* _duelMenuController;
 		bool IsRockPaperScissorsAvailable();
 		void RockPaperScissors(irr::EKEY_CODE key);
 		void SelectOption(int i);
-		void SetResponseSelectedOption() const;
 		void ChangeBattlePhase(AccessibilityFieldFocus::BattleStep bp);
 		void AnnounceNumber();
 		void AnnounceCard();

@@ -8,26 +8,30 @@
 
 
 namespace ygo {
-	class FieldController{
+	class FieldController : IEventHandler{
 	public:
-		static FieldController* GetInstance();
-		void KeyInputEvent(const irr::SEvent& event);
-		void GuiEvent(const irr::SEvent& event);
+		static IEventHandler* GetInstance();
+		void KeyInputEvent(const irr::SEvent& event) override;
+		void GuiEvent(const irr::SEvent& event) override;
+		bool HasEventKey(irr::EKEY_CODE key) override;
+		void RotateField();
+		void ChangeFocusedPlayerField(AccessibilityFieldFocus::Player player = AccessibilityFieldFocus::Player::MAIN_PLAYER);
 
 		void SetSelectedCardField();
 		void SelectFieldSlot(const irr::SEvent& event, int slot, AccessibilityFieldFocus::Field field);
 		void SetMousePositionOnCardOnFieldOrHand(ClientCard* card);
+		void SetMousePositionOnSlot(AccessibilityFieldFocus::Field field, int slot = 0);
 		AccessibilityFieldFocus::DisplayedCards GetField();
-		FieldSlotModel* GetFieldSlotModel(bool recursion = false, AccessibilityFieldFocus::Player player = AccessibilityFieldFocus::Player::PLAYER);
-		void ReadFreeSlots(const AccessibilityFieldFocus::Player& player = AccessibilityFieldFocus::Player::PLAYER, const int& cardType = AccessibilityFieldFocus::CardType::NO_CARD_TYPE, bool isLink = false);
-		AccessibilityFieldFocus::Field currentField = AccessibilityFieldFocus::Field::PLAYER_MONSTERS;
-		AccessibilityFieldFocus::Player currentPlayer = AccessibilityFieldFocus::Player::PLAYER;
+		FieldSlotModel* GetFieldSlotModel(bool recursion = false, AccessibilityFieldFocus::Player player = AccessibilityFieldFocus::Player::MAIN_PLAYER);
+		void ReadFreeSlots(const AccessibilityFieldFocus::Player& player = AccessibilityFieldFocus::Player::MAIN_PLAYER, const int& cardType = AccessibilityFieldFocus::CardType::NO_CARD_TYPE, bool isLink = false);
+		AccessibilityFieldFocus::Field currentField = AccessibilityFieldFocus::Field::MONSTER_ZONE;
+		AccessibilityFieldFocus::Player currentPlayer = AccessibilityFieldFocus::Player::MAIN_PLAYER;
 	private:
-		static FieldController* _fieldController;
-		bool IsOnField(const ClientCard* card, const int& player = AccessibilityFieldFocus::Player::PLAYER);
-
-	private:
+		static IEventHandler* _fieldController;
 		CardController* _cardController = nullptr;
+		bool IsOnField(const ClientCard* card, const int& player = AccessibilityFieldFocus::Player::MAIN_PLAYER);
+		void ChangeField(const AccessibilityFieldFocus::Field& field);
+
 	};
 }
 

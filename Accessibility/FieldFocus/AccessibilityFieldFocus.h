@@ -8,25 +8,27 @@ namespace ygo {
 	private:
 	public:
 		static bool IsInMainTable(int location) {
-			std::vector<int> mainTable = { PLAYER_MONSTERS, PLAYER_SPELLS, LINK_ZONE };
+			std::vector<int> mainTable = { MONSTER_ZONE, SPELL_ZONE, LINK_ZONE };
 			return std::find(mainTable.begin(), mainTable.end(), location) != mainTable.end();
 		}
 		/** A identifier to tell where the accessibility reader will look at in the field*/
 		enum Field
 		{
-			PLAYER_HAND = 0,
-			PLAYER_DECK = 1,
-			PLAYER_MONSTERS = 4,
-			PLAYER_SPELLS = 8,
-			PLAYER_GRAVEYARD = 16,
-			PLAYER_BANNED_CARDS = 32,
-			PLAYER_EXTRA_DECK = 64,
+			UNKNOWN_ZONE = -1,
+			HAND_ZONE = 0,
+			DECK_ZONE = 1,
+			MONSTER_ZONE = 4,
+			SPELL_ZONE = 8,
+			GRAVEYARD_ZONE = 16,
+			REMOVED_CARDS_ZONE = 32,
+			EXTRA_DECK_ZONE = 64,
 			PLAYER_FIELD = 6,
 			PLAYER_PENDULUM_ZONE = 7,
 			PLAYER_SUMMONABLE_MONSTERS = 8,
 			PLAYER_SPECIAL_SUMMONABLE_MONSTERS = 9,
 			PLAYER_ACTIVABLE_CARDS = 10,
 			PLAYER_SETTABLE_CARDS = 11,
+			PLAYER_SPELL_FIELD = 999,
 			ATTACKABLE_CARDS = 12,
 			SELECTABLE_CARDS = 13,
 			SELECTED_CARDS = 14,
@@ -37,7 +39,7 @@ namespace ygo {
 
 		enum Player
 		{
-			PLAYER = 0,
+			MAIN_PLAYER = 0,
 			ENEMY_PLAYER = 1
 		};
 

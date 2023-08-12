@@ -18,6 +18,11 @@ class IEventHandler
 	 * \param event Data Type that contains the information of the element.
 	 */
 	virtual void GuiEvent(const irr::SEvent& event) = 0;
+	/**
+	 * \brief Check if the class has an event to the pressed key.
+	 * \param key Key pressed.
+	 */
+	virtual bool HasEventKey(irr::EKEY_CODE key) = 0;
 };
 
 #endif

@@ -13,8 +13,8 @@
 #include "ScreenReader/Messages/AccessibilityStringDictionary.h"
 
 namespace ygo {
-	CardController* CardController::_cardController = nullptr;
-	CardController* CardController::GetInstance()
+	IEventHandler* CardController::_cardController = nullptr;
+	IEventHandler* CardController::GetInstance()
 	{
 		if (_cardController == nullptr)
 			_cardController = new CardController();
@@ -25,7 +25,7 @@ namespace ygo {
 	{
 		if(event.KeyInput.Key == KeyboardConfiguration::CardInformation)
 		{
-			const int currentCardIndex = CardDisplayController::GetInstance()->currentCardIndex;
+			const int currentCardIndex = static_cast<CardDisplayController *>(CardDisplayController::GetInstance())->currentCardIndex;
 			if(mainGame->dField.display_cards.size() <= currentCardIndex)
 				return;
 			SetCard(mainGame->dField.display_cards[currentCardIndex]);
@@ -38,6 +38,14 @@ namespace ygo {
 		return;
 	}
 
+	bool CardController::HasEventKey(irr::EKEY_CODE key)
+	{
+		std::vector<int> keys = { KeyboardConfiguration::CardInformation };
+		if(std::find(keys.begin(), keys.end(), key) == keys.end())
+			return true;
+		return false;
+	}
+
 	void CardController::SetCard(ClientCard* card)
 	{
 		if (!card)
@@ -48,7 +56,7 @@ namespace ygo {
 	void CardController::ReadCardInfo()
 	{
 		auto* card = new CardModel(_selectedCard);
-		auto* fieldController = FieldController::GetInstance();
+		auto* fieldController = static_cast<FieldController *>(FieldController::GetInstance());
 		const FieldSlotModel* fieldSlotModel = fieldController->GetFieldSlotModel();
 		if(fieldSlotModel != nullptr)
 			card->SetFieldSlot(fieldSlotModel->slotNumber);
@@ -58,7 +66,7 @@ namespace ygo {
 	void CardController::ReadCardBasicInfo()
 	{
 		auto* card = new CardModel(_selectedCard);
-		auto* fieldController = FieldController::GetInstance();
+		auto* fieldController = static_cast<FieldController *>(FieldController::GetInstance());
 		const FieldSlotModel* fieldSlotModel = fieldController->GetFieldSlotModel();
 		if(fieldSlotModel != nullptr)
 			card->SetFieldSlot(fieldSlotModel->slotNumber);
@@ -179,5 +187,24 @@ namespace ygo {
 	void CardController::SetCardType(const AccessibilityFieldFocus::CardType type)
 	{
 		_cardType = type;
+	}
+
+	AccessibilityFieldFocus::Field CardController::GetCardLocation(const ClientCard* card) {
+		AccessibilityFieldFocus::Field location = AccessibilityFieldFocus::Field::UNKNOWN_ZONE;
+		if (card->location == LOCATION_EXTRA)
+			location = AccessibilityFieldFocus::Field::EXTRA_DECK_ZONE;
+		else if (card->location == LOCATION_DECK)
+			location = AccessibilityFieldFocus::Field::DECK_ZONE;
+		else if (card->location == LOCATION_GRAVE)
+			location = AccessibilityFieldFocus::Field::GRAVEYARD_ZONE;
+		else if (card->location == LOCATION_REMOVED)
+			location = AccessibilityFieldFocus::Field::REMOVED_CARDS_ZONE;
+		else if (card->location == LOCATION_HAND)
+			location = AccessibilityFieldFocus::Field::HAND_ZONE;
+		else if (card->location == LOCATION_MZONE)
+			location = AccessibilityFieldFocus::Field::MONSTER_ZONE;
+		else if (card->location == LOCATION_SZONE)
+			location = AccessibilityFieldFocus::Field::SPELL_ZONE;
+		return location;
 	}
 }

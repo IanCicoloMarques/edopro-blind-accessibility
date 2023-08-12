@@ -135,6 +135,7 @@
     <ClInclude Include="..\accessibility\Duel\FieldSlotController.h" />
     <ClInclude Include="..\accessibility\Duel\Models\FieldSlotModel.h" />
     <ClInclude Include="..\accessibility\Duel\Models\UseCardModel.h" />
+    <ClInclude Include="..\accessibility\Duel\PlayerController.h" />
     <ClInclude Include="..\accessibility\Helper\ButtonHelper.h" />
     <ClInclude Include="..\accessibility\Helper\CardDisplayHelper.h" />
     <ClInclude Include="..\accessibility\Helper\KeyboardHelper.h" />
@@ -258,6 +259,7 @@
     <ClCompile Include="..\accessibility\Duel\FieldController.cpp" />
     <ClCompile Include="..\accessibility\Duel\FieldSlotController.cpp" />
     <ClCompile Include="..\accessibility\Duel\Models\FieldSlotModel.cpp" />
+    <ClCompile Include="..\accessibility\Duel\PlayerController.cpp" />
     <ClCompile Include="..\accessibility\Helper\ButtonHelper.cpp" />
     <ClCompile Include="..\accessibility\Menus\AIMenu.cpp" />
     <ClCompile Include="..\accessibility\Menus\ConfigurationMenu.cpp" />

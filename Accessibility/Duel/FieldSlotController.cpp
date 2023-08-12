@@ -13,29 +13,59 @@ namespace ygo {
 		return _fieldSlotController;
 	}
 
-	FieldSlotModel* FieldSlotController::GetFieldSlotData(const int& slot, AccessibilityFieldFocus::Field field)
+	FieldSlotModel* FieldSlotController::GetFieldSlotData(const int& slot, AccessibilityFieldFocus::Field field, AccessibilityFieldFocus::Player player)
 	{
 		auto* fieldSlot = new FieldSlotModel();
 		if (field == AccessibilityFieldFocus::Field::LINK_ZONE)
 		{
 			fieldSlot->field = AccessibilityFieldFocus::Field::LINK_ZONE;
 			fieldSlot->xPosition = GetLinkFieldXPosition(slot);
-			fieldSlot->yPosition = _linkYPosition;
+			fieldSlot->yPosition = GetYPosition(AccessibilityFieldFocus::Field::LINK_ZONE);
 			fieldSlot->slotNumber = slot;
 		}
-		else if (field == AccessibilityFieldFocus::Field::PLAYER_MONSTERS)
+		else if (field == AccessibilityFieldFocus::Field::MONSTER_ZONE)
 		{
-			fieldSlot->field = AccessibilityFieldFocus::Field::PLAYER_MONSTERS;
+			fieldSlot->field = AccessibilityFieldFocus::Field::MONSTER_ZONE;
 			fieldSlot->xPosition = GetPlayerFieldXPosition(slot);
-			fieldSlot->yPosition = _monsterFieldYPosition;
+			fieldSlot->yPosition = GetYPosition(AccessibilityFieldFocus::Field::MONSTER_ZONE, player);
 			fieldSlot->slotNumber = slot;
 		}
-		else if (field == AccessibilityFieldFocus::Field::PLAYER_SPELLS)
+		else if (field == AccessibilityFieldFocus::Field::SPELL_ZONE)
 		{
-			fieldSlot->field = AccessibilityFieldFocus::Field::PLAYER_SPELLS;
+			fieldSlot->field = AccessibilityFieldFocus::Field::SPELL_ZONE;
 			fieldSlot->xPosition = GetPlayerFieldXPosition(slot);
-			fieldSlot->yPosition = _spellFieldYPosition;
+			fieldSlot->yPosition = GetYPosition(AccessibilityFieldFocus::Field::SPELL_ZONE, player);
 			fieldSlot->slotNumber = slot;
+		}
+		else if (field == AccessibilityFieldFocus::Field::DECK_ZONE)
+		{
+			fieldSlot->field = AccessibilityFieldFocus::Field::DECK_ZONE;
+			fieldSlot->xPosition = GetXPosition(AccessibilityFieldFocus::Field::DECK_ZONE, player);
+			fieldSlot->yPosition = GetYPosition(AccessibilityFieldFocus::Field::DECK_ZONE, player);
+		}
+		else if (field == AccessibilityFieldFocus::Field::GRAVEYARD_ZONE)
+		{
+			fieldSlot->field = AccessibilityFieldFocus::Field::GRAVEYARD_ZONE;
+			fieldSlot->xPosition = GetXPosition(AccessibilityFieldFocus::Field::GRAVEYARD_ZONE, player);
+			fieldSlot->yPosition = GetYPosition(AccessibilityFieldFocus::Field::GRAVEYARD_ZONE, player);
+		}
+		else if (field == AccessibilityFieldFocus::Field::REMOVED_CARDS_ZONE)
+		{
+			fieldSlot->field = AccessibilityFieldFocus::Field::REMOVED_CARDS_ZONE;
+			fieldSlot->xPosition = GetXPosition(AccessibilityFieldFocus::Field::REMOVED_CARDS_ZONE, player);
+			fieldSlot->yPosition = GetYPosition(AccessibilityFieldFocus::Field::REMOVED_CARDS_ZONE, player);
+		}
+		else if (field == AccessibilityFieldFocus::Field::PLAYER_SPELL_FIELD)
+		{
+			fieldSlot->field = AccessibilityFieldFocus::Field::PLAYER_SPELL_FIELD;
+			fieldSlot->xPosition = GetXPosition(AccessibilityFieldFocus::Field::PLAYER_SPELL_FIELD, player);
+			fieldSlot->yPosition = GetYPosition(AccessibilityFieldFocus::Field::PLAYER_SPELL_FIELD, player);
+		}
+		else if (field == AccessibilityFieldFocus::Field::EXTRA_DECK_ZONE)
+		{
+			fieldSlot->field = AccessibilityFieldFocus::Field::EXTRA_DECK_ZONE;
+			fieldSlot->xPosition = GetXPosition(AccessibilityFieldFocus::Field::EXTRA_DECK_ZONE, player);
+			fieldSlot->yPosition = GetYPosition(AccessibilityFieldFocus::Field::EXTRA_DECK_ZONE, player);
 		}
 		return fieldSlot;
 	}
@@ -70,5 +100,61 @@ namespace ygo {
 		return posX;
 	}
 
+	double FieldSlotController::GetXPosition(const AccessibilityFieldFocus::Field field, const AccessibilityFieldFocus::Player player)
+	{
+		constexpr double leftSlotX = 0.36;
+		constexpr double rightSlotX = 0.92;
+		double xPosition = 0;
+		switch (field) {
+			case AccessibilityFieldFocus::DECK_ZONE:
+			case AccessibilityFieldFocus::GRAVEYARD_ZONE:
+			case AccessibilityFieldFocus::REMOVED_CARDS_ZONE:
+				if(player == AccessibilityFieldFocus::Player::MAIN_PLAYER)
+					xPosition =  rightSlotX;
+				else
+					xPosition = leftSlotX;
+			break;
+			case AccessibilityFieldFocus::EXTRA_DECK_ZONE:
+			case AccessibilityFieldFocus::PLAYER_SPELL_FIELD:
+				if(player == AccessibilityFieldFocus::Player::MAIN_PLAYER)
+					xPosition = leftSlotX;
+				else
+					xPosition = rightSlotX;
+			break;
+		}
+		return xPosition;
+	}
 
+	double FieldSlotController::GetYPosition(AccessibilityFieldFocus::Field field, AccessibilityFieldFocus::Player player)
+	{
+		double yPosition = 0;
+		switch (field) {
+			case AccessibilityFieldFocus::DECK_ZONE:
+			case AccessibilityFieldFocus::MONSTER_ZONE:
+			case AccessibilityFieldFocus::EXTRA_DECK_ZONE:
+				if(player == AccessibilityFieldFocus::Player::MAIN_PLAYER)
+					yPosition = _monsterFieldYPositionMainPlayer;
+				else
+					yPosition = 0.30;
+			break;
+			case AccessibilityFieldFocus::SPELL_ZONE:
+			case AccessibilityFieldFocus::GRAVEYARD_ZONE:
+			case AccessibilityFieldFocus::PLAYER_SPELL_FIELD:
+				if(player == AccessibilityFieldFocus::Player::MAIN_PLAYER)
+					yPosition = _spellFieldYPositionMainPlayer;
+				else
+					yPosition = 0.39;
+			break;
+			case AccessibilityFieldFocus::REMOVED_CARDS_ZONE:
+				if(player == AccessibilityFieldFocus::Player::MAIN_PLAYER)
+					yPosition = 0.56;
+				else
+					yPosition = 0.43;
+			break;
+			case AccessibilityFieldFocus::LINK_ZONE:
+				yPosition = _linkYPosition;
+			break;
+		}
+		return yPosition;
+	}
 }

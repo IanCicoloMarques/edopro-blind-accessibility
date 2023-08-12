@@ -35,11 +35,11 @@ namespace ygo
 	//Menu Keys
 	int KeyboardConfiguration::MenuButtonYes = irr::KEY_COMMA;
 	int KeyboardConfiguration::MenuButtonNo = irr::KEY_PERIOD;
-	int KeyboardConfiguration::MenuButtonFirstTurn = irr::KEY_PERIOD;;
+	int KeyboardConfiguration::MenuButtonFirstTurn = irr::KEY_COMMA;;
 	int KeyboardConfiguration::MenuButtonSecondTurn = irr::KEY_PERIOD;;
-	int KeyboardConfiguration::MenuButtonAttackUp = irr::KEY_PERIOD;;
+	int KeyboardConfiguration::MenuButtonAttackUp = irr::KEY_COMMA;;
 	int KeyboardConfiguration::MenuButtonAttackDown = irr::KEY_PERIOD;;
-	int KeyboardConfiguration::MenuButtonDefenseUp = irr::KEY_PERIOD;;
+	int KeyboardConfiguration::MenuButtonDefenseUp = irr::KEY_COMMA;;
 	int KeyboardConfiguration::MenuButtonDefenseDown = irr::KEY_PERIOD;;
 
 	//Mouse

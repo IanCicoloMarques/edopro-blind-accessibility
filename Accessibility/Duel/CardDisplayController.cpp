@@ -15,8 +15,8 @@
 
 
 namespace ygo {
-	CardDisplayController* CardDisplayController::_cardDisplayController = nullptr;
-	CardDisplayController* CardDisplayController::GetInstance()
+	IEventHandler* CardDisplayController::_cardDisplayController = nullptr;
+	IEventHandler* CardDisplayController::GetInstance()
 	{
 		if (_cardDisplayController == nullptr)
 			_cardDisplayController = new CardDisplayController();
@@ -25,25 +25,27 @@ namespace ygo {
 
 	void CardDisplayController::KeyInputEvent(const irr::SEvent& event)
 	{
-		const AccessibilityFieldFocus::Player player = FieldController::GetInstance()->currentPlayer;
+		if(_fieldController == nullptr)
+			_fieldController = static_cast<FieldController *>(FieldController::GetInstance());
+		const AccessibilityFieldFocus::Player player = _fieldController->currentPlayer;
 		if(event.KeyInput.Key == KeyboardConfiguration::ExtraDeck)
-			DisplayTable(event, AccessibilityFieldFocus::Field::PLAYER_EXTRA_DECK, player);
+			DisplayTable(event, AccessibilityFieldFocus::Field::EXTRA_DECK_ZONE, player);
 		else if(event.KeyInput.Key == KeyboardConfiguration::Graveyard)
-			DisplayTable(event, AccessibilityFieldFocus::Field::PLAYER_GRAVEYARD, player);
+			DisplayTable(event, AccessibilityFieldFocus::Field::GRAVEYARD_ZONE, player);
 		else if(event.KeyInput.Key == KeyboardConfiguration::Hand)
-			DisplayTable(event, AccessibilityFieldFocus::Field::PLAYER_HAND, player);
+			DisplayTable(event, AccessibilityFieldFocus::Field::HAND_ZONE, player);
 		else if(event.KeyInput.Key == KeyboardConfiguration::RemovedZone)
-			DisplayTable(event, AccessibilityFieldFocus::Field::PLAYER_BANNED_CARDS, player);
+			DisplayTable(event, AccessibilityFieldFocus::Field::REMOVED_CARDS_ZONE, player);
 		else if(event.KeyInput.Key == KeyboardConfiguration::MonsterZone)
-			DisplayTable(event, AccessibilityFieldFocus::Field::PLAYER_MONSTERS, player);
+			DisplayTable(event, AccessibilityFieldFocus::Field::MONSTER_ZONE, player);
 		else if(event.KeyInput.Key == KeyboardConfiguration::SpellZone)
-			DisplayTable(event, AccessibilityFieldFocus::Field::PLAYER_SPELLS, player);
+			DisplayTable(event, AccessibilityFieldFocus::Field::SPELL_ZONE, player);
 		else if(event.KeyInput.Key == KeyboardConfiguration::Deck)
-			DisplayTable(event, AccessibilityFieldFocus::Field::PLAYER_DECK, player);
+			DisplayTable(event, AccessibilityFieldFocus::Field::DECK_ZONE, player);
 		else if(event.KeyInput.Key == KeyboardConfiguration::Chain)
 			DisplayChain(event);
 		else if(event.KeyInput.Key == KeyboardConfiguration::SelectableCards)
-			DisplaySelectableCards(event);
+			SelectableCards(event);
 		else if(event.KeyInput.Key == KeyboardConfiguration::SpecialSummonableCards)
 			DisplaySpecialSummonableMonsters(event);
 		else if(event.KeyInput.Key == KeyboardConfiguration::ActivatableCards)
@@ -60,11 +62,72 @@ namespace ygo {
 			ScrollDisplay(initialIndex, irr::KEY_LEFT);
 			ShowCardInfo();
 		}
+		else if(event.KeyInput.Key == irr::KEY_UP){
+			_fieldController->ChangeFocusedPlayerField();
+			DisplayCards(event, _fieldController->currentField, _fieldController->currentPlayer);
+		}
 	}
 
 	void CardDisplayController::GuiEvent(const irr::SEvent& event)
 	{
 		return;
+	}
+
+	bool CardDisplayController::HasEventKey(irr::EKEY_CODE key)
+	{
+		std::vector<int> keys = {
+			KeyboardConfiguration::ExtraDeck, KeyboardConfiguration::Graveyard, KeyboardConfiguration::Hand, KeyboardConfiguration::RemovedZone,
+			KeyboardConfiguration::MonsterZone, KeyboardConfiguration::SpellZone, KeyboardConfiguration::Deck, KeyboardConfiguration::Chain,
+			KeyboardConfiguration::SelectableCards, KeyboardConfiguration::SpecialSummonableCards, KeyboardConfiguration::ActivatableCards,
+			irr::KEY_RIGHT, irr::KEY_LEFT, irr::KEY_UP
+		};
+		if(std::find(keys.begin(), keys.end(), key) == keys.end())
+			return true;
+		return false;
+	}
+
+	void CardDisplayController::SelectableCards(const irr::SEvent& event)
+	{
+		if (mainGame->scrCardList->isTrulyVisible())
+			SetSelectableCards();
+		else
+			DisplaySelectableCards(event);
+	}
+
+	void CardDisplayController::SetSelectableCards() {
+		currentCardIndex = 0;
+		if (!mainGame->dField.selectable_cards.empty()) {
+			mainGame->dField.display_cards.clear();
+			for (int i = 0; i < 5; ++i) {
+				if (mainGame->dField.selectable_cards.size() > i)
+					mainGame->dField.display_cards.push_back(mainGame->dField.selectable_cards[i]);
+			}
+			mainGame->ShowCardInfo(mainGame->dField.display_cards[currentCardIndex]->code);
+		}
+		else
+		{
+			const std::wstring nvdaString = fmt::format(gDataManager->GetAccessibilityString(128).data());
+			ScreenReader::getReader()->readScreen(nvdaString, false);
+			CloseDisplay();
+		}
+	}
+
+	void CardDisplayController::DisplayCards(const irr::SEvent& event, AccessibilityFieldFocus::Field field, AccessibilityFieldFocus::Player player)
+	{
+		if(field == AccessibilityFieldFocus::Field::EXTRA_DECK_ZONE)
+			DisplayTable(event, AccessibilityFieldFocus::Field::EXTRA_DECK_ZONE, player);
+		else if(field == AccessibilityFieldFocus::Field::GRAVEYARD_ZONE)
+			DisplayTable(event, AccessibilityFieldFocus::Field::GRAVEYARD_ZONE, player);
+		else if(field == AccessibilityFieldFocus::Field::HAND_ZONE)
+			DisplayTable(event, AccessibilityFieldFocus::Field::HAND_ZONE, player);
+		else if(field == AccessibilityFieldFocus::Field::REMOVED_CARDS_ZONE)
+			DisplayTable(event, AccessibilityFieldFocus::Field::REMOVED_CARDS_ZONE, player);
+		else if(field == AccessibilityFieldFocus::Field::MONSTER_ZONE)
+			DisplayTable(event, AccessibilityFieldFocus::Field::MONSTER_ZONE, player);
+		else if(field == AccessibilityFieldFocus::Field::SPELL_ZONE)
+			DisplayTable(event, AccessibilityFieldFocus::Field::SPELL_ZONE, player);
+		else if(field == AccessibilityFieldFocus::Field::DECK_ZONE)
+			DisplayTable(event, AccessibilityFieldFocus::Field::DECK_ZONE, player);
 	}
 
 	void CardDisplayController::ChangeCurrentCardIndex(irr::EKEY_CODE ekeyCode)
@@ -109,8 +172,9 @@ namespace ygo {
 	{
 		if (!mainGame->dField.display_cards.empty()) {
 			mainGame->ShowCardInfo(mainGame->dField.display_cards[currentCardIndex]->code);
-			CardController::GetInstance()->SetCard(mainGame->dField.display_cards[currentCardIndex]);
-			CardController::GetInstance()->ReadCardBasicInfo();
+			auto* cardController = static_cast<CardController *>(CardController::GetInstance());
+			cardController->SetCard(mainGame->dField.display_cards[currentCardIndex]);
+			cardController->ReadCardBasicInfo();
 		}
 	}
 
@@ -131,19 +195,19 @@ namespace ygo {
 
 	void CardDisplayController::DisplayTable(const irr::SEvent& event, const AccessibilityFieldFocus::Field field, AccessibilityFieldFocus::Player player)
 	{
-		if(field == AccessibilityFieldFocus::Field::PLAYER_MONSTERS)
+		if(field == AccessibilityFieldFocus::Field::MONSTER_ZONE)
 			DisplayMonsterField(event, player);
-		else if(field == AccessibilityFieldFocus::Field::PLAYER_SPELLS)
+		else if(field == AccessibilityFieldFocus::Field::SPELL_ZONE)
 			DisplaySpellField(event, player);
-		else if(field == AccessibilityFieldFocus::Field::PLAYER_BANNED_CARDS)
+		else if(field == AccessibilityFieldFocus::Field::REMOVED_CARDS_ZONE)
 			DisplayRemovedCards(event, player);
-		else if(field == AccessibilityFieldFocus::Field::PLAYER_HAND)
+		else if(field == AccessibilityFieldFocus::Field::HAND_ZONE)
 			DisplayHand(event, player);
-		else if(field == AccessibilityFieldFocus::Field::PLAYER_GRAVEYARD)
+		else if(field == AccessibilityFieldFocus::Field::GRAVEYARD_ZONE)
 			DisplayGraveyard(event, player);
-		else if(field == AccessibilityFieldFocus::Field::PLAYER_EXTRA_DECK)
+		else if(field == AccessibilityFieldFocus::Field::EXTRA_DECK_ZONE)
 			DisplayExtraDeck(event, player);
-		else if(field == AccessibilityFieldFocus::Field::PLAYER_DECK)
+		else if(field == AccessibilityFieldFocus::Field::DECK_ZONE)
 			DisplayDeck(event, player);
 	}
 
@@ -227,44 +291,44 @@ namespace ygo {
 	{
 		const bool canViewCards = CanDisplayCards(event);
 		if (canViewCards) {
-			CardController::GetInstance()->SetCardType(AccessibilityFieldFocus::CardType::CHAIN);
-			FieldController::GetInstance()->currentField = AccessibilityFieldFocus::Field::CHAINED_CARDS;
+			static_cast<CardController *>(CardController::GetInstance())->SetCardType(AccessibilityFieldFocus::CardType::CHAIN);
+			_fieldController->currentField = AccessibilityFieldFocus::Field::CHAINED_CARDS;
 			DisplayCards(mainGame->dField.chains);
 		}
 		else
 			CloseDisplay();
 	}
 
-	void CardDisplayController::DisplayMonsterField(const irr::SEvent& event,AccessibilityFieldFocus::Player displayed_field = AccessibilityFieldFocus::Player::PLAYER)
+	void CardDisplayController::DisplayMonsterField(const irr::SEvent& event,AccessibilityFieldFocus::Player displayed_field = AccessibilityFieldFocus::Player::MAIN_PLAYER)
 	{
 		const bool canViewCards = CanDisplayCards(event);
 		if (canViewCards) {
-			FieldController::GetInstance()->currentField = AccessibilityFieldFocus::Field::PLAYER_MONSTERS;
-			CardController::GetInstance()->SetCardType(AccessibilityFieldFocus::CardType::MONSTER);
+			_fieldController->currentField = AccessibilityFieldFocus::Field::MONSTER_ZONE;
+			static_cast<CardController *>(CardController::GetInstance())->SetCardType(AccessibilityFieldFocus::CardType::MONSTER);
 			DisplayCards(mainGame->dField.mzone[displayed_field], fmt::format(gDataManager->GetAccessibilityString(95).data()));
 		}
 		else
 			CloseDisplay();
 	}
 
-	void CardDisplayController::DisplaySpellField(const irr::SEvent& event, AccessibilityFieldFocus::Player displayed_field = AccessibilityFieldFocus::Player::PLAYER)
+	void CardDisplayController::DisplaySpellField(const irr::SEvent& event, AccessibilityFieldFocus::Player displayed_field = AccessibilityFieldFocus::Player::MAIN_PLAYER)
 	{
 		const bool canViewCards = CanDisplayCards(event);
 		if (canViewCards) {
-			FieldController::GetInstance()->currentField = AccessibilityFieldFocus::Field::PLAYER_SPELLS;
-			CardController::GetInstance()->SetCardType(AccessibilityFieldFocus::CardType::SPELL);
+			_fieldController->currentField = AccessibilityFieldFocus::Field::SPELL_ZONE;
+			static_cast<CardController *>(CardController::GetInstance())->SetCardType(AccessibilityFieldFocus::CardType::SPELL);
 			DisplayCards(mainGame->dField.szone[displayed_field], fmt::format(gDataManager->GetAccessibilityString(66).data()));
 		}
 		else
 			CloseDisplay();
 	}
 
-	void CardDisplayController::DisplayExtraDeck(const irr::SEvent& event, AccessibilityFieldFocus::Player displayed_field = AccessibilityFieldFocus::Player::PLAYER)
+	void CardDisplayController::DisplayExtraDeck(const irr::SEvent& event, AccessibilityFieldFocus::Player displayed_field = AccessibilityFieldFocus::Player::MAIN_PLAYER)
 	{
 		const bool canViewCards = CanDisplayCards(event);
 		if (canViewCards) {
-			FieldController::GetInstance()->currentField = AccessibilityFieldFocus::Field::PLAYER_EXTRA_DECK;
-			CardController::GetInstance()->SetCardType(AccessibilityFieldFocus::CardType::MONSTER);
+			_fieldController->currentField = AccessibilityFieldFocus::Field::EXTRA_DECK_ZONE;
+			static_cast<CardController *>(CardController::GetInstance())->SetCardType(AccessibilityFieldFocus::CardType::MONSTER);
 			DisplayCards(mainGame->dField.extra[displayed_field], fmt::format(gDataManager->GetAccessibilityString(92).data()));
 		}
 		else
@@ -275,8 +339,8 @@ namespace ygo {
 	{
 		const bool canViewCards = CanDisplayCards(event);
 		if (canViewCards) {
-			CardController::GetInstance()->SetCardType(AccessibilityFieldFocus::CardType::MONSTER);
-			FieldController::GetInstance()->currentField = AccessibilityFieldFocus::Field::PLAYER_DECK;
+			static_cast<CardController *>(CardController::GetInstance())->SetCardType(AccessibilityFieldFocus::CardType::MONSTER);
+			_fieldController->currentField = AccessibilityFieldFocus::Field::DECK_ZONE;
 			if(!mainGame->dInfo.isReplay)
 				DisplayCards(mainGame->dField.deck[displayed_field], fmt::format(gDataManager->GetAccessibilityString(94).data()));
 			else
@@ -286,12 +350,12 @@ namespace ygo {
 			CloseDisplay();
 	}
 
-	void CardDisplayController::DisplayHand(const irr::SEvent& event, AccessibilityFieldFocus::Player displayed_field = AccessibilityFieldFocus::Player::PLAYER)
+	void CardDisplayController::DisplayHand(const irr::SEvent& event, AccessibilityFieldFocus::Player displayed_field = AccessibilityFieldFocus::Player::MAIN_PLAYER)
 	{
 		const bool canViewCards = CanDisplayCards(event);
 		if (canViewCards) {
-			FieldController::GetInstance()->currentField = AccessibilityFieldFocus::Field::PLAYER_HAND;
-			CardController::GetInstance()->SetCardType(AccessibilityFieldFocus::CardType::MONSTER);
+			_fieldController->currentField = AccessibilityFieldFocus::Field::HAND_ZONE;
+			static_cast<CardController *>(CardController::GetInstance())->SetCardType(AccessibilityFieldFocus::CardType::MONSTER);
 			DisplayCards(mainGame->dField.hand[displayed_field], fmt::format(gDataManager->GetAccessibilityString(90).data()));
 		}
 		else
@@ -302,12 +366,11 @@ namespace ygo {
 	{
 		const bool canViewCards = CanDisplayCards(event);
 		if (canViewCards) {
-			CardController::GetInstance()->SetCardType(AccessibilityFieldFocus::CardType::MONSTER);
-			FieldController::GetInstance()->currentField = AccessibilityFieldFocus::Field::PLAYER_SPECIAL_SUMMONABLE_MONSTERS;
+			static_cast<CardController *>(CardController::GetInstance())->SetCardType(AccessibilityFieldFocus::CardType::MONSTER);
+			_fieldController->currentField = AccessibilityFieldFocus::Field::PLAYER_SPECIAL_SUMMONABLE_MONSTERS;
 			if (mainGame->wCardSelect->isTrulyVisible()) {
 				mainGame->dField.display_cards = mainGame->dField.selectable_cards;
-				ScreenReader::getReader()->readScreen(fmt::format(gDataManager->GetAccessibilityString(96).data(),
-				                                                  mainGame->dField.display_cards.size()), false);
+				ScreenReader::getReader()->readScreen(fmt::format(gDataManager->GetAccessibilityString(96).data(), mainGame->dField.display_cards.size()), false);
 				mainGame->env->setFocus(mainGame->wCardSelect);
 			}
 			else
@@ -317,24 +380,24 @@ namespace ygo {
 			CloseDisplay();
 	}
 
-	void CardDisplayController::DisplayGraveyard(const irr::SEvent& event, AccessibilityFieldFocus::Player displayed_field = AccessibilityFieldFocus::Player::PLAYER)
+	void CardDisplayController::DisplayGraveyard(const irr::SEvent& event, AccessibilityFieldFocus::Player displayed_field = AccessibilityFieldFocus::Player::MAIN_PLAYER)
 	{
 		const bool canViewCards = CanDisplayCards(event);
 		if (canViewCards) {
-			FieldController::GetInstance()->currentField = AccessibilityFieldFocus::Field::PLAYER_GRAVEYARD;
-			CardController::GetInstance()->SetCardType(AccessibilityFieldFocus::CardType::GRAVEYARD);
+			_fieldController->currentField = AccessibilityFieldFocus::Field::GRAVEYARD_ZONE;
+			static_cast<CardController *>(CardController::GetInstance())->SetCardType(AccessibilityFieldFocus::CardType::GRAVEYARD);
 			DisplayCards(mainGame->dField.grave[displayed_field], fmt::format(gDataManager->GetAccessibilityString(93).data()));
 		}
 		else
 			CloseDisplay();
 	}
 
-	void CardDisplayController::DisplayRemovedCards(const irr::SEvent& event, AccessibilityFieldFocus::Player displayed_field = AccessibilityFieldFocus::Player::PLAYER)
+	void CardDisplayController::DisplayRemovedCards(const irr::SEvent& event, AccessibilityFieldFocus::Player displayed_field = AccessibilityFieldFocus::Player::MAIN_PLAYER)
 	{
 		const bool canViewCards = CanDisplayCards(event);
 		if (canViewCards) {
-			CardController::GetInstance()->SetCardType(AccessibilityFieldFocus::CardType::MONSTER);
-			FieldController::GetInstance()->currentField = AccessibilityFieldFocus::Field::PLAYER_BANNED_CARDS;
+			static_cast<CardController *>(CardController::GetInstance())->SetCardType(AccessibilityFieldFocus::CardType::MONSTER);
+			_fieldController->currentField = AccessibilityFieldFocus::Field::REMOVED_CARDS_ZONE;
 			DisplayCards(mainGame->dField.remove[displayed_field], fmt::format(gDataManager->GetAccessibilityString(98).data()));
 		}
 		else
@@ -345,8 +408,8 @@ namespace ygo {
 	{
 		const bool canViewCards = CanDisplayCards(event);
 		if (canViewCards) {
-			CardController::GetInstance()->SetCardType(AccessibilityFieldFocus::CardType::MONSTER);
-			FieldController::GetInstance()->currentField = AccessibilityFieldFocus::Field::SELECTABLE_CARDS;
+			static_cast<CardController *>(CardController::GetInstance())->SetCardType(AccessibilityFieldFocus::CardType::MONSTER);
+			_fieldController->currentField = AccessibilityFieldFocus::Field::SELECTABLE_CARDS;
 			if (mainGame->wCardSelect->isTrulyVisible()) {
 				mainGame->dField.display_cards = mainGame->dField.selectable_cards;
 				ScreenReader::getReader()->readScreen(fmt::format(gDataManager->GetAccessibilityString(99).data(),
@@ -364,8 +427,8 @@ namespace ygo {
 	{
 		const bool canViewCards = CanDisplayCards(event);
 		if (canViewCards) {
-			CardController::GetInstance()->SetCardType(AccessibilityFieldFocus::CardType::MONSTER);
-			FieldController::GetInstance()->currentField = AccessibilityFieldFocus::Field::PLAYER_ACTIVABLE_CARDS;
+			static_cast<CardController *>(CardController::GetInstance())->SetCardType(AccessibilityFieldFocus::CardType::MONSTER);
+			_fieldController->currentField = AccessibilityFieldFocus::Field::PLAYER_ACTIVABLE_CARDS;
 			DisplayCards(mainGame->dField.activatable_cards, fmt::format(gDataManager->GetAccessibilityString(65).data()));
 		}
 		else

@@ -1,16 +1,23 @@
 #ifndef CARD_DISPLAY_CONTROLLER_H
 #define CARD_DISPLAY_CONTROLLER_H
+#include "FieldController.h"
 #include "FieldFocus/AccessibilityFieldFocus.h"
 #include "../gframe/client_card.h"
 #include "../gframe/client_field.h"
+#include "Control/IEventHandler.h"
 
 
 namespace ygo {
-	class CardDisplayController{
+	class CardDisplayController : IEventHandler{
 	public:
-		static CardDisplayController* GetInstance();
+		static IEventHandler* GetInstance();
 		void KeyInputEvent(const irr::SEvent& event);
 		void GuiEvent(const irr::SEvent& event);
+		bool HasEventKey(irr::EKEY_CODE key) override;
+		void SelectableCards(const irr::SEvent& event);
+		void SetSelectableCards();
+		void DisplayCards(const irr::SEvent& event, AccessibilityFieldFocus::Field field, AccessibilityFieldFocus::Player player = AccessibilityFieldFocus::Player::MAIN_PLAYER);
+
 		void ChangeCurrentCardIndex(irr::EKEY_CODE ekeyCode);
 		void ShowCardInfo();
 		void TryClickCard();
@@ -19,7 +26,8 @@ namespace ygo {
 		int currentCardIndex = 0;
 
 	private:
-		static CardDisplayController* _cardDisplayController;
+		static IEventHandler* _cardDisplayController;
+		FieldController* _fieldController = nullptr;
 		bool CanDisplayCards(irr::SEvent event);
 		void DisplayTable(const irr::SEvent& event, AccessibilityFieldFocus::Field field, AccessibilityFieldFocus::Player player);
 		void DisplayCards(const std::vector<ClientCard*>& field, const std::wstring& text);

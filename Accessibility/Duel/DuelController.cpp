@@ -13,8 +13,8 @@
 #include "Helper/MouseHelper.h"
 #include "Models/CardModel.h"
 #include "../gframe/CGUIImageButton/CGUIImageButton.h"
-#include <IGUIWindow.h>
-#include "../gframe/duelclient.h"
+// #include <IGUIWindow.h>
+// #include "../gframe/duelclient.h"
 
 namespace ygo {
 	IEventHandler* DuelController::_duelController = nullptr;

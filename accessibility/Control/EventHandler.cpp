@@ -215,9 +215,9 @@ namespace ygo {
 
 	void EventHandler::SelectableCards(const irr::SEvent& event)
 	{
-		if (mainGame->scrCardList->isTrulyVisible())
-			SetSelectableCards();
-		else
+		// if (mainGame->scrCardList->isTrulyVisible())
+		// 	SetSelectableCards(); Já apaguei a função
+		// else
 			DisplaySelectableCards(event);
 	};
 

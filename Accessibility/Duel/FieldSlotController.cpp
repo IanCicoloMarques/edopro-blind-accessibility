@@ -103,7 +103,7 @@ namespace ygo {
 	double FieldSlotController::GetXPosition(const AccessibilityFieldFocus::Field field, const AccessibilityFieldFocus::Player player)
 	{
 		constexpr double leftSlotX = 0.43;
-		constexpr double rightSlotX = 0.92;
+		constexpr double rightSlotX = 0.88;
 		double xPosition = 0;
 		switch (field) {
 			case AccessibilityFieldFocus::DECK_ZONE:
@@ -138,7 +138,7 @@ namespace ygo {
 			case AccessibilityFieldFocus::DECK_ZONE:
 			case AccessibilityFieldFocus::EXTRA_DECK_ZONE:
 				if(player == AccessibilityFieldFocus::Player::MAIN_PLAYER)
-					yPosition = 0.80;
+					yPosition = 0.83;
 				else
 					yPosition = 0.30;
 				break;
@@ -151,7 +151,7 @@ namespace ygo {
 			case AccessibilityFieldFocus::GRAVEYARD_ZONE:
 			case AccessibilityFieldFocus::FIELD_SPELL:
 				if(player == AccessibilityFieldFocus::Player::MAIN_PLAYER)
-					yPosition = 0.68;
+					yPosition = 0.70;
 				else
 					yPosition = 0.39;
 				break;

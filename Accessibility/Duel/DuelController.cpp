@@ -46,7 +46,7 @@ namespace ygo {
 			KeyboardConfiguration::NormalSummon, KeyboardConfiguration::SetSummon, KeyboardConfiguration::SpecialSummon, KeyboardConfiguration::ActivateCard,
 			KeyboardConfiguration::Attack, KeyboardConfiguration::ChangeBattlePosition, KeyboardConfiguration::SelectCard
 		};
-		if(std::find(keys.begin(), keys.end(), key) == keys.end())
+		if(std::find(keys.begin(), keys.end(), key) != keys.end())
 			return true;
 		return false;
 	}

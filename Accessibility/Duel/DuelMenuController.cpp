@@ -161,7 +161,7 @@ namespace ygo {
 			irr::KEY_KEY_1, irr::KEY_NUMPAD1, irr::KEY_KEY_2, irr::KEY_NUMPAD2,irr::KEY_KEY_3, irr::KEY_NUMPAD3, irr::KEY_KEY_4, irr::KEY_NUMPAD4,
 			irr::KEY_KEY_5, irr::KEY_NUMPAD5, irr::KEY_KEY_0, irr::KEY_NUMPAD0,irr::KEY_UP, irr::KEY_DOWN, irr::KEY_KEY_4, irr::KEY_NUMPAD4
 		};
-		if(std::find(keys.begin(), keys.end(), key) == keys.end())
+		if(std::find(keys.begin(), keys.end(), key) != keys.end())
 			return true;
 		return false;
 	}

@@ -16,6 +16,12 @@
 
 namespace ygo {
 	IEventHandler* CardDisplayController::_cardDisplayController = nullptr;
+
+	CardDisplayController::CardDisplayController()
+	{
+		_fieldController = static_cast<FieldController *>(FieldController::GetInstance());
+	}
+
 	IEventHandler* CardDisplayController::GetInstance()
 	{
 		if (_cardDisplayController == nullptr)
@@ -25,8 +31,6 @@ namespace ygo {
 
 	void CardDisplayController::KeyInputEvent(const irr::SEvent& event)
 	{
-		if(_fieldController == nullptr)
-			_fieldController = static_cast<FieldController *>(FieldController::GetInstance());
 		const AccessibilityFieldFocus::Player player = _fieldController->currentPlayer;
 		if(event.KeyInput.Key == KeyboardConfiguration::ExtraDeck)
 			DisplayTable(event, AccessibilityFieldFocus::Field::EXTRA_DECK_ZONE, player);
@@ -81,7 +85,7 @@ namespace ygo {
 			KeyboardConfiguration::SelectableCards, KeyboardConfiguration::SpecialSummonableCards, KeyboardConfiguration::ActivatableCards,
 			irr::KEY_RIGHT, irr::KEY_LEFT, irr::KEY_UP
 		};
-		if(std::find(keys.begin(), keys.end(), key) == keys.end())
+		if(std::find(keys.begin(), keys.end(), key) != keys.end())
 			return true;
 		return false;
 	}

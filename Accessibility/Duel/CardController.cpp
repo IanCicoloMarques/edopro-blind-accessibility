@@ -14,6 +14,12 @@
 
 namespace ygo {
 	IEventHandler* CardController::_cardController = nullptr;
+
+	CardController::CardController()
+	{
+		_selectedCard = nullptr;
+	}
+
 	IEventHandler* CardController::GetInstance()
 	{
 		if (_cardController == nullptr)
@@ -41,7 +47,7 @@ namespace ygo {
 	bool CardController::HasEventKey(irr::EKEY_CODE key)
 	{
 		std::vector<int> keys = { KeyboardConfiguration::CardInformation };
-		if(std::find(keys.begin(), keys.end(), key) == keys.end())
+		if(std::find(keys.begin(), keys.end(), key) != keys.end())
 			return true;
 		return false;
 	}
@@ -181,6 +187,8 @@ namespace ygo {
 
 	ClientCard* CardController::GetSelectedCard()
 	{
+		if(_selectedCard == nullptr)
+			return nullptr;
 		return _selectedCard;
 	}
 

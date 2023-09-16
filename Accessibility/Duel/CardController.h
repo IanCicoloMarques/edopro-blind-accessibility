@@ -8,6 +8,7 @@
 namespace ygo {
 	class CardController : IEventHandler{
 	public:
+		CardController();
 		static IEventHandler* GetInstance();
 		void KeyInputEvent(const irr::SEvent& event);
 		void GuiEvent(const irr::SEvent& event);
@@ -25,7 +26,7 @@ namespace ygo {
 		bool isSelected = false;
 	private:
 		static IEventHandler* _cardController;
-		ClientCard* _selectedCard = nullptr;
+		ClientCard* _selectedCard;
 		int _cardType = AccessibilityFieldFocus::CardType::MONSTER;
 	};
 }

@@ -12,6 +12,14 @@
 
 namespace ygo {
 	IEventHandler* FieldController::_fieldController = nullptr;
+
+	FieldController::FieldController()
+	{
+		_cardController = static_cast<CardController *>(CardController::GetInstance());
+		currentField = AccessibilityFieldFocus::Field::MONSTER_ZONE;
+		currentPlayer = AccessibilityFieldFocus::Player::MAIN_PLAYER;
+	}
+
 	IEventHandler* FieldController::GetInstance()
 	{
 		if (_fieldController == nullptr)
@@ -21,7 +29,7 @@ namespace ygo {
 
 	void FieldController::SetSelectedCardField()
 	{
-		const ClientCard* card = _cardController->GetSelectedCard();
+		ClientCard* card = _cardController->GetSelectedCard();
 		if (!_cardController->GetSelectedCard())
 			return;
 
@@ -74,7 +82,7 @@ namespace ygo {
 			irr::KEY_KEY_1, irr::KEY_NUMPAD1, irr::KEY_KEY_2, irr::KEY_NUMPAD2,irr::KEY_KEY_3, irr::KEY_NUMPAD3, irr::KEY_KEY_4, irr::KEY_NUMPAD4,
 			irr::KEY_KEY_5, irr::KEY_NUMPAD5, irr::KEY_KEY_6, irr::KEY_NUMPAD6,irr::KEY_KEY_7, irr::KEY_NUMPAD7
 		};
-		if(std::find(keys.begin(), keys.end(), key) == keys.end())
+		if(std::find(keys.begin(), keys.end(), key) != keys.end())
 			return true;
 		return false;
 	}
@@ -102,9 +110,9 @@ namespace ygo {
 		currentField = field;
 		if (currentField == AccessibilityFieldFocus::Field::LINK_ZONE)
 			nvdaString = fmt::format(gDataManager->GetAccessibilityString(144).data());
-		else if (currentField == AccessibilityFieldFocus::CardType::MONSTER)
+		else if (currentField == AccessibilityFieldFocus::Field::MONSTER_ZONE)
 			nvdaString = fmt::format(gDataManager->GetAccessibilityString(145).data());
-		else if (currentField == AccessibilityFieldFocus::CardType::SPELL)
+		else if (currentField == AccessibilityFieldFocus::Field::SPELL_ZONE)
 			nvdaString = fmt::format(gDataManager->GetAccessibilityString(146).data());
 		ScreenReader::getReader()->readScreen(nvdaString);
 	}
@@ -181,29 +189,105 @@ namespace ygo {
 			ScreenReader::getReader()->readScreen(freeSlots, false);
 	}
 
-	bool FieldController::IsOnField(const ClientCard* card, const int& player)
+	bool FieldController::IsOnField(ClientCard* card, const int& player)
 	{
-		for (int i = 0; i < 6; i++) {
-			if (mainGame->dField.mzone[player][i] && mainGame->dField.mzone[player][i] == card) {
-				_cardController->SetCardType(AccessibilityFieldFocus::CardType::MONSTER);
-				_cardController->isSelected = true;
-				currentField = AccessibilityFieldFocus::MONSTER_ZONE;
-				return true;
-			}
-			if (mainGame->dField.szone[player][i] && mainGame->dField.szone[player][i] == card) {
-				_cardController->SetCardType(AccessibilityFieldFocus::CardType::SPELL);
-				_cardController->isSelected = true;
-				currentField = AccessibilityFieldFocus::SPELL_ZONE;
-				return true;
-			}
+		if(std::find(mainGame->dField.mzone[player].begin(), mainGame->dField.mzone[player].end(), card) != mainGame->dField.mzone[player].end())
+		{
+			_cardController->SetCard(card);
+			_cardController->SetCardType(AccessibilityFieldFocus::CardType::MONSTER);
+			_cardController->isSelected = true;
+			currentField = AccessibilityFieldFocus::MONSTER_ZONE;
+			return true;
+		}
+		else if(std::find(mainGame->dField.szone[player].begin(), mainGame->dField.szone[player].end(), card) != mainGame->dField.szone[player].end())
+		{
+			_cardController->SetCard(card);
+			_cardController->SetCardType(AccessibilityFieldFocus::CardType::SPELL);
+			_cardController->isSelected = true;
+			currentField = AccessibilityFieldFocus::SPELL_ZONE;
+			return true;
+		}
+		return false;
+	}
+
+	bool FieldController::IsInGraveyard(ClientCard* clientCard, AccessibilityFieldFocus::Player player)
+	{
+		if(std::find(mainGame->dField.grave[player].begin(), mainGame->dField.grave[player].end(), clientCard) != mainGame->dField.grave[player].end())
+		{
+			_cardController->SetCard(clientCard);
+			_cardController->SetCardType(AccessibilityFieldFocus::CardType::NO_CARD_TYPE);
+			_cardController->isSelected = true;
+			currentField = AccessibilityFieldFocus::GRAVEYARD_ZONE;
+			return true;
+		}
+		return false;
+	}
+
+	bool FieldController::IsInExtraDeck(ClientCard* clientCard, AccessibilityFieldFocus::Player player)
+	{
+		if(std::find(mainGame->dField.extra[player].begin(), mainGame->dField.extra[player].end(), clientCard) != mainGame->dField.extra[player].end())
+		{
+			_cardController->SetCard(clientCard);
+			_cardController->SetCardType(AccessibilityFieldFocus::CardType::MONSTER);
+			_cardController->isSelected = true;
+			currentField = AccessibilityFieldFocus::EXTRA_DECK_ZONE;
+			return true;
+		}
+		return false;
+	}
+
+	bool FieldController::IsRemoved(ClientCard* clientCard, AccessibilityFieldFocus::Player player)
+	{
+		if(std::find(mainGame->dField.remove[player].begin(), mainGame->dField.remove[player].end(), clientCard) != mainGame->dField.remove[player].end())
+		{
+			_cardController->SetCard(clientCard);
+			_cardController->SetCardType(AccessibilityFieldFocus::CardType::NO_CARD_TYPE);
+			_cardController->isSelected = true;
+			currentField = AccessibilityFieldFocus::REMOVED_CARDS_ZONE;
+			return true;
+		}
+		return false;
+	}
+
+	bool FieldController::IsInDeck(ClientCard* clientCard, AccessibilityFieldFocus::Player player)
+	{
+		if(std::find(mainGame->dField.deck[player].begin(), mainGame->dField.deck[player].end(), clientCard) != mainGame->dField.deck[player].end())
+		{
+			_cardController->SetCard(clientCard);
+			_cardController->SetCardType(AccessibilityFieldFocus::CardType::NO_CARD_TYPE);
+			_cardController->isSelected = true;
+			currentField = AccessibilityFieldFocus::DECK_ZONE;
+			return true;
 		}
 		return false;
 	}
 
 	FieldSlotModel* FieldController::GetFieldSlotModel(const bool recursion, AccessibilityFieldFocus::Player player) {
 		FieldSlotModel* fieldSlotModel = nullptr;
+		if(IsOnField(_cardController->GetSelectedCard(), player))
+			fieldSlotModel = GetMonsterSpellSlotModel(player);
+		if(IsInGraveyard(_cardController->GetSelectedCard(), player))
+			fieldSlotModel = FieldSlotController::GetInstance()->GetFieldSlotData(0,AccessibilityFieldFocus::Field::GRAVEYARD_ZONE);
+		if(IsInExtraDeck(_cardController->GetSelectedCard(), player))
+			fieldSlotModel = FieldSlotController::GetInstance()->GetFieldSlotData(0,AccessibilityFieldFocus::Field::EXTRA_DECK_ZONE);
+		if(IsRemoved(_cardController->GetSelectedCard(), player))
+			fieldSlotModel = FieldSlotController::GetInstance()->GetFieldSlotData(0,AccessibilityFieldFocus::Field::REMOVED_CARDS_ZONE);
+		if(IsInDeck(_cardController->GetSelectedCard(), player))
+			fieldSlotModel = FieldSlotController::GetInstance()->GetFieldSlotData(0,AccessibilityFieldFocus::Field::DECK_ZONE);
+
+		//Caso não encontre a carta, busca no outro campo;
+		if (!fieldSlotModel && !recursion) {
+			player = player == AccessibilityFieldFocus::Player::MAIN_PLAYER ? AccessibilityFieldFocus::Player::ENEMY_PLAYER : AccessibilityFieldFocus::Player::MAIN_PLAYER;
+			fieldSlotModel = GetFieldSlotModel(true, player);
+		}
+		return fieldSlotModel;
+	}
+
+	FieldSlotModel* FieldController::GetMonsterSpellSlotModel(AccessibilityFieldFocus::Player player)
+	{
 		int fieldSlot = 0;
-		//Busca a carta no campo selecionado;
+		FieldSlotModel* fieldSlotModel = nullptr;
+		//Busca a carta no campo de monstros ou spells;
 		if (currentField != AccessibilityFieldFocus::GRAVEYARD_ZONE &&
 			currentField != AccessibilityFieldFocus::EXTRA_DECK_ZONE &&
 			currentField != AccessibilityFieldFocus::REMOVED_CARDS_ZONE) {
@@ -218,12 +302,7 @@ namespace ygo {
 				}
 			}
 		}
-		//Caso não encontre a carta, busca no outro campo;
-		if (fieldSlot == 0 && !recursion) {
-			player = player == AccessibilityFieldFocus::Player::MAIN_PLAYER ? AccessibilityFieldFocus::Player::ENEMY_PLAYER : AccessibilityFieldFocus::Player::MAIN_PLAYER;
-			fieldSlotModel = GetFieldSlotModel(true, player);
-		}
-		else if(fieldSlot != 0)
+		if(fieldSlot != 0)
 			fieldSlotModel = FieldSlotController::GetInstance()->GetFieldSlotData(fieldSlot, currentField);
 		return fieldSlotModel;
 	}

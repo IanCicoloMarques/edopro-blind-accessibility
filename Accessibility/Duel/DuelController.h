@@ -18,6 +18,7 @@ namespace ygo {
 		void DuelCommands(const irr::SEvent& event, ClientCard* card);
 
 		static IEventHandler* _duelController;
+
 		//Duel commands
 		void NormalSummon(UseCardModel* useCardModel);
 		void SetCard(UseCardModel* useCardModel);

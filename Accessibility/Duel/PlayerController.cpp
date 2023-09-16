@@ -46,7 +46,7 @@ namespace ygo {
 	bool PlayerController::HasEventKey(irr::EKEY_CODE key)
 	{
 		std::vector<int> keys = { KeyboardConfiguration::Chat, KeyboardConfiguration::PlayerInformation, KeyboardConfiguration::SeeTurn };
-		if(std::find(keys.begin(), keys.end(), key) == keys.end())
+		if(std::find(keys.begin(), keys.end(), key) != keys.end())
 			return true;
 		return false;
 	}

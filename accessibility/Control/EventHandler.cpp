@@ -82,6 +82,8 @@ namespace ygo {
 			_cardDisplayController = CardDisplayController::GetInstance();
 		if(_cardController == nullptr)
 			_cardController = CardController::GetInstance();
+		if(_playerController == nullptr)
+			_playerController = CardController::GetInstance();
 	}
 
 	void EventHandler::UseCard(AccessibilityFieldFocus::UseType use, const irr::SEvent& event, ClientCard* clientCard)

@@ -10,6 +10,7 @@
 namespace ygo {
 	class CardDisplayController : IEventHandler{
 	public:
+		CardDisplayController();
 		static IEventHandler* GetInstance();
 		void KeyInputEvent(const irr::SEvent& event);
 		void GuiEvent(const irr::SEvent& event);

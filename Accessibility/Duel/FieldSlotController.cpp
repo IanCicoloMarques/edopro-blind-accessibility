@@ -33,7 +33,7 @@ namespace ygo {
 		else if (field == AccessibilityFieldFocus::Field::SPELL_ZONE)
 		{
 			fieldSlot->field = AccessibilityFieldFocus::Field::SPELL_ZONE;
-			fieldSlot->xPosition = GetPlayerFieldXPosition(slot);
+			fieldSlot->xPosition = GetPlayerFieldXPosition(slot, AccessibilityFieldFocus::Field::SPELL_ZONE);
 			fieldSlot->yPosition = GetYPosition(AccessibilityFieldFocus::Field::SPELL_ZONE, player);
 			fieldSlot->slotNumber = slot;
 		}
@@ -93,10 +93,14 @@ namespace ygo {
 		return posX;
 	}
 
-	double FieldSlotController::GetPlayerFieldXPosition(const int slot)
+	double FieldSlotController::GetPlayerFieldXPosition(const int slot, const AccessibilityFieldFocus::Field field)
 	{
 		constexpr double startPosition = 0.40;
-		double posX = posX = startPosition + (slot * FieldSlotModel::slotSize);
+		double posX;
+		if(field == AccessibilityFieldFocus::Field::SPELL_ZONE && slot == 6)
+			posX = GetXPosition(AccessibilityFieldFocus::Field::FIELD_SPELL);
+		else
+			posX = startPosition + (slot * FieldSlotModel::slotSize);
 		return posX;
 	}
 

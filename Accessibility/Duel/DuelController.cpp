@@ -67,7 +67,11 @@ namespace ygo {
 		else if(event.KeyInput.Key == KeyboardConfiguration::ChangeBattlePosition)
 			Command(AccessibilityFieldFocus::UseType::CHANGE_BATTLE_POSITION, event, card);
 		else if(event.KeyInput.Key == KeyboardConfiguration::SelectCard)
-			Command(AccessibilityFieldFocus::UseType::SELECT_CARD, event, mainGame->dField.display_cards[static_cast<CardDisplayController *>(CardDisplayController::GetInstance())->currentCardIndex]);
+		{
+			const int currentIndex = static_cast<CardDisplayController *>(CardDisplayController::GetInstance())->currentCardIndex;
+			if(mainGame->dField.display_cards.size() > currentIndex)
+				Command(AccessibilityFieldFocus::UseType::SELECT_CARD, event, mainGame->dField.display_cards[currentIndex]);
+		}
 	}
 
 	void DuelController::Command(AccessibilityFieldFocus::UseType useType, const irr::SEvent& event, ClientCard* card)
@@ -125,6 +129,7 @@ namespace ygo {
 		fieldController->currentField = AccessibilityFieldFocus::Field::MONSTER_ZONE;
 		if (mainGame->btnSummon->isVisible()) {
 			useCardModel->canUse = true;
+			fieldController->SetSelectedCardField();
 			ButtonHelper::ClickButton(mainGame->btnSummon);
 			fieldController->ReadFreeSlots(AccessibilityFieldFocus::Player::MAIN_PLAYER, AccessibilityFieldFocus::CardType::MONSTER);
 		}
@@ -140,10 +145,12 @@ namespace ygo {
 		int cardType;
 		if (mainGame->btnMSet->isVisible()) {
 			button = mainGame->btnMSet;
+			fieldController->SetSelectedCardField();
 			cardType = AccessibilityFieldFocus::CardType::MONSTER;
 		}
 		else if (mainGame->btnSSet->isVisible()) {
 			button = mainGame->btnSSet;
+			fieldController->SetSelectedCardField();
 			cardType = AccessibilityFieldFocus::CardType::SPELL;
 		}
 
@@ -162,6 +169,7 @@ namespace ygo {
 		fieldController->currentField = AccessibilityFieldFocus::Field::MONSTER_ZONE;
 		if (mainGame->btnSPSummon->isVisible()) {
 			useCardModel->canUse = true;
+			fieldController->SetSelectedCardField();
 			ButtonHelper::ClickButton(mainGame->btnSPSummon);
 			fieldController->ReadFreeSlots(AccessibilityFieldFocus::Player::MAIN_PLAYER, AccessibilityFieldFocus::CardType::MONSTER, CardModel::IsLink(card));
 		}
@@ -204,6 +212,7 @@ namespace ygo {
 
 		if (mainGame->btnAttack->isTrulyVisible()) {
 			useCardModel->canUse = true;
+			fieldController->SetSelectedCardField();
 			ButtonHelper::ClickButton(mainGame->btnAttack);
 		}
 		else if(fieldController->currentField == AccessibilityFieldFocus::Field::MONSTER_ZONE && fieldController->currentPlayer == AccessibilityFieldFocus::Player::ENEMY_PLAYER)

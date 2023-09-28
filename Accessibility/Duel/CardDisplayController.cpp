@@ -219,6 +219,8 @@ namespace ygo {
 	{
 		if (mainGame->wCardDisplay->isVisible())
 			ButtonHelper::ClickButton(mainGame->btnDisplayOK);
+		else if (mainGame->wCardSelect->isVisible())
+			ButtonHelper::ClickButton(mainGame->btnDisplayOK);
 	}
 
 	bool CardDisplayController::CanDisplayCards(irr::SEvent event) {
@@ -244,6 +246,7 @@ namespace ygo {
 	}
 
 	void CardDisplayController::DisplayCards(const std::vector<ClientCard*>& field, const std::wstring& text = L"") {
+		CloseDisplay();
 		mainGame->dField.display_cards.clear();
 		currentCardIndex = 0;
 		for (auto it = field.begin(); it != field.end(); ++it) {

@@ -38,10 +38,11 @@ public:
 	 */
 	CardModel(ygo::ClientCard* selectedCard)
 	{
+		if(selectedCard->code == 3722304989)
+			return;
 		cardName = fmt::format(L"{}", ygo::gDataManager->GetName(selectedCard->code));
 		cardType = fmt::format(L"{}", ygo::gDataManager->FormatType(selectedCard->type));
 		cardAttribute = fmt::format(L"{}", ygo::gDataManager->FormatAttribute(selectedCard->attribute));
-		SetLevel(selectedCard);
 		cardRace = fmt::format(L"{}", ygo::gDataManager->FormatRace(selectedCard->race));
 		cardAttack = fmt::format(ygo::gDataManager->GetAccessibilityString(69).data(), selectedCard->attack);
 		cardDefense = fmt::format(ygo::gDataManager->GetAccessibilityString(70).data(), selectedCard->defense);
@@ -51,10 +52,11 @@ public:
 		linkMarks = GetLinkMarks(selectedCard);
 		overlayedCards = GetOverlayedCards(selectedCard);
 		location = fmt::format(L"{}[{}]", ygo::gDataManager->FormatLocation(selectedCard->location, selectedCard->sequence), selectedCard->sequence + 1);
-		selectedPosition = 0;
 		isSelected = ygo::gDataManager->GetAccessibilityString(selectedCard->is_selected ? 137 : 140).data();
 		isFaceUp = selectedCard->code != 0 ? true : false;
 		cardFace = fmt::format(L"Face {}", isFaceUp ? L"Up" : L"Down");
+		SetLevel(selectedCard);
+		selectedPosition = 0;
 	}
 
 	/**
@@ -172,17 +174,18 @@ public:
 private:
 	void SetLevel(const ygo::ClientCard* selectedCard)
 	{
+		uint32_t level = ygo::gDataManager->GetCardData(selectedCard->code)->level;
 		cardLevel = selectedCard->link_marker != 0 ?
-			fmt::format(ygo::gDataManager->GetAccessibilityString(67).data(), ygo::gDataManager->GetCardData(selectedCard->code)->level) :
-			fmt::format(ygo::gDataManager->GetAccessibilityString(68).data(), ygo::gDataManager->GetCardData(selectedCard->code)->level);
+			fmt::format(ygo::gDataManager->GetAccessibilityString(67).data(), level) :
+			fmt::format(ygo::gDataManager->GetAccessibilityString(68).data(), level);
 	}
-
 
 	void SetLevel(const ygo::CardDataC* selectedCard)
 	{
+		uint32_t level = ygo::gDataManager->GetCardData(selectedCard->code)->level;
 		cardLevel = selectedCard->link_marker != 0 ?
-			fmt::format(ygo::gDataManager->GetAccessibilityString(67).data(), ygo::gDataManager->GetCardData(selectedCard->code)->level) :
-			fmt::format(ygo::gDataManager->GetAccessibilityString(68).data(), ygo::gDataManager->GetCardData(selectedCard->code)->level);
+			fmt::format(ygo::gDataManager->GetAccessibilityString(67).data(), level) :
+			fmt::format(ygo::gDataManager->GetAccessibilityString(68).data(), level);
 	}
 
 	void SetPosition(const ygo::ClientCard* selectedCard)

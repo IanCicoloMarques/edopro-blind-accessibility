@@ -58,6 +58,8 @@ namespace ygo {
 			ButtonHelper::ClickButton(mainGame->btnYes);
 		else if(event.KeyInput.Key == KeyboardConfiguration::MenuButtonFirstTurn && mainGame->btnFirst->isTrulyVisible())
 			ButtonHelper::ClickButton(mainGame->btnFirst);
+		else if(event.KeyInput.Key == KeyboardConfiguration::MenuButtonSecondTurn && mainGame->btnSecond->isTrulyVisible())
+			ButtonHelper::ClickButton(mainGame->btnSecond);
 		else if(event.KeyInput.Key == KeyboardConfiguration::MenuButtonAttackUp && mainGame->btnPSAU->isTrulyVisible())
 			ButtonHelper::ClickButton(mainGame->btnPSAU);
 		else if(event.KeyInput.Key == KeyboardConfiguration::MenuButtonAttackDown && mainGame->btnPSAD->isTrulyVisible())
@@ -68,8 +70,6 @@ namespace ygo {
 			ButtonHelper::ClickButton(mainGame->btnFileSaveNo);
 		else if(event.KeyInput.Key == KeyboardConfiguration::MenuButtonNo && mainGame->btnNo->isTrulyVisible())
 			ButtonHelper::ClickButton(mainGame->btnNo);
-		else if(event.KeyInput.Key == KeyboardConfiguration::MenuButtonSecondTurn && mainGame->btnSecond->isTrulyVisible())
-			ButtonHelper::ClickButton(mainGame->btnSecond);
 		else if(event.KeyInput.Key == KeyboardConfiguration::MenuButtonDefenseUp && mainGame->btnPSDU->isTrulyVisible())
 			ButtonHelper::ClickButton(mainGame->btnPSDU);
 		else if(event.KeyInput.Key == KeyboardConfiguration::MenuButtonDefenseDown && mainGame->btnPSDD->isTrulyVisible())

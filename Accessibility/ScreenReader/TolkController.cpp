@@ -36,6 +36,11 @@ void TolkController::readHelpMessage()
 	Tolk_Output(helpMessage.c_str());
 }
 
+void TolkController::readBuiltMessage()
+{
+	Tolk_Output(builtMessage.c_str());
+}
+
 void TolkController::setHelpMessage(std::wstring string)
 {
 	helpMessage = string;

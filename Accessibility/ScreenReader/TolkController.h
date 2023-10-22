@@ -23,6 +23,7 @@ private:
 	std::wstring getLastMessage();
 	void readHelpMessage();
 	void readLastMessage();
+	void readBuiltMessage();
 	std::wstring lastMessage;
 	std::wstring helpMessage;
 	std::wstring builtMessage;

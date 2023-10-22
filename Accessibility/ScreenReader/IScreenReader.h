@@ -22,6 +22,7 @@ public:
 	virtual void cleanBuiltMessage() = 0;
 	virtual void readHelpMessage() = 0;
 	virtual void readLastMessage() = 0;
+	virtual void readBuiltMessage() = 0;
 };
 
 #endif

@@ -22,6 +22,7 @@
     <ClInclude Include="Configuration\AccessibilityConfiguration.h" />
     <ClInclude Include="Configuration\Keyboard\KeyboardConfiguration.h" />
     <ClInclude Include="Configuration\Keyboard\KeyboardConfigurationType.h" />
+    <ClInclude Include="Configuration\MessageType.h" />
     <ClInclude Include="Control\IEventHandler.h" />
     <ClInclude Include="FieldFocus\AccessibilityDeckFocus.h" />
     <ClInclude Include="FieldFocus\AccessibilityFieldFocus.h" />

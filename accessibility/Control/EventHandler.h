@@ -54,7 +54,8 @@ namespace ygo {
 		static bool effectResolver;
 		static bool mudConfiguration;
 		static bool selectZone;
-		static bool rockPaperScissor;
+		static bool PlayRockPaperScissor;
+		static bool WonRockPaperScissor;
 	private:
 		IEventHandler* _duelMenuController = nullptr;
 		IEventHandler* _fieldControllerMenu = nullptr;

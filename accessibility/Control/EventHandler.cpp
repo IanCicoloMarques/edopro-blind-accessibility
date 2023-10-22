@@ -23,7 +23,8 @@ namespace ygo {
 	bool EventHandler::effectResolver = false;
 	bool EventHandler::mudConfiguration = false;
 	bool EventHandler::selectZone = false;
-	bool EventHandler::rockPaperScissor = false;
+	bool EventHandler::PlayRockPaperScissor = false;
+	bool EventHandler::WonRockPaperScissor = false;
 	static AccessibilityFieldFocus::Field lookupFieldLocId;
 
 	static inline void TriggerEvent(irr::gui::IGUIElement* target, irr::gui::EGUI_EVENT_TYPE type) {

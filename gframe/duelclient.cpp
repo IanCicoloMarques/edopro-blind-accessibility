@@ -617,11 +617,16 @@ void DuelClient::HandleSTOCPacketLanAsync(const std::vector<uint8_t>& data) {
 	}
 	case STOC_SELECT_HAND: {
 		mainGame->wHand->setVisible(true);
-		EventHandler::rockPaperScissor = true;
+		EventHandler::PlayRockPaperScissor = true;
 		break;
 	}
 	case STOC_SELECT_TP: {
 		std::lock_guard<std::mutex> lock(mainGame->gMutex);
+		if(EventHandler::PlayRockPaperScissor)
+		{
+			EventHandler::WonRockPaperScissor = true;
+			ScreenReader::getReader()->readScreen(L"You won the rock paper scissors match");
+		}
 		ScreenReader::getReader()->readScreen(gDataManager->GetAccessibilityString(47).data());
 		ScreenReader::getReader()->cleanBuiltMessage();
 		ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
@@ -1678,6 +1683,12 @@ int DuelClient::ClientAnalyze(const uint8_t* msg, uint32_t len) {
 		mainGame->dInfo.is_shuffling = false;
 		mainGame->dField.selectable_cards.clear();
 		mainGame->dField.display_cards.clear();
+		if(EventHandler::PlayRockPaperScissor)
+		{
+			EventHandler::PlayRockPaperScissor = false;
+			if(!EventHandler::WonRockPaperScissor)
+				ScreenReader::getReader()->readScreen(L"You won the rock paper scissors match");
+		}
 		if (mainGame->dInfo.isFirst)
 			ScreenReader::getReader()->readScreen(gDataManager->GetAccessibilityString(59).data(), false);
 		else

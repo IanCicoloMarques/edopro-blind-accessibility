@@ -32,6 +32,7 @@
 #include "../accessibility/ScreenReader/ScreenReader.h"
 #include "../accessibility/Control/EventHandler.h"
 #include "Helper/ButtonHelper.h"
+#include "Helper/MessageHelper.h"
 #include "Menus/MenuType.h"
 #include "ScreenReader/Messages/AccessibilityStringDictionary.h"
 
@@ -393,11 +394,11 @@ void DuelClient::HandleSTOCPacketLanAsync(const std::vector<uint8_t>& data) {
 				mainGame->wChat->setVisible(false);
 				if (iseof) {
 					mainGame->PopupMessage(gDataManager->GetSysString(1401));
-					ScreenReader::getReader()->readScreen(gDataManager->GetSysString(1401).data());
+					MessageHelper::ReadMessage(gDataManager->GetSysString(1401).data());
 				}
 				else {
 					mainGame->PopupMessage(gDataManager->GetSysString(1402));
-					ScreenReader::getReader()->readScreen(gDataManager->GetSysString(1402).data());
+					MessageHelper::ReadMessage(gDataManager->GetSysString(1402).data());
 				}
 			} else {
 				gSoundManager->StopSounds();
@@ -406,7 +407,7 @@ void DuelClient::HandleSTOCPacketLanAsync(const std::vector<uint8_t>& data) {
 				}
 				std::unique_lock<epro::mutex> lock(mainGame->gMutex);
 				mainGame->PopupMessage(gDataManager->GetSysString(1502));
-				ScreenReader::getReader()->readScreen(gDataManager->GetSysString(1502).data());
+				MessageHelper::ReadMessage(gDataManager->GetSysString(1502).data());
 				mainGame->btnCreateHost->setEnabled(mainGame->coreloaded);
 				mainGame->btnJoinHost->setEnabled(true);
 				mainGame->btnJoinCancel->setEnabled(true);
@@ -466,9 +467,7 @@ void DuelClient::HandleSTOCPacketLanAsync(const std::vector<uint8_t>& data) {
 			}
 			if (stringid < 1406) {
 				mainGame->PopupMessage(gDataManager->GetSysString(stringid));
-				ScreenReader::getReader()->readScreen(gDataManager->GetSysString(stringid).data());
-				ScreenReader::getReader()->cleanBuiltMessage();
-				ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
+				MessageHelper::ReadMessage(gDataManager->GetSysString(stringid).data());
 			}
 			connect_state |= 0x100;
 			event_base_loopbreak(client_base);
@@ -554,9 +553,7 @@ void DuelClient::HandleSTOCPacketLanAsync(const std::vector<uint8_t>& data) {
 			}
 			}
 			mainGame->PopupMessage(text);
-			ScreenReader::getReader()->readScreen(text.c_str());
-			ScreenReader::getReader()->cleanBuiltMessage();
-			ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
+			MessageHelper::ReadMessage(text.c_str());
 			mainGame->cbDeckSelect->setEnabled(true);
 			if(mainGame->dInfo.team1 + mainGame->dInfo.team2 > 2)
 				mainGame->btnHostPrepDuelist->setEnabled(true);
@@ -565,9 +562,7 @@ void DuelClient::HandleSTOCPacketLanAsync(const std::vector<uint8_t>& data) {
 		case ERROR_TYPE::SIDEERROR: {
 			std::lock_guard<epro::mutex> lock(mainGame->gMutex);
 			mainGame->PopupMessage(gDataManager->GetSysString(1408));
-			ScreenReader::getReader()->readScreen(fmt::format(gDataManager->GetSysString(1408)));
-			ScreenReader::getReader()->cleanBuiltMessage();
-			ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
+			MessageHelper::ReadMessage(gDataManager->GetSysString(1408).data());
 			break;
 		}
 		case ERROR_TYPE::VERERROR:
@@ -585,14 +580,13 @@ void DuelClient::HandleSTOCPacketLanAsync(const std::vector<uint8_t>& data) {
 					mainGame->PopupMessage(epro::format(gDataManager->GetSysString(1423),
 													   version.client.major, version.client.minor,
 													   version.core.major, version.core.minor));
-					ScreenReader::getReader()->readScreen(gDataManager->GetSysString(1423).data());
-					ScreenReader::getReader()->cleanBuiltMessage();
-					ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
+					MessageHelper::ReadMessage(gDataManager->GetSysString(1423).data());
+					MessageHelper::ReadMessage(gDataManager->GetSysString(1423).data());
+
+
 				} else {
 					mainGame->PopupMessage(fmt::sprintf(gDataManager->GetSysString(1411), _pkt.code >> 12, (_pkt.code >> 4) & 0xff, _pkt.code & 0xf));
-					ScreenReader::getReader()->readScreen(gDataManager->GetSysString(1411).data());
-					ScreenReader::getReader()->cleanBuiltMessage();
-					ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
+					MessageHelper::ReadMessage(gDataManager->GetSysString(1411).data());
 					mainGame->PopupMessage(epro::sprintf(gDataManager->GetSysString(1411), _pkt.code >> 12, (_pkt.code >> 4) & 0xff, _pkt.code & 0xf));
 				}
 				if(mainGame->isHostingOnline) {
@@ -622,16 +616,8 @@ void DuelClient::HandleSTOCPacketLanAsync(const std::vector<uint8_t>& data) {
 	}
 	case STOC_SELECT_TP: {
 		std::lock_guard<std::mutex> lock(mainGame->gMutex);
-		if(EventHandler::PlayRockPaperScissor)
-		{
-			EventHandler::WonRockPaperScissor = true;
-			ScreenReader::getReader()->readScreen(L"You won the rock paper scissors match");
-		}
-		ScreenReader::getReader()->readScreen(gDataManager->GetAccessibilityString(47).data());
-		ScreenReader::getReader()->cleanBuiltMessage();
-		ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
-		ScreenReader::getReader()->buildMessage(gDataManager->GetAccessibilityString(48).data());
-		ScreenReader::getReader()->buildMessage(gDataManager->GetAccessibilityString(49).data());
+		MessageHelper::ReadMessage(Message::MessageType::WON_ROCK_PAPERS_CISSORS);
+		MessageHelper::ReadMessage(Message::MessageType::SELECT_YOUR_TURN);
 		mainGame->PopupElement(mainGame->wFTSelect);
 		break;
 	}
@@ -700,9 +686,7 @@ void DuelClient::HandleSTOCPacketLanAsync(const std::vector<uint8_t>& data) {
 		mainGame->dInfo.isFirst = (mainGame->dInfo.player_type < mainGame->dInfo.team1) || (mainGame->dInfo.player_type >=7);
 		mainGame->dInfo.isTeam1 = mainGame->dInfo.isFirst;
 		mainGame->SetMessageWindow();
-		ScreenReader::getReader()->readScreen(gDataManager->GetAccessibilityString(50).data());
-		ScreenReader::getReader()->cleanBuiltMessage();
-		ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
+		MessageHelper::ReadMessage(Message::MessageType::NEXT_MATCH);
 		break;
 	}
 	case STOC_WAITING_SIDE:
@@ -710,10 +694,8 @@ void DuelClient::HandleSTOCPacketLanAsync(const std::vector<uint8_t>& data) {
 		std::lock_guard<epro::mutex> lock(mainGame->gMutex);
 		mainGame->dField.Clear();
 		mainGame->stHintMsg->setText(gDataManager->GetSysString(pktType == STOC_WAITING_SIDE ?  1409 : 1424).data());
-		ScreenReader::getReader()->readScreen(fmt::format(gDataManager->GetSysString(pktType == STOC_WAITING_SIDE ? 1409 : 1424).data()));
-		ScreenReader::getReader()->cleanBuiltMessage();
-		ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
 		mainGame->stHintMsg->setVisible(true);
+		MessageHelper::ReadMessage(gDataManager->GetSysString(pktType == STOC_WAITING_SIDE ? 1409 : 1424).data());
 		break;
 	}
 	case STOC_CREATE_GAME: {
@@ -1142,7 +1124,7 @@ void DuelClient::HandleSTOCPacketLanAsync(const std::vector<uint8_t>& data) {
 		mainGame->stHostPrepDuelist[pkt.pos]->setText(name);
 		mainGame->btnHostPrepStart->setVisible(is_host);
 		mainGame->btnHostPrepStart->setEnabled(is_host && CheckReady());
-		ScreenReader::getReader()->readScreen(fmt::format(gDataManager->GetAccessibilityString(51).data(), mainGame->stHostPrepDuelist[pkt.pos]->getText()));
+		MessageHelper::ReadMessage(fmt::format(gDataManager->GetAccessibilityString(51).data(), mainGame->stHostPrepDuelist[pkt.pos]->getText()));
 		break;
 	}
 	case STOC_HS_PLAYER_CHANGE: {
@@ -1167,36 +1149,28 @@ void DuelClient::HandleSTOCPacketLanAsync(const std::vector<uint8_t>& data) {
 			else
 				mainGame->dInfo.opponames[state - mainGame->dInfo.team1] = prename;
 		} else if(state == PLAYERCHANGE_READY) {
-			ScreenReader::getReader()->readScreen(fmt::format(gDataManager->GetAccessibilityString(52).data(), mainGame->stHostPrepDuelist[pos]->getText()));
-			ScreenReader::getReader()->cleanBuiltMessage();
-			ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
-			ScreenReader::getReader()->buildMessage(gDataManager->GetAccessibilityString(53).data());
+			MessageHelper::ReadMessage(fmt::format(gDataManager->GetAccessibilityString(52).data(), mainGame->stHostPrepDuelist[pos]->getText()));
+			MessageHelper::ReadMessage(gDataManager->GetAccessibilityString(53).data());
 			mainGame->chkHostPrepReady[pos]->setChecked(true);
 			if(pos == selftype) {
 				mainGame->btnHostPrepReady->setVisible(false);
 				mainGame->btnHostPrepNotReady->setVisible(true);
 			}
 		} else if(state == PLAYERCHANGE_NOTREADY) {
-			ScreenReader::getReader()->readScreen(fmt::format(gDataManager->GetAccessibilityString(54).data(), mainGame->stHostPrepDuelist[pos]->getText()));
-			ScreenReader::getReader()->cleanBuiltMessage();
-			ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
-			ScreenReader::getReader()->buildMessage(gDataManager->GetAccessibilityString(53).data());
+			MessageHelper::ReadMessage(fmt::format(gDataManager->GetAccessibilityString(54).data(), mainGame->stHostPrepDuelist[pos]->getText()));
+			MessageHelper::ReadMessage(gDataManager->GetAccessibilityString(53).data());
 			mainGame->chkHostPrepReady[pos]->setChecked(false);
 			if(pos == selftype) {
 				mainGame->btnHostPrepReady->setVisible(true);
 				mainGame->btnHostPrepNotReady->setVisible(false);
 			}
 		} else if(state == PLAYERCHANGE_LEAVE) {
-			ScreenReader::getReader()->readScreen(fmt::format(gDataManager->GetAccessibilityString(55).data(), mainGame->stHostPrepDuelist[pos]->getText()));
-			ScreenReader::getReader()->cleanBuiltMessage();
-			ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
+			MessageHelper::ReadMessage(fmt::format(gDataManager->GetAccessibilityString(55).data(), mainGame->stHostPrepDuelist[pos]->getText()));
 			mainGame->stHostPrepDuelist[pos]->setText(L"");
 			mainGame->chkHostPrepReady[pos]->setChecked(false);
 		} else if(state == PLAYERCHANGE_OBSERVE) {
-			ScreenReader::getReader()->readScreen(fmt::format(gDataManager->GetAccessibilityString(56).data(), mainGame->stHostPrepDuelist[pos]->getText()));
-			ScreenReader::getReader()->cleanBuiltMessage();
-			ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
-			ScreenReader::getReader()->buildMessage(gDataManager->GetAccessibilityString(57).data());
+			MessageHelper::ReadMessage(fmt::format(gDataManager->GetAccessibilityString(56).data(), mainGame->stHostPrepDuelist[pos]->getText()));
+			MessageHelper::ReadMessage(gDataManager->GetAccessibilityString(57).data());
 			watching++;
 			mainGame->stHostPrepDuelist[pos]->setText(L"");
 			mainGame->chkHostPrepReady[pos]->setChecked(false);
@@ -1687,12 +1661,12 @@ int DuelClient::ClientAnalyze(const uint8_t* msg, uint32_t len) {
 		{
 			EventHandler::PlayRockPaperScissor = false;
 			if(!EventHandler::WonRockPaperScissor)
-				ScreenReader::getReader()->readScreen(L"You won the rock paper scissors match");
+				MessageHelper::ReadMessage(L"You won the rock paper scissors match");
 		}
 		if (mainGame->dInfo.isFirst)
-			ScreenReader::getReader()->readScreen(gDataManager->GetAccessibilityString(59).data(), false);
+			MessageHelper::ReadMessage(gDataManager->GetAccessibilityString(59).data());
 		else
-			ScreenReader::getReader()->readScreen(gDataManager->GetAccessibilityString(60).data(), false);
+			MessageHelper::ReadMessage(gDataManager->GetAccessibilityString(60).data());
 		return true;
 	}
 	case MSG_UPDATE_DATA: {
@@ -1944,29 +1918,21 @@ int DuelClient::ClientAnalyze(const uint8_t* msg, uint32_t len) {
 		std::wstring text;
 		if(desc == 0) {
 			fmt::sprintf(gDataManager->GetSysString(200), gDataManager->GetName(code), gDataManager->FormatLocation(info.location, info.sequence));
-			std::wstring nvdaString = fmt::format(gDataManager->GetAccessibilityString(61).data(), gDataManager->GetName(code), gDataManager->FormatLocation(info.location, info.sequence));
-			ScreenReader::getReader()->readScreen(nvdaString.c_str());
-			ScreenReader::getReader()->cleanBuiltMessage();
-			ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
-			ScreenReader::getReader()->buildMessage(gDataManager->GetAccessibilityString(62).data());
-			ScreenReader::getReader()->buildMessage(gDataManager->GetAccessibilityString(63).data());
 			text = epro::format(L"{}\n{}", event_string,
 							   epro::sprintf(gDataManager->GetSysString(200), gDataManager->GetName(code), gDataManager->FormatLocation(info.location, info.sequence)));
+			std::wstring nvdaString = fmt::format(gDataManager->GetAccessibilityString(61).data(), gDataManager->GetName(code), gDataManager->FormatLocation(info.location, info.sequence));
+			MessageHelper::ReadMessage(nvdaString.c_str());
+			MessageHelper::ReadMessage(Message::COMMA_YES_DOT_NO);
 		} else if(desc == 221) {
 			text = epro::format(L"{}\n{}\n{}", event_string,
 							   epro::sprintf(gDataManager->GetSysString(221), gDataManager->GetName(code), gDataManager->FormatLocation(info.location, info.sequence)),
 							   gDataManager->GetSysString(223));
 			std::wstring nvdaString = fmt::format(gDataManager->GetAccessibilityString(64).data(), gDataManager->GetName(code), gDataManager->FormatLocation(info.location, info.sequence));
-			ScreenReader::getReader()->readScreen(nvdaString.c_str());
-			ScreenReader::getReader()->cleanBuiltMessage();
-			ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
-			ScreenReader::getReader()->buildMessage(gDataManager->GetAccessibilityString(62).data());
-			ScreenReader::getReader()->buildMessage(gDataManager->GetAccessibilityString(63).data());
+			MessageHelper::ReadMessage(nvdaString.c_str());
+			MessageHelper::ReadMessage(Message::COMMA_YES_DOT_NO);
 		} else {
-			ScreenReader::getReader()->readScreen(text.c_str());
-			ScreenReader::getReader()->cleanBuiltMessage();
-			ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
 			text = epro::sprintf(gDataManager->GetDesc(desc, mainGame->dInfo.compat_mode), gDataManager->GetName(code));
+			MessageHelper::ReadMessage(text.c_str());
 		}
 		std::lock_guard<epro::mutex> lock(mainGame->gMutex);
 		ClientCard* pcard = mainGame->dField.GetCard(info.controler, info.location, info.sequence);
@@ -1986,12 +1952,9 @@ int DuelClient::ClientAnalyze(const uint8_t* msg, uint32_t len) {
 		std::lock_guard<epro::mutex> lock(mainGame->gMutex);
 		mainGame->dField.highlighting_card = 0;
 		mainGame->stQMessage->setText(gDataManager->GetDesc(desc, mainGame->dInfo.compat_mode).data());
-		ScreenReader::getReader()->readScreen(gDataManager->GetDesc(desc, mainGame->dInfo.compat_mode).data());
-		ScreenReader::getReader()->cleanBuiltMessage();
-		ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
-		ScreenReader::getReader()->buildMessage(gDataManager->GetAccessibilityString(62).data());
-		ScreenReader::getReader()->buildMessage(gDataManager->GetAccessibilityString(63).data());
 		mainGame->PopupElement(mainGame->wQuery);
+		MessageHelper::ReadMessage(gDataManager->GetDesc(desc, mainGame->dInfo.compat_mode).data());
+		MessageHelper::ReadMessage(Message::COMMA_YES_DOT_NO);
 		return false;
 	}
 	case MSG_SELECT_OPTION: {
@@ -2049,10 +2012,8 @@ int DuelClient::ClientAnalyze(const uint8_t* msg, uint32_t len) {
 		std::sort(mainGame->dField.selectable_cards.begin(), mainGame->dField.selectable_cards.end(), ClientCard::client_card_sort);
 		std::wstring text = epro::format(L"{}({}-{})", gDataManager->GetDesc(select_hint ? select_hint : 560, mainGame->dInfo.compat_mode),
 			mainGame->dField.select_min, mainGame->dField.select_max);
-		ScreenReader::getReader()->readScreen(fmt::format(L"{}", gDataManager->GetDesc(select_hint ? select_hint : 560, mainGame->dInfo.compat_mode)));
-		ScreenReader::getReader()->cleanBuiltMessage();
-		ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
-		ScreenReader::getReader()->buildMessage(gDataManager->GetAccessibilityTipsString(13).data());
+		MessageHelper::ReadMessage(fmt::format(L"{}", gDataManager->GetDesc(select_hint ? select_hint : 560, mainGame->dInfo.compat_mode)));
+		MessageHelper::ReadMessage(gDataManager->GetAccessibilityTipsString(13).data());
 		std::lock_guard<epro::mutex> lock(mainGame->gMutex);
 		select_hint = 0;
 		if (panelmode) {
@@ -2142,9 +2103,9 @@ int DuelClient::ClientAnalyze(const uint8_t* msg, uint32_t len) {
 		std::sort(mainGame->dField.selectable_cards.begin(), mainGame->dField.selectable_cards.end(), ClientCard::client_card_sort);
 		std::wstring text = epro::format(L"{}({}-{})", gDataManager->GetDesc(select_hint ? select_hint : 560, mainGame->dInfo.compat_mode),
 			mainGame->dField.select_min, mainGame->dField.select_max);
-		ScreenReader::getReader()->readScreen(fmt::format(L"{}", gDataManager->GetName(mainGame->dField.display_cards[EventHandler::indexLookedUpCard]->code)));
-		ScreenReader::getReader()->cleanBuiltMessage();
-		ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
+		MessageHelper::ReadMessage(fmt::format(L"{}", gDataManager->GetName(mainGame->dField.display_cards[EventHandler::indexLookedUpCard]->code)));
+
+
 		std::lock_guard<epro::mutex> lock(mainGame->gMutex);
 		select_hint = 0;
 		if (panelmode) {
@@ -2252,15 +2213,15 @@ int DuelClient::ClientAnalyze(const uint8_t* msg, uint32_t len) {
 		std::lock_guard<epro::mutex> lock(mainGame->gMutex);
 		if(!conti_exist){
 			mainGame->stHintMsg->setText(gDataManager->GetSysString(550).data());
-			ScreenReader::getReader()->readScreen(gDataManager->GetSysString(550).data());
-			ScreenReader::getReader()->cleanBuiltMessage();
-			ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
+			MessageHelper::ReadMessage(gDataManager->GetSysString(550).data());
+
+
 		}
 		else {
 			mainGame->stHintMsg->setText(gDataManager->GetSysString(556).data());
-			ScreenReader::getReader()->readScreen(gDataManager->GetSysString(556).data());
-			ScreenReader::getReader()->cleanBuiltMessage();
-			ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
+			MessageHelper::ReadMessage(gDataManager->GetSysString(556).data());
+
+
 		}
 		mainGame->stHintMsg->setVisible(true);
 		if(panelmode) {
@@ -2274,22 +2235,17 @@ int DuelClient::ClientAnalyze(const uint8_t* msg, uint32_t len) {
 			if(!forced) {
 				if (count == 0) {
 					mainGame->stQMessage->setText(fmt::format(L"{}\n{}", gDataManager->GetSysString(201), gDataManager->GetSysString(202)).data());
-					ScreenReader::getReader()->readScreen(fmt::format(L"{}", gDataManager->GetSysString(202)).data());
-					ScreenReader::getReader()->cleanBuiltMessage();
-					ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
-					ScreenReader::getReader()->buildMessage(gDataManager->GetAccessibilityString(265).data());
-					ScreenReader::getReader()->buildMessage(gDataManager->GetAccessibilityString(265).data());
+					MessageHelper::ReadMessage(Message::CHECK_FIELD);
 				}
 				else if (select_trigger) {
 					mainGame->stQMessage->setText(fmt::format(L"{}\n{}\n{}", event_string, gDataManager->GetSysString(222), gDataManager->GetSysString(223)).data());
-					ScreenReader::getReader()->readScreen(fmt::format(L"{}", gDataManager->GetSysString(222)).data());
+					MessageHelper::ReadMessage(fmt::format(L"{}", gDataManager->GetSysString(222)).data());
 				}
 				else {
 					mainGame->stQMessage->setText(fmt::format(L"{}\n{}", event_string, gDataManager->GetSysString(203)).data());
-					ScreenReader::getReader()->readScreen(fmt::format(L"{}", gDataManager->GetSysString(203)).data());
+					MessageHelper::ReadMessage(fmt::format(L"{}", gDataManager->GetSysString(203)).data());
 				}
-				ScreenReader::getReader()->readScreen(fmt::format(L"{}", gDataManager->GetAccessibilityString(Accessibility::Dict::Chain::CHAIN_SELECT_CARD).data()));
-				ScreenReader::getReader()->readScreen(fmt::format(L"{}", gDataManager->GetAccessibilityString(Accessibility::Dict::Chain::CHAIN_CANCEL).data()));
+				MessageHelper::ReadMessage(Message::SELECT_CHAIN);
 				if(count == 0)
 					mainGame->stQMessage->setText(epro::format(L"{}\n{}", gDataManager->GetSysString(201), gDataManager->GetSysString(202)).data());
 				else if(select_trigger)
@@ -2297,10 +2253,8 @@ int DuelClient::ClientAnalyze(const uint8_t* msg, uint32_t len) {
 				else
 					mainGame->stQMessage->setText(epro::format(L"{}\n{}", event_string, gDataManager->GetSysString(203)).data());
 				ButtonHelper::ClickButton(mainGame->btnYes);
-
 			}
 		}
-
 		gSoundManager->PlaySoundEffect(SoundManager::SFX::CHAIN);
 		return false;
 	}
@@ -2329,9 +2283,9 @@ int DuelClient::ClientAnalyze(const uint8_t* msg, uint32_t len) {
 		mainGame->stHintMsg->setText(text.data());
 		mainGame->stHintMsg->setVisible(true);
 		EventHandler::selectZone = true;
-		ScreenReader::getReader()->readScreen(text.c_str());
-		ScreenReader::getReader()->cleanBuiltMessage();
-		ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
+		MessageHelper::ReadMessage(text.c_str());
+
+
 		if (mainGame->dInfo.curMsg == MSG_SELECT_PLACE && (
 			(mainGame->gSettings.chkMAutoPos->isChecked() && mainGame->dField.selectable_field & 0x7f007f) ||
 			(mainGame->gSettings.chkSTAutoPos->isChecked() && !(mainGame->dField.selectable_field & 0x7f007f)))) {
@@ -2402,11 +2356,7 @@ int DuelClient::ClientAnalyze(const uint8_t* msg, uint32_t len) {
 			SetResponseI(positions);
 			return true;
 		}
-		ScreenReader::getReader()->readScreen(gDataManager->GetAccessibilityString(267).data());
-		ScreenReader::getReader()->cleanBuiltMessage();
-		ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
-		ScreenReader::getReader()->buildMessage(gDataManager->GetAccessibilityString(268).data());
-		ScreenReader::getReader()->buildMessage(gDataManager->GetAccessibilityString(269).data());
+		MessageHelper::ReadMessage(Message::SELECT_POSITION);
 		int count = 0, filter = 0x1, startpos;
 		while(filter != 0x10) {
 			if(positions & filter) count++;
@@ -2467,19 +2417,14 @@ int DuelClient::ClientAnalyze(const uint8_t* msg, uint32_t len) {
 			pcard->select_seq = i;
 			pcard->is_selectable = true;
 		}
-		ScreenReader::getReader()->readScreen(fmt::format(L"{}({}-{})", gDataManager->GetDesc(select_hint ? select_hint : 531, mainGame->dInfo.compat_mode), mainGame->dField.select_min, mainGame->dField.select_max).data());
-		ScreenReader::getReader()->cleanBuiltMessage();
-		ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
-		ScreenReader::getReader()->buildMessage(gDataManager->GetAccessibilityString(270).data());
-		ScreenReader::getReader()->buildMessage(gDataManager->GetAccessibilityString(271).data());
-		ScreenReader::getReader()->buildMessage(gDataManager->GetAccessibilityString(272).data());
-		ScreenReader::getReader()->buildMessage(gDataManager->GetAccessibilityString(273).data());
+		MessageHelper::ReadMessage(fmt::format(L"{}({}-{})", gDataManager->GetDesc(select_hint ? select_hint : 531, mainGame->dInfo.compat_mode), mainGame->dField.select_min, mainGame->dField.select_max).data());
+		MessageHelper::ReadMessage(Message::SELECT_TRIBUTE);
 		std::lock_guard<epro::mutex> lock(mainGame->gMutex);
 		mainGame->stHintMsg->setText(epro::format(L"{}({}-{})", gDataManager->GetDesc(select_hint ? select_hint : 531, mainGame->dInfo.compat_mode), mainGame->dField.select_min, mainGame->dField.select_max).data());
 		mainGame->stHintMsg->setVisible(true);
 		if (mainGame->dField.select_cancelable) {
 			mainGame->dField.ShowCancelOrFinishButton(1);
-			ScreenReader::getReader()->readScreen(gDataManager->GetAccessibilityString(274).data());
+			MessageHelper::ReadMessage(gDataManager->GetAccessibilityString(274).data());
 		}
 		select_hint = 0;
 		return false;
@@ -2566,9 +2511,9 @@ int DuelClient::ClientAnalyze(const uint8_t* msg, uint32_t len) {
 		}
 		std::sort(mainGame->dField.selectsum_all.begin(), mainGame->dField.selectsum_all.end(), ClientCard::client_card_sort);
 		std::wstring text = fmt::format(L"{}({})", gDataManager->GetDesc(select_hint ? select_hint : 560, mainGame->dInfo.compat_mode), mainGame->dField.select_sumval);
-		ScreenReader::getReader()->readScreen(text.c_str());
-		ScreenReader::getReader()->cleanBuiltMessage();
-		ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
+		MessageHelper::ReadMessage(text.c_str());
+
+
 		select_hint = 0;
 		mainGame->wCardSelect->setText(text.data());
 		mainGame->stHintMsg->setText(text.data());
@@ -2603,9 +2548,9 @@ int DuelClient::ClientAnalyze(const uint8_t* msg, uint32_t len) {
 			mainGame->wCardSelect->setText(gDataManager->GetSysString(206).data());
 		else
 			mainGame->wCardSelect->setText(gDataManager->GetSysString(205).data());
-		ScreenReader::getReader()->readScreen(mainGame->wCardSelect->getText());
-		ScreenReader::getReader()->cleanBuiltMessage();
-		ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
+		MessageHelper::ReadMessage(mainGame->wCardSelect->getText());
+
+
 		mainGame->dField.select_min = 0;
 		mainGame->dField.select_max = count;
 		mainGame->dField.ShowSelectCard();
@@ -2661,9 +2606,9 @@ int DuelClient::ClientAnalyze(const uint8_t* msg, uint32_t len) {
 		}
 		if(mainGame->dInfo.isCatchingUp)
 			return true;
-		ScreenReader::getReader()->readScreen(fmt::format(L"{}", gDataManager->GetName(pcard->code)));
-		ScreenReader::getReader()->cleanBuiltMessage();
-		ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
+		MessageHelper::ReadMessage(fmt::format(L"{}", gDataManager->GetName(pcard->code)));
+
+
 		mainGame->AddLog(fmt::format(L"*[{}]", gDataManager->GetName(pcard->code)), pcard->code);
 		Play(SoundManager::SFX::REVEAL);
 		mainGame->AddLog(epro::sprintf(gDataManager->GetSysString(207), count));
@@ -2784,9 +2729,9 @@ int DuelClient::ClientAnalyze(const uint8_t* msg, uint32_t len) {
 			std::sort(panel_confirm.begin(), panel_confirm.end(), ClientCard::client_card_sort);
 			std::unique_lock<epro::mutex> lock(mainGame->gMutex);
 			mainGame->dField.selectable_cards = panel_confirm;
-			ScreenReader::getReader()->readScreen(fmt::sprintf(gDataManager->GetSysString(208), panel_confirm.size()).data());
-			ScreenReader::getReader()->cleanBuiltMessage();
-			ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
+			MessageHelper::ReadMessage(fmt::sprintf(gDataManager->GetSysString(208), panel_confirm.size()).data());
+
+
 			mainGame->wCardSelect->setText(epro::sprintf(gDataManager->GetSysString(208), panel_confirm.size()).data());
 			mainGame->dField.ShowSelectCard(true);
 			mainGame->actionSignal.Wait(lock);
@@ -2833,9 +2778,9 @@ int DuelClient::ClientAnalyze(const uint8_t* msg, uint32_t len) {
 				mainGame->WaitFrameSignal(10, lock);
 			}
 		}
-		ScreenReader::getReader()->readScreen(fmt::format(gDataManager->GetAccessibilityString(275).data(), player + 1));
-		ScreenReader::getReader()->cleanBuiltMessage();
-		ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
+		MessageHelper::ReadMessage(fmt::format(gDataManager->GetAccessibilityString(275).data(), player + 1));
+
+
 		return true;
 	}
 	case MSG_SHUFFLE_HAND: {
@@ -2910,9 +2855,9 @@ int DuelClient::ClientAnalyze(const uint8_t* msg, uint32_t len) {
 		for (const auto& pcard : mainGame->dField.extra[player])
 			if(!(pcard->position & POS_FACEUP))
 				pcard->SetCode(BufferIO::Read<uint32_t>(pbuf));
-		ScreenReader::getReader()->readScreen(fmt::format(gDataManager->GetAccessibilityString(276).data(), player + 1));
-		ScreenReader::getReader()->cleanBuiltMessage();
-		ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
+		MessageHelper::ReadMessage(fmt::format(gDataManager->GetAccessibilityString(276).data(), player + 1));
+
+
 		return true;
 	}
 	case MSG_REFRESH_DECK: {
@@ -3066,9 +3011,9 @@ int DuelClient::ClientAnalyze(const uint8_t* msg, uint32_t len) {
 			mainGame->WaitFrameSignal(40, lock);
 			mainGame->showcard = 0;
 		}
-		ScreenReader::getReader()->readScreen(gDataManager->GetAccessibilityString(277).data());
-		ScreenReader::getReader()->cleanBuiltMessage();
-		ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
+		MessageHelper::ReadMessage(gDataManager->GetAccessibilityString(277).data());
+
+
 		return true;
 	}
 	case MSG_NEW_PHASE: {
@@ -3110,9 +3055,9 @@ int DuelClient::ClientAnalyze(const uint8_t* msg, uint32_t len) {
 			mainGame->btnDP->setVisible(true);
 			mainGame->btnDP->setSubElement(true);
 			mainGame->showcardcode = 4;
-			ScreenReader::getReader()->readScreen(gDataManager->GetAccessibilityString(278).data());
-			ScreenReader::getReader()->cleanBuiltMessage();
-			ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
+			MessageHelper::ReadMessage(gDataManager->GetAccessibilityString(278).data());
+
+
 			break;
 		case PHASE_STANDBY:
 			event_string = gDataManager->GetSysString(21).data();
@@ -3126,9 +3071,9 @@ int DuelClient::ClientAnalyze(const uint8_t* msg, uint32_t len) {
 			mainGame->btnM1->setSubElement(true);
 			mainGame->showcardcode = 6;
 			EventHandler::battlePhase = AccessibilityFieldFocus::BattleStep::MP1;
-			ScreenReader::getReader()->readScreen(gDataManager->GetAccessibilityString(279).data());
-			ScreenReader::getReader()->cleanBuiltMessage();
-			ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
+			MessageHelper::ReadMessage(gDataManager->GetAccessibilityString(279).data());
+
+
 			break;
 		case PHASE_BATTLE_START:
 			event_string = gDataManager->GetSysString(24).data();
@@ -3138,9 +3083,9 @@ int DuelClient::ClientAnalyze(const uint8_t* msg, uint32_t len) {
 			mainGame->btnBP->setEnabled(false);
 			mainGame->showcardcode = 7;
 			EventHandler::battlePhase = AccessibilityFieldFocus::BattleStep::BP;
-			ScreenReader::getReader()->readScreen(gDataManager->GetAccessibilityString(280).data());
-			ScreenReader::getReader()->cleanBuiltMessage();
-			ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
+			MessageHelper::ReadMessage(gDataManager->GetAccessibilityString(280).data());
+
+
 			break;
 		case PHASE_MAIN2:
 			event_string = gDataManager->GetSysString(22).data();
@@ -3150,9 +3095,9 @@ int DuelClient::ClientAnalyze(const uint8_t* msg, uint32_t len) {
 			mainGame->btnM2->setEnabled(false);
 			mainGame->showcardcode = 8;
 			EventHandler::battlePhase = AccessibilityFieldFocus::BattleStep::MP2;
-			ScreenReader::getReader()->readScreen(gDataManager->GetAccessibilityString(281).data());
-			ScreenReader::getReader()->cleanBuiltMessage();
-			ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
+			MessageHelper::ReadMessage(gDataManager->GetAccessibilityString(281).data());
+
+
 			break;
 		case PHASE_END:
 			event_string = gDataManager->GetSysString(26).data();
@@ -3161,9 +3106,9 @@ int DuelClient::ClientAnalyze(const uint8_t* msg, uint32_t len) {
 			mainGame->btnEP->setPressed(true);
 			mainGame->btnEP->setEnabled(false);
 			mainGame->showcardcode = 9;
-			ScreenReader::getReader()->readScreen(gDataManager->GetAccessibilityString(282).data());
-			ScreenReader::getReader()->cleanBuiltMessage();
-			ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
+			MessageHelper::ReadMessage(gDataManager->GetAccessibilityString(282).data());
+
+
 			break;
 		}
 		if(!mainGame->dInfo.isCatchingUp) {
@@ -3281,9 +3226,9 @@ int DuelClient::ClientAnalyze(const uint8_t* msg, uint32_t len) {
 
 			if (!redundantInfo) {
 				mainGame->AddLog(nvdaString);
-				ScreenReader::getReader()->readScreen(nvdaString);
-				ScreenReader::getReader()->cleanBuiltMessage();
-				ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
+				MessageHelper::ReadMessage(nvdaString);
+
+
 			}
 		}
 		auto lock = LockIf();
@@ -3368,7 +3313,7 @@ int DuelClient::ClientAnalyze(const uint8_t* msg, uint32_t len) {
 						mainGame->dField.display_cards.push_back(pcard);
 						EventHandler::indexLookedUpCard = 0;
 						Play(SoundManager::SFX::REVEAL);
-						ScreenReader::getReader()->readScreen(fmt::format(gDataManager->GetAccessibilityString(301).data(), gDataManager->GetName(pcard->code)));
+						MessageHelper::ReadMessage(fmt::format(gDataManager->GetAccessibilityString(301).data(), gDataManager->GetName(pcard->code)));
 					} else {
 						if (current.location == LOCATION_MZONE && pcard->overlayed.size() > 0) {
 							for (const auto& ocard : pcard->overlayed)
@@ -3480,9 +3425,9 @@ int DuelClient::ClientAnalyze(const uint8_t* msg, uint32_t len) {
 			mainGame->dField.MoveCard(pcard, 10);
 			mainGame->WaitFrameSignal(11, lock);
 		}
-		ScreenReader::getReader()->readScreen(nvdaString);
-		ScreenReader::getReader()->cleanBuiltMessage();
-		ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
+		MessageHelper::ReadMessage(nvdaString);
+
+
 		return true;
 	}
 	case MSG_SET: {
@@ -3490,9 +3435,9 @@ int DuelClient::ClientAnalyze(const uint8_t* msg, uint32_t len) {
 		/*const auto code = BufferIO::Read<uint32_t>(pbuf);*/
 		/*CoreUtils::loc_info info = CoreUtils::ReadLocInfo(pbuf, mainGame->dInfo.compat_mode);*/
 		event_string = gDataManager->GetSysString(1601).data();
-		ScreenReader::getReader()->readScreen(event_string);
-		ScreenReader::getReader()->cleanBuiltMessage();
-		ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
+		MessageHelper::ReadMessage(event_string);
+
+
 		return true;
 	}
 	case MSG_SWAP: {
@@ -3505,9 +3450,9 @@ int DuelClient::ClientAnalyze(const uint8_t* msg, uint32_t len) {
 		event_string = gDataManager->GetSysString(1602).data();
 		ClientCard* pc1 = mainGame->dField.GetCard(info1.controler, info1.location, info1.sequence);
 		ClientCard* pc2 = mainGame->dField.GetCard(info2.controler, info2.location, info2.sequence);
-		ScreenReader::getReader()->readScreen(fmt::format(gDataManager->GetAccessibilityString(304).data(), gDataManager->GetName(pc1->alias)));
-		ScreenReader::getReader()->cleanBuiltMessage();
-		ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
+		MessageHelper::ReadMessage(fmt::format(gDataManager->GetAccessibilityString(304).data(), gDataManager->GetName(pc1->alias)));
+
+
 		auto lock = LockIf();
 		mainGame->dField.RemoveCard(info1.controler, info1.location, info1.sequence);
 		mainGame->dField.RemoveCard(info2.controler, info2.location, info2.sequence);
@@ -3567,9 +3512,9 @@ int DuelClient::ClientAnalyze(const uint8_t* msg, uint32_t len) {
 			mainGame->WaitFrameSignal(30, lock);
 			mainGame->showcard = 0;
 			mainGame->WaitFrameSignal(11, lock);
-			ScreenReader::getReader()->readScreen(fmt::format(gDataManager->GetAccessibilityString(306).data(), mainGame->LocalPlayer(BufferIO::Read<uint8_t>(pbuf)) + 1, gDataManager->GetName(code)));
-			ScreenReader::getReader()->cleanBuiltMessage();
-			ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
+			MessageHelper::ReadMessage(fmt::format(gDataManager->GetAccessibilityString(306).data(), mainGame->LocalPlayer(BufferIO::Read<uint8_t>(pbuf)) + 1, gDataManager->GetName(code)));
+
+
 		}
 		return true;
 	}
@@ -3598,9 +3543,9 @@ int DuelClient::ClientAnalyze(const uint8_t* msg, uint32_t len) {
 			mainGame->WaitFrameSignal(30, lock);
 			mainGame->showcard = 0;
 			mainGame->WaitFrameSignal(11, lock);
-			ScreenReader::getReader()->readScreen(fmt::format(gDataManager->GetAccessibilityString(307).data(), mainGame->LocalPlayer(BufferIO::Read<uint8_t>(pbuf)) + 1, gDataManager->GetName(code)));
-			ScreenReader::getReader()->cleanBuiltMessage();
-			ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
+			MessageHelper::ReadMessage(fmt::format(gDataManager->GetAccessibilityString(307).data(), mainGame->LocalPlayer(BufferIO::Read<uint8_t>(pbuf)) + 1, gDataManager->GetName(code)));
+
+
 		}
 		return true;
 	}
@@ -3675,9 +3620,9 @@ int DuelClient::ClientAnalyze(const uint8_t* msg, uint32_t len) {
 	case MSG_CHAINED: {
 		const auto ct = BufferIO::Read<uint8_t>(pbuf);
 		auto lock = LockIf();
-		ScreenReader::getReader()->readScreen(event_string);
-		ScreenReader::getReader()->cleanBuiltMessage();
-		ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
+		MessageHelper::ReadMessage(event_string);
+
+
 		event_string = epro::sprintf(gDataManager->GetSysString(1609), gDataManager->GetName(mainGame->dField.current_chain.code));
 		mainGame->dField.chains.push_back(mainGame->dField.current_chain);
 		if (ct > 1 && !mainGame->dInfo.isCatchingUp)
@@ -3746,9 +3691,9 @@ int DuelClient::ClientAnalyze(const uint8_t* msg, uint32_t len) {
 			else
 				pcard = mainGame->dField.GetCard(info.controler, info.location, info.sequence);
 			pcard->is_highlighting = true;
-			ScreenReader::getReader()->readScreen(fmt::format(gDataManager->GetAccessibilityString(308).data(), gDataManager->GetName(pcard->alias)));
-			ScreenReader::getReader()->cleanBuiltMessage();
-			ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
+			MessageHelper::ReadMessage(fmt::format(gDataManager->GetAccessibilityString(308).data(), gDataManager->GetName(pcard->alias)));
+
+
 		}
 		mainGame->WaitFrameSignal(30, lock);
 		for(auto& pcard : pcards)
@@ -3786,9 +3731,9 @@ int DuelClient::ClientAnalyze(const uint8_t* msg, uint32_t len) {
 				mainGame->dField.MoveCard(pcard, 5);
 			} else
 				mainGame->WaitFrameSignal(30, lock);
-			ScreenReader::getReader()->readScreen(fmt::format(gDataManager->GetAccessibilityString(309).data(), gDataManager->GetName(pcard->code), gDataManager->FormatLocation(info.location, info.sequence), info.sequence + 1));
-			ScreenReader::getReader()->cleanBuiltMessage();
-			ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
+			MessageHelper::ReadMessage(fmt::format(gDataManager->GetAccessibilityString(309).data(), gDataManager->GetName(pcard->code), gDataManager->FormatLocation(info.location, info.sequence), info.sequence + 1));
+
+
 			mainGame->AddLog(epro::sprintf(gDataManager->GetSysString((mainGame->dInfo.curMsg == MSG_BECOME_TARGET) ? 1610 : 1680), gDataManager->GetName(pcard->code), gDataManager->FormatLocation(info.location, info.sequence), info.sequence + 1), pcard->code);
 			pcard->is_highlighting = false;
 		}
@@ -3821,9 +3766,9 @@ int DuelClient::ClientAnalyze(const uint8_t* msg, uint32_t len) {
 				mainGame->WaitFrameSignal(5, lock);
 			}
 		}
-		ScreenReader::getReader()->readScreen(fmt::format(gDataManager->GetAccessibilityString(310).data(), player + 1, count));
-		ScreenReader::getReader()->cleanBuiltMessage();
-		ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
+		MessageHelper::ReadMessage(fmt::format(gDataManager->GetAccessibilityString(310).data(), player + 1, count));
+
+
 		event_string = epro::sprintf(gDataManager->GetSysString(1611 + player), count);
 		return true;
 	}
@@ -3849,9 +3794,9 @@ int DuelClient::ClientAnalyze(const uint8_t* msg, uint32_t len) {
 		}
 		mainGame->dInfo.lp[player] = final;
 		mainGame->dInfo.strLP[player] = fmt::to_wstring(mainGame->dInfo.lp[player]);
-		ScreenReader::getReader()->readScreen(fmt::format(gDataManager->GetAccessibilityString(311).data(), player + 1, val, mainGame->dInfo.lp[player]));
-		ScreenReader::getReader()->cleanBuiltMessage();
-		ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
+		MessageHelper::ReadMessage(fmt::format(gDataManager->GetAccessibilityString(311).data(), player + 1, val, mainGame->dInfo.lp[player]));
+
+
 		return true;
 	}
 	case MSG_RECOVER: {
@@ -3874,9 +3819,9 @@ int DuelClient::ClientAnalyze(const uint8_t* msg, uint32_t len) {
 		}
 		mainGame->dInfo.lp[player] = final;
 		mainGame->dInfo.strLP[player] = fmt::to_wstring(mainGame->dInfo.lp[player]);
-		ScreenReader::getReader()->readScreen(fmt::format(gDataManager->GetAccessibilityString(312).data(), player + 1, val, mainGame->dInfo.lp[player]));
-		ScreenReader::getReader()->cleanBuiltMessage();
-		ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
+		MessageHelper::ReadMessage(fmt::format(gDataManager->GetAccessibilityString(312).data(), player + 1, val, mainGame->dInfo.lp[player]));
+
+
 		return true;
 	}
 	case MSG_EQUIP: {
@@ -3900,9 +3845,9 @@ int DuelClient::ClientAnalyze(const uint8_t* msg, uint32_t len) {
 			else if(mainGame->dField.hovered_card == pc2)
 				pc1->is_showequip = true;
 		}
-		ScreenReader::getReader()->readScreen(fmt::format(gDataManager->GetAccessibilityString(313).data(), pc2->location, gDataManager->GetName(pc2->alias), pc1->location, gDataManager->GetName(pc1->alias)));
-		ScreenReader::getReader()->cleanBuiltMessage();
-		ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
+		MessageHelper::ReadMessage(fmt::format(gDataManager->GetAccessibilityString(313).data(), pc2->location, gDataManager->GetName(pc2->alias), pc1->location, gDataManager->GetName(pc1->alias)));
+
+
 		return true;
 	}
 	case MSG_LPUPDATE: {
@@ -3986,9 +3931,9 @@ int DuelClient::ClientAnalyze(const uint8_t* msg, uint32_t len) {
 		}
 		mainGame->dInfo.lp[player] = final;
 		mainGame->dInfo.strLP[player] = fmt::to_wstring(mainGame->dInfo.lp[player]);
-		ScreenReader::getReader()->readScreen(fmt::format(gDataManager->GetAccessibilityString(311).data(), player + 1, cost, mainGame->dInfo.lp[player]));
-		ScreenReader::getReader()->cleanBuiltMessage();
-		ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
+		MessageHelper::ReadMessage(fmt::format(gDataManager->GetAccessibilityString(311).data(), player + 1, cost, mainGame->dInfo.lp[player]));
+
+
 		return true;
 	}
 	case MSG_ADD_COUNTER: {
@@ -4006,9 +3951,9 @@ int DuelClient::ClientAnalyze(const uint8_t* msg, uint32_t len) {
 			return true;
 		std::unique_lock<epro::mutex> lock(mainGame->gMutex);
 		pc->is_highlighting = true;
-		ScreenReader::getReader()->readScreen(fmt::format(gDataManager->GetSysString(1617), gDataManager->GetName(pc->code), gDataManager->GetCounterName(type), count));
-		ScreenReader::getReader()->cleanBuiltMessage();
-		ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
+		MessageHelper::ReadMessage(fmt::format(gDataManager->GetSysString(1617), gDataManager->GetName(pc->code), gDataManager->GetCounterName(type), count));
+
+
 		mainGame->stACMessage->setText(epro::format(gDataManager->GetSysString(1617), gDataManager->GetName(pc->code), gDataManager->GetCounterName(type), count).data());
 		mainGame->PopupElement(mainGame->wACMessage, 20);
 		mainGame->WaitFrameSignal(40, lock);
@@ -4030,9 +3975,9 @@ int DuelClient::ClientAnalyze(const uint8_t* msg, uint32_t len) {
 		if(mainGame->dInfo.isCatchingUp)
 			return true;
 		pc->is_highlighting = true;
-		ScreenReader::getReader()->readScreen(fmt::format(gDataManager->GetSysString(1618), gDataManager->GetName(pc->code), gDataManager->GetCounterName(type), count));
-		ScreenReader::getReader()->cleanBuiltMessage();
-		ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
+		MessageHelper::ReadMessage(fmt::format(gDataManager->GetSysString(1618), gDataManager->GetName(pc->code), gDataManager->GetCounterName(type), count));
+
+
 		mainGame->stACMessage->setText(epro::format(gDataManager->GetSysString(1618), gDataManager->GetName(pc->code), gDataManager->GetCounterName(type), count).data());
 		mainGame->PopupElement(mainGame->wACMessage, 20);
 		mainGame->WaitFrameSignal(40, lock);
@@ -4066,9 +4011,9 @@ int DuelClient::ClientAnalyze(const uint8_t* msg, uint32_t len) {
 			xd = 3.95f;
 			yd = (info1.controler == 0) ? -3.5f : 3.5f;
 		}
-		ScreenReader::getReader()->readScreen(event_string);
-		ScreenReader::getReader()->cleanBuiltMessage();
-		ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
+		MessageHelper::ReadMessage(event_string);
+
+
 		sy = std::sqrt((xa - xd) * (xa - xd) + (ya - yd) * (ya - yd)) / 2.0f;
 		mainGame->atk_t.set((xa + xd) / 2, (ya + yd) / 2, 0);
 		mainGame->atk_r.set(0, 0, -std::atan((xd - xa) / (yd - ya)));
@@ -4118,22 +4063,22 @@ int DuelClient::ClientAnalyze(const uint8_t* msg, uint32_t len) {
 		return true;
 	}
 	case MSG_ATTACK_DISABLED: {
-		ScreenReader::getReader()->readScreen(gDataManager->GetAccessibilityString(315).data());
-		ScreenReader::getReader()->cleanBuiltMessage();
-		ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
+		MessageHelper::ReadMessage(gDataManager->GetAccessibilityString(315).data());
+
+
 		event_string = epro::sprintf(gDataManager->GetSysString(1621), gDataManager->GetName(mainGame->dField.attacker->code));
 		return true;
 	}
 	case MSG_DAMAGE_STEP_START: {
-		ScreenReader::getReader()->readScreen(gDataManager->GetAccessibilityString(316).data());
-		ScreenReader::getReader()->cleanBuiltMessage();
-		ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
+		MessageHelper::ReadMessage(gDataManager->GetAccessibilityString(316).data());
+
+
 		return true;
 	}
 	case MSG_DAMAGE_STEP_END: {
-		ScreenReader::getReader()->readScreen(gDataManager->GetAccessibilityString(317).data());
-		ScreenReader::getReader()->cleanBuiltMessage();
-		ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
+		MessageHelper::ReadMessage(gDataManager->GetAccessibilityString(317).data());
+
+
 		return true;
 	}
 	case MSG_MISSED_EFFECT: {
@@ -4141,9 +4086,9 @@ int DuelClient::ClientAnalyze(const uint8_t* msg, uint32_t len) {
 			return true;
 		CoreUtils::ReadLocInfo(pbuf, mainGame->dInfo.compat_mode);
 		uint32_t code = BufferIO::Read<uint32_t>(pbuf);
-		ScreenReader::getReader()->readScreen(fmt::format(gDataManager->GetSysString(1622), gDataManager->GetName(code)));
-		ScreenReader::getReader()->cleanBuiltMessage();
-		ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
+		MessageHelper::ReadMessage(fmt::format(gDataManager->GetSysString(1622), gDataManager->GetName(code)));
+
+
 		std::unique_lock<epro::mutex> lock(mainGame->gMutex);
 		mainGame->AddLog(epro::sprintf(gDataManager->GetSysString(1622), gDataManager->GetName(code)), code);
 		return true;
@@ -4157,9 +4102,9 @@ int DuelClient::ClientAnalyze(const uint8_t* msg, uint32_t len) {
 		std::wstring text(gDataManager->GetSysString(1623));
 		for (int i = 0; i < count; ++i) {
 			bool res = !!BufferIO::Read<uint8_t>(pbuf);
-			ScreenReader::getReader()->readScreen(text);
-			ScreenReader::getReader()->cleanBuiltMessage();
-			ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
+			MessageHelper::ReadMessage(text);
+
+
 			text += epro::format(L"[{}]", gDataManager->GetSysString(res ? 60 : 61));
 		}
 		std::unique_lock<epro::mutex> lock(mainGame->gMutex);
@@ -4178,9 +4123,9 @@ int DuelClient::ClientAnalyze(const uint8_t* msg, uint32_t len) {
 		std::wstring text(gDataManager->GetSysString(1624));
 		for (int i = 0; i < count; ++i) {
 			uint8_t res = BufferIO::Read<uint8_t>(pbuf);
-			ScreenReader::getReader()->readScreen(text);
-			ScreenReader::getReader()->cleanBuiltMessage();
-			ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
+			MessageHelper::ReadMessage(text);
+
+
 			text += epro::format(L"[{}]", res);
 		}
 		std::unique_lock<epro::mutex> lock(mainGame->gMutex);
@@ -4229,9 +4174,9 @@ int DuelClient::ClientAnalyze(const uint8_t* msg, uint32_t len) {
 		}
 		std::unique_lock<epro::mutex> lock(mainGame->gMutex);
 		mainGame->wANRace->setText(gDataManager->GetDesc(select_hint ? select_hint : 563, mainGame->dInfo.compat_mode).data());
-		ScreenReader::getReader()->readScreen(fmt::format(gDataManager->GetDesc(select_hint ? select_hint : 563, mainGame->dInfo.compat_mode)));
-		ScreenReader::getReader()->cleanBuiltMessage();
-		ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
+		MessageHelper::ReadMessage(fmt::format(gDataManager->GetDesc(select_hint ? select_hint : 563, mainGame->dInfo.compat_mode)));
+
+
 		mainGame->PopupElement(mainGame->wANRace);
 		select_hint = 0;
 		return false;
@@ -4248,10 +4193,10 @@ int DuelClient::ClientAnalyze(const uint8_t* msg, uint32_t len) {
 		}
 		std::unique_lock<epro::mutex> lock(mainGame->gMutex);
 		mainGame->wANAttribute->setText(gDataManager->GetDesc(select_hint ? select_hint : 562, mainGame->dInfo.compat_mode).data());
-		ScreenReader::getReader()->readScreen(fmt::format(gDataManager->GetDesc(select_hint ? select_hint : 562, mainGame->dInfo.compat_mode)));
-		ScreenReader::getReader()->readScreen(gDataManager->GetAccessibilityString(318).data());
-		ScreenReader::getReader()->cleanBuiltMessage();
-		ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
+		MessageHelper::ReadMessage(fmt::format(gDataManager->GetDesc(select_hint ? select_hint : 562, mainGame->dInfo.compat_mode)));
+		MessageHelper::ReadMessage(gDataManager->GetAccessibilityString(318).data());
+
+
 		mainGame->PopupElement(mainGame->wANAttribute);
 		select_hint = 0;
 		return false;
@@ -4265,10 +4210,10 @@ int DuelClient::ClientAnalyze(const uint8_t* msg, uint32_t len) {
 		std::unique_lock<epro::mutex> lock(mainGame->gMutex);
 		mainGame->ebANCard->setText(L"");
 		mainGame->wANCard->setText(gDataManager->GetDesc(select_hint ? select_hint : 564, mainGame->dInfo.compat_mode).data());
-		ScreenReader::getReader()->readScreen(fmt::format(gDataManager->GetDesc(select_hint ? select_hint : 564, mainGame->dInfo.compat_mode)));
-		ScreenReader::getReader()->readScreen(gDataManager->GetAccessibilityString(319).data());
-		ScreenReader::getReader()->cleanBuiltMessage();
-		ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
+		MessageHelper::ReadMessage(fmt::format(gDataManager->GetDesc(select_hint ? select_hint : 564, mainGame->dInfo.compat_mode)));
+		MessageHelper::ReadMessage(gDataManager->GetAccessibilityString(319).data());
+
+
 		mainGame->dField.UpdateDeclarableList();
 		mainGame->PopupElement(mainGame->wANCard);
 		select_hint = 0;
@@ -4285,10 +4230,8 @@ int DuelClient::ClientAnalyze(const uint8_t* msg, uint32_t len) {
 		}
 		mainGame->cbANNumber->setSelected(0);
 		mainGame->wANNumber->setText(gDataManager->GetDesc(select_hint ? select_hint : 565, mainGame->dInfo.compat_mode).data());
-		ScreenReader::getReader()->readScreen(fmt::format(gDataManager->GetDesc(select_hint ? select_hint : 566, mainGame->dInfo.compat_mode)));
-		ScreenReader::getReader()->cleanBuiltMessage();
-		ScreenReader::getReader()->buildMessage(ScreenReader::getReader()->getLastMessage());
-		ScreenReader::getReader()->buildMessage(gDataManager->GetAccessibilityString(320).data());
+		MessageHelper::ReadMessage(fmt::format(gDataManager->GetDesc(select_hint ? select_hint : 566, mainGame->dInfo.compat_mode)));
+		MessageHelper::ReadMessage(gDataManager->GetAccessibilityString(320).data());
 		mainGame->PopupElement(mainGame->wANNumber);
 		select_hint = 0;
 		return false;

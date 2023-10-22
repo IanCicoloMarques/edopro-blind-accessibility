@@ -12,8 +12,8 @@ namespace ygo {
 	public:
 		CardDisplayController();
 		static IEventHandler* GetInstance();
-		void KeyInputEvent(const irr::SEvent& event);
-		void GuiEvent(const irr::SEvent& event);
+		void KeyInputEvent(const irr::SEvent& event) override;
+		void GuiEvent(const irr::SEvent& event) override;
 		bool HasEventKey(irr::EKEY_CODE key) override;
 		void SelectableCards(const irr::SEvent& event);
 		void SetSelectableCards();
@@ -34,14 +34,14 @@ namespace ygo {
 		void DisplayCards(const std::vector<ClientCard*>& field, const std::wstring& text);
 		void DisplayCardsReverse(const std::vector<ClientCard*>& field, const std::wstring& text);
 		void DisplayChain(const irr::SEvent& event);
-		void DisplayMonsterField(const irr::SEvent& event, AccessibilityFieldFocus::Player displayed_field);
-		void DisplaySpellField(const irr::SEvent& event, AccessibilityFieldFocus::Player displayed_field);
-		void DisplayExtraDeck(const irr::SEvent& event, AccessibilityFieldFocus::Player displayed_field);
-		void DisplayDeck(const irr::SEvent& event, AccessibilityFieldFocus::Player displayed_field);
-		void DisplayHand(const irr::SEvent& event, AccessibilityFieldFocus::Player displayed_field);
+		void DisplayMonsterField(const irr::SEvent& event, AccessibilityFieldFocus::Player displayedField);
+		void DisplaySpellField(const irr::SEvent& event, AccessibilityFieldFocus::Player displayedField);
+		void DisplayExtraDeck(const irr::SEvent& event, AccessibilityFieldFocus::Player displayedField);
+		void DisplayDeck(const irr::SEvent& event, AccessibilityFieldFocus::Player displayedField);
+		void DisplayHand(const irr::SEvent& event, AccessibilityFieldFocus::Player displayedField);
 		void DisplaySpecialSummonableMonsters(const irr::SEvent& event);
-		void DisplayGraveyard(const irr::SEvent& event, AccessibilityFieldFocus::Player displayed_field);
-		void DisplayRemovedCards(const irr::SEvent& event, AccessibilityFieldFocus::Player displayed_field);
+		void DisplayGraveyard(const irr::SEvent& event, AccessibilityFieldFocus::Player displayedField);
+		void DisplayRemovedCards(const irr::SEvent& event, AccessibilityFieldFocus::Player displayedField);
 		void DisplayActivableCards(const irr::SEvent& event);
 		void DisplaySelectableCards(const irr::SEvent& event);
 		void DisplaySelectableCards(const std::vector<ClientCard*>& field, const std::wstring& text = L"");

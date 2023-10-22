@@ -97,11 +97,19 @@ namespace ygo {
 			ChangeField(AccessibilityFieldFocus::Field::LINK_ZONE);
 	}
 
+	void FieldController::ChangeFocusedPlayerField()
+	{
+		if(currentPlayer == AccessibilityFieldFocus::Player::MAIN_PLAYER)
+			currentPlayer = AccessibilityFieldFocus::Player::ENEMY_PLAYER;
+		else if(currentPlayer == AccessibilityFieldFocus::Player::ENEMY_PLAYER)
+			currentPlayer = AccessibilityFieldFocus::Player::MAIN_PLAYER;
+	}
+
 	void FieldController::ChangeFocusedPlayerField(AccessibilityFieldFocus::Player player)
 	{
-		if(player == AccessibilityFieldFocus::Player::MAIN_PLAYER && currentPlayer != AccessibilityFieldFocus::Player::MAIN_PLAYER)
+		if(player == AccessibilityFieldFocus::Player::ENEMY_PLAYER)
 			currentPlayer = AccessibilityFieldFocus::Player::ENEMY_PLAYER;
-		else if(player == AccessibilityFieldFocus::Player::ENEMY_PLAYER && currentPlayer != AccessibilityFieldFocus::Player::ENEMY_PLAYER)
+		else if(player == AccessibilityFieldFocus::Player::MAIN_PLAYER)
 			currentPlayer = AccessibilityFieldFocus::Player::MAIN_PLAYER;
 	}
 

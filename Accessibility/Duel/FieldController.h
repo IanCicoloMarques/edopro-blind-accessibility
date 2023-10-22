@@ -15,8 +15,23 @@ namespace ygo {
 		void KeyInputEvent(const irr::SEvent& event) override;
 		void GuiEvent(const irr::SEvent& event) override;
 		bool HasEventKey(irr::EKEY_CODE key) override;
+
+		/**
+		 * \brief Changes the focused field to the next field.
+		 * Goes from Monsters to Spells to Link back to Monsters
+		 */
 		void RotateField();
-		void ChangeFocusedPlayerField(AccessibilityFieldFocus::Player player = AccessibilityFieldFocus::Player::MAIN_PLAYER);
+
+		/**
+		 * \brief Inverts the focused player field. If the focus is on the main player, it will change to the enemy player and vice versa.
+		 */
+		void ChangeFocusedPlayerField();
+
+		/**
+		 * \brief Change the focused field to the specified player.
+		 * \param player The player to change the focus to.
+		 */
+		void ChangeFocusedPlayerField(AccessibilityFieldFocus::Player player);
 
 		void SetSelectedCardField();
 		void SelectFieldSlot(const irr::SEvent& event, int slot, AccessibilityFieldFocus::Field field);
